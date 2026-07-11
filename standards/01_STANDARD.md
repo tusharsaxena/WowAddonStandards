@@ -1,9 +1,10 @@
-# Ka0s WoW Addon Standard (v1.1, 2026-07-11)
+# Ka0s WoW Addon Standard (v1.2, 2026-07-11)
 
 **Status:** Source of truth. All `04_DEVIATIONS.md` audits and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
 **Changelog**
 
+- **v1.2 (2026-07-11):** Added a **git workflow** rule. Ka0s addons are developed **trunk-based** — commit directly to the default branch; do **not** create feature branches for routine work unless the human explicitly asks; never push unless asked. Renamed §17 "Versioning" → "Versioning & git workflow" and added the matching anti-pattern (§19). Also reflected in `02_NEW_ADDON_CONTEXT.md`.
 - **v1.1 (2026-07-11):** Reversed the library-embedding rule. Ka0s addons now **vendor all libraries in `libs/` and commit them**; `.pkgmeta` `externals:` for libs is forbidden. Rationale: fully self-contained, offline-installable addons. Affects §3.1, §3.3, §6.3, §13, §19. (v1.0 mandated externals.)
 - **v1.0 (2026-05-03):** Initial standard.
 
@@ -785,11 +786,17 @@ Every addon **MUST** ship:
 
 ---
 
-## 17. Versioning
+## 17. Versioning & git workflow
 
 - **MUST** use semver (`MAJOR.MINOR.PATCH`). MAJOR for backwards-incompatible API or SV changes; MINOR for new features; PATCH for fixes only.
 - **MUST** bump in TOC `## Version:`, and in any code constants and README badges/Version History tables. The `wow-addon:version-bump` skill automates this.
 - **MUST** increment `schemaVersion` (in defaults) whenever a SV migration is required.
+
+**Git workflow**
+
+- **MUST** work trunk-based: commit directly to the addon's default branch. Do **NOT** create feature/topic branches for routine work — branch **only** when the human explicitly asks (e.g. a risky spike needing isolation).
+- **MUST NOT** push to a remote unless the human asks; the human pushes when ready.
+- **SHOULD** commit on a completed, green unit of work (a done sub-milestone/task), not at every checkpoint.
 
 ---
 
@@ -835,6 +842,7 @@ For quick reference, the rules above as a do-not list:
 18. In-memory-only debug toggle — must persist in SV.
 19. Cross-module direct table access — use the bus.
 20. User-supplied Lua execution — banned at the standard level (no Ka0s addon needs it).
+21. Creating a feature/topic branch without an explicit request — work trunk-based (§17).
 
 ---
 

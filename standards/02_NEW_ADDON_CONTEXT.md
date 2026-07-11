@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v1.1, 2026-07-11)
+# New Ka0s Addon — Context Pack (v1.2, 2026-07-11)
 
 **Drop this file (or its contents) into the root of any new Ka0s addon as `CLAUDE.md` and you have a complete starter brief.** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -317,6 +317,7 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 18. Doc set: README, CLAUDE.md, ARCHITECTURE.md, LICENSE. No drift; sync before every release.
 19. Reviews: archive every audit under `reviews/<YYYY-MM-DD>/` with the 5-artifact bundle.
 20. Versioning: semver. Bump TOC, code constants, README. `wow-addon:version-bump` skill automates this.
+21. Git: trunk-based. Commit to the default branch; no feature branches unless the human asks. Never push unless asked.
 
 ## Forbidden patterns
 
@@ -339,6 +340,7 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 - In-memory-only debug toggle.
 - Cross-module direct table access.
 - User-supplied Lua execution.
+- Creating a feature branch without an explicit request (work trunk-based).
 
 ---
 
