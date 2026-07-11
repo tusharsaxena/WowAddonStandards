@@ -8,7 +8,9 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). The standard is versioned; see the changelog at the top of `01_STANDARD.md` (current: **v1.1**).
+**Substrate:** Ace3. **License:** MIT (always). The standard is versioned; see the changelog at the top of `01_STANDARD.md` (current: **v1.3**).
+
+**Since v1.0:** libraries are now **vendored in `libs/` and committed** (no `.pkgmeta` externals) — v1.1; development is **trunk-based** (no feature branches unless asked, never push unless asked) — v1.2; addons with their own main window follow **§6A Standalone windows / data browsers** — v1.3.
 
 ## The five patterns it makes canonical
 

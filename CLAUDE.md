@@ -56,6 +56,13 @@ the rest as needed.
 - **Deviation IDs** are per-addon (AT-*, CM-*, KCD-*, PC-*, WG-*) and referenced across the reports.
   Keep them stable; they are the shared key between a run's `04_DEVIATIONS.md` and its remediation plans.
 
+## Git workflow
+
+- **Never create a branch in this repo automatically.** Work directly on the current branch (usually
+  `main`) — trunk-based. Only create a branch when the user **explicitly asks** for one.
+- **Never push, and never commit unless the user asks.** Approval to commit or branch once does not
+  carry over to the next change.
+
 ## Known corrections (read before trusting a finding)
 
 `audit/2026-05-03/remediation/README.md` records corrections the design agents surfaced against that
