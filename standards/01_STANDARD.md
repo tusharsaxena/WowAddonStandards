@@ -1,9 +1,10 @@
-# Ka0s WoW Addon Standard (v1.2, 2026-07-11)
+# Ka0s WoW Addon Standard (v1.3, 2026-07-11)
 
 **Status:** Source of truth. All `04_DEVIATIONS.md` audits and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
 **Changelog**
 
+- **v1.3 (2026-07-11):** Added **§6A Standalone windows / data browsers** — house rules for an addon's own main window (non-secure `CreateFrame`, `UISpecialFrames` ESC handling, SV-persisted position/size, scale setting, lazy tabs, single `SKIN` + `ApplySkin` re-skin seam, pooled rows). §6 remains the options-panel surface. Reference implementation: Ka0s Loot History. Also reflected in `02_NEW_ADDON_CONTEXT.md`.
 - **v1.2 (2026-07-11):** Added a **git workflow** rule. Ka0s addons are developed **trunk-based** — commit directly to the default branch; do **not** create feature branches for routine work unless the human explicitly asks; never push unless asked. Renamed §17 "Versioning" → "Versioning & git workflow" and added the matching anti-pattern (§19). Also reflected in `02_NEW_ADDON_CONTEXT.md`.
 - **v1.1 (2026-07-11):** Reversed the library-embedding rule. Ka0s addons now **vendor all libraries in `libs/` and commit them**; `.pkgmeta` `externals:` for libs is forbidden. Rationale: fully self-contained, offline-installable addons. Affects §3.1, §3.3, §6.3, §13, §19. (v1.0 mandated externals.)
 - **v1.0 (2026-05-03):** Initial standard.
@@ -481,6 +482,21 @@ Every Ka0s panel **MUST** use these exact pixel/font values so all addons render
 - The "Slash Commands" divider is the same AceGUI `Heading` (height 26, `GameFontNormalLarge`).
 
 **Font summary:** title `GameFontNormalHuge` · section/landing headings `GameFontNormalLarge` · tagline `GameFontHighlight` · widget labels + slash rows the AceGUI defaults.
+
+---
+
+## 6A. Standalone windows / data browsers
+
+§6 governs the **options** surface. An addon's own **main window** — a data browser, log, tracker, or dashboard — is a different surface with different rules. Reference implementation: Ka0s Loot History's browser (`modules/Browser.lua` + `BrowserTable.lua`).
+
+- **MUST** be a plain **non-secure** `CreateFrame("Frame")` (movable/resizable) — **not** a Blizzard Settings canvas, **not** a secure/protected frame. A non-secure window touches no protected functions, so it needs **no combat-lockdown gate** and may open/refresh in combat. (Secure/action-button content is the exception and follows §9.2.)
+- **MUST** register the window in `UISpecialFrames` so `Escape` closes it and it joins the standard close-stack.
+- **MUST** persist window position and size in SavedVariables (e.g. `db.global.settings.window`), restored on open. **SHOULD** clamp to a readable minimum size and `SetClampedToScreen(true)`.
+- **SHOULD** expose a scale setting (e.g. `windowScale`) applied via `frame:SetScale`.
+- **SHOULD** use a tab strip with **lazy per-tab content build** — build each tab's body on first show, not up front.
+- **SHOULD** centralize the window's look in a single `SKIN` table + one `ApplySkin(frame)` re-skin seam, built from **stock Blizzard textures** (no shipped art), so a future settings-driven re-skin has one touch point.
+- **MUST** pool rows for any high-churn list inside the window (§9.6) — never one frame per record.
+- **SHOULD** provide explicit window verbs (`show` / `hide` / `toggle`) and/or a minimap/LDB launcher for display; bare `/<slash>` still prints help (§7.4).
 
 ---
 
