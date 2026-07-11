@@ -2,7 +2,7 @@
 
 **Addon:** Ka0s Consumable Master
 **Source:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/ConsumableMaster/`
-**Standard:** `WowAddonStandards/03_STANDARDS.md` v1.0
+**Standard:** `WowAddonStandards/standards/01_STANDARD.md` v1.0
 **Design doc:** `./TECHNICAL_DESIGN_ConsumableMaster.md`
 **Deviations covered:** CM-1 .. CM-14
 **Next minor:** 1.4.0 → 1.5.0

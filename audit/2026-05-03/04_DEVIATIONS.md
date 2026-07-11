@@ -1,6 +1,6 @@
 # Per-Addon Deviation Report (2026-05-03)
 
-Each section walks one addon against `03_STANDARDS.md` top-to-bottom. Severity tiers:
+Each section walks one addon against `01_STANDARD.md` top-to-bottom. Severity tiers:
 
 - **🔴 BLOCKER** — violates a MUST rule with material risk (taint, data loss, incompatibility, license).
 - **🟠 MAJOR** — violates a MUST rule with no immediate risk but blocks promotion to "standards-compliant".
@@ -232,7 +232,7 @@ Evidence cites the per-addon raw report under `_raw/`.
    - KickCD KCD-4 (Compat for Specialization), KCD-5 (file peels — IconGrid)
    - WhatGroup WG-4 (Settings peel)
 
-Sprints 1–4 are the "standards compliance" milestone. After Sprint 5 every addon is fully aligned with `03_STANDARDS.md`.
+Sprints 1–4 are the "standards compliance" milestone. After Sprint 5 every addon is fully aligned with `01_STANDARD.md`.
 
 ---
 

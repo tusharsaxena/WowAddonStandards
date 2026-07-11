@@ -3,15 +3,15 @@
 **Addon:** KickCD
 **Tier:** 2 (canonical reference for Tier 2 layout)
 **Source root:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/KickCD`
-**Standard:** `WowAddonStandards/03_STANDARDS.md`
-**Deviation list:** `WowAddonStandards/04_DEVIATIONS.md` (KCD-1..KCD-13)
-**Raw audit:** `WowAddonStandards/_raw/KickCD.md`
+**Standard:** `WowAddonStandards/standards/01_STANDARD.md`
+**Deviation list:** `WowAddonStandards/audit/2026-05-03/04_DEVIATIONS.md` (KCD-1..KCD-13)
+**Raw audit:** `WowAddonStandards/audit/2026-05-03/_raw/KickCD.md`
 
 ---
 
 ## 1. Goal
 
-Bring KickCD to full compliance with `03_STANDARDS.md (v1.0, 2026-05-03)` and reduce file LOC under the 1500 cap. KickCD is already the **canonical Tier 2 reference**; remediation refines what exists rather than restructuring it. The two big lifts are:
+Bring KickCD to full compliance with `01_STANDARD.md (v1.0, 2026-05-03)` and reduce file LOC under the 1500 cap. KickCD is already the **canonical Tier 2 reference**; remediation refines what exists rather than restructuring it. The two big lifts are:
 
 1. Peel `modules/IconGrid.lua` (1753 LOC) and `settings/Panel.lua` (1258 LOC) under the 1500 cap.
 2. Add the missing tooling (`.pkgmeta`, `.luacheckrc`), shop IDs, Compat shims, and lib hygiene.

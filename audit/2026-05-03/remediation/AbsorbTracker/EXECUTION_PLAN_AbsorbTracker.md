@@ -2,13 +2,13 @@
 
 > For agentic workers: tasks use `- [ ]` checkboxes. Use the superpowers:executing-plans skill or subagent-driven-development to run.
 
-**Goal:** Bring AbsorbTracker to full standards compliance with `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/03_STANDARDS.md` v1.0 and ship as v1.9.0, addressing deviations AT-1..AT-11 from `04_DEVIATIONS.md`.
+**Goal:** Bring AbsorbTracker to full standards compliance with `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/standards/01_STANDARD.md` v1.0 and ship as v1.9.0, addressing deviations AT-1..AT-11 from `04_DEVIATIONS.md`.
 
 **Architecture:** AbsorbTracker stays Tier 1 (flat). New top-level files: `Compat.lua`, `Locale.lua`, `.pkgmeta`, `.luacheckrc`. `Panel/` subfolder is renamed to `panel/`. `Utils.lua` debug seam moves to a SV-persistent flag. Slash registers via AceConsole. Vendored libs (`libs/`) leave git tree in favour of `.pkgmeta` externals. See `TECHNICAL_DESIGN_AbsorbTracker.md` for full rationale.
 
 **Source path:** /mnt/d/Profile/Users/Tushar/Documents/GIT/AbsorbTracker
 
-**Standard references:** `03_STANDARDS.md §1.1` (Tier 1 layout), `§2.1` (TOC), `§3.3` (externals), `§7.1` (AceConsole), `§8.1` (Locale), `§11` (Compat), `§12` (Debug seam), `§13` (.pkgmeta), `§14` (.luacheckrc), `§15` (Docs), `§17` (Versioning).
+**Standard references:** `01_STANDARD.md §1.1` (Tier 1 layout), `§2.1` (TOC), `§3.3` (externals), `§7.1` (AceConsole), `§8.1` (Locale), `§11` (Compat), `§12` (Debug seam), `§13` (.pkgmeta), `§14` (.luacheckrc), `§15` (Docs), `§17` (Versioning).
 
 ---
 

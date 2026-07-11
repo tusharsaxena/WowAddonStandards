@@ -2,7 +2,7 @@
 
 **Tier:** 1 (flat). **Stays flat.** No promotion to Tier 2.
 **Source root:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/WhatGroup/`
-**Standards basis:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/03_STANDARDS.md`
+**Standards basis:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/standards/01_STANDARD.md`
 **Deviations:** WG-1 .. WG-11 from `04_DEVIATIONS.md`.
 
 ---
@@ -85,7 +85,7 @@ LFG_LIST_*  ─────────┘     (notifiedFor / notifyGen / WipeCa
 ### WG-1 — Missing `.pkgmeta` (🔴, S)
 
 **Current:** absent.
-**Target:** root-level `.pkgmeta` declaring Ace3 libs as externals (per `03_STANDARDS.md` §13 template), `package-as: WhatGroup`, ignore list with `reviews/`, `_dev/`, `docs/internal/`, `*.bak`, `.luacheckrc`.
+**Target:** root-level `.pkgmeta` declaring Ace3 libs as externals (per `01_STANDARD.md` §13 template), `package-as: WhatGroup`, ignore list with `reviews/`, `_dev/`, `docs/internal/`, `*.bak`, `.luacheckrc`.
 **Migration:** create file from §13 template; LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceConsole-3.0, AceDB-3.0, AceGUI-3.0 as externals. Do not delete vendored `libs/` content in the same commit (that's a separate sprint per `04_DEVIATIONS.md` cross-cutting plan).
 **Risks:** None at install time — `.pkgmeta` only affects packager. Verification: `cat .pkgmeta`; future packager run produces a build with the same Ace3 versions.
 
@@ -236,7 +236,7 @@ self:RegisterChatCommand("wg", "OnSlash")
 self:RegisterChatCommand("whatgroup", "OnSlash")
 ```
 
-Wait — re-read. **This is already AceConsole.** `RegisterChatCommand` is the AceConsole-3.0 method (per `03_STANDARDS.md` §7.1 example). `WhatGroup.lua:23-25` registers `AceConsole-3.0` as a mixin.
+Wait — re-read. **This is already AceConsole.** `RegisterChatCommand` is the AceConsole-3.0 method (per `01_STANDARD.md` §7.1 example). `WhatGroup.lua:23-25` registers `AceConsole-3.0` as a mixin.
 
 **Re-classification:** WG-8 in `04_DEVIATIONS.md` is mis-stated — WhatGroup already uses AceConsole. There are no `SLASH_WG1 = "/wg"` lines in the source. Confirm at peel time.
 

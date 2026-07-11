@@ -1,10 +1,10 @@
 # AbsorbTracker — Technical Design (HLD + LLD)
 
-> Companion to `EXECUTION_PLAN_AbsorbTracker.md`. Source standard: `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/03_STANDARDS.md`. Source deviation report: `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/04_DEVIATIONS.md` (rows AT-1..AT-11). Raw evidence: `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/_raw/AbsorbTracker.md`.
+> Companion to `EXECUTION_PLAN_AbsorbTracker.md`. Source standard: `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/standards/01_STANDARD.md`. Source deviation report: `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/audit/2026-05-03/04_DEVIATIONS.md` (rows AT-1..AT-11). Raw evidence: `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/audit/2026-05-03/_raw/AbsorbTracker.md`.
 
 ## 1. Goal
 
-Bring AbsorbTracker to full compliance with `03_STANDARDS.md` v1.0 (2026-05-03) — Tier 1 (flat) — without behavior changes, shipping at v1.9.0.
+Bring AbsorbTracker to full compliance with `01_STANDARD.md` v1.0 (2026-05-03) — Tier 1 (flat) — without behavior changes, shipping at v1.9.0.
 
 ## 2. Scope
 

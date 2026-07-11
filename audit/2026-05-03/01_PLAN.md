@@ -37,13 +37,13 @@ All written to `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/`:
 
 | # | File | Purpose |
 |---|------|---------|
-| 00 | `00_PLAN.md` | This document. |
-| 01 | `01_CURRENT_STATE.md` | Per-addon snapshot: structure, libs, patterns, TOC metadata, settings, slash, locale, debug, packaging. One section per addon, side-by-side comparison matrix at the top. |
-| 02 | `02_INDUSTRY_RESEARCH.md` | Patterns from reference addons. What they do, why, what to steal, what to avoid. |
-| 03 | `03_STANDARDS.md` | The canonical standard. Tech stack, library selection rationale, folder layout, file naming, module pattern, settings/AceDB schema, options (AceConfig) layout, slash commands, localization, debug/logging, error handling, events, frames, taint discipline, packaging (.pkgmeta), version-bump conventions, documentation set (README/CLAUDE.md/ARCHITECTURE.md). Prescriptive — "DO this, NOT that." |
+| 00 | `01_PLAN.md` | This document. |
+| 01 | `02_CURRENT_STATE.md` | Per-addon snapshot: structure, libs, patterns, TOC metadata, settings, slash, locale, debug, packaging. One section per addon, side-by-side comparison matrix at the top. |
+| 02 | `03_INDUSTRY_RESEARCH.md` | Patterns from reference addons. What they do, why, what to steal, what to avoid. |
+| 03 | `01_STANDARD.md` | The canonical standard. Tech stack, library selection rationale, folder layout, file naming, module pattern, settings/AceDB schema, options (AceConfig) layout, slash commands, localization, debug/logging, error handling, events, frames, taint discipline, packaging (.pkgmeta), version-bump conventions, documentation set (README/CLAUDE.md/ARCHITECTURE.md). Prescriptive — "DO this, NOT that." |
 | 04 | `04_DEVIATIONS.md` | Per-addon gap report. For each addon: what conforms, what deviates, severity (blocker/major/minor/nit), and a prioritized remediation backlog with effort estimates. |
-| 05 | `05_NEW_ADDON_CONTEXT.md` | Drop-in `CLAUDE.md`-style context for new addons. Self-contained: standard layout, starter files, library list with versions, conventions checklist. Designed to paste into a new repo on day one. |
-| 06 | `06_EXECUTIVE_SUMMARY.md` | One-page TL;DR: top 5 wins, top 5 risks, recommended sequencing for remediation. |
+| 05 | `02_NEW_ADDON_CONTEXT.md` | Drop-in `CLAUDE.md`-style context for new addons. Self-contained: standard layout, starter files, library list with versions, conventions checklist. Designed to paste into a new repo on day one. |
+| 06 | `00_EXECUTIVE_SUMMARY.md` | One-page TL;DR: top 5 wins, top 5 risks, recommended sequencing for remediation. |
 
 ---
 
@@ -79,9 +79,9 @@ For each of the five addons, capture:
 - Documentation: README, CLAUDE.md, ARCHITECTURE.md state and accuracy.
 - Tests: any harness, smoke tests, lint config (luacheck).
 
-**Output:** `01_CURRENT_STATE.md` with a comparison matrix at top + per-addon deep-dive.
+**Output:** `02_CURRENT_STATE.md` with a comparison matrix at top + per-addon deep-dive.
 
-**Checkpoint 2 (review):** I print a summary of major findings to chat. You skim `01_CURRENT_STATE.md` and confirm before I move on. (You can interrupt to add/remove reference addons for M3.)
+**Checkpoint 2 (review):** I print a summary of major findings to chat. You skim `02_CURRENT_STATE.md` and confirm before I move on. (You can interrupt to add/remove reference addons for M3.)
 
 ---
 
@@ -97,7 +97,7 @@ Survey reference addons (sources: GitHub, Wago, CurseForge, public wikis). For e
 
 Cross-cut findings: what's converged across the ecosystem (de-facto standards) vs what's project-specific.
 
-**Output:** `02_INDUSTRY_RESEARCH.md`.
+**Output:** `03_INDUSTRY_RESEARCH.md`.
 
 **Checkpoint 3 (review):** I summarize the convergent patterns + the dissenting ones. You confirm direction (e.g., "yes, standardize on Ace3" vs "I want to evaluate non-Ace stack too") before I write the standard.
 
@@ -105,7 +105,7 @@ Cross-cut findings: what's converged across the ecosystem (de-facto standards) v
 
 ### M4 — Synthesize the standard
 
-Write `03_STANDARDS.md`. Prescriptive, opinionated, with rationale for each choice. Includes:
+Write `01_STANDARD.md`. Prescriptive, opinionated, with rationale for each choice. Includes:
 
 - Reference folder tree (the canonical layout).
 - Required/recommended/optional libraries with current versions.
@@ -122,7 +122,7 @@ Write `03_STANDARDS.md`. Prescriptive, opinionated, with rationale for each choi
 - Naming: files, frames, global tables, saved-variable keys, locale keys.
 - Versioning & changelog conventions.
 
-**Checkpoint 4 (review):** You read `03_STANDARDS.md` and approve, request edits, or push back on specific choices. This document is the source of truth for M5.
+**Checkpoint 4 (review):** You read `01_STANDARD.md` and approve, request edits, or push back on specific choices. This document is the source of truth for M5.
 
 ---
 
@@ -132,7 +132,7 @@ Two parallel write-ups:
 
 **5a — `04_DEVIATIONS.md`:** For each of the five addons, walk the standard top-to-bottom and mark conforming/deviating. Each deviation gets: severity, evidence (file:line), proposed fix, effort (S/M/L). End each addon's section with a prioritized backlog.
 
-**5b — `05_NEW_ADDON_CONTEXT.md`:** Self-contained context document an LLM (or human) can read before scaffolding a new addon. Includes:
+**5b — `02_NEW_ADDON_CONTEXT.md`:** Self-contained context document an LLM (or human) can read before scaffolding a new addon. Includes:
 - The standard layout as a tree.
 - Starter TOC, `.pkgmeta`, `Core.lua`, `Settings.lua`, `Locales/enUS.lua` snippets.
 - Library list with embed instructions.
@@ -145,7 +145,7 @@ Two parallel write-ups:
 
 ### M6 — Executive summary & handoff
 
-Write `06_EXECUTIVE_SUMMARY.md`: one page, top wins, top risks, recommended sequencing for remediation work, links into the other reports.
+Write `00_EXECUTIVE_SUMMARY.md`: one page, top wins, top risks, recommended sequencing for remediation work, links into the other reports.
 
 **Checkpoint 6 (final):** You sign off; project complete. Any remediation work is a separate engagement.
 

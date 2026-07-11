@@ -1,6 +1,6 @@
 # Ka0s WoW Addon Standard (v1.1, 2026-07-11)
 
-**Status:** Source of truth. All `04_DEVIATIONS.md` audits and `05_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
+**Status:** Source of truth. All `04_DEVIATIONS.md` audits and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
 **Changelog**
 

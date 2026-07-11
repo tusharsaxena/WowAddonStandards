@@ -2,8 +2,8 @@
 
 **Addon:** prettychat (current folder, lowercase) — to be renamed to **PrettyChat**.
 **Tier:** Tier 1 (flat).
-**Standards baseline:** `WowAddonStandards/03_STANDARDS.md`.
-**Findings consumed:** `WowAddonStandards/04_DEVIATIONS.md` PC-1 .. PC-15 plus raw `_raw/prettychat.md`.
+**Standards baseline:** `WowAddonStandards/standards/01_STANDARD.md`.
+**Findings consumed:** `WowAddonStandards/audit/2026-05-03/04_DEVIATIONS.md` PC-1 .. PC-15 plus raw `_raw/prettychat.md`.
 **Source root (current):** `/mnt/d/Profile/Users/Tushar/Documents/GIT/prettychat/`.
 
 This is the principal-engineer-level HLD + LLD that the executing subagent will work from. The agent has no other context.

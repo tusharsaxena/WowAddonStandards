@@ -162,7 +162,7 @@ Aggregated across all 10 reports:
 
 ## 5. Validation against Ka0s in-house decisions
 
-Cross-checking the 10 "decisions to lock in M4" from `01_CURRENT_STATE.md` against industry practice:
+Cross-checking the 10 "decisions to lock in M4" from `02_CURRENT_STATE.md` against industry practice:
 
 | Decision | Industry signal | Recommendation for M4 |
 |---|---|---|
@@ -196,4 +196,4 @@ These weren't in the Ka0s-only analysis but are worth taking a position on in M4
 
 ---
 
-**Status:** M3 complete. Proceeding to M4 (synthesize `03_STANDARDS.md`).
+**Status:** M3 complete. Proceeding to M4 (synthesize `01_STANDARD.md`).

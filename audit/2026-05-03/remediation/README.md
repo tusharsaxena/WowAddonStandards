@@ -1,6 +1,6 @@
 # Remediation Documents — Index (2026-05-03)
 
-Per-addon technical designs (HLD+LLD) and execution plans (subagent-ready, checkbox-tracked) for bringing each addon to full standards compliance per [`../03_STANDARDS.md`](../03_STANDARDS.md).
+Per-addon technical designs (HLD+LLD) and execution plans (subagent-ready, checkbox-tracked) for bringing each addon to full standards compliance per [`../../../standards/01_STANDARD.md`](../../../standards/01_STANDARD.md).
 
 | Addon | Technical Design | Execution Plan | Tasks | Notable scope decisions |
 |---|---|---|---|---|
@@ -24,7 +24,7 @@ The design agents read the actual source while writing each design. They surface
 | **PC-11** "hand-rolled `SLASH_*`" | ✅ Already compliant | AceConsole `:RegisterChatCommand` at `PrettyChat.lua:33-34` |
 | **KCD-7** "hand-rolled `SLASH_*`" | ✅ Already compliant | AceConsole `:RegisterChatCommand` at `core/KickCD.lua:60-61`; zero `SLASH_*` globals |
 
-**Net effect:** the cross-cutting "5/5 hand-roll `SLASH_*`" finding in `04_DEVIATIONS.md` and `06_EXECUTIVE_SUMMARY.md` is **wrong**. Reality: **AbsorbTracker is the only addon with hand-rolled `SLASH_*`**; the other 4 already use AceConsole. Verified via grep across all 5 source trees.
+**Net effect:** the cross-cutting "5/5 hand-roll `SLASH_*`" finding in `04_DEVIATIONS.md` and `00_EXECUTIVE_SUMMARY.md` is **wrong**. Reality: **AbsorbTracker is the only addon with hand-rolled `SLASH_*`**; the other 4 already use AceConsole. Verified via grep across all 5 source trees.
 
 This collapses Sprint 3 (Slash → AceConsole migration) from a 1-day cross-collection sprint to a 1-task AbsorbTracker fix (covered in AT-5 / its execution plan M3).
 
@@ -54,4 +54,4 @@ Recommended sequencing across the collection (revised given the corrections abov
 | 5 | 2-3 days | High-value bugs + file peels | KickCD M7-M8, ConsumableMaster M8, WhatGroup M5, prettychat M3 + M8 (folder rename) |
 | 6 | 1 day | Doc reconciliation + release prep | All 5 plans, final milestone |
 
-Total ~6 days. After Sprint 6, every addon ships a new minor version that conforms fully to `03_STANDARDS.md`.
+Total ~6 days. After Sprint 6, every addon ships a new minor version that conforms fully to `01_STANDARD.md`.

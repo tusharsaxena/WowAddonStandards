@@ -2,15 +2,15 @@
 
 **Addon:** Ka0s Consumable Master (`ConsumableMaster`)
 **Source:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/ConsumableMaster/`
-**Standard:** `WowAddonStandards/03_STANDARDS.md` v1.0
-**Deviation IDs:** CM-1 .. CM-14 (`WowAddonStandards/04_DEVIATIONS.md`)
+**Standard:** `WowAddonStandards/standards/01_STANDARD.md` v1.0
+**Deviation IDs:** CM-1 .. CM-14 (`WowAddonStandards/audit/2026-05-03/04_DEVIATIONS.md`)
 **Tier:** Tier 1 borderline. 16 production root `.lua` files plus a `defaults/` and `settings/` cluster put us above the 8-file flat ceiling — but the standard explicitly permits "flat with folders" for addons whose extra folders are pure data (`defaults/`) or the canonical UI cluster (`settings/`). We retain the current flat-with-folders shape rather than promote to Tier 2 `core/modules/`. Promotion is deferred until a real `modules/` need emerges.
 
 ---
 
 ## 1. Goal
 
-Bring ConsumableMaster to full standards compliance against `03_STANDARDS.md` (2026-05-03) by closing CM-1 through CM-14 without weakening the addon's two strongest invariants:
+Bring ConsumableMaster to full standards compliance against `01_STANDARD.md` (2026-05-03) by closing CM-1 through CM-14 without weakening the addon's two strongest invariants:
 
 - **The macro firewall.** `MacroManager.lua` is the sole caller of `CreateMacro` / `EditMacro`. The standard already cites this as the §9.4 reference implementation. Every remediation step preserves the firewall — the lint check we add (CM-2) treats a violation as an error.
 - **The coalescing recompute pipeline.** `RequestRecompute` collapses event flurries into one `C_Timer.After(0, ...)` tick. Refactors that touch `Core.lua` must preserve `_recomputePending` / `_recomputeScheduled` semantics.
@@ -212,7 +212,7 @@ ignore:
 
 **Risks:** None. Curse/Wago packagers consume `.pkgmeta` only at upload; missing externals would currently show as commit-tracked libs.
 
-**Verification:** `bigwigs-packager` dry run (or visual diff against `WowAddonStandards/03_STANDARDS.md` §13 template).
+**Verification:** `bigwigs-packager` dry run (or visual diff against `WowAddonStandards/standards/01_STANDARD.md` §13 template).
 
 ### CM-2 Add `.luacheckrc`
 
@@ -863,7 +863,7 @@ The remediation is complete when all of the following hold simultaneously on a c
 9. **Reset path:** `/cm reset` triggers the popup; on accept, the panel refreshes immediately and macros rewrite within one frame; no taint warnings on a clean retail client.
 10. **Version bumped:** TOC `## Version:`, `KCM.VERSION` in `Core.lua`, README badge / Version History header all read the next minor (`1.5.0`).
 
-When all ten hold, ConsumableMaster is fully aligned with `03_STANDARDS.md` v1.0.
+When all ten hold, ConsumableMaster is fully aligned with `01_STANDARD.md` v1.0.
 
 ---
 

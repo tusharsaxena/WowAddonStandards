@@ -51,7 +51,7 @@ Legend: ✅ present and idiomatic · ◐ present but partial / non-idiomatic · 
 
 ## 2. Convergent strengths (already de-facto Ka0s standards)
 
-These are patterns present in **3+ addons** and worth canonicalizing in `03_STANDARDS.md`:
+These are patterns present in **3+ addons** and worth canonicalizing in `01_STANDARD.md`:
 
 1. **Schema-as-single-source.** Every addon has a `Schema` (or equivalent) table where each row defines: SV path, default, validator, label, widget, scope. The same table feeds the AceGUI panel AND the `/cmd get|set|list|reset` slash dispatcher. Found verbatim in AbsorbTracker (`Schema.lua`), ConsumableMaster (`KCM.Schema`), KickCD (`KickCD.Settings.Schema`), prettychat (`Schema.lua`), and inline in WhatGroup (`Settings.Schema`). KickCD's implementation is the most complete; AbsorbTracker's is the cleanest in 200 lines.
 
@@ -102,7 +102,7 @@ These are gaps present in **all five** addons and are the highest-priority items
 - AceConfig-3.0 fully embedded but unreferenced — pure dead weight.
 
 ### KickCD
-- **Closest to the target standard.** Modular `core/`/`modules/`/`defaults/`/`settings/`/`locales/` layout. Bootstrap-namespace promoted in place to AceAddon. Closed message bus with five named messages and one-sender-each contract. **The folder layout itself is the strongest internal candidate to lift into `03_STANDARDS.md`.**
+- **Closest to the target standard.** Modular `core/`/`modules/`/`defaults/`/`settings/`/`locales/` layout. Bootstrap-namespace promoted in place to AceAddon. Closed message bus with five named messages and one-sender-each contract. **The folder layout itself is the strongest internal candidate to lift into `01_STANDARD.md`.**
 - Two files too monolithic: `modules/IconGrid.lua` 1753 LOC, `settings/Panel.lua` 1258 LOC.
 - Hand-rolled fallback-metatable locale despite AceLocale vendored — pick one.
 - Uses deprecated `GetSpecialization`/`GetSpecializationInfo` directly — needs Compat shim.

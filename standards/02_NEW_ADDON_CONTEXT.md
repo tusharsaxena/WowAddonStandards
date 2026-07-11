@@ -2,7 +2,7 @@
 
 **Drop this file (or its contents) into the root of any new Ka0s addon as `CLAUDE.md` and you have a complete starter brief.** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
-Authoritative reference: `WowAddonStandards/03_STANDARDS.md`. This document is its operational distillation.
+Authoritative reference: `WowAddonStandards/standards/01_STANDARD.md`. This document is its operational distillation.
 
 ---
 
@@ -291,7 +291,7 @@ ignore:
   - "*.bak"
 ```
 
-Libraries are **vendored under `libs/` and committed** (`03_STANDARDS.md §3.3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon (e.g. KickCD's `libs/`) so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
+Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon (e.g. KickCD's `libs/`) so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
 
 ---
 
