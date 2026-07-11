@@ -4,7 +4,7 @@
 **Author:** Claude (principal-engineer mode), for Ka0s
 **Status:** DRAFT — awaiting sign-off
 
-> Note: This is a research/analysis project, not a code-implementation project. I'm using a milestone+checkpoint structure rather than the TDD-step format from `writing-plans`, because the deliverables are reports, not code. No addon code will be modified by this work — only reports under `_standards/2026-05-03/`.
+> Note: This is a research/analysis project, not a code-implementation project. I'm using a milestone+checkpoint structure rather than the TDD-step format from `writing-plans`, because the deliverables are reports, not code. No addon code will be modified by this work — only reports under `WowAddonStandards/`.
 
 ---
 
@@ -33,7 +33,7 @@ Then deliver concrete, per-addon remediation guidance plus a reusable "context p
 
 ## Deliverables
 
-All written to `/mnt/d/Profile/Users/Tushar/Documents/GIT/_standards/2026-05-03/`:
+All written to `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/`:
 
 | # | File | Purpose |
 |---|------|---------|
@@ -153,7 +153,7 @@ Write `06_EXECUTIVE_SUMMARY.md`: one page, top wins, top risks, recommended sequ
 
 ## Method notes
 
-- **Read-only.** No addon source code is modified by this project. All output lives under `_standards/2026-05-03/`.
+- **Read-only.** No addon source code is modified by this project. All output lives under `WowAddonStandards/`.
 - **Evidence-based.** Every claim about a current-state addon must cite `path/to/file.lua:line` so you can verify quickly.
 - **Use existing reviews.** Each addon has a `reviews/` folder — I'll mine those for prior findings rather than re-deriving them.
 - **Use existing CLAUDE.md / ARCHITECTURE.md.** Treat these as starting points, but verify against actual code (docs drift).
@@ -163,7 +163,7 @@ Write `06_EXECUTIVE_SUMMARY.md`: one page, top wins, top risks, recommended sequ
 ## Risks / open questions for sign-off
 
 1. **Reference addon list** — confirm the list above, or amend. (Plater, Details!, WeakAuras, ElvUI, Bagnon, OmniCD added; remove any you don't want benchmarked.)
-2. **Output location** — `_standards/2026-05-03/` under `GIT/`. OK, or prefer somewhere else (e.g., a dedicated `wow-addon-standards` repo)?
+2. **Output location** — `WowAddonStandards/` under `GIT/`. OK, or prefer somewhere else (e.g., a dedicated `wow-addon-standards` repo)?
 3. **Stack assumption** — I'll bias the standard toward the Ace3 stack you're already on, unless you want a clean-slate evaluation that includes non-Ace alternatives.
 4. **Depth of industry research** — fast skim (folder structures + TOC + headline patterns) vs deep dive (read modules, trace taint patterns). Default: fast skim, deep dive only where convergent practice is unclear. OK?
 5. **CI/packaging** — should the standard mandate GitHub Actions + BigWigsMods/packager? Or leave CI optional?

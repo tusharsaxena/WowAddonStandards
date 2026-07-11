@@ -2,7 +2,7 @@
 
 **Tier:** 1 (flat). **Stays flat.** No promotion to Tier 2.
 **Source root:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/WhatGroup/`
-**Standards basis:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/_standards/2026-05-03/03_STANDARDS.md`
+**Standards basis:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/03_STANDARDS.md`
 **Deviations:** WG-1 .. WG-11 from `04_DEVIATIONS.md`.
 
 ---

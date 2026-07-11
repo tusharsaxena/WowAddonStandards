@@ -4,7 +4,7 @@
 **Tier:** 2 (canonical reference)
 **Source root:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/KickCD`
 **Companion design doc:** `./TECHNICAL_DESIGN_KickCD.md`
-**Standards:** `_standards/2026-05-03/03_STANDARDS.md`
+**Standards:** `WowAddonStandards/03_STANDARDS.md`
 **Deviations:** KCD-1..KCD-12 (KCD-13 deferred to v2)
 
 > **How to run this plan.** Each milestone is a sequence of small `- [ ]` tasks. Each task lists the files touched, a step-1 code snippet (or surgical instruction), a step-2 verification command, and a step-3 commit message. **Do not skip the verify step.** Milestones M7 and M8 end with a CHECKPOINT — STOP and wait for user review before continuing.
@@ -838,7 +838,7 @@ function IconGrid:GetPrimaryIcon() return state.ordered[1] end
 - [ ] **Step 2 (verify).** `git log --oneline -20` shows the M1-M9 commits in order; `git tag --list` includes `v1.2.0`.
 - [ ] **Step 3.** Done.
 
-**Checkpoint:** M10 complete — KickCD on `1.2.0`, fully standards-compliant per `_standards/2026-05-03/03_STANDARDS.md`.
+**Checkpoint:** M10 complete — KickCD on `1.2.0`, fully standards-compliant per `WowAddonStandards/03_STANDARDS.md`.
 
 ---
 

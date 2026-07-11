@@ -3,9 +3,9 @@
 **Addon:** KickCD
 **Tier:** 2 (canonical reference for Tier 2 layout)
 **Source root:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/KickCD`
-**Standard:** `_standards/2026-05-03/03_STANDARDS.md`
-**Deviation list:** `_standards/2026-05-03/04_DEVIATIONS.md` (KCD-1..KCD-13)
-**Raw audit:** `_standards/2026-05-03/_raw/KickCD.md`
+**Standard:** `WowAddonStandards/03_STANDARDS.md`
+**Deviation list:** `WowAddonStandards/04_DEVIATIONS.md` (KCD-1..KCD-13)
+**Raw audit:** `WowAddonStandards/_raw/KickCD.md`
 
 ---
 

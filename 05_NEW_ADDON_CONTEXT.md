@@ -2,7 +2,7 @@
 
 **Drop this file (or its contents) into the root of any new Ka0s addon as `CLAUDE.md` and you have a complete starter brief.** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
-Authoritative reference: `_standards/2026-05-03/03_STANDARDS.md`. This document is its operational distillation.
+Authoritative reference: `WowAddonStandards/03_STANDARDS.md`. This document is its operational distillation.
 
 ---
 

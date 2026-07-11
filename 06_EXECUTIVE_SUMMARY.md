@@ -63,7 +63,7 @@ After Sprint 5, the entire collection conforms to `03_STANDARDS.md` and any new 
 ## Deliverables index
 
 ```
-_standards/2026-05-03/
+WowAddonStandards/
   00_PLAN.md                    -- approved milestone plan
   01_CURRENT_STATE.md           -- per-addon snapshot + matrix
   02_INDUSTRY_RESEARCH.md       -- 10 reference addons synthesized

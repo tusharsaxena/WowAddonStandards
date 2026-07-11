@@ -2,7 +2,7 @@
 
 > For agentic workers: tasks use `- [ ]` checkboxes. Use the superpowers:executing-plans skill or subagent-driven-development to run.
 
-**Goal:** Bring AbsorbTracker to full standards compliance with `/mnt/d/Profile/Users/Tushar/Documents/GIT/_standards/2026-05-03/03_STANDARDS.md` v1.0 and ship as v1.9.0, addressing deviations AT-1..AT-11 from `04_DEVIATIONS.md`.
+**Goal:** Bring AbsorbTracker to full standards compliance with `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/03_STANDARDS.md` v1.0 and ship as v1.9.0, addressing deviations AT-1..AT-11 from `04_DEVIATIONS.md`.
 
 **Architecture:** AbsorbTracker stays Tier 1 (flat). New top-level files: `Compat.lua`, `Locale.lua`, `.pkgmeta`, `.luacheckrc`. `Panel/` subfolder is renamed to `panel/`. `Utils.lua` debug seam moves to a SV-persistent flag. Slash registers via AceConsole. Vendored libs (`libs/`) leave git tree in favour of `.pkgmeta` externals. See `TECHNICAL_DESIGN_AbsorbTracker.md` for full rationale.
 

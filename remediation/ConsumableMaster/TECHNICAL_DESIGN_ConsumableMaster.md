@@ -2,8 +2,8 @@
 
 **Addon:** Ka0s Consumable Master (`ConsumableMaster`)
 **Source:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/ConsumableMaster/`
-**Standard:** `_standards/2026-05-03/03_STANDARDS.md` v1.0
-**Deviation IDs:** CM-1 .. CM-14 (`_standards/2026-05-03/04_DEVIATIONS.md`)
+**Standard:** `WowAddonStandards/03_STANDARDS.md` v1.0
+**Deviation IDs:** CM-1 .. CM-14 (`WowAddonStandards/04_DEVIATIONS.md`)
 **Tier:** Tier 1 borderline. 16 production root `.lua` files plus a `defaults/` and `settings/` cluster put us above the 8-file flat ceiling — but the standard explicitly permits "flat with folders" for addons whose extra folders are pure data (`defaults/`) or the canonical UI cluster (`settings/`). We retain the current flat-with-folders shape rather than promote to Tier 2 `core/modules/`. Promotion is deferred until a real `modules/` need emerges.
 
 ---
@@ -212,7 +212,7 @@ ignore:
 
 **Risks:** None. Curse/Wago packagers consume `.pkgmeta` only at upload; missing externals would currently show as commit-tracked libs.
 
-**Verification:** `bigwigs-packager` dry run (or visual diff against `_standards/2026-05-03/03_STANDARDS.md` §13 template).
+**Verification:** `bigwigs-packager` dry run (or visual diff against `WowAddonStandards/03_STANDARDS.md` §13 template).
 
 ### CM-2 Add `.luacheckrc`
 
