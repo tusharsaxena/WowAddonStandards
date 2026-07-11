@@ -44,7 +44,7 @@ Every modern addon uses the loader's two varargs to share private state across f
 ### 2.2 `.pkgmeta` with externals + `move-folders` for monorepo→multi-addon (5 of 10)
 BigWigs, DBM, Details!, Plumber, Bagnon all use the BigWigsMods packager to ship N installable addons from one git repo. **Externals — never vendored libs.** This is the de-facto 2026 standard for Ace3 lib management.
 
-**Action:** mandate `.pkgmeta` with `externals:` for AceX libs, ignore lists for `_dev/` and `reviews/`, and `move-folders:` for any future monorepo. The full BigWigs `.pkgmeta` is the reference template (https://raw.githubusercontent.com/BigWigsMods/BigWigs/master/.pkgmeta).
+**Action (superseded by Standard v1.1):** this originally recommended `.pkgmeta` `externals:` for AceX libs; Ka0s now **vendors all libs** in `libs/` instead. Still mandate `.pkgmeta` for ignore lists and `move-folders:` for any future monorepo — just without an `externals:` block.
 
 ### 2.3 Multi-flavor TOC (one Interface line, many builds) (8 of 10)
 `## Interface: 120005, 120007, 50504, 20505, 11508` style. Plater, Plumber, OmniCD (with per-flavor TOCs), Bagnon (3-TOC + runtime flag), and the rest support multiple WoW versions from a single source tree. Per-flavor *code branching* uses runtime flags (`E.isRetail`, `Addon.IsClassic`) or per-flavor *data files* swapped via TOC includes — never `if WOW_PROJECT_ID` ladders inline.
@@ -183,7 +183,7 @@ Cross-checking the 10 "decisions to lock in M4" from `01_CURRENT_STATE.md` again
 
 These weren't in the Ka0s-only analysis but are worth taking a position on in M4:
 
-1. **Externals over vendoring.** Use `.pkgmeta` `externals:` for AceX libs. Stop committing libs to git. (Resolves the "vendored AceConfig unused" issue across all 5 addons.)
+1. **Vendoring over externals** *(revised in Standard v1.1, 2026-07-11 — originally the reverse).* Vendor and commit all AceX libs in `libs/`; do **not** use `.pkgmeta` `externals:`. Ka0s prioritizes self-contained, offline-installable addons over the repo-size savings of externals. Still prune vendored-*unused* libs (the real "vendored AceConfig unused" issue) — vendor only what you `LibStub()`.
 2. **`Compat.lua` per addon** for deprecated-API shims (`GetSpecialization*`, `GetSpellInfo` post-11.x, `UnitAura`).
 3. **Hot-path upvalue cache** — any addon with a per-frame loop must cache db values into module locals and refresh on settings change.
 4. **Object pool standard** — for any addon with N>10 dynamic frames, use OmniCD-style pool.

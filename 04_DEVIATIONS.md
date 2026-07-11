@@ -22,7 +22,7 @@ Evidence cites the per-addon raw report under `_raw/`.
 | AT-1 | 🔴 | §13 | No `.pkgmeta`. | S | `_raw/AbsorbTracker.md` |
 | AT-2 | 🔴 | §14 | No `.luacheckrc`. | S | same |
 | AT-3 | 🔴 | §2.1 | TOC missing `X-Curse-Project-ID` / `X-Wago-ID`. | S | `AbsorbTracker.toc:1-23` |
-| AT-4 | 🟠 | §3.3 | AceAddon-3.0 vendored but used only as AceDB carrier; `AceConfig-3.0` vendored, used only for Profiles sub-page. Move to externals or remove unused libs. | M | raw §4 |
+| AT-4 | 🟠 | §3.3 | AceAddon-3.0 vendored but used only as AceDB carrier; `AceConfig-3.0` vendored, used only for Profiles sub-page. Remove libs not `LibStub()`'d; keep the rest vendored (Standard v1.1 — no externals). | M | raw §4 |
 | AT-5 | 🟠 | §7.1 | Slash uses raw `SLASH_*` registration; should use AceConsole `:RegisterChatCommand`. | S | `SlashCommands.lua` |
 | AT-6 | 🟠 | §8.1 | No locale module at all (no `Locale.lua`); strings hardcoded across 20 files. | M | raw §9 |
 | AT-7 | 🟠 | §12 | `/at debug` toggle is in-memory only (`Utils.lua:5`); must persist in SV. | S | raw §12 |
@@ -99,7 +99,7 @@ Evidence cites the per-addon raw report under `_raw/`.
 | KCD-3 | 🔴 | §2.1 | TOC missing `X-Curse-Project-ID` / `X-Wago-ID`. | S | TOC |
 | KCD-4 | 🔴 | §11 | Direct `GetSpecialization`/`GetSpecializationInfo` calls bypass Compat (`modules/Cooldowns.lua:78-82`, `modules/IconGrid.lua:286-290`). Wrap in `NS.Compat.GetSpecialization()`. | S | raw §13 |
 | KCD-5 | 🔴 | §1.2 | `modules/IconGrid.lua` 1753 LOC and `settings/Panel.lua` 1258 LOC violate the 1500-LOC cap. Peel both. | L | raw §2 |
-| KCD-6 | 🟠 | §3.3 | Vendored-but-unloaded libs: AceLocale, AceBucket, AceComm, AceHook, AceSerializer, AceTab, AceTimer in `libs/`. Remove all of them (or move to externals if they get loaded). | S | raw §4 |
+| KCD-6 | 🟠 | §3.3 | Vendored-but-unloaded libs: AceLocale, AceBucket, AceComm, AceHook, AceSerializer, AceTab, AceTimer in `libs/`. Remove all of them (unused); keep loaded libs vendored (Standard v1.1 — no externals). | S | raw §4 |
 | KCD-7 | 🟠 | §7.1 | Slash uses raw `SLASH_*`. Migrate to AceConsole. | S | raw §8 |
 | KCD-8 | 🟠 | §8.1 | Hand-rolled metatable locale (correct *pattern*) but AceLocale is vendored unused. Either delete AceLocale from libs or unify on AceLocale non-strict mode. Standard accepts both — pick one and remove the other. | S | raw §9 |
 | KCD-9 | 🟡 | §15 | `ARCHITECTURE.md:38` says "4 messages" while `:53` correctly says 5 — internal contradiction. Reconcile. | S | raw §15 |
@@ -224,7 +224,7 @@ Evidence cites the per-addon raw report under `_raw/`.
 1. **Sprint 1 — Tooling sweep** (1 day, parallel-safe): add `.pkgmeta`, `.luacheckrc`, X-IDs to all 5 addons. Pure mechanical work; unlocks every downstream improvement.
 2. **Sprint 2 — Compat + locale scaffolds** (1 day): drop empty `Compat.lua` and `Locale.lua` shells into all 5; mandatory standards compliance even if bodies are minimal.
 3. **Sprint 3 — Slash to AceConsole** (1 day): mechanical migration in all 5 addons.
-4. **Sprint 4 — Lib cleanup** (1 day): remove vendored-unused libs; declare externals.
+4. **Sprint 4 — Lib cleanup** (1 day): remove vendored-*unused* libs; keep the rest vendored (Standard v1.1 — no externals).
 5. **Sprint 5 — Per-addon high-value bugs** (1-2 days):
    - prettychat PC-6 (loot filter race)
    - prettychat PC-4 (folder rename — schedule with release notes)

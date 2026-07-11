@@ -23,7 +23,7 @@ Five addons audited (AbsorbTracker, ConsumableMaster, KickCD, prettychat, WhatGr
 ## Top 5 risks & gaps
 
 1. **No `.pkgmeta`, `.luacheckrc`, or X-IDs in any of the 5 TOCs.** Pure tooling debt; ~1 day to fix across the collection.
-2. **Vendored-but-unused libs in 4 of 5 addons** (especially KickCD: AceLocale, AceBucket, AceComm, AceHook, AceSerializer, AceTab, AceTimer all in `libs/` and never loaded). Standard mandates externals over vendoring (§3.3).
+2. **Vendored-but-unused libs in 4 of 5 addons** (especially KickCD: AceLocale, AceBucket, AceComm, AceHook, AceSerializer, AceTab, AceTimer all in `libs/` and never loaded). Standard v1.1 keeps libs **vendored** but requires pruning the ones you don't `LibStub()` (§3.3).
 3. **No localization in 4 of 5 addons** despite hand-rolled or vendored AceLocale infrastructure. The standard codifies the metatable-fallback `__index → key` pattern (§8.1) — KickCD's hand-rolled approach was actually correct industry practice; AceLocale strict mode is the deviation.
 4. **All 5 addons hand-roll `SLASH_*` registration** despite vendoring AceConsole. Mechanical migration to `:RegisterChatCommand`.
 5. **File-LOC violations** — KickCD's `IconGrid.lua` (1753) and `settings/Panel.lua` (1258); ConsumableMaster's `SlashCommands.lua` (1257). Standard caps at 1500.
@@ -43,7 +43,7 @@ Five addons audited (AbsorbTracker, ConsumableMaster, KickCD, prettychat, WhatGr
 | 1 | 1 day | `.pkgmeta` + `.luacheckrc` + X-IDs across all 5 | Tooling baseline; unblocks every downstream improvement |
 | 2 | 1 day | Drop empty `Compat.lua` + `Locale.lua` scaffolds in all 5 | Standards compliance scaffolding |
 | 3 | 1 day | `SLASH_*` → AceConsole migration in all 5 | Mechanical |
-| 4 | 1 day | Lib externals migration; remove dead vendored libs | Repo size + maintenance win |
+| 4 | 1 day | Prune dead vendored libs (keep used libs vendored — no externals, Standard v1.1) | Repo size + maintenance win |
 | 5 | 1-2 days | Per-addon high-value bugs (PC-6 race, CM-4 migration, KCD-4 Compat, KCD-5 / WG-4 file peels) | Per-addon polish |
 
 **Total: ~5 days of focused work** to bring all 5 addons to "standards-compliant".
