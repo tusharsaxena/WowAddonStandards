@@ -463,8 +463,29 @@ NS.COMMANDS = {
 }
 ```
 
-- **MUST** render `/<slash>` (no args) as the help output, generated from this table — no hand-maintained help string.
+- **MUST** render `/<slash>` (no args) as the help output, generated from this table — no hand-maintained help string. (Browser-first addons **MAY** map bare `/<slash>` to their main window instead — a documented deviation — but `/<slash> help` MUST still print the index; see §7.4.)
 - **MUST NOT** use `if arg == "foo" then elseif arg == "bar" then` chains (DBM anti-pattern).
+
+### 7.4 Help output & chat tag
+
+Reference: KickCD `core/KickCD.lua` `printHelp`, Loot History `settings/Slash.lua`.
+
+- Every line the addon prints to chat **MUST** carry a short **bracketed tag** — the addon's initials in `[...]`, wrapped in one colour code — exposed as a **single shared constant** (`NS.PREFIX`) so every module prints identically. Examples: `|cff00ffff[KCD]|r`, `|cff33ff99[LH]|r`. **MUST NOT** hand-write `"|cff…" .. addonName .. "|r"` per call site.
+- The `help` index (and the fallback for an unknown verb) **MUST** be generated from `NS.COMMANDS`:
+  - **Header:** `<tag> v<version> slash commands (/<alias> is an alias for /<slash>):`
+  - **One row per command:** `<tag> |cffffff00/<slash> <name>|r — |cffffffff<desc>|r` — gold command, em-dash (`—`), white description.
+- An **unknown verb MUST** print `unknown command '<verb>'` and then the help index — never silently no-op.
+- Dispatch **MUST** lower-case only the verb and preserve case in the remainder, so schema paths survive `/<slash> set <path> <value>`.
+
+```lua
+function Sl:PrintHelp()
+  print(NS.PREFIX .. " v" .. NS.version ..
+    " slash commands (|cffffff00/<alias>|r is an alias for |cffffff00/<slash>|r):")
+  for _, cmd in ipairs(NS.COMMANDS) do
+    print(NS.PREFIX .. (" |cffffff00/<slash> %s|r — |cffffffff%s|r"):format(cmd.name, cmd.desc))
+  end
+end
+```
 
 ---
 
