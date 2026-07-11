@@ -372,6 +372,7 @@ end
 - **MUST** render content with **raw AceGUI** inside the canvas. **MUST NOT** use AceConfigDialog for content. (Industry: BigWigs and WeakAuras use AceConfig but at a scale that justifies the tax; ElvUI/Plater/DBM hand-roll. Ka0s sits in the AceGUI sweet spot.)
 - **MUST** build body lazily in first `OnShow`. (Universal Ka0s pattern; preserve it.)
 - **MUST** wrap panel-build in `C_Timer.After(0, ...)` if the panel can be opened at file-load (WhatGroup taint-fix pattern).
+- The single-category snippet above is the minimum entry point; §6.5–6.7 extend it into the mandatory **landing-page + subcategory** structure, **two-column** body, and **section-header** styling that every Ka0s panel now shares.
 
 ### 6.2 Combat lockdown
 
@@ -386,6 +387,47 @@ end
 ### 6.4 Lazy options loading (large addons)
 
 - For addons with ≥5 options sub-panels or whose options code is large, **SHOULD** ship options as a sibling LoadOnDemand addon (`<Addon>_Options.toc` with `## LoadOnDemand: 1`). None of the current 5 Ka0s addons need this.
+
+### 6.5 Landing page + subcategories
+
+Every Ka0s options panel **MUST** be built as a **parent canvas category = landing page** with one or more **canvas subcategories** for the actual settings (the first named "General"). Reference implementations: KickCD `settings/Panel.lua`, Loot History `settings/Panel.lua`.
+
+```lua
+local main = Settings.RegisterCanvasLayoutCategory(mainPanel, "Ka0s <Addon>")
+Settings.RegisterAddOnCategory(main)
+local sub  = Settings.RegisterCanvasLayoutSubcategory(main, generalPanel, "General")
+```
+
+- The **landing page** (parent panel) **MUST** render, top to bottom: the addon **logo**, a full-width **tagline** Label (`GameFontHighlight`), a **"Slash Commands"** section heading, then one Label per command generated from the addon's `COMMANDS` table (so the list stays in lockstep with `/<slash> help`). Command rows use `|cffffff00/<slash> <verb>|r  —  <desc>`.
+- **Logo asset:** ship a **`.tga`** (or `.blp`) under `media/logo/` — WoW **cannot** load `.jpg`/`.png` textures at runtime. Reference it by absolute path `Interface\AddOns\<Folder>\media\logo\<name>.tga`, display at **300×300**; source art SHOULD be power-of-two (e.g. 512×512). Keep the original `.jpg`/`.png` beside it for editing.
+- **Header (both parent and subcategory):** left-aligned title in `GameFontNormalHuge`, a gold `Options_HorizontalDivider` tinted to the title's colour, and (subcategories) a **Defaults** button top-right. Subcategory titles render as a breadcrumb **"Ka0s <Addon> ▸ <Page>"** with the arrow via `|A:common-icon-forwardarrow:16:16|a`.
+- Bodies **MUST** build lazily in first `OnShow` (§6.1) — AceGUI lays out against the panel's current width, which is 0 before the panel is first shown.
+
+### 6.6 Two-column layout (default)
+
+Schema-driven panels **MUST** default to a **two-column grid**: pair consecutive schema rows into 50%/50% widgets (`widget:SetRelativeWidth(0.5)`) inside a full-width Flow `SimpleGroup`, with a small vertical spacer between rows.
+
+```lua
+-- pair rows; flush the row once it holds two widgets (or on a wide row / group change)
+if not pendingRow then pendingRow = flowGroup() end
+makeWidget(row, pendingRow, 0.5)
+if #pendingRow.children >= 2 then flushRow() end
+```
+
+- A row that is intrinsically wide (a multi-check block, a long list) **MAY** set `wide = true` to break onto its own full-width line.
+- The pairing is **schema-driven**: each row's `group` names its section (§6.7) and row order within a group drives the pairing — no per-panel layout code.
+
+### 6.7 Section headers
+
+Group options under **section headers** rendered as an AceGUI **`Heading`** (a centred label flanked by horizontal dividers), font bumped to `GameFontNormalLarge`, with a small spacer above (except the first) and below.
+
+```lua
+local h = AceGUI:Create("Heading")
+h:SetText(groupName); h:SetFullWidth(true)
+h.label:SetFontObject(GameFontNormalLarge)
+```
+
+This is the same widget used for the landing page's "Slash Commands" divider, so headers read identically across the landing page and every subcategory.
 
 ---
 
