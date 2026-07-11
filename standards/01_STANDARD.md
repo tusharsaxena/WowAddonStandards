@@ -429,6 +429,58 @@ h.label:SetFontObject(GameFontNormalLarge)
 
 This is the same widget used for the landing page's "Slash Commands" divider, so headers read identically across the landing page and every subcategory.
 
+### 6.8 Layout constants (exact values)
+
+Every Ka0s panel **MUST** use these exact pixel/font values so all addons render identically. Define them as named constants (KickCD: `Const.PANEL_*` in `core/Constants.lua`; Loot History: locals at the top of `settings/Panel.lua`) — never inline magic numbers.
+
+**Header** — parent landing page *and* every subcategory:
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `PADDING_X` | **16** | left/right edge inset for header, divider, and body |
+| `HEADER_TOP` | **20** | vertical inset of the title (and the Defaults button) from the panel top — ≈½ the `GameFontNormalHuge` glyph height |
+| `HEADER_HEIGHT` | **54** | panel-top → divider distance; in lockstep with `HEADER_TOP` so the title-to-divider gap is fixed |
+| `DEFAULTS_W` | **110** | Defaults button width (fits "Restore Defaults" en-US) |
+| body top inset | **−(HEADER_HEIGHT + 8) = −62** | body frame `TOPLEFT` y |
+
+- **Title FontString:** `GameFontNormalHuge`, anchored `TOPLEFT` at `(PADDING_X, −HEADER_TOP)`.
+- **Divider:** `Options_HorizontalDivider` atlas, `TOPLEFT`/`TOPRIGHT` at `(±PADDING_X, −HEADER_HEIGHT)`, `SetVertexColor(titleFS:GetTextColor())` so it tracks the title gold.
+- **Defaults button** (subcategories only): `TOPRIGHT` at `(−PADDING_X, −HEADER_TOP)`.
+- **Subcategory title** = breadcrumb `Ka0s <Addon> |A:common-icon-forwardarrow:16:16|a <Page>`; the **parent page** shows the title alone.
+
+**Section headers:**
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `SECTION_HEADING_H` | **26** | AceGUI `Heading` height |
+| `SECTION_TOP_SPACER` | **10** | spacer above each section (skipped before the first) |
+| `SECTION_BOTTOM_SPACER` | **6** | spacer between the heading and its first widget |
+
+- Heading label font: `GameFontNormalLarge`.
+
+**Two-column body:**
+
+| Constant | Value | Meaning |
+|---|---|---|
+| column width | `SetRelativeWidth(0.5)` | each paired widget = half the row |
+| `ROW_VSPACER` | **8** | spacer between rows |
+| scroll inset `TOPLEFT` | `(PADDING_X − 4, −8)` | AceGUI `ScrollFrame` vs body |
+| scroll inset `BOTTOMRIGHT` | `(−(PADDING_X + 12), 8)` | reserves the scrollbar gutter |
+
+**Landing page:**
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `LOGO_SIZE` | **300** | logo display size (source art power-of-two, e.g. 512²) |
+| `GAP_AFTER_LOGO` | **8** | spacer below the logo |
+| `GAP_AFTER_DESC` | **12** | spacer below the tagline |
+| `GAP_BELOW_HEADING` | **6** | spacer below the "Slash Commands" heading |
+
+- Tagline Label font: `GameFontHighlight`, left-justified, full width.
+- The "Slash Commands" divider is the same AceGUI `Heading` (height 26, `GameFontNormalLarge`).
+
+**Font summary:** title `GameFontNormalHuge` · section/landing headings `GameFontNormalLarge` · tagline `GameFontHighlight` · widget labels + slash rows the AceGUI defaults.
+
 ---
 
 ## 7. Slash commands
