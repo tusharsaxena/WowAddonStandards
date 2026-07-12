@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.0, 2026-07-12)
+# Ka0s WoW Addon Standard (v2.1, 2026-07-12)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,7 @@
 
 **Changelog**
 
+- **v2.1 (2026-07-12):** Standardized the **root `README.md` structure** (§15.1) and the **TOC field order + file-listing structure** (§2.1, §2.5) — one canonical layout every addon follows, taken from the collection's Tier-2 modular tracker as the golden template. Added the **no-`TODO.md`** rule (§15.4): released addons track all issues/enhancements in **GitHub issues**, not a `TODO.md`; only an unreleased, in-development addon may keep a `TODO.md` during its development phase. §19 anti-patterns updated.
 - **v2.0 (2026-07-12):** Major refresh.
   - **Retail-only.** Dropped the multi-flavor apparatus. A single `## Interface:` line carries the latest Retail patch number (currently `120007`); no comma-separated flavor lists, no per-flavor TOCs, no `_Mainline`/`_Classic` data splits. §1.2, §2.1, §2.3, §11, §19 updated.
   - **Docs relocated.** Root keeps `README.md` (full), a **stub** `CLAUDE.md` (pointer), and `LICENSE`; `ARCHITECTURE.md` and all other docs move under `docs/`. §1.1, §1.2, §15.
@@ -143,16 +144,18 @@ Reference implementation (in the collection): the standalone loot-history browse
 
 ### 2.1 Required fields
 
+The metadata block **MUST** use this **exact field order** (omit a line only when the field genuinely doesn't apply); no blank lines inside the block:
+
 ```
 ## Interface: 120007                     -- SINGLE number; latest Retail patch (§2.3)
 ## Title: Ka0s <Human Name>              -- prefix every Ka0s addon
 ## Notes: <one-line user-facing description>
 ## Author: add1kted2ka0s
 ## Version: <semver>                     -- managed by version-bump skill
+## IconTexture: <path|fileID>            -- optional but encouraged
 ## SavedVariables: <Addon>DB             -- single global SV per addon
 ## OptionalDeps: Ace3, LibStub, CallbackHandler-1.0, LibSharedMedia-3.0
 ## DefaultState: enabled
-## IconTexture: <fileID>                 -- optional but encouraged
 ## Category-enUS: <Combat|Group|Auction|Chat|UI|Misc>
 ## X-License: MIT
 ## X-Standard: https://github.com/tusharsaxena/WowAddonStandards
@@ -161,6 +164,7 @@ Reference implementation (in the collection): the standalone loot-history browse
 ## X-WoWI-ID: <id>                       -- only if WoWI listing exists
 ```
 
+- **MUST** follow the field order above so every Ka0s TOC reads identically. The file listing that follows the metadata block has its own required structure (§2.5). Reference implementation (in the collection): the Tier-2 modular tracker's TOC.
 - **MUST** have `X-License: MIT`. **MUST NOT** ship "All Rights Reserved".
 - **MUST** have `X-Standard:` pointing at the standards repo, declaring the addon is built to this standard.
 - **MUST** have `X-Curse-Project-ID` and `X-Wago-ID` once an addon is published anywhere.
@@ -186,6 +190,43 @@ The collection targets **Retail (Mainline) only**. Classic/other flavors are out
 
 - **MUST** list `.lua` files in dependency-correct order. **MUST NOT** rely on alphabetical loading.
 - **SHOULD NOT** use `embeds.xml` at Tier 1. Tier 2 **MAY** use a single `embeds.xml` if file count justifies it — remove it if it doesn't earn its keep.
+
+### 2.5 File-listing structure (after the metadata block)
+
+The metadata block (§2.1) is followed by **one blank line**, then the file listing broken into **commented sections in load order**. Every Ka0s TOC uses the same section comments so the load order is self-documenting. Reference implementation (in the collection): the Tier-2 modular tracker's TOC.
+
+```
+# Libraries (must load first)
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+libs\AceAddon-3.0\AceAddon-3.0.lua
+...
+
+# Locales
+locales\enUS.lua
+
+# Core
+core\Compat.lua
+core\Constants.lua
+core\State.lua
+core\Util.lua
+core\Database.lua
+core\<Addon>.lua
+
+# Defaults
+defaults\Profile.lua
+
+# Modules
+modules\<Feature>.lua
+
+# Settings (last — depend on everything else being initialized)
+settings\Panel.lua
+settings\...
+```
+
+- **MUST** use `#` section headers, in the order **Libraries → Locales → Core → Defaults → Modules → Settings**, matching the Tier-2 load order (§1.2). Libraries always load **first**; settings **last**.
+- **Tier 1** addons keep the `# Libraries (must load first)` section, then list their flat source files (`Compat.lua`, `Locale.lua`, `<Addon>.lua`, `Database.lua`, `Settings.lua`) in dependency order under a single `# Addon` section — no `core/`/`modules/` split (§1.1).
+- **MUST** end the file with a single trailing newline.
 
 ---
 
@@ -889,22 +930,50 @@ sudo luarocks install luacheck
 
 ---
 
-## 15. Documentation set
+**Root of the repo** ships exactly three docs (plus `LICENSE`): a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`. Everything else lives under `docs/`.
 
-**Root of the repo** ships exactly three docs (plus `LICENSE`):
+### 15.1 Root `README.md` — canonical structure
 
-- `README.md` — **full, user-facing**, stays at root (GitHub renders it). Sections in this order: Title, Badges (including a `[wow]` interface badge — §2.3), Description (1-2 paragraphs), Features (bullet list), Installation, Usage / Slash Commands (table), Configuration (high level), **a line/badge stating the addon is built to the Ka0s WoW Addon Standard, linking <https://github.com/tusharsaxena/WowAddonStandards>**, Version History (table, last 5 versions).
-- `CLAUDE.md` — **a STUB**: a short pointer that (a) names the tier, (b) states the addon adheres to the Ka0s WoW Addon Standard at <https://github.com/tusharsaxena/WowAddonStandards>, and (c) directs the reader into `docs/` for the full agent context. **MUST NOT** carry the full agent brief at root — that lives in `docs/`.
-- `LICENSE` — MIT, full text.
+Every Ka0s `README.md` **MUST** follow one structure so all addons read identically. Reference implementation (in the collection): the Tier-2 modular tracker's README. Sections in **this exact order**:
 
-**`docs/`** holds everything else:
+1. **H1 title** — `# Ka0s <Name>`. **MUST**.
+2. **Badge row** — in order: a **`[wow]`** interface badge (in lockstep with the TOC `## Interface:`, §2.3); a **published-version** badge (CurseForge/Wago) once published; a **`[license]`** MIT badge; and a badge/line linking the **Ka0s WoW Addon Standard** (<https://github.com/tusharsaxena/WowAddonStandards>). **MUST**.
+3. **Logo** — the addon logo image. **MUST**.
+4. **Description** — 1–2 paragraphs of what the addon does and why; **MAY** inline a short feature bullet list and a closing line on how to configure it (Blizzard Settings panel + `/<slash>`). **MUST**.
+5. **`## Screenshots`** — captioned images of the addon and its settings sub-panels. **SHOULD** (**MUST** once published).
+6. **`## Usage`** — **MUST**, with two subsections:
+   - **`### Slash commands`** — one intro line (short + long slash form, and the `[XY]` chat prefix), then a **Command | Purpose** table generated from `NS.COMMANDS` so it stays in lockstep with `/<slash> help` (§7.4).
+   - **`### Settings panel`** — a **Tab | Covers** table, one row per settings subcategory (§6.5).
+7. **`## Critical settings`** — **SHOULD** for addons whose behavior hinges on a few key options; `###` subsections, each naming the option's setting path.
+8. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
+9. **`## Troubleshooting`** — **SHOULD**; a **Symptom | What to check** table.
+10. **`## Issues and feature requests`** — **MUST**. A short paragraph pointing users to the addon's **GitHub issues** (`<repo>/issues`) as the **single source of truth for the backlog**, asking them to file there rather than in comments. (This is why a released addon ships no `TODO.md` — §15.4.)
+11. **`## Testing`** — **MUST**. How to verify: the headless harness (`lua tests/run.lua`), lint (`luacheck .`), and the in-game smoke-test suite (link `docs/smoke-tests.md`), with a note to run it before tagging a release or after bumping `## Interface:` / refreshing libs (§14A, §16).
+12. **`## Version History`** — **MUST**. A **Version | Date | Notes** table, most-recent first, last 5 entries.
+
+- The optional sections (5, 7, 8, 9) are **SHOULD** — omit one only when it would be empty — but when present their **relative order MUST** be preserved.
+- `wow-addon:normalize-readme` reshapes a README to this structure; `wow-addon:sync-docs` keeps the slash-command and version-history tables in lockstep with code.
+- The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `version-bump`).
+
+### 15.2 Root `CLAUDE.md` — stub
+
+- **A STUB**: a short pointer that (a) names the tier, (b) states the addon adheres to the Ka0s WoW Addon Standard at <https://github.com/tusharsaxena/WowAddonStandards>, and (c) directs the reader into `docs/` for the full agent context. **MUST NOT** carry the full agent brief at root — that lives in `docs/`.
+
+### 15.3 `docs/`
 
 - `docs/ARCHITECTURE.md` — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
 - The **full agent-context pack** (the detailed working notes the root `CLAUDE.md` points to).
-- `docs/TODO.md`, plus any planning / reference / design docs.
+- `docs/smoke-tests.md` (§16) and any planning / reference / design docs — **but no `TODO.md` once released** (§15.4).
+
+### 15.4 No `TODO.md`
+
+- A **released** addon **MUST NOT** ship a `TODO.md` anywhere (root or `docs/`). All bugs, enhancements, and outstanding work are tracked in the addon's **GitHub issues** — the single source of truth for the backlog, surfaced via the README's "Issues and feature requests" section (§15.1).
+- **Exception:** an **unreleased, in-development** addon (before its first tagged/published release) **MAY** keep a `docs/TODO.md` as a scratch backlog **during the development phase only**. It **MUST** be deleted at (or before) the first release, with any remaining items migrated to GitHub issues.
+- Rationale: two backlogs drift. A checked-in `TODO.md` competes with the issue tracker, goes stale, and hides work from anyone not reading the repo. GitHub issues are searchable, assignable, closable, and linkable from commits/PRs.
+
+### 15.5 Keeping docs in sync
 
 - **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `reviews/` folder. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
-- The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `version-bump`).
 
 ---
 
@@ -981,6 +1050,8 @@ For quick reference, the rules above as a do-not list:
 24. No `tests/` harness, or a logic change with no covering test — TDD is mandatory (§14A).
 25. Loose files directly in `media/` — use typed subfolders (§1.4).
 26. Full agent brief in the root `CLAUDE.md` — root `CLAUDE.md` is a stub; the brief lives in `docs/` (§15).
+27. A checked-in `TODO.md` in a **released** addon — track the backlog in GitHub issues; a `TODO.md` is allowed only in an unreleased, in-development addon during its development phase (§15.4).
+28. Non-canonical `README.md` section order, or a TOC that departs from the required field order / file-listing structure — follow §15.1 and §2.1/§2.5.
 
 ---
 

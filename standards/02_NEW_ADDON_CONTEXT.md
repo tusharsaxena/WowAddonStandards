@@ -76,7 +76,7 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
   libs/                  -- vendored, committed
   media/                 -- typed subfolders: logos/, screenshots/, ...
   tests/                 -- run.lua, loader.lua, wow_mock.lua, test_*.lua
-  docs/                  -- ARCHITECTURE.md + full agent context (this pack) + TODO/planning
+  docs/                  -- ARCHITECTURE.md + full agent context (this pack); no TODO.md once released (§15.4)
 ```
 
 ## Tier 2 starter tree
@@ -107,7 +107,7 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
   media/                 -- typed subfolders (logos/, screenshots/, ...)
   libs/                  -- vendored, committed
   tests/                 -- run.lua, loader.lua, wow_mock.lua, test_*.lua
-  docs/                  -- ARCHITECTURE.md + full agent context + planning
+  docs/                  -- ARCHITECTURE.md + full agent context + planning; no TODO.md once released (§15.4)
   reviews/<YYYY-MM-DD>/  -- retained audit history
   README.md  (root, full)   CLAUDE.md (root, stub)   LICENSE (root)
   .luacheckrc  .pkgmeta
@@ -119,12 +119,15 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
 
 ### TOC
 
+Fixed field order (§2.1), then a blank line, then the file listing in commented sections (§2.5):
+
 ```
 ## Interface: 120007
 ## Title: Ka0s <Name>
 ## Notes: <one-line description>
 ## Author: add1kted2ka0s
 ## Version: 0.1.0
+## IconTexture: <path|fileID>
 ## SavedVariables: <Addon>DB
 ## OptionalDeps: Ace3, LibStub, CallbackHandler-1.0, LibSharedMedia-3.0
 ## DefaultState: enabled
@@ -134,13 +137,17 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
 ## X-Curse-Project-ID: <id>
 ## X-Wago-ID: <id>
 
-# Libraries first (vendored in libs/ — .xml where the lib ships one, else .lua):
-# libs\LibStub\LibStub.lua
-# libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
-# libs\AceAddon-3.0\AceAddon-3.0.xml
+# Libraries (must load first) — vendored in libs/, .xml where the lib ships one, else .lua
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\AceAddon-3.0\AceAddon-3.0.xml
 # ...(one line per lib you LibStub)
 
-# Tier 1: list files in dependency order
+# Locales
+locales\enUS.lua
+
+# Tier 1: one # Addon section, files in dependency order
+# (Tier 2: # Core / # Defaults / # Modules / # Settings sections instead — §2.5)
 Compat.lua
 Locale.lua
 <Addon>.lua
@@ -148,7 +155,7 @@ Database.lua
 Settings.lua
 ```
 
-The `## Interface:` is a **single** latest-Retail number (Retail only, §2.3); bump it each patch with `wow-addon:bump-interface`, and keep the README `[wow]` badge in lockstep.
+The `## Interface:` is a **single** latest-Retail number (Retail only, §2.3); bump it each patch with `wow-addon:bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (§2.1, §2.5).
 
 ### `<Addon>.lua` (entry)
 
@@ -396,6 +403,8 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 18. Preview/test mode (§6B): addons with a positionable display SHOULD show placeholder data while unlocked and/or via `/<slash> preview`.
 19. Tests: ship a headless `tests/` harness. TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**.
 20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else (`ARCHITECTURE.md`, full agent context, planning) under `docs/`. Media in typed `media/` subfolders. No drift; sync before every release.
+20a. `README.md` follows the **canonical section order** (§15.1): title → badges (`[wow]`/version/license/standard) → logo → description → Screenshots → Usage (Slash commands + Settings panel tables) → Critical settings → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Testing → Version History. TOC follows the fixed field order + `#`-section file listing (§2.1/§2.5).
+20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (§15.4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
 21. Reviews: archive every audit under `reviews/<YYYY-MM-DD>/` with the 5-artifact bundle. Kept, not deleted.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:version-bump` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
@@ -427,6 +436,8 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 - Committing with red `lua tests/run.lua` or non-clean `luacheck .`; a logic change with no covering test.
 - Loose files directly in `media/` (use typed subfolders).
 - Full agent brief in the root `CLAUDE.md` (root is a stub; brief lives in `docs/`).
+- `TODO.md` in a **released** addon (track the backlog in GitHub issues; allowed only in an unreleased, in-development addon, deleted before first release).
+- Non-canonical `README.md` section order, or a TOC departing from the required field order / file-listing structure (§15.1, §2.1/§2.5).
 - Creating a feature branch without an explicit request (work trunk-based).
 
 ---
@@ -448,6 +459,9 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 - [ ] Preview/test mode (§6B) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
 - [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; `docs/ARCHITECTURE.md` + full agent context in `docs/`; passes the drift check.
+- [ ] `README.md` follows the canonical section order (§15.1), including **Usage** (Slash-commands + Settings-panel tables), **Issues and feature requests** (→ GitHub issues), **Testing**, and **Version History**.
+- [ ] TOC follows the fixed field order and `#`-section file-listing structure (§2.1/§2.5).
+- [ ] **No `TODO.md`** at release (backlog is in GitHub issues); any pre-release `docs/TODO.md` has been removed (§15.4).
 - [ ] LICENSE = MIT full text.
 - [ ] First entry in `reviews/<YYYY-MM-DD>/` (even if just a "Hello world" smoke test).
 
