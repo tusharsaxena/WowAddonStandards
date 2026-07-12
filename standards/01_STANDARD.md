@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.2, 2026-07-12)
+# Ka0s WoW Addon Standard (v2.3, 2026-07-12)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,7 @@
 
 **Changelog**
 
+- **v2.3 (2026-07-12):** **§12 debug console overhaul**, promoted from the loot-history reference implementation. The console now mandates: a **shipped monospace font** under `media/fonts/` (e.g. **JetBrains Mono**, OFL; LSM-registered) applied at **10pt**; a **tagged, colour-coded line format** — `<HH:MM:SS> | [<Tag>] <content>` with the timestamp in muted steel-blue (`6f8faf`), the `[tag]` in muted tan/gold (`c9a66b`), and the `|` separator + content in the default white — mirrored to a **code-free Copy buffer** via **two pure formatters** (`FormatPlain`/`FormatColored`) so the two never drift; a **`NS.Debug(tag, fmt, ...)`** sink with the **tag as the first argument**; a **default window size of `700×344`**; and **session-only, window-independent enabled-state** — `NS.State.debug`, default **off**, held out of SavedVariables and **reset every `/reload`**, toggled by `/<slash> debug on|off` (bare `/<slash> debug` toggles the *window* only) and an in-title-bar **`Debug: ON`/`OFF`** control (green/red). **This reverses the v2.0 "enabled-state SHOULD persist in SV" line** — debug is now session-only by default; persisting it is the documented deviation.
 - **v2.2 (2026-07-12):** Added **§3.6 No addon-suite dependencies** — a Ka0s addon MUST be fully self-contained and behave identically with no other addon installed; it MUST NOT hard-depend on, embed, or read the media/API/SavedVariables of any addon *suite* or standalone addon (ElvUI, EllesmereUI, DBM, WeakAuras, BigWigs, …). Optional, presence-guarded integration that degrades gracefully is still allowed (the shared-**library** vendoring rule of §3.3 is unchanged — libraries are not suites). §19 anti-patterns updated.
 - **v2.1 (2026-07-12):** Standardized the **root `README.md` structure** (§15.1) and the **TOC field order + file-listing structure** (§2.1, §2.5) — one canonical layout every addon follows, taken from the collection's Tier-2 modular tracker as the golden template. Added the **no-`TODO.md`** rule (§15.4): released addons track all issues/enhancements in **GitHub issues**, not a `TODO.md`; only an unreleased, in-development addon may keep a `TODO.md` during its development phase. §19 anti-patterns updated.
 - **v2.0 (2026-07-12):** Major refresh.
@@ -630,7 +631,7 @@ NS.COMMANDS = {
   { name = "resetall", desc = "Reset all to defaults", fn = function() ... end },
   { name = "config",  desc = "Open options panel",    fn = function() NS.Panel:Open() end },
   { name = "preview", desc = "Toggle preview mode",   fn = function() ... end },   -- if §6B applies
-  { name = "debug",   desc = "Toggle debug console",  fn = function() ... end },   -- §12
+  { name = "debug",   desc = "Window; 'on'/'off' set logging", fn = function(rest) ... end },  -- §12 (on|off|toggle)
 }
 ```
 
@@ -806,29 +807,68 @@ end
 
 Every addon **MUST** ship a debug seam. Debug output **MUST** route to a **dedicated on-screen debug console styled like the addon's own main window** — **not** the default chat frame. Reference implementation (in the collection): the loot-history browser's debug console (`modules/DebugLog.lua`).
 
-The console (as implemented by the reference):
+### 12.1 Console window
 
-- A standalone `BackdropTemplate` frame (e.g. `<Addon>DebugWindow`) parented to `UIParent` on **`DIALOG`** strata so it sits **above** the addon's main window, with a draggable title bar (`"<Addon> — Debug"`), a 1px divider, and a close glyph.
-- **Clear** and **Copy** buttons. The **Copy** action opens a read-through multiline `EditBox` pre-filled with the buffered log and auto-highlighted for `Ctrl+C`.
-- The log surface is a `ScrollingMessageFrame` with `SetMaxLines(500)`, mouse-wheel scroll, `GameFontHighlightSmall`; each appended line is timestamped (grey `HH:MM:SS`).
-- Registered in `UISpecialFrames` (ESC closes); **reuses the addon's `SKIN`/`ApplySkin` seam** (§6A) so it matches the main window.
-- `Show` / `Hide` / `Toggle` methods; opening the console turns logging on, closing it turns logging off.
+- A standalone `BackdropTemplate` frame (e.g. `<Addon>DebugWindow`) parented to `UIParent` on **`DIALOG`** strata so it sits **above** the addon's main window, with a draggable title bar (`"<Addon> — Debug"`), a 1px divider, and a thin close glyph.
+- **Default size `700 × 344`** — the reference width, wide enough that tagged lines rarely wrap. Movable, clamped to screen, registered in `UISpecialFrames` (ESC closes).
+- **Reuses the addon's `SKIN`/`ApplySkin` seam** (§6A) so it matches the main window.
+- The log surface is a `ScrollingMessageFrame` with `SetMaxLines(500)`, mouse-wheel scroll, `SetJustifyH("LEFT")`, fading off.
 
-The sink:
+### 12.2 Monospace font (shipped)
+
+- The console log **MUST** render in a **monospace** font so timestamps and tags line up. The addon **SHOULD ship** a monospace TTF under `media/fonts/` (§1.4) — e.g. **JetBrains Mono** (OFL) — **vendored with its license file**, rather than depending on a user-installed font. Register it with LibSharedMedia-3.0 at load (`LSM:Register("font", "<Name>", path)`) and expose the path as a constant (e.g. `NS.Constants.FONT_MONO`).
+- Apply it with `SetFont(NS.Constants.FONT_MONO, 10, "")` — **10pt is the reference size** — to **both** the log and the Copy `EditBox` (so the copied view matches the console).
+
+### 12.3 Line format — timestamped, tagged, coloured
+
+Each line **MUST** follow `<HH:MM:SS> | [<Tag>] <content>`:
+
+- The **tag** is a single short word, rendered **verbatim** (no padding, no truncation), naming what the line is about — `Loot`, `Cast`, `Attr`, `Open`, `Mail`, … The set is **open**; modules add tags as needed.
+- In the console, the **timestamp is muted steel-blue (`6f8faf`)** and the **`[tag]` is muted tan/gold (`c9a66b`)**; the `|` separator and the content stay the frame's **default colour (white)**. (`||` renders one literal pipe inside a colour-coded string.)
+- The plain-text **Copy buffer mirrors the same line with no colour codes**, so copied logs paste clean.
+- Provide **two pure formatters** (frame-free, unit-tested) so the coloured string can't drift from the plain one:
 
 ```lua
-NS.Debug = NS.Debug or {}
-function NS.Debug:Print(fmt, ...)
-  if not (NS.State and NS.State.debug) then return end   -- gated; zero-alloc when off
-  local msg = (select("#", ...) > 0) and string.format(fmt, ...) or fmt
-  NS.DebugLog:Add(msg)   -- append to the console, NOT print() to chat
+function DebugLog.FormatPlain(ts, tag, msg)      -- clean text, for the Copy buffer
+  return ("%s | [%s] %s"):format(tostring(ts), tostring(tag or ""), tostring(msg))
+end
+function DebugLog.FormatColored(ts, tag, msg)    -- console view
+  return ("|cff6f8faf%s|r || |cffc9a66b[%s]|r %s"):format(
+    tostring(ts), tostring(tag or ""), tostring(msg))
 end
 ```
 
-- **MUST** be zero-allocation when off (the gate is the first line; no `string.format` until past the gate).
-- **MUST** be toggleable via slash `/<slash> debug` (which toggles the console).
-- **SHOULD** persist the enabled-state in SavedVariables so it survives `/reload` and re-login (a persistent `db.profile.debugLog`-style flag). A session-only flag is an acceptable deviation under this SHOULD but is weaker.
-- **MAY** support levels (`Debug:Print(level, fmt, ...)`) and structured dump verbs (`/<slash> debug <topic>`) for large addons.
+### 12.4 The sink
+
+```lua
+function NS.Debug(tag, fmt, ...)
+  if not (NS.State and NS.State.debug) then return end   -- gated; zero-alloc when off
+  local msg = (select("#", ...) > 0) and string.format(fmt, ...) or fmt
+  NS.DebugLog:Add(tag, msg)   -- append to the console, NOT print() to chat
+end
+```
+
+- **MUST** be zero-allocation when off (the gate is the first line; no `string.format`, concat, or table build before it).
+- The **tag is the first argument** so every call site self-documents its category: `NS.Debug("Loot", "%s x%d", name, qty)`.
+- **MAY** support structured dump verbs (`/<slash> debug <topic>`) for large addons.
+
+### 12.5 Enabled-state — session-only, decoupled from the window
+
+The enabled-state (`NS.State.debug`) is a **runtime flag, independent of the console window's visibility**:
+
+- **MUST** be **session-only**: default **off**, held in `NS.State.debug` (**never** in SavedVariables), and **reset to off on every `/reload` and fresh login**. *(This replaces the pre-v2.3 "SHOULD persist in SV" guidance — a persisted debug flag too easily gets left on. Persisting it is now the documented deviation, not the default.)*
+- Logging and the window are **independent** — capture runs even when the console is closed, so a bug can be reproduced first and the log opened after.
+- Slash (§7): `/<slash> debug` **toggles the window only** (state untouched); `/<slash> debug on` and `/<slash> debug off` set the flag. Each state change prints a `NS.PREFIX`-tagged chat ack.
+- The title bar carries a **state toggle** on the left, styled like the Clear/Copy text buttons: **`Debug: ON`** in green when on, **`Debug: OFF`** in red when off. Clicking it flips the flag and the label re-renders on every state change.
+- Route **all** state changes through one `DebugLog:SetEnabled(on)` seam so the slash command and the header toggle can't diverge (single write path: set flag → refresh header → print ack).
+
+### 12.6 Copy / Clear
+
+- **Clear** wipes both the visible log and the Copy buffer.
+- **Copy** opens a read-through multiline `EditBox` pre-filled with the plain buffer and auto-highlighted for `Ctrl+C`; it uses the same monospace font. WoW exposes **no clipboard API** — the user's `Ctrl+C` inside an `EditBox` is the only copy path, so a button alone cannot write the OS clipboard. *(The colour-vs-clean-copy split is deliberate: the `ScrollingMessageFrame` gives the coloured live view, the `EditBox` gives code-free copies — one widget cannot do both, since selecting colour-coded text copies its `|c…|r` escapes.)*
+
+### 12.7 Fallback
+
 - **Tier-1 utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (§6A) **MUST** use the console.
 
 Note: user-facing chat messages (help index, command acks, errors) still `print()` to chat with `NS.PREFIX` (§7.4) — that ordinary chat seam is separate from the debug console.

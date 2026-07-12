@@ -216,7 +216,8 @@ local addonName, NS = ...
 
 NS.defaults = {
   profile = { -- defaults referenced by Schema rows
-    debug = false,       -- debug console enabled-state (SHOULD persist; §12)
+    -- NOTE: the debug flag is NOT here. It is session-only (NS.State.debug,
+    -- default off, reset every /reload) and never persisted to SV (§12.5).
   },
   global = { schemaVersion = 1 },
 }
@@ -265,7 +266,12 @@ local COMMANDS = {
   { name = "reset",  desc = "Reset one",    fn = function(arg) S:CliReset(arg) end },
   { name = "resetall", desc = "Reset all",  fn = function() S:CliResetAll() end },
   { name = "preview", desc = "Toggle preview", fn = function() NS:TogglePreview() end },  -- if §6B applies
-  { name = "debug",  desc = "Toggle debug console", fn = function() NS.DebugLog:Toggle() end },  -- §12
+  { name = "debug",  desc = "Window; 'on'/'off' set logging", fn = function(rest)  -- §12 (on|off|toggle)
+      local a = rest and tostring(rest):lower():match("^%s*(%S*)") or ""
+      if a == "on" then NS.DebugLog:SetEnabled(true)
+      elseif a == "off" then NS.DebugLog:SetEnabled(false)
+      else NS.DebugLog:Toggle() end   -- bare: toggle the WINDOW, state untouched
+    end },
 }
 NS.COMMANDS = COMMANDS
 
@@ -288,18 +294,20 @@ end
 
 ### Debug console (§12)
 
-Debug output routes to a **dedicated on-screen console styled like the main window**, not chat. Full reference: `01_STANDARD.md §12`. Minimal sink:
+Debug output routes to a **dedicated on-screen console styled like the main window**, not chat. Full reference: `01_STANDARD.md §12`. Minimal sink — note the **tag is the first argument**:
 
 ```lua
-NS.Debug = NS.Debug or {}
-function NS.Debug:Print(fmt, ...)
+function NS.Debug(tag, fmt, ...)
   if not (NS.State and NS.State.debug) then return end   -- gated; zero-alloc when off
   local msg = (select("#", ...) > 0) and string.format(fmt, ...) or fmt
-  NS.DebugLog:Add(msg)   -- append to the console, NOT print() to chat
+  NS.DebugLog:Add(tag, msg)   -- append to the console, NOT print() to chat
 end
+-- call site: NS.Debug("Loot", "%s x%d", name, qty)
 ```
 
-The console itself: a `BackdropTemplate` frame (`<Addon>DebugWindow`) on `DIALOG` strata, draggable title bar, `ScrollingMessageFrame` (`SetMaxLines(500)`, `GameFontHighlightSmall`, timestamped lines), **Clear** + **Copy** (copy = read-through multiline `EditBox`), registered in `UISpecialFrames`, reusing the addon's `SKIN`/`ApplySkin` seam (§6A). `Show`/`Hide`/`Toggle`; opening it enables logging, closing disables it. Enabled-state SHOULD persist in SV. Tier-1 addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
+The console: a `BackdropTemplate` frame (`<Addon>DebugWindow`) on `DIALOG` strata, **default size `700×344`**, draggable title bar, a `ScrollingMessageFrame` (`SetMaxLines(500)`) rendered in a **shipped monospace font** (`media/fonts/`, e.g. JetBrains Mono OFL, LSM-registered) at **10pt**. Lines follow `<HH:MM:SS> | [<Tag>] <content>` — timestamp coloured `6f8faf`, `[tag]` `c9a66b`, separator/content white; the plain **Copy buffer** mirrors the same line code-free (two pure formatters, `FormatPlain`/`FormatColored`). **Clear** + **Copy** (copy = read-through multiline `EditBox`, same font), registered in `UISpecialFrames`, reusing the addon's `SKIN`/`ApplySkin` seam (§6A).
+
+**Enabled-state is session-only and window-independent** (§12.5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. Tier-1 addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
 
 ### Tests (`tests/`, §14A)
 
@@ -399,7 +407,7 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
 15. File LOC cap: ~1500. Peel when exceeded.
 16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries.
-17. Debug: on-screen **console** styled like the main window (§12), not chat, if the addon has a window. Zero-alloc when off. Enabled-state SHOULD persist in SV.
+17. Debug: on-screen **console** styled like the main window (§12), not chat, if the addon has a window. Monospace font (10pt) + tagged colour-coded lines via `NS.Debug(tag, …)`; zero-alloc when off. Enabled-state is **session-only** (`NS.State.debug`, default off, reset every `/reload`; never in SV), decoupled from window visibility.
 18. Preview/test mode (§6B): addons with a positionable display SHOULD show placeholder data while unlocked and/or via `/<slash> preview`.
 19. Tests: ship a headless `tests/` harness. TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**.
 20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else (`ARCHITECTURE.md`, full agent context, planning) under `docs/`. Media in typed `media/` subfolders. No drift; sync before every release.
@@ -456,7 +464,7 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 - [ ] AceConsole `:RegisterChatCommand` registered.
 - [ ] Options panel uses `Settings.RegisterCanvasLayoutCategory`, **category registered eagerly at load** (entry always visible), **body built lazily** on first `OnShow`.
 - [ ] Combat-lockdown guard on panel-open.
-- [ ] Debug **console** (§12) — on-screen, styled like the main window; toggled `/<slash> debug`; enabled-state persisted in SV (SHOULD). (Tier-1 no-window addons MAY use chat.)
+- [ ] Debug **console** (§12) — on-screen, styled like the main window; monospace font (10pt) + tagged colour-coded lines `<ts> | [<Tag>] <content>`; `/<slash> debug` toggles the window, `/<slash> debug on|off` set logging; enabled-state **session-only** (never in SV), decoupled from window visibility; title-bar `Debug: ON/OFF` toggle. (Tier-1 no-window addons MAY use chat.)
 - [ ] Preview/test mode (§6B) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
 - [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; `docs/ARCHITECTURE.md` + full agent context in `docs/`; passes the drift check.
@@ -484,7 +492,7 @@ named evidence is in `03_INDUSTRY_RESEARCH.md`.)
 | Taint-free chat formatting | Override `_G[GLOBALSTRING]` values rather than hooking chat events or replacing `AddMessage`; order filter registration deterministically. |
 | Combat-lockdown cascade | A layered `InCombatLockdown()` guard at config-open → settings-register → frame-show, each deferring on `PLAYER_REGEN_ENABLED`. |
 | Eager settings registration + lazy body | Register the Blizzard **category** at load (bootstrap on `ADDON_LOADED(Blizzard_Settings)`/`PLAYER_LOGIN`, or in `OnInitialize`); build the panel body only in the first `OnShow`. |
-| On-screen debug console | A `DIALOG`-strata `BackdropTemplate` window with a `ScrollingMessageFrame`, Clear/Copy, `UISpecialFrames`, reusing the main window's `SKIN`/`ApplySkin`; a gated `NS.Debug` sink that appends there instead of chat. |
+| On-screen debug console | A `DIALOG`-strata `700×344` `BackdropTemplate` window; a `ScrollingMessageFrame` in a shipped monospace font (10pt) with tagged, colour-coded lines (`<ts> \| [<Tag>] <content>`), Clear/Copy, `UISpecialFrames`, reusing the main window's `SKIN`/`ApplySkin`; a gated `NS.Debug(tag, …)` sink that appends there instead of chat; session-only window-independent enabled-state with a title-bar `Debug: ON/OFF` toggle. |
 | Preview/test mode | Placeholder data fed through the real render path while the display is unlocked and/or via `/<slash> preview`. |
 | Headless test harness | `tests/run.lua` micro-framework + `tests/loader.lua` (`setfenv` over ordered sources) + `tests/wow_mock.lua` (self-returning no-op frame; CreateFrame/Settings/LibStub fakes); per-module `test_*.lua` suites. |
 | Lazy first-OnShow panel build | Latch (`rendered` flag) so the AceGUI body builds once, on first `OnShow`, when the panel width is non-zero. |
