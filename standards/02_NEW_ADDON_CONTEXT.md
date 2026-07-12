@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.0, 2026-07-12)
+# New Ka0s Addon — Context Pack (v1.0.0, 2026-07-12)
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (§15).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 

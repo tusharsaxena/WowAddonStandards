@@ -112,7 +112,7 @@ Audit runs are **not** stored here — each lives under its own addon's `audit/<
 
 ## Status
 
-Standard is at **v2.7** and living. Compliance auditing has moved out of this repo into each addon's
+Standard is at **v1.0.0** and living. Compliance auditing has moved out of this repo into each addon's
 own repository, driven by the `AUDIT.md` / `NEW_ADDON.md` playbooks that the `wow-addon` plugin
 consumes.
 

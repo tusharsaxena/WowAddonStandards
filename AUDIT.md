@@ -49,7 +49,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 
 1. **Resolve the standard.** Read the canonical rules from `standards/01_STANDARD.md` in the
    `WowAddonStandards` repo (the addon's TOC `## X-Standard:` URL points here). Use the current
-   version — note it (e.g. "audited against v2.7") in `01_CURRENT_STATE.md` so the run is reproducible.
+   version — note it (e.g. "audited against v1.0.0") in `01_CURRENT_STATE.md` so the run is reproducible.
 2. **Create the run folder.** `<REPO_ROOT>/audit/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, packaging, docs) and record what it does
