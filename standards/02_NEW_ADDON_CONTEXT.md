@@ -342,11 +342,14 @@ sudo luarocks install luacheck
 ### Message bus
 
 ```lua
--- Producer (pick exactly one)
+-- Producer (pick exactly one; send on any embed — SendMessage fans out to all receivers)
 NS.addon:SendMessage("Ka0s_<Addon>_RosterChanged", roster)
 
--- Consumer
-NS.addon:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
+-- Consumer — MUST register on its OWN AceEvent target, never the shared bus-as-self:
+-- CallbackHandler keys callbacks by (message, target), so two receivers sharing one object
+-- clobber each other (last registrant wins, silently). See 01_STANDARD §4.4.
+NS.<Module>.__ev = NS.NewBusTarget()   -- AceEvent:Embed({}); or an AceAddon module `self`
+NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
 ```
 
 ### `.luacheckrc`

@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.5, 2026-07-12)
+# Ka0s WoW Addon Standard (v2.6, 2026-07-12)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,7 @@
 
 **Changelog**
 
+- **v2.6 (2026-07-12):** **§4.4 message-bus receiver rule.** Each *receiver* MUST register on its own AceEvent target; two consumers of the same message registering on the shared `NS.bus`/`NS.addon` object silently clobber each other — CallbackHandler keys callbacks by `(message, target)`, so the last registrant wins with no error, and the failure is masked by `/reload` (re-enable re-registers the survivor). Added the correct target shapes (an AceAddon module `self`, or a private `NS.NewBusTarget()` embed), a **test-harness rule** (the bus mock MUST model real per-target dispatch, not no-ops), and matching §19 anti-patterns (#32, #33). Surfaced by a live-settings-toggle bug in the loot-history tracker: the Browser's `SettingsChanged` handler, registered on the shared bus after the Collector's, clobbered it, so setting changes only applied after a reload. (Addons using AceAddon `NewModule(..., "AceEvent-3.0")` per module — e.g. the interrupt tracker — were already safe, since each module is a distinct target.)
 - **v2.5 (2026-07-12):** **Re-based the canonical `README.md` structure (§15.1)** on the collection's **consumables & macro manager** as the golden template (previously the Tier-2 modular tracker), adopting its layout and styling. Table headers are now **`Command | What it does`**, **`Symptom | Fix`**, and **`Version | Date | Highlights`** (Version History is most-recent-first, no longer capped at 5); the **description MAY inline a summary table** (not just a bullet list); the **`### Settings panel`** subsection MAY carry per-panel prose beneath its table; and the former **`## Critical settings`** section is replaced, in the same slot (after Usage, before FAQ), by an optional **`## How <it> works`** narrative explainer of the addon's core mechanic. The **standard-link badge** and the standalone **`## Testing`** section stay **MUST**, and the **`Tab | Covers`** settings table is retained — the reference README documents these differently, but the standard keeps them.
 - **v2.4 (2026-07-12):** **§6 options-panel refinements** from the Tier-2 tracker's settings work. **(1)** New **§6.10 Scroll container** — the body's AceGUI `ScrollFrame` **MUST** keep its vertical scrollbar shown *even when the content fits* (park + disable the thumb; don't hide the bar), so every subcategory renders at an identical body width and right margin. Hiding the bar on short pages is now an anti-pattern (§19). **(2)** **§6.6 / §6.8** — a cell-filling action `Button` in a 50/50 pair **MUST** inset to `SetRelativeWidth(0.492)` (new constant `BUTTON_PAIR_REL`), not a flush `0.5`, so AceGUI Flow's ~2px right-cell spill isn't shaved off by the `ScrollFrame` clip rect. §19 anti-patterns updated.
 - **v2.3 (2026-07-12):** **§12 debug console overhaul**, promoted from the loot-history reference implementation. The console now mandates: a **shipped monospace font** under `media/fonts/` (e.g. **JetBrains Mono**, OFL; LSM-registered) applied at **10pt**; a **tagged, colour-coded line format** — `<HH:MM:SS> | [<Tag>] <content>` with the timestamp in muted steel-blue (`6f8faf`), the `[tag]` in muted tan/gold (`c9a66b`), and the `|` separator + content in the default white — mirrored to a **code-free Copy buffer** via **two pure formatters** (`FormatPlain`/`FormatColored`) so the two never drift; a **`NS.Debug(tag, fmt, ...)`** sink with the **tag as the first argument**; a **default window size of `700×344`**; and **session-only, window-independent enabled-state** — `NS.State.debug`, default **off**, held out of SavedVariables and **reset every `/reload`**, toggled by `/<slash> debug on|off` (bare `/<slash> debug` toggles the *window* only) and an in-title-bar **`Debug: ON`/`OFF`** control (green/red). **This reverses the v2.0 "enabled-state SHOULD persist in SV" line** — debug is now session-only by default; persisting it is the documented deviation.
@@ -346,16 +347,30 @@ function M:HandleSomething(...) ... end
 Modules **MUST** communicate via named messages, not direct calls.
 
 ```lua
--- Producer (one per message)
+-- Producer (one per message; send on any embed — SendMessage fans out to all receivers)
 NS.bus:SendMessage("Ka0s_<Addon>_RosterChanged", roster)
 
--- Consumer
-NS.bus:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
+-- Consumer (MUST register on its OWN target, never the shared bus — see the receiver rule)
+NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
 ```
 
 - **MUST** prefix every message `Ka0s_<Addon>_` to avoid collision.
 - **MUST** document each message in `docs/ARCHITECTURE.md` with: name, sender (one), payload schema, all consumers.
 - **MUST NOT** have two senders for the same message.
+- **Each *receiver* MUST register on its own AceEvent target — never register two receivers of the same message on one shared object.** CallbackHandler keys callbacks by `(message, target)` (`events[message][self] = fn`), so if two consumers call `RegisterMessage("Ka0s_<Addon>_X", …)` on the *same* object (typically the shared `NS.bus`/`NS.addon`), the second **silently overwrites** the first — only the last registrant ever receives the message. There is no error, and it is easily masked: a `/reload` re-registers the survivor, so a live change (e.g. a settings toggle broadcast on `SettingsChanged`) appears to "work after a reload" while failing in-session. Two correct target shapes:
+  - **AceAddon modules** — `addon:NewModule("<Name>", "AceEvent-3.0")` gives each module its own AceEvent embed; register on the module's `self`. (Reference: the interrupt-tracker's per-module handlers.)
+  - **Plain-table modules on a single AceAddon object** — each receiver owns a private target from a one-line factory; never register on `NS.bus`/`NS.addon` as `self`:
+    ```lua
+    function NS.NewBusTarget()          -- fresh AceEvent-embedded table per receiver
+      local AceEvent = LibStub("AceEvent-3.0", true)
+      if not AceEvent then return nil end
+      local t = {}; AceEvent:Embed(t); return t
+    end
+    -- in each consumer's enable path:
+    NS.<Module>.__ev = NS.NewBusTarget()
+    NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
+    ```
+- **Test harness MUST model real dispatch.** A no-op `RegisterMessage`/`SendMessage` mock hides this class of bug (the clobber only manifests through real `(message, target)` keying). The bus mock **MUST** key callbacks by target and fan `SendMessage` out to every target, so a test can assert two receivers of one message both fire.
 - Implementation: AceEvent-3.0's `:SendMessage`/`:RegisterMessage` (already in the addon); no new lib needed.
 
 ### 4.5 Schema-as-single-source
@@ -1116,6 +1131,8 @@ For quick reference, the rules above as a do-not list:
 29. Hard-depending on an addon suite or standalone addon (ElvUI/EllesmereUI/DBM/WeakAuras/…), or reading its media/API/frames/SavedVariables — addons are fully self-contained; suite integration is optional, presence-guarded, and degrades gracefully (§3.6).
 30. Hiding the options-panel scrollbar on short pages (bar shown only when content overflows) — the body `ScrollFrame` keeps its bar always shown and inert so body width is identical across subcategories (§6.10).
 31. A 50/50 paired action button left at `SetRelativeWidth(0.5)` — cell-filling buttons inset to `BUTTON_PAIR_REL` (0.492) so the right button clears the `ScrollFrame` clip (§6.6, §6.8, §6.10).
+32. Two receivers of the same bus message registering on the **shared** bus object (`NS.bus`/`NS.addon` as `self`) — CallbackHandler keys callbacks by `(message, target)`, so the later registrant silently clobbers the earlier (last-registrant-wins, no error, masked by `/reload`); each receiver MUST own a distinct AceEvent target — an AceAddon module `self`, or a private `NS.NewBusTarget()` embed (§4.4).
+33. A bus test mock with no-op `RegisterMessage`/`SendMessage` — it can't catch same-target receiver clobbering; the mock MUST key by target and fan `SendMessage` out to all targets (§4.4, §14A).
 
 ---
 
