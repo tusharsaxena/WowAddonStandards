@@ -29,8 +29,8 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
 5. **Write tests first.** Stand up `tests/` (§14A) and drive each behavior test-first.
 6. **Check Definition of Done.** Walk the checklist at the bottom before tagging `v0.1.0`.
 7. **Register in the roster.** *[standards repo]* Add the addon's row to
-   `WowAddonStandards/ADDONS.md`. This puts it in scope for the next audit and standards refresh — it
-   is the only edit needed to bring a new addon into scope.
+   `WowAddonStandards/standards/ADDONS.md`. This puts it in scope for the next standards refresh — it
+   is the only edit needed to bring a new addon into the collection.
 
 Then keep it compliant over time with the `wow-addon:` skills listed at the end of this file
 (`review`, `sync-docs`, `version-bump`, …) and re-audit it as part of the collection.
@@ -108,7 +108,7 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
   libs/                  -- vendored, committed
   tests/                 -- run.lua, loader.lua, wow_mock.lua, test_*.lua
   docs/                  -- ARCHITECTURE.md + full agent context + planning; no TODO.md once released (§15.4)
-  reviews/<YYYY-MM-DD>/  -- retained audit history
+  audit/<YYYY-MM-DD>/    -- retained audit history (§16)
   README.md  (root, full)   CLAUDE.md (root, stub)   LICENSE (root)
   .luacheckrc  .pkgmeta
 ```
@@ -358,7 +358,7 @@ NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roste
 std = "lua51"
 max_line_length = false
 codes = true
-exclude_files = { "libs/", "reviews/", "_dev/", "tests/" }
+exclude_files = { "libs/", "audit/", "_dev/", "tests/" }
 ignore = { "212/self", "212/event" }
 read_globals = {
   "_G", "LibStub", "CreateFrame", "GetTime", "UnitName", "UnitGUID",
@@ -416,7 +416,7 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else (`ARCHITECTURE.md`, full agent context, planning) under `docs/`. Media in typed `media/` subfolders. No drift; sync before every release.
 20a. `README.md` follows the **canonical section order** (§15.1): title → badges (`[wow]`/version/license/standard) → logo → description → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Testing → Version History. TOC follows the fixed field order + `#`-section file listing (§2.1/§2.5).
 20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (§15.4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
-21. Reviews: archive every audit under `reviews/<YYYY-MM-DD>/` with the 5-artifact bundle. Kept, not deleted.
+21. Audits: archive every audit under `audit/<YYYY-MM-DD>/` with its 5-artifact bundle (§16). Kept, not deleted.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:version-bump` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
 24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, one `SKIN` + `ApplySkin` seam, pooled rows. See `01_STANDARD.md §6A`.
@@ -475,7 +475,7 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 - [ ] TOC follows the fixed field order and `#`-section file-listing structure (§2.1/§2.5).
 - [ ] **No `TODO.md`** at release (backlog is in GitHub issues); any pre-release `docs/TODO.md` has been removed (§15.4).
 - [ ] LICENSE = MIT full text.
-- [ ] First entry in `reviews/<YYYY-MM-DD>/` (even if just a "Hello world" smoke test).
+- [ ] First entry in `audit/<YYYY-MM-DD>/` (even if just a "Hello world" smoke test).
 
 ---
 
@@ -508,7 +508,8 @@ named evidence is in `03_INDUSTRY_RESEARCH.md`.)
 (All under `wow-addon:` prefix in your local Claude Code plugin.)
 
 - `wow-addon:new-addon` — scaffold a new addon (Ace3 stack, AceDB, modular folder layout, MIT license, slash command).
-- `wow-addon:review` — principal-engineer review of the current addon. Produces `reviews/<DATE>/` bundle.
+- `wow-addon:standards-audit` — audit the current addon against the standard. Produces the `audit/<DATE>/` deviation + remediation bundle (§16).
+- `wow-addon:review` — principal-engineer code review of the current addon. Produces an `audit/<DATE>/` findings bundle (§16).
 - `wow-addon:sync-docs` — eliminate doc drift across README, CLAUDE.md, ARCHITECTURE.md.
 - `wow-addon:audit-conventions` — walk multiple addons and report drift in shared conventions.
 - `wow-addon:bump-interface` — bump the single TOC Interface line to the latest Retail patch.

@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.6, 2026-07-12)
+# Ka0s WoW Addon Standard (v2.7, 2026-07-12)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,7 @@
 
 **Changelog**
 
+- **v2.7 (2026-07-12):** **Audit history folder renamed `reviews/` → `audit/` (§16).** Every audit run now lives under **`audit/<YYYY-MM-DD>/`** in the addon's own repo — a frozen dated snapshot. §16 recognises two producers that share this folder: the new **`/wow-addon:standards-audit`** (compliance against this standard → `01_CURRENT_STATE`…`05_EXECUTION_PLAN`; playbook `AUDIT.md`) and **`wow-addon:review`** (principal-engineer code review → `01_FINDINGS`…`05_FINAL_SUMMARY`). Mechanical `reviews/` → `audit/` rename in the layout tree, the lowercase-subfolder list (§1.3), tier-promotion and package-ignore exclusions (§1.1, §13), the `.pkgmeta` `exclude_files`, and §15.5. (Context: compliance audits moved out of the central standards repo — each addon audits itself via the plugin — so the standards repo now ships the `AUDIT.md` / `NEW_ADDON.md` playbooks and the roster, not the runs.)
 - **v2.6 (2026-07-12):** **§4.4 message-bus receiver rule.** Each *receiver* MUST register on its own AceEvent target; two consumers of the same message registering on the shared `NS.bus`/`NS.addon` object silently clobber each other — CallbackHandler keys callbacks by `(message, target)`, so the last registrant wins with no error, and the failure is masked by `/reload` (re-enable re-registers the survivor). Added the correct target shapes (an AceAddon module `self`, or a private `NS.NewBusTarget()` embed), a **test-harness rule** (the bus mock MUST model real per-target dispatch, not no-ops), and matching §19 anti-patterns (#32, #33). Surfaced by a live-settings-toggle bug in the loot-history tracker: the Browser's `SettingsChanged` handler, registered on the shared bus after the Collector's, clobbered it, so setting changes only applied after a reload. (Addons using AceAddon `NewModule(..., "AceEvent-3.0")` per module — e.g. the interrupt tracker — were already safe, since each module is a distinct target.)
 - **v2.5 (2026-07-12):** **Re-based the canonical `README.md` structure (§15.1)** on the collection's **consumables & macro manager** as the golden template (previously the Tier-2 modular tracker), adopting its layout and styling. Table headers are now **`Command | What it does`**, **`Symptom | Fix`**, and **`Version | Date | Highlights`** (Version History is most-recent-first, no longer capped at 5); the **description MAY inline a summary table** (not just a bullet list); the **`### Settings panel`** subsection MAY carry per-panel prose beneath its table; and the former **`## Critical settings`** section is replaced, in the same slot (after Usage, before FAQ), by an optional **`## How <it> works`** narrative explainer of the addon's core mechanic. The **standard-link badge** and the standalone **`## Testing`** section stay **MUST**, and the **`Tab | Covers`** settings table is retained — the reference README documents these differently, but the standard keeps them.
 - **v2.4 (2026-07-12):** **§6 options-panel refinements** from the Tier-2 tracker's settings work. **(1)** New **§6.10 Scroll container** — the body's AceGUI `ScrollFrame` **MUST** keep its vertical scrollbar shown *even when the content fits* (park + disable the thumb; don't hide the bar), so every subcategory renders at an identical body width and right margin. Hiding the bar on short pages is now an anti-pattern (§19). **(2)** **§6.6 / §6.8** — a cell-filling action `Button` in a 50/50 pair **MUST** inset to `SetRelativeWidth(0.492)` (new constant `BUTTON_PAIR_REL`), not a flush `0.5`, so AceGUI Flow's ~2px right-cell spill isn't shaved off by the `ScrollFrame` clip rect. §19 anti-patterns updated.
@@ -79,7 +80,7 @@ For utility-class addons (e.g. a small group-composition utility at ~3 files, a 
 - **MUST** stay flat — no `core/`, `modules/` subfolders for source.
 - **MUST** keep each file under 1500 LOC. If a file exceeds 1000, plan a peel.
 - **MAY** peel a single oversized file into 2-3 sub-files in the same folder (e.g. `Settings_Schema.lua`, `Settings_Panel.lua`) — **MUST NOT** introduce subfolders for source.
-- Promotion to Tier 2 is mandatory once source-file count would exceed 8 (excluding `libs/`, `media/`, `docs/`, `tests/`, `reviews/`).
+- Promotion to Tier 2 is mandatory once source-file count would exceed 8 (excluding `libs/`, `media/`, `docs/`, `tests/`, `audit/`).
 
 ### 1.2 Tier 2 — Modular (>8 files or any addon with multiple feature modules)
 
@@ -115,7 +116,7 @@ Reference implementation (in the collection): the Tier-2 modular interrupt/coold
   libs/                    -- vendored Ace3 + other libs, committed to git (§3.3)
   tests/                   -- headless Lua 5.1 harness (§14A)
   docs/                    -- ARCHITECTURE.md, full agent context, planning/reference docs (§15)
-  reviews/<YYYY-MM-DD>/    -- audit history (retained; §16)
+  audit/<YYYY-MM-DD>/      -- audit history (retained; §16)
   README.md                -- full, user-facing (stays at root)
   CLAUDE.md                -- STUB: short pointer into docs/ (§15)
   LICENSE
@@ -129,7 +130,7 @@ Reference implementation (in the collection): the Tier-2 modular interrupt/coold
 ### 1.3 Casing
 
 - Addon root folder: **PascalCase** matching the `## Title:` in TOC (minus the `Ka0s ` prefix).
-- Subfolders: **lowercase** (`core/`, `modules/`, `libs/`, `media/`, `defaults/`, `settings/`, `locales/`, `docs/`, `reviews/`, `tests/`). **MUST** use `libs/` lowercase (not `Libs/`).
+- Subfolders: **lowercase** (`core/`, `modules/`, `libs/`, `media/`, `defaults/`, `settings/`, `locales/`, `docs/`, `audit/`, `tests/`). **MUST** use `libs/` lowercase (not `Libs/`).
 - Lua files: **PascalCase.lua** (`Database.lua`, `IconGrid.lua`).
 - Non-source folders that ship: lowercase.
 
@@ -923,7 +924,7 @@ ignore:
 ```
 
 - **MUST** vendor and commit every library the addon uses (§3.3). **MUST NOT** declare `externals:`; **MUST** commit `libs/` to git as part of the addon.
-- **MUST** ignore `reviews/`, `_dev/`, `docs/`, `tests/`, lockfiles in the package (dev-only; not shipped to players).
+- **MUST** ignore `audit/`, `_dev/`, `docs/`, `tests/`, lockfiles in the package (dev-only; not shipped to players).
 - **MUST NOT** use `enable-toc-creation` flavor fan-out — the addon is Retail-only with a single TOC (§2.3).
 - **MAY** use `move-folders:` only when the repo is a monorepo for multiple addons (out of scope today).
 
@@ -939,7 +940,7 @@ Every addon **MUST** ship `.luacheckrc` at the root. Base it on the common WoW-a
 std = "lua51"
 max_line_length = false
 codes = true
-exclude_files = { "libs/", "reviews/", "_dev/", "tests/" }
+exclude_files = { "libs/", "audit/", "_dev/", "tests/" }
 ignore = {
   "212/self",   -- unused argument self
   "212/event",  -- unused argument event
@@ -1049,15 +1050,18 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 
 ### 15.5 Keeping docs in sync
 
-- **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `reviews/` folder. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
+- **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `audit/` run. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
 
 ---
 
-## 16. Reviews / audit history
+## 16. Audit history
 
-- **MUST** keep `reviews/<YYYY-MM-DD>/` folders for every audit. Five-artifact bundle: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`. The `wow-addon:review` skill produces this format.
-- **SHOULD** retain every prior `reviews/` folder; they are the addon's institutional memory. (Reviews are **kept**, not deleted after commit.)
-- `03_SMOKE_TESTS.md` catalogues **in-game** checks; they complement the headless unit suites (§14A), which cover testable logic.
+- **MUST** keep an **`audit/<YYYY-MM-DD>/`** folder for every audit run, in the addon's **own** repo — a frozen, dated snapshot. A re-audit is a **new** dated folder; never edit a prior run.
+- Two skills write here, each a five-artifact bundle:
+  - **`/wow-addon:standards-audit`** — compliance against this standard: `01_CURRENT_STATE.md`, `02_DEVIATIONS.md` (stable per-addon deviation IDs), `03_EVIDENCE.md`, `04_TECHNICAL_DESIGN.md`, `05_EXECUTION_PLAN.md`. The step-by-step playbook is `AUDIT.md` at the root of the standards repo. This audit is **read-only** — it produces a remediation plan, it does not change code.
+  - **`wow-addon:review`** — principal-engineer code review: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`.
+- **SHOULD** retain every prior `audit/` folder; they are the addon's institutional memory. (Runs are **kept**, not deleted after commit.)
+- A review's `03_SMOKE_TESTS.md` catalogues **in-game** checks; they complement the headless unit suites (§14A), which cover testable logic.
 
 ---
 
