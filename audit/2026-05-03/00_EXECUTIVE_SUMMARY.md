@@ -1,6 +1,6 @@
 # Executive Summary — Ka0s Addon Audit (2026-05-03)
 
-**One-page TL;DR of this audit run.** Audited against the standard: [`../../standards/01_STANDARD.md`](../../standards/01_STANDARD.md). Full evidence: [`01_PLAN.md`](01_PLAN.md), [`02_CURRENT_STATE.md`](02_CURRENT_STATE.md), [`03_INDUSTRY_RESEARCH.md`](03_INDUSTRY_RESEARCH.md), [`04_DEVIATIONS.md`](04_DEVIATIONS.md), and per-addon remediation plans in [`remediation/`](remediation/).
+**One-page TL;DR of this audit run.** Audited against the standard: [`../../standards/01_STANDARD.md`](../../standards/01_STANDARD.md). Full evidence: [`01_PLAN.md`](01_PLAN.md), [`02_CURRENT_STATE.md`](02_CURRENT_STATE.md), [`03_DEVIATIONS.md`](03_DEVIATIONS.md), and per-addon remediation plans in [`remediation/`](remediation/). (The industry research this run produced has since been promoted to the standards process — [`../../standards/03_INDUSTRY_RESEARCH.md`](../../standards/03_INDUSTRY_RESEARCH.md).)
 
 ---
 
@@ -30,13 +30,13 @@ Five addons audited (AbsorbTracker, ConsumableMaster, KickCD, prettychat, WhatGr
 
 ## Bonus risk worth flagging
 
-**ConsumableMaster declares `schemaVersion = 1` with no migration code anywhere.** A future v2 migration will silently corrupt user SVs. Trivial S-effort fix; high blast-radius if not done. ([`04_DEVIATIONS.md`](04_DEVIATIONS.md) CM-4.)
+**ConsumableMaster declares `schemaVersion = 1` with no migration code anywhere.** A future v2 migration will silently corrupt user SVs. Trivial S-effort fix; high blast-radius if not done. ([`03_DEVIATIONS.md`](03_DEVIATIONS.md) CM-4.)
 
 ---
 
 ## Recommended remediation sequencing
 
-[Detailed in [`04_DEVIATIONS.md`](04_DEVIATIONS.md) §"Cross-cutting summary" and reconciled in [`remediation/README.md`](remediation/README.md).]
+[Detailed in [`03_DEVIATIONS.md`](03_DEVIATIONS.md) §"Cross-cutting summary" and reconciled in [`remediation/README.md`](remediation/README.md).]
 
 | Sprint | Effort | Scope | Outcome |
 |---|---|---|---|
@@ -64,12 +64,13 @@ audit/2026-05-03/
   00_EXECUTIVE_SUMMARY.md       -- this file
   01_PLAN.md                    -- approved milestone plan
   02_CURRENT_STATE.md           -- per-addon snapshot + matrix
-  03_INDUSTRY_RESEARCH.md       -- 10 reference addons synthesized
-  04_DEVIATIONS.md              -- per-addon gap report + sprints
+  03_DEVIATIONS.md              -- per-addon gap report + sprints
   _raw/                         -- full per-addon evidence
     AbsorbTracker.md  ConsumableMaster.md  KickCD.md  prettychat.md  WhatGroup.md
-    _industry/                  -- 10 reference-addon raw reports
   remediation/                  -- per-addon TECHNICAL_DESIGN + EXECUTION_PLAN (+ README index)
+
+# Industry research (03_INDUSTRY_RESEARCH.md + _raw/_industry/) was promoted to the standards
+# process and now lives under ../../standards/.
 ```
 
 ---
@@ -78,4 +79,4 @@ audit/2026-05-03/
 
 1. Review [`../../standards/01_STANDARD.md`](../../standards/01_STANDARD.md) and approve / request edits.
 2. Drop [`../../standards/02_NEW_ADDON_CONTEXT.md`](../../standards/02_NEW_ADDON_CONTEXT.md) content into the next new addon's `CLAUDE.md`.
-3. Schedule the remediation sprints against [`04_DEVIATIONS.md`](04_DEVIATIONS.md), executing the per-addon plans in [`remediation/`](remediation/).
+3. Schedule the remediation sprints against [`03_DEVIATIONS.md`](03_DEVIATIONS.md), executing the per-addon plans in [`remediation/`](remediation/).

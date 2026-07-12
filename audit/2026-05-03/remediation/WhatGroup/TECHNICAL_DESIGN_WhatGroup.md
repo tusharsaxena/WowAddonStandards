@@ -3,7 +3,7 @@
 **Tier:** 1 (flat). **Stays flat.** No promotion to Tier 2.
 **Source root:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/WhatGroup/`
 **Standards basis:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/WowAddonStandards/standards/01_STANDARD.md`
-**Deviations:** WG-1 .. WG-11 from `04_DEVIATIONS.md`.
+**Deviations:** WG-1 .. WG-11 from `03_DEVIATIONS.md`.
 
 ---
 
@@ -21,7 +21,7 @@ Out of explicit non-goals: do NOT modularize, do NOT touch `WhatGroup.lua` captu
 
 WG-1 missing `.pkgmeta`; WG-2 missing `.luacheckrc`; WG-3 missing `X-Curse-Project-ID`/`X-Wago-ID` in TOC; WG-4 in-folder peel of `WhatGroup_Settings.lua`; WG-5 missing `Compat.lua`; WG-6 missing locale module shell; WG-7 in-memory-only debug toggle (must persist in SV); WG-8 hand-rolled `SLASH_*` (migrate to AceConsole); WG-9 `appID`-as-`searchResultID` reuse undocumented; WG-10 fuzzy public surface on `_G.WhatGroup`; WG-11 cargo-cult `## DefaultState: enabled` in TOC.
 
-The standard explicitly endorses staying flat for WhatGroup (`04_DEVIATIONS.md` "What's deliberately not on this list" → "WhatGroup staying Tier 1 flat. Standard explicitly allows it; its analyst made the case. No deviation.").
+The standard explicitly endorses staying flat for WhatGroup (`03_DEVIATIONS.md` "What's deliberately not on this list" → "WhatGroup staying Tier 1 flat. Standard explicitly allows it; its analyst made the case. No deviation.").
 
 ## 3. HLD — System view
 
@@ -86,7 +86,7 @@ LFG_LIST_*  ─────────┘     (notifiedFor / notifyGen / WipeCa
 
 **Current:** absent.
 **Target:** root-level `.pkgmeta` declaring Ace3 libs as externals (per `01_STANDARD.md` §13 template), `package-as: WhatGroup`, ignore list with `reviews/`, `_dev/`, `docs/internal/`, `*.bak`, `.luacheckrc`.
-**Migration:** create file from §13 template; LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceConsole-3.0, AceDB-3.0, AceGUI-3.0 as externals. Do not delete vendored `libs/` content in the same commit (that's a separate sprint per `04_DEVIATIONS.md` cross-cutting plan).
+**Migration:** create file from §13 template; LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceConsole-3.0, AceDB-3.0, AceGUI-3.0 as externals. Do not delete vendored `libs/` content in the same commit (that's a separate sprint per `03_DEVIATIONS.md` cross-cutting plan).
 **Risks:** None at install time — `.pkgmeta` only affects packager. Verification: `cat .pkgmeta`; future packager run produces a build with the same Ace3 versions.
 
 ### WG-2 — Missing `.luacheckrc` (🔴, S)
@@ -220,7 +220,7 @@ Schema labels and tooltips are NOT migrated to L["..."] in this milestone — th
 
 **Current:** `WhatGroup.lua:239` seeds `WhatGroup.debug` from `db.profile.debug`; `/wg debug` toggles via `Helpers.Set("debug", ...)`. **This is already SV-persistent** — re-read the current state. Looking at `WhatGroup_Settings.lua:108-115`: the `debug` schema row IS in `profile`, default false. So debug IS persistent across reloads.
 
-**Re-classification:** WG-7 in `04_DEVIATIONS.md` is mis-stated — WhatGroup already has a persistent debug toggle. The standard wants `db.global.debug`; WhatGroup uses `db.profile.debug`. Both are SV-persistent. The standard says "MUST gate via persistent SV flag (`NS.db.global.debug`)" — pedantically `profile` vs `global` matters when an addon supports per-profile debug; for a single-account-shared-profile addon (WhatGroup uses `AceDB:New(..., true)` for shared Default profile), profile is functionally identical to global.
+**Re-classification:** WG-7 in `03_DEVIATIONS.md` is mis-stated — WhatGroup already has a persistent debug toggle. The standard wants `db.global.debug`; WhatGroup uses `db.profile.debug`. Both are SV-persistent. The standard says "MUST gate via persistent SV flag (`NS.db.global.debug`)" — pedantically `profile` vs `global` matters when an addon supports per-profile debug; for a single-account-shared-profile addon (WhatGroup uses `AceDB:New(..., true)` for shared Default profile), profile is functionally identical to global.
 
 **Decision:** keep `db.profile.debug` (no migration to `db.global.debug` required). Document the analysis in `ARCHITECTURE.md` so the next reviewer doesn't re-flag.
 
@@ -238,7 +238,7 @@ self:RegisterChatCommand("whatgroup", "OnSlash")
 
 Wait — re-read. **This is already AceConsole.** `RegisterChatCommand` is the AceConsole-3.0 method (per `01_STANDARD.md` §7.1 example). `WhatGroup.lua:23-25` registers `AceConsole-3.0` as a mixin.
 
-**Re-classification:** WG-8 in `04_DEVIATIONS.md` is mis-stated — WhatGroup already uses AceConsole. There are no `SLASH_WG1 = "/wg"` lines in the source. Confirm at peel time.
+**Re-classification:** WG-8 in `03_DEVIATIONS.md` is mis-stated — WhatGroup already uses AceConsole. There are no `SLASH_WG1 = "/wg"` lines in the source. Confirm at peel time.
 
 **Decision:** no migration needed; close WG-8 as "already compliant; analyst error".
 **Migration:** no-op.

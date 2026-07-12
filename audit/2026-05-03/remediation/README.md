@@ -14,7 +14,7 @@ Per-addon technical designs (HLD+LLD) and execution plans (subagent-ready, check
 
 ## Deviation report corrections (surfaced by design agents)
 
-The design agents read the actual source while writing each design. They surfaced **5 stale findings** in [`../04_DEVIATIONS.md`](../04_DEVIATIONS.md) that should be marked as already-compliant rather than implemented:
+The design agents read the actual source while writing each design. They surfaced **5 stale findings** in [`../03_DEVIATIONS.md`](../03_DEVIATIONS.md) that should be marked as already-compliant rather than implemented:
 
 | Finding | Status | Evidence |
 |---|---|---|
@@ -24,7 +24,7 @@ The design agents read the actual source while writing each design. They surface
 | **PC-11** "hand-rolled `SLASH_*`" | ✅ Already compliant | AceConsole `:RegisterChatCommand` at `PrettyChat.lua:33-34` |
 | **KCD-7** "hand-rolled `SLASH_*`" | ✅ Already compliant | AceConsole `:RegisterChatCommand` at `core/KickCD.lua:60-61`; zero `SLASH_*` globals |
 
-**Net effect:** the cross-cutting "5/5 hand-roll `SLASH_*`" finding in `04_DEVIATIONS.md` and `00_EXECUTIVE_SUMMARY.md` is **wrong**. Reality: **AbsorbTracker is the only addon with hand-rolled `SLASH_*`**; the other 4 already use AceConsole. Verified via grep across all 5 source trees.
+**Net effect:** the cross-cutting "5/5 hand-roll `SLASH_*`" finding in `03_DEVIATIONS.md` and `00_EXECUTIVE_SUMMARY.md` is **wrong**. Reality: **AbsorbTracker is the only addon with hand-rolled `SLASH_*`**; the other 4 already use AceConsole. Verified via grep across all 5 source trees.
 
 This collapses Sprint 3 (Slash → AceConsole migration) from a 1-day cross-collection sprint to a 1-task AbsorbTracker fix (covered in AT-5 / its execution plan M3).
 

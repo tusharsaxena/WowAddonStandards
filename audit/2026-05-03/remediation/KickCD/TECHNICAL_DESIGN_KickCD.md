@@ -4,7 +4,7 @@
 **Tier:** 2 (canonical reference for Tier 2 layout)
 **Source root:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/KickCD`
 **Standard:** `WowAddonStandards/standards/01_STANDARD.md`
-**Deviation list:** `WowAddonStandards/audit/2026-05-03/04_DEVIATIONS.md` (KCD-1..KCD-13)
+**Deviation list:** `WowAddonStandards/audit/2026-05-03/03_DEVIATIONS.md` (KCD-1..KCD-13)
 **Raw audit:** `WowAddonStandards/audit/2026-05-03/_raw/KickCD.md`
 
 ---
@@ -219,7 +219,7 @@ This is the largest risk. Detailed region maps follow.
 
 ### KCD-7 — Slash to AceConsole (🟠, S) — **already implemented**
 
-**Re-audit:** `core/KickCD.lua:60-61` already calls `self:RegisterChatCommand("kickcd", "OnSlashCommand")` and `self:RegisterChatCommand("kcd", "OnSlashCommand")`; AceConsole-3.0 is mixed in at `:23-26`. `grep -n "SLASH_" core/ modules/ settings/` returns **zero hits**. The deviation listing in `04_DEVIATIONS.md` is stale relative to the current source.
+**Re-audit:** `core/KickCD.lua:60-61` already calls `self:RegisterChatCommand("kickcd", "OnSlashCommand")` and `self:RegisterChatCommand("kcd", "OnSlashCommand")`; AceConsole-3.0 is mixed in at `:23-26`. `grep -n "SLASH_" core/ modules/ settings/` returns **zero hits**. The deviation listing in `03_DEVIATIONS.md` is stale relative to the current source.
 
 **Target:** confirm via grep, document in remediation execution log, mark KCD-7 as **already met**. No code change.
 

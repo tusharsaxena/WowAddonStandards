@@ -3,7 +3,7 @@
 **Addon:** Ka0s Consumable Master (`ConsumableMaster`)
 **Source:** `/mnt/d/Profile/Users/Tushar/Documents/GIT/ConsumableMaster/`
 **Standard:** `WowAddonStandards/standards/01_STANDARD.md` v1.0
-**Deviation IDs:** CM-1 .. CM-14 (`WowAddonStandards/audit/2026-05-03/04_DEVIATIONS.md`)
+**Deviation IDs:** CM-1 .. CM-14 (`WowAddonStandards/audit/2026-05-03/03_DEVIATIONS.md`)
 **Tier:** Tier 1 borderline. 16 production root `.lua` files plus a `defaults/` and `settings/` cluster put us above the 8-file flat ceiling — but the standard explicitly permits "flat with folders" for addons whose extra folders are pure data (`defaults/`) or the canonical UI cluster (`settings/`). We retain the current flat-with-folders shape rather than promote to Tier 2 `core/modules/`. Promotion is deferred until a real `modules/` need emerges.
 
 ---
@@ -488,7 +488,7 @@ self:RegisterChatCommand("cm", "OnSlashCommand")
 self:RegisterChatCommand("consumablemaster", "OnSlashCommand")
 ```
 
-The deviation entry in `04_DEVIATIONS.md` flags CM-7 as needing migration, but the raw report (`_raw/ConsumableMaster.md` §8) and the source confirm AceConsole is already used. **No code change required** — verify and document closure in the execution plan.
+The deviation entry in `03_DEVIATIONS.md` flags CM-7 as needing migration, but the raw report (`_raw/ConsumableMaster.md` §8) and the source confirm AceConsole is already used. **No code change required** — verify and document closure in the execution plan.
 
 **Verification:** `grep -n "RegisterChatCommand\|SLASH_KCM" Core.lua SlashCommands.lua` shows AceConsole only.
 
@@ -607,7 +607,7 @@ Either eliminates the drift. The execution plan picks (a).
 
 ### CM-11 `docs/module-map.md` stale exports
 
-**Current state:** Per `04_DEVIATIONS.md` CM-11, `docs/module-map.md` lists exports that do not exist (e.g. `HasPending`, `IsPending`, `Stats`, `MakeCheckbox`). Verified — searching the current source for `HasPending` / `PendingCount` / `IsAdopted` / `IsPending` / `MakeCheckbox` / `SchemaForPanel` returns no definitions (only the doc references the audit picked up from a prior version).
+**Current state:** Per `03_DEVIATIONS.md` CM-11, `docs/module-map.md` lists exports that do not exist (e.g. `HasPending`, `IsPending`, `Stats`, `MakeCheckbox`). Verified — searching the current source for `HasPending` / `PendingCount` / `IsAdopted` / `IsPending` / `MakeCheckbox` / `SchemaForPanel` returns no definitions (only the doc references the audit picked up from a prior version).
 
 Reviewing the *current* `docs/module-map.md` shows it has actually been **mostly cleaned up** since the audit — the visible exports for MacroManager, Selector, Ranker, Classifier, BagScanner, TooltipCache, SpecHelper, Settings, and Debug all match real functions in the current source. The remaining drift to verify and fix is small.
 

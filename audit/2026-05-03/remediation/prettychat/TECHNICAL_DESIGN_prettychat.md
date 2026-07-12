@@ -3,7 +3,7 @@
 **Addon:** prettychat (current folder, lowercase) — to be renamed to **PrettyChat**.
 **Tier:** Tier 1 (flat).
 **Standards baseline:** `WowAddonStandards/standards/01_STANDARD.md`.
-**Findings consumed:** `WowAddonStandards/audit/2026-05-03/04_DEVIATIONS.md` PC-1 .. PC-15 plus raw `_raw/prettychat.md`.
+**Findings consumed:** `WowAddonStandards/audit/2026-05-03/03_DEVIATIONS.md` PC-1 .. PC-15 plus raw `_raw/prettychat.md`.
 **Source root (current):** `/mnt/d/Profile/Users/Tushar/Documents/GIT/prettychat/`.
 
 This is the principal-engineer-level HLD + LLD that the executing subagent will work from. The agent has no other context.
@@ -20,7 +20,7 @@ The end-state addon is identical in behavior, smaller in footprint (PC-12 Global
 
 ## 2. Scope
 
-In scope: PC-1 through PC-15 from `04_DEVIATIONS.md`.
+In scope: PC-1 through PC-15 from `03_DEVIATIONS.md`.
 
 | # | Finding (one line) | Severity |
 |---|---|---|
@@ -286,7 +286,7 @@ Each finding lists: current state file:line, target state, migration steps, risk
 ### PC-11 — AceConsole slash registration
 
 - **Current:** `PrettyChat.lua:33-34` already uses `self:RegisterChatCommand("pc", ...)` and `self:RegisterChatCommand("prettychat", ...)`. **AceConsole IS in use today.** Re-check the deviation against the raw report:
-  - `_raw/prettychat.md` §8 "Slash commands" confirms AceConsole. The deviation in `04_DEVIATIONS.md` (PC-11) labels this as "Hand-rolled `SLASH_*`" — that is **incorrect** as written.
+  - `_raw/prettychat.md` §8 "Slash commands" confirms AceConsole. The deviation in `03_DEVIATIONS.md` (PC-11) labels this as "Hand-rolled `SLASH_*`" — that is **incorrect** as written.
   - **Resolution:** PC-11 is **already conforming**; reframe the milestone as a defensive verify-only pass. Do NOT downgrade to a SLASH_* path. The "cargo-cult removal" item PC-11 in the EXECUTION_PLAN is the audit/cleanup of any leftover mentions in docs.
 - **Target:** verify; remove any docs mention of "manual SLASH_PRETTYCHAT registration" if found (none expected).
 - **Risks:** none.

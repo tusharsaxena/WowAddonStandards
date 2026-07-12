@@ -12,7 +12,7 @@ this work.
 
 | Part | What it is |
 |---|---|
-| [**`standards/`**](standards/) | **The standard** — the canonical, living house rules for all Ka0s addons, plus a drop-in context pack for scaffolding new ones. Evolves in place; versioned via its changelog. |
+| [**`standards/`**](standards/) | **The standard** — the canonical, living house rules for all Ka0s addons, the industry research they are built on, and a drop-in context pack for scaffolding new ones. Evolves in place; versioned via its changelog. See [`standards/README.md`](standards/README.md) for how to rebuild it. |
 | [**`audit/`**](audit/) | **The audits** — periodic, point-in-time compliance runs against the standard. Each run is a frozen snapshot under `audit/YYYY-MM-DD/`, with per-addon deviations and remediation plans. |
 
 The standard is the source of truth; the audits are the evidence and the remediation roadmap.
@@ -39,17 +39,19 @@ The canonical output is [`standards/01_STANDARD.md`](standards/01_STANDARD.md) �
 ```
 WowAddonStandards/
   standards/                              -- THE STANDARD (living, canonical)
+    README.md                             -- what's here + how to rebuild the standard
     00_EXECUTIVE_SUMMARY.md               -- one-page TL;DR of the standard
     01_STANDARD.md                        -- the Ka0s WoW Addon Standard (canonical)
     02_NEW_ADDON_CONTEXT.md               -- drop-in CLAUDE.md context pack for new addons
+    03_INDUSTRY_RESEARCH.md               -- research foundation: 10 reference addons synthesized
+    _raw/_industry/                       -- per-addon raw research reports (evidence)
   audit/                                  -- periodic compliance runs (see audit/README.md)
     2026-05-03/                           -- one dated folder per run (frozen snapshot)
       00_EXECUTIVE_SUMMARY.md             -- one-page TL;DR of this run
       01_PLAN.md                          -- milestone plan
       02_CURRENT_STATE.md                 -- per-addon snapshot + matrix
-      03_INDUSTRY_RESEARCH.md             -- 10 reference addons synthesized
-      04_DEVIATIONS.md                    -- per-addon gap report + sprints
-      _raw/                               -- per-addon evidence (_industry/ = reference research)
+      03_DEVIATIONS.md                    -- per-addon gap report + sprints
+      _raw/                               -- per-addon compliance evidence
       remediation/                        -- per-addon design + execution plans
 ```
 
@@ -59,7 +61,7 @@ WowAddonStandards/
 2. Drop [`standards/02_NEW_ADDON_CONTEXT.md`](standards/02_NEW_ADDON_CONTEXT.md) into any new addon's
    `CLAUDE.md` so it starts compliant.
 3. Schedule the remediation sprints against
-   [`audit/2026-05-03/04_DEVIATIONS.md`](audit/2026-05-03/04_DEVIATIONS.md), executing the per-addon
+   [`audit/2026-05-03/03_DEVIATIONS.md`](audit/2026-05-03/03_DEVIATIONS.md), executing the per-addon
    plans in [`audit/2026-05-03/remediation/`](audit/2026-05-03/remediation/).
 4. Run future audits as new `audit/YYYY-MM-DD/` folders — see [`audit/README.md`](audit/README.md).
 

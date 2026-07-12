@@ -1,6 +1,8 @@
-# Industry Research — Reference Addon Patterns (2026-05-03)
+# Industry Research — Reference Addon Patterns
 
 Deep-dive analysis of 10 widely respected community addons to extract patterns the Ka0s standard should consider adopting (or explicitly reject). Per-addon raw reports under `_raw/_industry/<Addon>.md` are the evidence base; this file is the synthesized cross-cutting view.
+
+**Role:** this is a **standards-process** input, not an audit artifact — it is the research foundation from which [`01_STANDARD.md`](01_STANDARD.md) is synthesized. See [`README.md`](README.md) for how the standard is (re)built from this document. Research first conducted 2026-05-03; refresh it and re-synthesize when the ecosystem moves.
 
 | Addon | Stack | Repo | Raw report |
 |---|---|---|---|
@@ -162,7 +164,7 @@ Aggregated across all 10 reports:
 
 ## 5. Validation against Ka0s in-house decisions
 
-Cross-checking the 10 "decisions to lock in M4" from `02_CURRENT_STATE.md` against industry practice:
+Cross-checking the 10 "decisions to lock in" from the collection's current-state analysis (a run's `02_CURRENT_STATE.md`, e.g. [`../audit/2026-05-03/02_CURRENT_STATE.md`](../audit/2026-05-03/02_CURRENT_STATE.md)) against industry practice:
 
 | Decision | Industry signal | Recommendation for M4 |
 |---|---|---|
@@ -196,4 +198,4 @@ These weren't in the Ka0s-only analysis but are worth taking a position on in M4
 
 ---
 
-**Status:** M3 complete. Proceeding to M4 (synthesize `01_STANDARD.md`).
+**Status:** This research is the standing foundation for [`01_STANDARD.md`](01_STANDARD.md). When it is refreshed, re-run the synthesis step in [`README.md`](README.md) and bump the standard's changelog.
