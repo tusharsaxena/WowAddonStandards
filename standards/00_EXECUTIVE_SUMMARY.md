@@ -8,9 +8,9 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). The standard is versioned; see the changelog at the top of `01_STANDARD.md` (current: **v1.3**).
+**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and reference it: <https://github.com/tusharsaxena/WowAddonStandards>. The standard is versioned; see the changelog at the top of `01_STANDARD.md` (current: **v2.0**).
 
-**Since v1.0:** libraries are now **vendored in `libs/` and committed** (no `.pkgmeta` externals) — v1.1; development is **trunk-based** (no feature branches unless asked, never push unless asked) — v1.2; addons with their own main window follow **§6A Standalone windows / data browsers** — v1.3.
+**Since v1.0:** libraries are **vendored and committed** (no externals) — v1.1; development is **trunk-based** — v1.2; addons with their own main window follow **§6A Standalone windows / data browsers** — v1.3. **v2.0** is a major refresh: **Retail-only** with a single latest-Retail `## Interface:` line (no multi-flavor); **docs relocated** to `docs/` with a full root `README.md` and a **stub** root `CLAUDE.md`; a mandatory **headless Lua 5.1 test harness + TDD commit gate** (`lua tests/run.lua` green **and** `luacheck .` clean before every commit — §14A); an on-screen **debug console** instead of chat output (§12); **settings category registered eagerly** so the entry is always visible (§6.1); an optional **preview/test mode** (§6B); **typed `media/` subfolders**; and a convention that the standard **describes reference implementations rather than naming addons** (§0).
 
 ## The five patterns it makes canonical
 
@@ -30,5 +30,6 @@ These were validated against the Ka0s collection and the broader ecosystem (see 
 
 ## Scope boundaries
 
-- **CI / GitHub Actions** are intentionally out of scope per Ka0s decision.
-- A long-term **`Ka0s-Core`** sibling addon (Bagnon-style engine extraction) is recorded as a future direction in `01_STANDARD.md §20`, not pursued now.
+- **Retail (Mainline) only.** Classic/other flavors are out of scope; addons ship a single latest-Retail `## Interface:` line (`§2.3`).
+- **CI / GitHub Actions** are intentionally out of scope per Ka0s decision. **Local** testing and linting are **in scope** — a headless Lua 5.1 harness plus `luacheck` (`§14A`).
+- A long-term **`Ka0s-Core`** sibling addon (shared-engine extraction, including the debug-console + test scaffolding) is recorded as a future direction in `01_STANDARD.md §20`, not pursued now.

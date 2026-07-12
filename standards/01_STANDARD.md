@@ -1,12 +1,24 @@
-# Ka0s WoW Addon Standard (v1.3, 2026-07-11)
+# Ka0s WoW Addon Standard (v2.0, 2026-07-12)
 
-**Status:** Source of truth. All `03_DEVIATIONS.md` audits and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
+**Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
+
+**Adherence:** Every Ka0s addon **MUST** be built to this standard and **MUST** reference it: <https://github.com/tusharsaxena/WowAddonStandards> (see §15, §2.1).
 
 **Changelog**
 
-- **v1.3 (2026-07-11):** Added **§6A Standalone windows / data browsers** — house rules for an addon's own main window (non-secure `CreateFrame`, `UISpecialFrames` ESC handling, SV-persisted position/size, scale setting, lazy tabs, single `SKIN` + `ApplySkin` re-skin seam, pooled rows). §6 remains the options-panel surface. Reference implementation: Ka0s Loot History. Also reflected in `02_NEW_ADDON_CONTEXT.md`.
-- **v1.2 (2026-07-11):** Added a **git workflow** rule. Ka0s addons are developed **trunk-based** — commit directly to the default branch; do **not** create feature branches for routine work unless the human explicitly asks; never push unless asked. Renamed §17 "Versioning" → "Versioning & git workflow" and added the matching anti-pattern (§19). Also reflected in `02_NEW_ADDON_CONTEXT.md`.
-- **v1.1 (2026-07-11):** Reversed the library-embedding rule. Ka0s addons now **vendor all libraries in `libs/` and commit them**; `.pkgmeta` `externals:` for libs is forbidden. Rationale: fully self-contained, offline-installable addons. Affects §3.1, §3.3, §6.3, §13, §19. (v1.0 mandated externals.)
+- **v2.0 (2026-07-12):** Major refresh.
+  - **Retail-only.** Dropped the multi-flavor apparatus. A single `## Interface:` line carries the latest Retail patch number (currently `120007`); no comma-separated flavor lists, no per-flavor TOCs, no `_Mainline`/`_Classic` data splits. §1.2, §2.1, §2.3, §11, §19 updated.
+  - **Docs relocated.** Root keeps `README.md` (full), a **stub** `CLAUDE.md` (pointer), and `LICENSE`; `ARCHITECTURE.md` and all other docs move under `docs/`. §1.1, §1.2, §15.
+  - **Automated tests + local build (new §14A).** Every addon ships a headless plain-Lua-5.1 `tests/` harness (runner + micro-framework, headless source loader, WoW-API mocks, per-module suites); TDD, with `lua tests/run.lua` green **and** `luacheck .` clean required before every commit. Local toolchain documented. (CI stays out of scope; local testing is now in scope.)
+  - **Preview / test mode (new §6B).** Addons with a positionable UI should ship a placeholder-data preview mode.
+  - **Debug console (§12).** Debug output routes to a dedicated on-screen console styled like the addon's main window, not the chat frame; enabled-state should persist in SV.
+  - **Settings entry always visible (§6.1).** The Blizzard settings **category** must be registered eagerly at load so the entry is always present; only the body builds lazily. Deferring registration to first `/config` is now an anti-pattern.
+  - **Typed media subfolders (§1, §6.5).** Shipped media lives in `media/logos/`, `media/screenshots/`, etc. — nothing loose in `media/`.
+  - **No named implementations (§0).** The normative standard describes reference implementations by their characteristics instead of naming specific addons; named evidence lives in `03_INDUSTRY_RESEARCH.md`.
+  - Reaffirmed: libraries are vendored and committed (no externals; since v1.1).
+- **v1.3 (2026-07-11):** Added **§6A Standalone windows / data browsers**.
+- **v1.2 (2026-07-11):** Added the **git workflow** rule (trunk-based; no feature branches unless asked; never push unless asked). Renamed §17 and added the matching anti-pattern (§19).
+- **v1.1 (2026-07-11):** Reversed the library-embedding rule — addons now **vendor all libraries in `libs/` and commit them**; `.pkgmeta` `externals:` for libs is forbidden. (v1.0 mandated externals.)
 - **v1.0 (2026-05-03):** Initial standard.
 
 **Audience:** future Ka0s and any agent (human or LLM) authoring or maintaining a Ka0s addon.
@@ -26,17 +38,19 @@ Each section uses these markers:
 - **MAY** — optional; pick when it fits.
 - **MUST NOT** / **SHOULD NOT** — forbidden patterns with cited reasons.
 
-Where a Ka0s addon today already implements a rule well, it's named as the **reference implementation**. Where industry practice diverged, the industry source is cited.
+**Reference implementations are described, not named.** This normative standard **MUST NOT** name a specific addon (from the Ka0s collection or the wider ecosystem) as a reference implementation. Instead it *describes* the implementation — what it does and how — in enough detail to be actionable on its own. This keeps the standard self-contained and durable when addons change or are renamed. The **named** research evidence behind these patterns (which real addons exhibit them) lives in the companion research document, `03_INDUSTRY_RESEARCH.md`, which is a standards-process input rather than part of the normative standard.
+
+Where a Ka0s addon today already implements a rule well, it is called out as *"reference implementation (in the collection)"* with a description of the addon's role, never its name.
 
 ---
 
 ## 1. Tiered layout
 
-A Ka0s addon is in one of two tiers. **MUST** declare the tier in the addon's `CLAUDE.md` so reviewers know which rules to apply.
+A Ka0s addon is in one of two tiers. **MUST** declare the tier in the addon's root `CLAUDE.md` stub (or the `docs/` it points to) so reviewers know which rules to apply.
 
 ### 1.1 Tier 1 — Flat (≤8 source files)
 
-For utility-class addons (current example: WhatGroup at 3 files, prettychat at ~10 files).
+For utility-class addons (e.g. a small group-composition utility at ~3 files, a chat-formatting addon at ~10 files).
 
 ```
 <AddonName>/
@@ -45,28 +59,29 @@ For utility-class addons (current example: WhatGroup at 3 files, prettychat at ~
   Settings.lua             -- schema + AceDB defaults + panel
   Locale.lua               -- L = setmetatable({}, {__index=function(_,k) return k end})
   Compat.lua               -- deprecated-API shims (only if needed)
-  README.md
-  CLAUDE.md
-  ARCHITECTURE.md
+  README.md                -- full, user-facing (stays at root)
+  CLAUDE.md                -- STUB: short pointer into docs/ (§15)
   LICENSE                  -- MIT
   .luacheckrc
   .pkgmeta
   libs/                    -- vendored Ace3 + other libs, committed to git (§3.3)
-  media/                   -- textures/sounds shipped with the addon
+  media/                   -- typed subfolders only: logos/, screenshots/, ... (§1.4)
+  tests/                   -- headless Lua 5.1 harness (§14A)
+  docs/                    -- ARCHITECTURE.md, full agent context, planning/reference docs (§15)
 ```
 
-- **MUST** stay flat — no `core/`, `modules/` subfolders.
+- **MUST** stay flat — no `core/`, `modules/` subfolders for source.
 - **MUST** keep each file under 1500 LOC. If a file exceeds 1000, plan a peel.
-- **MAY** peel a single oversized file into 2-3 sub-files in the same folder (e.g. `Settings_Schema.lua`, `Settings_Panel.lua`) — **MUST NOT** introduce subfolders.
-- Promotion to Tier 2 is mandatory once source-file count would exceed 8 (excluding `libs/`, `media/`, `docs/`, `reviews/`).
+- **MAY** peel a single oversized file into 2-3 sub-files in the same folder (e.g. `Settings_Schema.lua`, `Settings_Panel.lua`) — **MUST NOT** introduce subfolders for source.
+- Promotion to Tier 2 is mandatory once source-file count would exceed 8 (excluding `libs/`, `media/`, `docs/`, `tests/`, `reviews/`).
 
 ### 1.2 Tier 2 — Modular (>8 files or any addon with multiple feature modules)
 
-Reference implementation: **KickCD**.
+Reference implementation (in the collection): the Tier-2 modular interrupt/cooldown group tracker.
 
 ```
 <AddonName>/
-  <AddonName>.toc          -- single file, multi-Interface line, lists all .lua in dependency order
+  <AddonName>.toc          -- single file, single Interface line (latest Retail), lists all .lua in dependency order
   core/
     Compat.lua             -- deprecated-API shims; loaded FIRST
     Constants.lua          -- numeric constants, enum-like tables
@@ -78,7 +93,7 @@ Reference implementation: **KickCD**.
   defaults/
     Profile.lua            -- C = profile defaults table
     Global.lua             -- G = global defaults table (rare; only when needed)
-    Spells.lua / Data*.lua -- per-flavor data tables (use *_Mainline.lua / *_Classic.lua suffix)
+    Spells.lua / Data*.lua -- Retail data tables (no per-flavor suffix; Retail only)
   settings/
     Schema.lua             -- one row per setting: {path, default, type, label, widget, validate, onChange}
     Panel.lua              -- Blizzard Settings.RegisterCanvasLayoutCategory + raw AceGUI render
@@ -90,27 +105,37 @@ Reference implementation: **KickCD**.
   modules/
     <Feature>.lua          -- one file per feature module; max ~1500 LOC each
     ...
-  media/
+  media/                   -- typed subfolders only (§1.4)
   libs/                    -- vendored Ace3 + other libs, committed to git (§3.3)
-  docs/
-  reviews/<YYYY-MM-DD>/    -- audit history
-  README.md
-  CLAUDE.md
-  ARCHITECTURE.md
+  tests/                   -- headless Lua 5.1 harness (§14A)
+  docs/                    -- ARCHITECTURE.md, full agent context, planning/reference docs (§15)
+  reviews/<YYYY-MM-DD>/    -- audit history (retained; §16)
+  README.md                -- full, user-facing (stays at root)
+  CLAUDE.md                -- STUB: short pointer into docs/ (§15)
   LICENSE
   .luacheckrc
   .pkgmeta
 ```
 
 - **MUST** load order: `core/Compat.lua` → `core/Constants.lua` → `core/Namespace.lua` → other `core/*` → `defaults/*` → `locales/*` → `settings/*` → `modules/*`.
-- **MUST** cap any single `.lua` file at 1500 LOC. ConsumableMaster's `SlashCommands.lua` (1257) is at the edge; KickCD's `IconGrid.lua` (1753) and WhatGroup's `WhatGroup_Settings.lua` (1056) violate this.
+- **MUST** cap any single `.lua` file at 1500 LOC. Files in the 1000–1500 band are on notice; a >1500 file is a bug — peel it.
 
 ### 1.3 Casing
 
-- Addon root folder: **PascalCase** matching the `## Title:` in TOC. (Fixes prettychat → PrettyChat.)
-- Subfolders: **lowercase** (`core/`, `modules/`, `libs/`, `media/`, `defaults/`, `settings/`, `locales/`, `docs/`, `reviews/`). **MUST** use `libs/` lowercase. (Fixes prettychat's `Libs/`.)
+- Addon root folder: **PascalCase** matching the `## Title:` in TOC (minus the `Ka0s ` prefix).
+- Subfolders: **lowercase** (`core/`, `modules/`, `libs/`, `media/`, `defaults/`, `settings/`, `locales/`, `docs/`, `reviews/`, `tests/`). **MUST** use `libs/` lowercase (not `Libs/`).
 - Lua files: **PascalCase.lua** (`Database.lua`, `IconGrid.lua`).
 - Non-source folders that ship: lowercase.
+
+### 1.4 Media subfolders
+
+Shipped media **MUST** live in **typed subfolders** under `media/` — nothing loose directly in `media/`:
+
+- `media/logos/` — the addon logo art (the runtime `.tga`/`.blp` plus the source `.jpg`/`.png`).
+- `media/screenshots/` — README/store screenshots and any demo GIFs.
+- `media/fonts/`, `media/sounds/`, `media/textures/` — as needed for shipped assets of that kind.
+
+Reference implementation (in the collection): the standalone loot-history browser ships its logo under `media/logos/`. **MUST** keep the runtime texture in a WoW-loadable format (`.tga`/`.blp`) and the editable source (`.jpg`/`.png`) beside it (§6.5).
 
 ---
 
@@ -119,7 +144,7 @@ Reference implementation: **KickCD**.
 ### 2.1 Required fields
 
 ```
-## Interface: 120000, 120001, 120005     -- multi-flavor, comma+space separated
+## Interface: 120007                     -- SINGLE number; latest Retail patch (§2.3)
 ## Title: Ka0s <Human Name>              -- prefix every Ka0s addon
 ## Notes: <one-line user-facing description>
 ## Author: add1kted2ka0s
@@ -130,30 +155,37 @@ Reference implementation: **KickCD**.
 ## IconTexture: <fileID>                 -- optional but encouraged
 ## Category-enUS: <Combat|Group|Auction|Chat|UI|Misc>
 ## X-License: MIT
+## X-Standard: https://github.com/tusharsaxena/WowAddonStandards
 ## X-Curse-Project-ID: <id>              -- mandatory if published
 ## X-Wago-ID: <id>                       -- mandatory if published
 ## X-WoWI-ID: <id>                       -- only if WoWI listing exists
 ```
 
 - **MUST** have `X-License: MIT`. **MUST NOT** ship "All Rights Reserved".
+- **MUST** have `X-Standard:` pointing at the standards repo, declaring the addon is built to this standard.
 - **MUST** have `X-Curse-Project-ID` and `X-Wago-ID` once an addon is published anywhere.
-- **SHOULD NOT** declare hard `Dependencies`. Use `OptionalDeps` and shim missing libs with soft fallbacks (AbsorbTracker is the reference: AceDB-missing flat-table shim, LSM-missing Blizzard fallback constants).
+- **SHOULD NOT** declare hard `Dependencies`. Use `OptionalDeps` and shim missing libs with soft fallbacks. Reference implementation (in the collection): the absorb-shield tracker ships an AceDB-missing flat-table shim and LSM-missing Blizzard fallback constants, so it loads even with no libs present.
 
 ### 2.2 SavedVariables naming
 
-- **MUST** be `<Addon>DB`, single global. (`AbsorbTrackerDB`, `KickCDDB`, etc.) Already universal in the collection.
+- **MUST** be `<Addon>DB`, single global (`<Addon>DB`). Already universal in the collection.
 - **SHOULD NOT** use `SavedVariablesPerCharacter` unless the data is genuinely per-character (most Ka0s addons run profile-per-character via AceDB; that's enough).
 - **MUST** declare a `schemaVersion` integer in defaults. **MUST** ship a `Database.lua` migration runner even if the body is empty — schema migration is a from-day-one concern.
 
-### 2.3 Multi-flavor
+### 2.3 Retail only — single Interface line
 
-- **MUST** ship a single TOC with a comma-separated multi-Interface line whenever possible. Per-flavor branching is data (TOC-included `Spells_Mainline.lua` vs `Spells_Classic.lua`) or runtime flags (`Compat.IsRetail`), not separate TOC files.
-- **MUST NOT** use `if WOW_PROJECT_ID == ... then` ladders inline in feature code. Branch in `Compat.lua` and expose flags.
+The collection targets **Retail (Mainline) only**. Classic/other flavors are out of scope for the standard.
+
+- **MUST** ship a single TOC with a **single** `## Interface:` value = the **latest Retail patch** interface number (currently `120007`). Bump it each patch with the `wow-addon:bump-interface` skill.
+- **MUST NOT** use a comma-separated multi-flavor Interface list, per-flavor TOC files, or `enable-toc-creation` flavor fan-out.
+- **MUST NOT** ship `_Mainline`/`_Classic` data splits. Data files are plain (`Spells.lua`, `Data*.lua`).
+- **MUST NOT** use `if WOW_PROJECT_ID == ...` ladders inline in feature code. Any genuine cross-patch version check is a Retail-patch check and is branched in `Compat.lua` behind a named flag (§11).
+- The README `[wow]` badge **MUST** show this same single Interface number and stay in lockstep with the TOC (§15).
 
 ### 2.4 File listing
 
 - **MUST** list `.lua` files in dependency-correct order. **MUST NOT** rely on alphabetical loading.
-- **SHOULD NOT** use `embeds.xml` at Tier 1. Tier 2 **MAY** use a single `embeds.xml` if file count justifies it. ConsumableMaster's `embeds.xml` is the only current user; remove if it doesn't earn its keep.
+- **SHOULD NOT** use `embeds.xml` at Tier 1. Tier 2 **MAY** use a single `embeds.xml` if file count justifies it — remove it if it doesn't earn its keep.
 
 ---
 
@@ -192,9 +224,9 @@ Ka0s addons **MUST ship every library vendored in `libs/` and committed to git**
 
 - **MUST** vendor all Ace3 and third-party libs under `libs/` and commit them. **MUST NOT** use `.pkgmeta` `externals:` to fetch libraries.
 - **MUST** use the standard folder-per-lib layout (`libs/AceAddon-3.0/AceAddon-3.0.xml`, `libs/LibStub/LibStub.lua`, …) and load libs **first** in the TOC — the lib's `.xml` where it ships one (it pulls the lib's `.lua` + any sub-files), the `.lua` otherwise.
-- **SHOULD** copy the folder-per-lib set from an existing Ka0s addon (e.g. KickCD's `libs/`) so lib versions stay consistent across the suite. Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
+- **SHOULD** copy the folder-per-lib set from an existing Ka0s addon's `libs/` so lib versions stay consistent across the suite. Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
 - **MUST** vendor only libs the addon actually `LibStub("X")` — vendor what you use, nothing more. Prune dead weight (e.g. AceConfig where only Profiles needs it; AceLocale/AceBucket/AceComm/AceHook/AceSerializer/AceTab where unloaded).
-- **MAY** vendor an addon-private micro-lib (e.g. an 80-line `ObjectPoolMixin`) the same way.
+- **MAY** vendor an addon-private micro-lib (e.g. an 80-line object-pool mixin) the same way.
 
 ### 3.4 Lib registry pattern
 
@@ -202,7 +234,7 @@ Ka0s addons **MUST ship every library vendored in `libs/` and committed to git**
 
 ### 3.5 Forking Ace libs is forbidden
 
-- **MUST NOT** privately fork an Ace3 lib (ElvUI's `Ace3-ElvUI`, OmniCD's `LibOmniCDC` are anti-patterns). Block on every Ace3 update.
+- **MUST NOT** privately fork an Ace3 lib. Private lib forks seen in some large UI suites (renamed copies of Ace3) block on every Ace3 update and are an anti-pattern.
 - **MUST** extend AceGUI via `AceGUI:RegisterWidgetType("Ka0s_X", ...)` if a custom widget is needed.
 
 ---
@@ -229,7 +261,7 @@ local State = NS.State -- runtime state
 
 ### 4.2 AceAddon registration (Tier 2 / any addon using Ace3 lifecycle)
 
-Reference: KickCD bootstrap-namespace promotion at `core/<AddonName>.lua`.
+Reference implementation (in the collection): the Tier-2 tracker promotes its bootstrap namespace to an AceAddon at `core/<AddonName>.lua`.
 
 ```lua
 local addonName, NS = ...
@@ -268,13 +300,13 @@ NS.bus:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end
 ```
 
 - **MUST** prefix every message `Ka0s_<Addon>_` to avoid collision.
-- **MUST** document each message in `ARCHITECTURE.md` with: name, sender (one), payload schema, all consumers.
+- **MUST** document each message in `docs/ARCHITECTURE.md` with: name, sender (one), payload schema, all consumers.
 - **MUST NOT** have two senders for the same message.
 - Implementation: AceEvent-3.0's `:SendMessage`/`:RegisterMessage` (already in the addon); no new lib needed.
 
 ### 4.5 Schema-as-single-source
 
-The single most important Ka0s pattern. Already implemented well in AbsorbTracker, KickCD, ConsumableMaster, prettychat, WhatGroup. **MUST** be present in every addon with ≥3 user-visible settings.
+The single most important Ka0s pattern. Already implemented well across the collection. **MUST** be present in every addon with ≥3 user-visible settings.
 
 ```lua
 NS.Schema = {
@@ -290,15 +322,15 @@ NS.Schema = {
 
 - **MUST** drive all of: AceDB defaults, AceGUI panel widgets, `/<slash> get|set|list|reset` dispatch, defaults reset.
 - **MUST** route every mutation through one helper: `NS.Schema:Set(path, value)` calls validate → write → onChange. Panel and slash both call this.
-- **MUST** validate at boot: every schema row's `path` resolves against the defaults table; warn loudly on mismatch (AbsorbTracker reference: `Schema.lua:101-105`).
+- **MUST** validate at boot: every schema row's `path` resolves against the defaults table; warn loudly on mismatch. Reference implementation (in the collection): the absorb-shield tracker walks every schema row at load and prints a loud warning for any path that doesn't resolve against defaults; the validation count is exposed for the test harness (§14A).
 
 ### 4.6 Two-phase init (only when needed)
 
-For Tier 2 addons with ≥6 modules, **SHOULD** use ElvUI's two-phase pattern: an "initial" queue that runs before AceDB is ready (Compat shims, Constants), and a "regular" queue that runs after (`OnInitialize`/`OnEnable`).
+For Tier 2 addons with ≥6 modules, **SHOULD** use a two-phase init pattern (as large UI suites do): an "initial" queue that runs before AceDB is ready (Compat shims, Constants), and a "regular" queue that runs after (`OnInitialize`/`OnEnable`).
 
-### 4.7 DBM-style Prototype Registry (optional)
+### 4.7 Prototype registry (optional)
 
-For Tier 2 addons where TOC ordering has been fragile (KickCD's pain point), **MAY** use a lazy table cache:
+For Tier 2 addons where TOC ordering has been fragile, **MAY** use a lazy table cache (the pattern large boss-mods use for their module prototypes):
 
 ```lua
 NS._prototypes = setmetatable({}, { __index = function(t, k) t[k] = {}; return t[k] end })
@@ -334,7 +366,7 @@ function NS:RunMigrations()
 end
 ```
 
-- **SHOULD** allow user to opt out via the soft-fallback path (AbsorbTracker's AceDB-missing shim). Not mandatory.
+- **SHOULD** allow the user to opt out via a soft-fallback path (an AceDB-missing shim, as the absorb-shield tracker ships). Not mandatory.
 
 ### 5.2 Defaults
 
@@ -343,7 +375,7 @@ end
 
 ### 5.3 Per-zone profile trees (optional)
 
-For party/group/raid/PvP context-aware addons (currently: KickCD), **SHOULD** consider OmniCD's per-zone profile model: `profile.party.arena`, `profile.party.party`, `profile.party.raid`, each carrying full settings.
+For party/group/raid/PvP context-aware addons, **SHOULD** consider a per-zone profile model: `profile.party.arena`, `profile.party.party`, `profile.party.raid`, each carrying full settings (the model used by party-cooldown trackers).
 
 ---
 
@@ -351,12 +383,12 @@ For party/group/raid/PvP context-aware addons (currently: KickCD), **SHOULD** co
 
 ### 6.1 Canonical pattern
 
-Already converged across all 5 Ka0s addons; codify:
+Already converged across the collection; codify:
 
 ```lua
 -- settings/Panel.lua
 local categoryID
-function NS.Panel:Register()
+function NS.Panel:Register()          -- called EAGERLY at load (see below)
   if categoryID then return end
   local frame = CreateFrame("Frame")
   frame.OnCommit = function() end
@@ -364,21 +396,22 @@ function NS.Panel:Register()
   frame.OnRefresh = function() end
   local category = Settings.RegisterCanvasLayoutCategory(frame, addonName)
   category.ID = addonName
-  Settings.RegisterAddOnCategory(category)
+  Settings.RegisterAddOnCategory(category)   -- entry now visible in the options list
   categoryID = category:GetID()
-  frame:SetScript("OnShow", function() NS.Panel:BuildBody(frame) end) -- lazy
+  frame:SetScript("OnShow", function() NS.Panel:BuildBody(frame) end) -- lazy body
 end
 ```
 
 - **MUST** use `Settings.RegisterCanvasLayoutCategory` for the entry point. **MUST NOT** use the deprecated `InterfaceOptions_AddCategory`.
-- **MUST** render content with **raw AceGUI** inside the canvas. **MUST NOT** use AceConfigDialog for content. (Industry: BigWigs and WeakAuras use AceConfig but at a scale that justifies the tax; ElvUI/Plater/DBM hand-roll. Ka0s sits in the AceGUI sweet spot.)
-- **MUST** build body lazily in first `OnShow`. (Universal Ka0s pattern; preserve it.)
-- **MUST** wrap panel-build in `C_Timer.After(0, ...)` if the panel can be opened at file-load (WhatGroup taint-fix pattern).
-- The single-category snippet above is the minimum entry point; §6.5–6.7 extend it into the mandatory **landing-page + subcategory** structure, **two-column** body, and **section-header** styling that every Ka0s panel now shares.
+- **MUST register the category eagerly at addon load** — in `OnInitialize`, or from a bootstrap frame firing on `PLAYER_LOGIN` / `ADDON_LOADED → Blizzard_Settings` — so the addon's entry is **always present** in the Blizzard options list, even before its panel body is built. **MUST NOT** defer the `Register*Category` calls to the first `/<slash> config` / panel-open (§6.9). Reference implementations (in the collection): the Tier-2 tracker registers from a bootstrap frame on `ADDON_LOADED(Blizzard_Settings)`/`PLAYER_LOGIN`; the loot-history browser registers in `OnInitialize`. Both are taint-free because they register **after** `Blizzard_Settings` is available and keep the body lazy.
+- **MUST** render content with **raw AceGUI** inside the canvas. **MUST NOT** use AceConfigDialog for content. (Industry: the two largest boss-mod / aura frameworks use AceConfig at a scale that justifies the tax; the big UI-replacement and nameplate suites hand-roll. Ka0s sits in the AceGUI sweet spot.)
+- **MUST** build the **body** lazily in first `OnShow`. (Universal Ka0s pattern; AceGUI lays out against the panel's current width, which is 0 before first show.)
+- **MUST** wrap any panel-build that can run at file-load in `C_Timer.After(0, ...)` (the group-utility taint-fix pattern) — but this defers the *body*, never the category registration.
+- The single-category snippet above is the minimum entry point; §6.5–6.8 extend it into the mandatory **landing-page + subcategory** structure, **two-column** body, and **section-header** styling that every Ka0s panel now shares.
 
 ### 6.2 Combat lockdown
 
-- **MUST** check `InCombatLockdown()` before opening the options panel from slash; defer with `RegisterEvent("PLAYER_REGEN_ENABLED")` and one-shot replay.
+- **MUST** check `InCombatLockdown()` before **opening** the options panel from slash; defer with `RegisterEvent("PLAYER_REGEN_ENABLED")` and one-shot replay. (This gates panel *open*, not category *registration*, which happens taint-free at load per §6.1.)
 - **SHOULD** apply the same gate to any settings setter that creates/destroys frames.
 
 ### 6.3 Profiles sub-page
@@ -388,11 +421,11 @@ end
 
 ### 6.4 Lazy options loading (large addons)
 
-- For addons with ≥5 options sub-panels or whose options code is large, **SHOULD** ship options as a sibling LoadOnDemand addon (`<Addon>_Options.toc` with `## LoadOnDemand: 1`). None of the current 5 Ka0s addons need this.
+- For addons with ≥5 options sub-panels or whose options code is large, **SHOULD** ship options as a sibling LoadOnDemand addon (`<Addon>_Options.toc` with `## LoadOnDemand: 1`). None of the current Ka0s addons need this.
 
 ### 6.5 Landing page + subcategories
 
-Every Ka0s options panel **MUST** be built as a **parent canvas category = landing page** with one or more **canvas subcategories** for the actual settings (the first named "General"). Reference implementations: KickCD `settings/Panel.lua`, Loot History `settings/Panel.lua`.
+Every Ka0s options panel **MUST** be built as a **parent canvas category = landing page** with one or more **canvas subcategories** for the actual settings (the first named "General"). Reference implementations (in the collection): the Tier-2 tracker's `settings/Panel.lua` and the loot-history browser's `settings/Panel.lua`.
 
 ```lua
 local main = Settings.RegisterCanvasLayoutCategory(mainPanel, "Ka0s <Addon>")
@@ -401,7 +434,7 @@ local sub  = Settings.RegisterCanvasLayoutSubcategory(main, generalPanel, "Gener
 ```
 
 - The **landing page** (parent panel) **MUST** render, top to bottom: the addon **logo**, a full-width **tagline** Label (`GameFontHighlight`), a **"Slash Commands"** section heading, then one Label per command generated from the addon's `COMMANDS` table (so the list stays in lockstep with `/<slash> help`). Command rows use `|cffffff00/<slash> <verb>|r  —  <desc>`.
-- **Logo asset:** ship a **`.tga`** (or `.blp`) under `media/logo/` — WoW **cannot** load `.jpg`/`.png` textures at runtime. Reference it by absolute path `Interface\AddOns\<Folder>\media\logo\<name>.tga`, display at **300×300**; source art SHOULD be power-of-two (e.g. 512×512). Keep the original `.jpg`/`.png` beside it for editing.
+- **Logo asset:** ship a **`.tga`** (or `.blp`) under **`media/logos/`** — WoW **cannot** load `.jpg`/`.png` textures at runtime. Reference it by absolute path `Interface\AddOns\<Folder>\media\logos\<name>.tga`, display at **300×300**; source art SHOULD be power-of-two (e.g. 512×512). Keep the original `.jpg`/`.png` beside it for editing.
 - **Header (both parent and subcategory):** left-aligned title in `GameFontNormalHuge`, a gold `Options_HorizontalDivider` tinted to the title's colour, and (subcategories) a **Defaults** button top-right. Subcategory titles render as a breadcrumb **"Ka0s <Addon> ▸ <Page>"** with the arrow via `|A:common-icon-forwardarrow:16:16|a`.
 - Bodies **MUST** build lazily in first `OnShow` (§6.1) — AceGUI lays out against the panel's current width, which is 0 before the panel is first shown.
 
@@ -433,7 +466,7 @@ This is the same widget used for the landing page's "Slash Commands" divider, so
 
 ### 6.8 Layout constants (exact values)
 
-Every Ka0s panel **MUST** use these exact pixel/font values so all addons render identically. Define them as named constants (KickCD: `Const.PANEL_*` in `core/Constants.lua`; Loot History: locals at the top of `settings/Panel.lua`) — never inline magic numbers.
+Every Ka0s panel **MUST** use these exact pixel/font values so all addons render identically. Define them as named constants (e.g. `Const.PANEL_*` in `core/Constants.lua`, or locals at the top of `settings/Panel.lua`) — never inline magic numbers.
 
 **Header** — parent landing page *and* every subcategory:
 
@@ -483,20 +516,37 @@ Every Ka0s panel **MUST** use these exact pixel/font values so all addons render
 
 **Font summary:** title `GameFontNormalHuge` · section/landing headings `GameFontNormalLarge` · tagline `GameFontHighlight` · widget labels + slash rows the AceGUI defaults.
 
+### 6.9 Registration timing (anti-pattern)
+
+- **MUST NOT** gate the settings-**category** registration behind a slash command, a first panel-open, or any user action. Deferring `Settings.RegisterCanvasLayoutCategory` / `RegisterAddOnCategory` until the user runs `/<slash> config` leaves the addon **missing from the options list** until they act — a real defect (a current Tier-1 group-utility addon does exactly this, deferring registration inside its `config` handler to avoid boot-time GameMenu taint). The taint-safe fix is **not** to defer registration but to register **after `Blizzard_Settings` is loaded** and keep the **body** lazy (§6.1) — the pattern both gold-standard addons use.
+
 ---
 
 ## 6A. Standalone windows / data browsers
 
-§6 governs the **options** surface. An addon's own **main window** — a data browser, log, tracker, or dashboard — is a different surface with different rules. Reference implementation: Ka0s Loot History's browser (`modules/Browser.lua` + `BrowserTable.lua`).
+§6 governs the **options** surface. An addon's own **main window** — a data browser, log, tracker, or dashboard — is a different surface with different rules. Reference implementation (in the collection): the standalone loot-history browser (a resizable, movable data-browser window with a tab strip and a scrolling record list).
 
 - **MUST** be a plain **non-secure** `CreateFrame("Frame")` (movable/resizable) — **not** a Blizzard Settings canvas, **not** a secure/protected frame. A non-secure window touches no protected functions, so it needs **no combat-lockdown gate** and may open/refresh in combat. (Secure/action-button content is the exception and follows §9.2.)
 - **MUST** register the window in `UISpecialFrames` so `Escape` closes it and it joins the standard close-stack.
 - **MUST** persist window position and size in SavedVariables (e.g. `db.global.settings.window`), restored on open. **SHOULD** clamp to a readable minimum size and `SetClampedToScreen(true)`.
 - **SHOULD** expose a scale setting (e.g. `windowScale`) applied via `frame:SetScale`.
 - **SHOULD** use a tab strip with **lazy per-tab content build** — build each tab's body on first show, not up front.
-- **SHOULD** centralize the window's look in a single `SKIN` table + one `ApplySkin(frame)` re-skin seam, built from **stock Blizzard textures** (no shipped art), so a future settings-driven re-skin has one touch point.
+- **SHOULD** centralize the window's look in a single `SKIN` table + one `ApplySkin(frame)` re-skin seam, built from **stock Blizzard textures** (no shipped art), so a future settings-driven re-skin has one touch point. The debug console (§12) reuses this same seam.
 - **MUST** pool rows for any high-churn list inside the window (§9.6) — never one frame per record.
 - **SHOULD** provide explicit window verbs (`show` / `hide` / `toggle`) and/or a minimap/LDB launcher for display; bare `/<slash>` still prints help (§7.4).
+
+---
+
+## 6B. Preview / test mode
+
+Addons whose main job is a **positionable or persistent on-screen display** (a bar, an icon grid, a nameplate widget, a tracker frame) **SHOULD** ship a **preview mode** (a.k.a. test / demo mode) that renders **representative placeholder data**, so the user can see and position the display without waiting for a real in-game event to populate it.
+
+Reference implementation (in the collection): the Tier-2 tracker's cast bar shows a placeholder preview — a question-mark icon, a fake spell name, a `0.0 / 0.0` timer, and a bar filled to mid — **while the frame is unlocked**, so the user can drag it into place against realistic content.
+
+- **SHOULD** trigger the preview automatically while the display is **unlocked** (drag/reposition mode), and/or via an explicit `/<slash> preview` (a.k.a. `test`) verb in the `COMMANDS` table (§7.3).
+- **SHOULD** feed the preview through the **same render path** as live data (placeholder values in, real widget out) so it exercises the real layout, not a separate mock.
+- **MUST** clear the preview and return to live data when the display is re-locked or the preview verb is toggled off.
+- Utility addons with no positionable display: **N/A**.
 
 ---
 
@@ -504,16 +554,16 @@ Every Ka0s panel **MUST** use these exact pixel/font values so all addons render
 
 ### 7.1 Registration
 
-- **MUST** use AceConsole-3.0 `:RegisterChatCommand`. (Currently zero of 5 Ka0s addons do this; all hand-roll `SLASH_*`. Migrate.)
+- **MUST** use AceConsole-3.0 `:RegisterChatCommand`. **MUST NOT** hand-roll `SLASH_*` globals.
 
 ```lua
-addon:RegisterChatCommand("at", "OnSlash")
-addon:RegisterChatCommand("absorbtracker", "OnSlash")
+addon:RegisterChatCommand("<slash>", "OnSlash")       -- 2-3 char primary verb
+addon:RegisterChatCommand("<addonname>", "OnSlash")   -- full lowercase name alias
 ```
 
 ### 7.2 Verb naming
 
-- **MUST** use 2-3 lowercase chars as the primary verb (`at`, `cm`, `kcd`, `pc`, `wg` already aligned). **SHOULD** also register the full lowercase addon name as an alias.
+- **MUST** use 2-3 lowercase chars as the primary verb. **SHOULD** also register the full lowercase addon name as an alias.
 - **MUST NOT** collide with existing well-known addon slashes.
 
 ### 7.3 Dispatch
@@ -528,18 +578,19 @@ NS.COMMANDS = {
   { name = "reset",   desc = "Reset one setting",     fn = function(arg) ... end },
   { name = "resetall", desc = "Reset all to defaults", fn = function() ... end },
   { name = "config",  desc = "Open options panel",    fn = function() NS.Panel:Open() end },
-  { name = "debug",   desc = "Toggle debug logging",  fn = function() ... end },
+  { name = "preview", desc = "Toggle preview mode",   fn = function() ... end },   -- if §6B applies
+  { name = "debug",   desc = "Toggle debug console",  fn = function() ... end },   -- §12
 }
 ```
 
 - **MUST** render `/<slash>` (no args) as the help output, generated from this table — no hand-maintained help string. (Browser-first addons **MAY** map bare `/<slash>` to their main window instead — a documented deviation — but `/<slash> help` MUST still print the index; see §7.4.)
-- **MUST NOT** use `if arg == "foo" then elseif arg == "bar" then` chains (DBM anti-pattern).
+- **MUST NOT** use `if arg == "foo" then elseif arg == "bar" then` chains.
 
 ### 7.4 Help output & chat tag
 
-Reference: KickCD `core/KickCD.lua` `printHelp`, Loot History `settings/Slash.lua`.
+Reference implementations (in the collection): the Tier-2 tracker's `printHelp` and the loot-history browser's `settings/Slash.lua`.
 
-- Every line the addon prints to chat **MUST** carry a short **bracketed tag** — the addon's initials in `[...]`, wrapped in one colour code — exposed as a **single shared constant** (`NS.PREFIX`) so every module prints identically. Examples: `|cff00ffff[KCD]|r`, `|cff33ff99[LH]|r`. **MUST NOT** hand-write `"|cff…" .. addonName .. "|r"` per call site.
+- Every line the addon prints to chat **MUST** carry a short **bracketed tag** — the addon's initials in `[...]`, wrapped in one colour code — exposed as a **single shared constant** (`NS.PREFIX`) so every module prints identically. Format example: `|cff00ffff[XY]|r` (initials `XY` in a single colour code). **MUST NOT** hand-write `"|cff…" .. addonName .. "|r"` per call site.
 - The `help` index (and the fallback for an unknown verb) **MUST** be generated from `NS.COMMANDS`:
   - **Header:** `<tag> v<version> slash commands (/<alias> is an alias for /<slash>):`
   - **One row per command:** `<tag> |cffffff00/<slash> <name>|r — |cffffffff<desc>|r` — gold command, em-dash (`—`), white description.
@@ -579,10 +630,10 @@ local L = NS.L
 L["Scale"] = "Skalierung"
 ```
 
-- **MUST** export `NS.L` with a metatable that returns the key on miss. Replaces AceLocale strict mode (which hard-errors on missing keys) and is industry-aligned (WeakAuras, OmniCD, KickCD, Plumber).
+- **MUST** export `NS.L` with a metatable that returns the key on miss. Replaces AceLocale strict mode (which hard-errors on missing keys) and is industry-aligned (the major aura framework, party-cooldown trackers, modular QoL addons, and the collection all do this).
 - **MAY** use AceLocale-3.0 in non-strict mode if you prefer it. Strict mode is forbidden.
-- **MUST** gate non-enUS files with `if GetLocale() ~= "<locale>" then return end` at top of file. (Plumber anti-pattern: loading all locales for every player.)
-- **SHOULD** put derived-key aliases in `locales/PostLoad.lua` (Plumber pattern): `L["Use original"] = L["Original"]`. Translators don't duplicate work.
+- **MUST** gate non-enUS files with `if GetLocale() ~= "<locale>" then return end` at top of file. (Loading every locale for every player — a QoL-addon anti-pattern — is wasteful.)
+- **SHOULD** put derived-key aliases in `locales/PostLoad.lua`: `L["Use original"] = L["Original"]`. Translators don't duplicate work.
 
 ### 8.2 Source-of-truth keys
 
@@ -592,7 +643,7 @@ L["Scale"] = "Skalierung"
 ### 8.3 Coverage
 
 - **MUST** at minimum ship `enUS.lua`. Any additional locale is opt-in.
-- **MUST NOT** rely on Blizzard `_G` strings as a substitute for a locale module. (Current WhatGroup pattern is acceptable for tiny addons but should still ship a locale module shell.)
+- **MUST NOT** rely on Blizzard `_G` strings as a substitute for a locale module. (Leaning on `_G` strings is acceptable for a tiny utility addon but it should still ship a locale module shell.)
 
 ---
 
@@ -600,16 +651,16 @@ L["Scale"] = "Skalierung"
 
 ### 9.1 Event registration
 
-- **MUST** use AceEvent-3.0 (`addon:RegisterEvent("X")`). **MUST NOT** create per-module frames just for events (DBM/Details!-scale hand-rolling is overkill below 1000 events/min).
-- **SHOULD** centralize CLEU dispatch on a single shared frame with a spellID hash table when CLEU is the hot path. Reference: BigWigs `mod:Log(subevent, fn, spellId)`. **MUST NOT** subscribe N modules separately to CLEU.
+- **MUST** use AceEvent-3.0 (`addon:RegisterEvent("X")`). **MUST NOT** create per-module frames just for events (boss-mod-scale hand-rolling is overkill below 1000 events/min).
+- **SHOULD** centralize CLEU dispatch on a single shared frame with a spellID hash table when CLEU is the hot path (the boss-mod `mod:Log(subevent, fn, spellId)` model). **MUST NOT** subscribe N modules separately to CLEU.
 - **MAY** use AceEvent's `:RegisterMessage`/`:SendMessage` for the closed message bus (§4.4).
 
 ### 9.2 Combat lockdown
 
 - **MUST** guard secure-environment writes (frame `:SetAttribute`, secure-template parents, focus-frame mutations) with `InCombatLockdown()` returning early and replaying on `PLAYER_REGEN_ENABLED`.
-- Reference implementations: WhatGroup 3-layer cascade (`runConfig`, `Settings.Register`, `ShowFrame`); prettychat combat-gated `OpenConfig`.
+- Reference implementation (in the collection): the group-composition utility uses a 3-layer cascade (config open → settings register → frame show), each re-checking combat; the chat-formatting addon combat-gates its config open.
 
-### 9.3 Taint-replacing Blizzard UI (Bagnon recipe)
+### 9.3 Taint-replacing Blizzard UI
 
 If your addon replaces a Blizzard frame (bag UI, bag manager, group finder window):
 
@@ -623,22 +674,22 @@ If your addon replaces a Blizzard frame (bag UI, bag manager, group finder windo
 
 If your addon writes macros or calls protected APIs (`CreateMacro`, `EditMacro`, `RunMacro`, `EditMacroByID`):
 
-- **MUST** firewall: a single module is the **only** caller of those APIs. Reference: ConsumableMaster's `MacroManager.lua` is the sole caller of `CreateMacro`/`EditMacro`. Audit at lint time.
+- **MUST** firewall: a single module is the **only** caller of those APIs. Reference implementation (in the collection): the consumables & macro manager routes every `CreateMacro`/`EditMacro` call through one `MacroManager` module, which is the sole caller. Audit this at lint time.
 - **MUST NOT** call protected APIs from event handlers that can fire in combat.
 
 ### 9.5 Chat-frame manipulation
 
-If your addon formats chat (currently: prettychat):
+If your addon formats chat:
 
-- **SHOULD** prefer overriding `_G[GLOBALSTRING]` (prettychat's pattern) over `ChatFrame_AddMessageEventFilter` and `hooksecurefunc(ChatFrame, "AddMessage")`.
+- **SHOULD** prefer overriding `_G[GLOBALSTRING]` over `ChatFrame_AddMessageEventFilter` and `hooksecurefunc(ChatFrame, "AddMessage")`. Reference implementation (in the collection): the chat-formatting addon overrides the relevant global strings rather than hooking chat events, so it is architecturally taint-free.
 - **MUST NOT** replace `AddMessage` outright — breaks every other chat addon.
-- **MUST** make cross-registration ordering deterministic (prettychat current bug: `pairs()` over filters). Use an ordered table.
+- **MUST** make cross-registration ordering deterministic (a `pairs()` over filters is order-nondeterministic). Use an ordered table.
 
 ### 9.6 Frame creation
 
 - **MUST** prefer Lua `CreateFrame` over XML for non-templated frames in Tier 1 addons.
-- **MAY** use XML for declarative groups of similar widgets in Tier 2 (Auctionator's `Manifest.xml` pattern).
-- **MUST** use object pooling for any high-churn UI (≥10 dynamic frames). Reference: OmniCD's ~80-line `ObjectPoolMixin` (Acquire/Release/HideAll). Roster churn becomes free.
+- **MAY** use XML for declarative groups of similar widgets in Tier 2 (the manifest-XML pattern used by auction-house addons).
+- **MUST** use object pooling for any high-churn UI (≥10 dynamic frames): an ~80-line object-pool mixin (Acquire/Release/HideAll), the pattern party-cooldown trackers use so roster churn becomes free.
 
 ### 9.7 Hot-path upvalue cache
 
@@ -655,7 +706,7 @@ end
 if DB_AURA_ENABLED then ... end
 ```
 
-- **MUST** call `M:RefreshUpvalues()` at end of every settings setter that touches values used in the hot path. Reference: Plater `RefreshDBUpvalues()`.
+- **MUST** call `M:RefreshUpvalues()` at end of every settings setter that touches values used in the hot path. (The DB-upvalue-refresh pattern nameplate frameworks use.)
 
 ---
 
@@ -665,23 +716,20 @@ If your addon exposes any function or data for third-party consumption:
 
 - **MUST** version-namespace it: `NS.API = NS.API or {}; NS.API.v1 = {...}`. Public consumers reference `MyAddon.API.v1.SomeFunction`.
 - **MUST** publish via `_G[addonName] = NS.API` (only the API surface; not the whole NS).
-- **MUST** document the v1 contract in `ARCHITECTURE.md` and treat it as semver-stable.
+- **MUST** document the v1 contract in `docs/ARCHITECTURE.md` and treat it as semver-stable.
 - **SHOULD NOT** break v1 even if the implementation changes; introduce v2 as a sibling table.
-- Ka0s-internal addons currently expose nothing; this rule is for future addons that anchor to other UF addons (KickCD-class) or expose hooks.
+- Ka0s-internal addons currently expose nothing; this rule is for future addons that other addons anchor to, or that expose hooks.
 
 ---
 
 ## 11. Compat / deprecated APIs
 
-Every addon **MUST** ship a `Compat.lua` (Tier 1) or `core/Compat.lua` (Tier 2). It is the **only** file that calls deprecated APIs and exposes shimmed versions.
+Every addon **MUST** ship a `Compat.lua` (Tier 1) or `core/Compat.lua` (Tier 2). It is the **only** file that calls deprecated APIs and exposes shimmed versions. Retail-only, so it shims across **Retail patch** differences — not across game flavors.
 
 ```lua
 local addonName, NS = ...
 NS.Compat = NS.Compat or {}
 local Compat = NS.Compat
-
-Compat.IsRetail  = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-Compat.IsClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
 -- Spell info: post-11.x consolidation
 function Compat.GetSpellInfo(id)
@@ -698,27 +746,41 @@ function Compat.GetSpecialization()
 end
 ```
 
-- **MUST** route every deprecated-API call through `Compat`. KickCD currently violates: direct `GetSpecialization`/`GetSpecializationInfo` at `modules/Cooldowns.lua:78-82` and `modules/IconGrid.lua:286-290`.
+- **MUST** route every deprecated-API call through `Compat`. Direct calls to deprecated spec/spell APIs scattered through feature modules are a violation — a current Tier-2 addon still calls `GetSpecialization`/`GetSpecializationInfo` directly in two modules and must be migrated.
+- **MUST NOT** branch on `WOW_PROJECT_ID` for game flavor (Retail only). Any Retail-patch version check that is genuinely needed lives here behind a named flag.
 
 ---
 
-## 12. Debug / logging
+## 12. Debug / logging — on-screen debug console
 
-Every addon **MUST** ship a debug seam. Reference: ConsumableMaster's `Debug.lua`.
+Every addon **MUST** ship a debug seam. Debug output **MUST** route to a **dedicated on-screen debug console styled like the addon's own main window** — **not** the default chat frame. Reference implementation (in the collection): the loot-history browser's debug console (`modules/DebugLog.lua`).
+
+The console (as implemented by the reference):
+
+- A standalone `BackdropTemplate` frame (e.g. `<Addon>DebugWindow`) parented to `UIParent` on **`DIALOG`** strata so it sits **above** the addon's main window, with a draggable title bar (`"<Addon> — Debug"`), a 1px divider, and a close glyph.
+- **Clear** and **Copy** buttons. The **Copy** action opens a read-through multiline `EditBox` pre-filled with the buffered log and auto-highlighted for `Ctrl+C`.
+- The log surface is a `ScrollingMessageFrame` with `SetMaxLines(500)`, mouse-wheel scroll, `GameFontHighlightSmall`; each appended line is timestamped (grey `HH:MM:SS`).
+- Registered in `UISpecialFrames` (ESC closes); **reuses the addon's `SKIN`/`ApplySkin` seam** (§6A) so it matches the main window.
+- `Show` / `Hide` / `Toggle` methods; opening the console turns logging on, closing it turns logging off.
+
+The sink:
 
 ```lua
 NS.Debug = NS.Debug or {}
 function NS.Debug:Print(fmt, ...)
-  if not NS.db or not NS.db.global.debug then return end  -- gated; SV-persistent
+  if not (NS.State and NS.State.debug) then return end   -- gated; zero-alloc when off
   local msg = (select("#", ...) > 0) and string.format(fmt, ...) or fmt
-  print("|cff33ff99" .. addonName .. "|r " .. msg)
+  NS.DebugLog:Add(msg)   -- append to the console, NOT print() to chat
 end
 ```
 
-- **MUST** gate via persistent SV flag (`NS.db.global.debug`). AbsorbTracker's in-memory-only `/at debug` is a deviation: resets every login.
 - **MUST** be zero-allocation when off (the gate is the first line; no `string.format` until past the gate).
-- **MUST** be toggleable via slash `/<addon> debug`.
-- **MAY** support levels (`Debug:Print(level, fmt, ...)`) for large addons.
+- **MUST** be toggleable via slash `/<slash> debug` (which toggles the console).
+- **SHOULD** persist the enabled-state in SavedVariables so it survives `/reload` and re-login (a persistent `db.profile.debugLog`-style flag). A session-only flag is an acceptable deviation under this SHOULD but is weaker.
+- **MAY** support levels (`Debug:Print(level, fmt, ...)`) and structured dump verbs (`/<slash> debug <topic>`) for large addons.
+- **Tier-1 utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (§6A) **MUST** use the console.
+
+Note: user-facing chat messages (help index, command acks, errors) still `print()` to chat with `NS.PREFIX` (§7.4) — that ordinary chat seam is separate from the debug console.
 
 ---
 
@@ -735,30 +797,32 @@ package-as: <Addon>
 
 ignore:
   - .luacheckrc
+  - .gitignore
   - reviews
-  - docs/internal
+  - docs
+  - tests
   - _dev
   - "*.bak"
 ```
 
 - **MUST** vendor and commit every library the addon uses (§3.3). **MUST NOT** declare `externals:`; **MUST** commit `libs/` to git as part of the addon.
-- **MUST** ignore `reviews/`, `_dev/`, `docs/`, `tests/`, lockfiles in the package.
-- **SHOULD** use `enable-toc-creation: yes` if you ship multiple flavors that need separate TOCs.
-- **MAY** use `move-folders:` only when the repo is a monorepo for multiple addons (out of scope today; Bagnon-style future direction).
+- **MUST** ignore `reviews/`, `_dev/`, `docs/`, `tests/`, lockfiles in the package (dev-only; not shipped to players).
+- **MUST NOT** use `enable-toc-creation` flavor fan-out — the addon is Retail-only with a single TOC (§2.3).
+- **MAY** use `move-folders:` only when the repo is a monorepo for multiple addons (out of scope today).
 
-CI (GitHub Actions) is **explicitly out of scope for this standard** per Ka0s decision.
+CI (GitHub Actions) is **out of scope** for this standard per Ka0s decision. **Local** testing and linting are **in scope** — see §14A.
 
 ---
 
 ## 14. Lint (`.luacheckrc`)
 
-Every addon **MUST** ship `.luacheckrc` at the root. Use the BigWigsMods snippet as the base:
+Every addon **MUST** ship `.luacheckrc` at the root. Base it on the common WoW-addon `luacheck` config:
 
 ```lua
 std = "lua51"
 max_line_length = false
 codes = true
-exclude_files = { "libs/", "reviews/", "_dev/" }
+exclude_files = { "libs/", "reviews/", "_dev/", "tests/" }
 ignore = {
   "212/self",   -- unused argument self
   "212/event",  -- unused argument event
@@ -773,32 +837,82 @@ read_globals = {
   -- per-addon globals are added per-repo
 }
 globals = {
-  "<Addon>DB",        -- per-repo
+  "<Addon>DB",        -- per-repo SavedVariables write target
 }
 ```
 
-- **MUST** lint on every commit (locally or as a pre-commit hook).
+- **MUST** run `luacheck .` with **0 errors** before every commit (§14A). `tests/` is excluded from lint (the harness is exercised by running it, not by linting it).
 - **MUST NOT** add `globals` (write access) without a comment justifying it.
+
+---
+
+## 14A. Automated tests & local build toolchain
+
+Every addon **MUST** ship an automated, **headless** test harness and be developed **test-first (TDD)**. Reference implementation (in the collection): the loot-history browser's `tests/` — a plain-Lua-5.1 harness (busted-compatible in spirit, no external framework required).
+
+### 14A.1 Harness shape
+
+```
+tests/
+  run.lua            -- runner + micro-framework; loads sources + suites, exits non-zero on any failure
+  loader.lua         -- headless source loader
+  wow_mock.lua       -- WoW API mock builder
+  test_<module>.lua  -- one suite per module (test_util.lua, test_database.lua, ...)
+```
+
+- **`run.lua`** defines a tiny framework — `test(name, fn)`, `assertEqual`, `assertTrue`, `assertFalse` — and exposes them (plus `NS` and the mocks) to suites via a single global table (e.g. `_G.<ADDON>_TEST`). It builds the addon environment once by loading every source in TOC order, calls `NS:InitDB()`, then `dofile`s each `test_*.lua`, runs each test under `pcall`, prints `PASS`/`FAIL`, and `os.exit(failed == 0 and 0 or 1)`.
+- **`loader.lua`** loads each source with `loadfile`, then `setfenv(chunk, makeEnv(mocks))` so WoW globals resolve to the mock table first (falling back to real `_G`), and calls each chunk as `chunk(addonName, NS)` — reproducing the `local addonName, NS = ...` header.
+- **`wow_mock.lua`** returns a **builder** (a fresh env per run). It stubs time/player/world APIs and a **universal self-returning no-op frame** (`setmetatable(f, { __index = function() return function() return f end end })`), plus `CreateFrame`, `UIParent`, `Settings.*`, and `LibStub` with `AceDB-3.0`/`AceAddon-3.0` fakes.
+- Suites are plain: `local T = _G.<ADDON>_TEST; local NS = T.NS; local test, assertEqual = T.test, T.assertEqual` then `test("...", function() assertEqual(...) end)`.
+
+### 14A.2 Commands
+
+- **Run unit tests:** `lua tests/run.lua` from the repo root (exits non-zero on failure).
+- **Lint:** `luacheck .` — **0 errors** (config in `.luacheckrc`, §14).
+- **Syntax-check one file:** `luac -p path/to/file.lua`.
+
+### 14A.3 Local toolchain
+
+WoW runs **Lua 5.1**, so the harness targets 5.1. Install locally:
+
+```sh
+sudo apt-get update && sudo apt-get install -y lua5.1 luarocks
+sudo luarocks install luacheck
+```
+
+### 14A.4 TDD & the commit gate
+
+- **MUST** be test-first: write or extend a **failing** test that pins the intended behavior, then implement until it passes.
+- **MUST**, before **every** commit, run **`lua tests/run.lua`** (all suites green) **and** **`luacheck .`** (0 errors). A commit with red tests or lint errors is forbidden.
+- **MUST** add/extend a suite whenever a behavior changes — no logic change lands without a covering test.
+- Pure/testable logic (schema validation, data collection, attribution, migrations, formatting) **MUST** be exercised headlessly. Genuinely in-client behavior (frame rendering, taint) is covered by the in-game smoke tests (§16), which complement — not replace — the unit suites.
 
 ---
 
 ## 15. Documentation set
 
-Every addon **MUST** ship:
+**Root of the repo** ships exactly three docs (plus `LICENSE`):
 
-- `README.md` — user-facing. Sections in this order: Title, Badges, Description (1-2 paragraphs), Features (bullet list), Installation, Usage / Slash Commands (table), Configuration (high level), Version History (table, last 5 versions). Reference: any of the 5 current Ka0s READMEs.
+- `README.md` — **full, user-facing**, stays at root (GitHub renders it). Sections in this order: Title, Badges (including a `[wow]` interface badge — §2.3), Description (1-2 paragraphs), Features (bullet list), Installation, Usage / Slash Commands (table), Configuration (high level), **a line/badge stating the addon is built to the Ka0s WoW Addon Standard, linking <https://github.com/tusharsaxena/WowAddonStandards>**, Version History (table, last 5 versions).
+- `CLAUDE.md` — **a STUB**: a short pointer that (a) names the tier, (b) states the addon adheres to the Ka0s WoW Addon Standard at <https://github.com/tusharsaxena/WowAddonStandards>, and (c) directs the reader into `docs/` for the full agent context. **MUST NOT** carry the full agent brief at root — that lives in `docs/`.
 - `LICENSE` — MIT, full text.
-- `CLAUDE.md` — agent context. Sections: stack, layout tier, key files (with one-line purpose each), conventions cheat-sheet, current TODOs, "do not change without reason" notes.
-- `ARCHITECTURE.md` — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
 
-**MUST** keep all four in sync with code. Drift is the #1 gripe surfaced in every Ka0s `reviews/` folder. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
+**`docs/`** holds everything else:
+
+- `docs/ARCHITECTURE.md` — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
+- The **full agent-context pack** (the detailed working notes the root `CLAUDE.md` points to).
+- `docs/TODO.md`, plus any planning / reference / design docs.
+
+- **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `reviews/` folder. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
+- The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `version-bump`).
 
 ---
 
 ## 16. Reviews / audit history
 
 - **MUST** keep `reviews/<YYYY-MM-DD>/` folders for every audit. Five-artifact bundle: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`. The `wow-addon:review` skill produces this format.
-- **SHOULD** retain every prior `reviews/` folder; they are the addon's institutional memory.
+- **SHOULD** retain every prior `reviews/` folder; they are the addon's institutional memory. (Reviews are **kept**, not deleted after commit.)
+- `03_SMOKE_TESTS.md` catalogues **in-game** checks; they complement the headless unit suites (§14A), which cover testable logic.
 
 ---
 
@@ -806,13 +920,14 @@ Every addon **MUST** ship:
 
 - **MUST** use semver (`MAJOR.MINOR.PATCH`). MAJOR for backwards-incompatible API or SV changes; MINOR for new features; PATCH for fixes only.
 - **MUST** bump in TOC `## Version:`, and in any code constants and README badges/Version History tables. The `wow-addon:version-bump` skill automates this.
+- **MUST** bump the single TOC `## Interface:` (and the matching README `[wow]` badge) each Retail patch via `wow-addon:bump-interface` (§2.3).
 - **MUST** increment `schemaVersion` (in defaults) whenever a SV migration is required.
 
 **Git workflow**
 
 - **MUST** work trunk-based: commit directly to the addon's default branch. Do **NOT** create feature/topic branches for routine work — branch **only** when the human explicitly asks (e.g. a risky spike needing isolation).
 - **MUST NOT** push to a remote unless the human asks; the human pushes when ready.
-- **SHOULD** commit on a completed, green unit of work (a done sub-milestone/task), not at every checkpoint.
+- **MUST** commit only on a **green** unit of work — `lua tests/run.lua` passing and `luacheck .` clean (§14A) — not at every checkpoint.
 
 ---
 
@@ -820,15 +935,17 @@ Every addon **MUST** ship:
 
 | Thing | Convention | Example |
 |---|---|---|
-| Addon folder | PascalCase | `KickCD` |
-| Subfolders | lowercase | `core/`, `modules/`, `libs/` |
+| Addon folder | PascalCase | `ExampleBar` |
+| Subfolders | lowercase | `core/`, `modules/`, `libs/`, `tests/`, `docs/` |
+| Media subfolders | lowercase, typed | `media/logos/`, `media/screenshots/` |
 | Lua files | PascalCase.lua | `IconGrid.lua` |
+| Test suites | `test_<module>.lua` | `test_database.lua` |
 | Namespace upvalue | `NS` (private) | `local addonName, NS = ...` |
-| Public API | `_G[addonName].API.v1` | `KickCD.API.v1` |
-| SavedVariables | `<Addon>DB` | `KickCDDB` |
-| Slash verbs | 2-3 lowercase | `/at`, `/kcd` |
-| Bus messages | `Ka0s_<Addon>_<Event>` | `Ka0s_KickCD_RosterChanged` |
-| AceConfig options key | snake_case dotted path | `display.scale` |
+| Public API | `_G[addonName].API.v1` | `ExampleBar.API.v1` |
+| SavedVariables | `<Addon>DB` | `ExampleBarDB` |
+| Slash verbs | 2-3 lowercase | `/eb`, `/xb` |
+| Bus messages | `Ka0s_<Addon>_<Event>` | `Ka0s_ExampleBar_RosterChanged` |
+| Settings key | snake_case dotted path | `display.scale` |
 | Locale keys | English source string | `L["Reset all settings"]` |
 | Module table | `NS.<PascalCase>` | `NS.IconGrid` |
 
@@ -846,19 +963,24 @@ For quick reference, the rules above as a do-not list:
 6. `if cmd == "x" then elseif ...` slash dispatcher — use schema + COMMANDS table.
 7. `.pkgmeta` `externals:` for libraries — vendor and commit all libs instead (§3.3).
 8. Forking Ace libs — use `RegisterWidgetType` extension instead.
-9. `if WOW_PROJECT_ID == ...` ladders inline — branch in Compat.
+9. `if WOW_PROJECT_ID == ...` game-flavor branching — Retail only; route any Retail-patch check through Compat (§11).
 10. Direct calls to deprecated APIs — route through Compat.
 11. `:Hide()` on Blizzard frames you replace — reparent to hidden parent.
 12. Replacing `AddMessage` — override globals or use AddMessageEventFilter.
 13. Hard `## Dependencies:` (use OptionalDeps + soft fallback).
 14. `## X-License: All Rights Reserved` — must be MIT.
-15. Per-flavor TOC duplication — use packager `enable-toc-creation`.
+15. Multi-flavor / Classic support (comma Interface lists, per-flavor TOCs, `_Classic` data splits, `enable-toc-creation` fan-out) — Retail only, single Interface line (§2.3).
 16. Files >1500 LOC — peel.
 17. Multiple senders for the same bus message.
-18. In-memory-only debug toggle — must persist in SV.
+18. Debug output to the chat frame when the addon has a main window — use the on-screen debug console (§12).
 19. Cross-module direct table access — use the bus.
 20. User-supplied Lua execution — banned at the standard level (no Ka0s addon needs it).
 21. Creating a feature/topic branch without an explicit request — work trunk-based (§17).
+22. Deferring settings-**category** registration until first `/config`/panel-open — register the category eagerly at load; only the body is lazy (§6.1, §6.9).
+23. Committing with red `lua tests/run.lua` or non-clean `luacheck .` — the commit gate is green tests + clean lint (§14A).
+24. No `tests/` harness, or a logic change with no covering test — TDD is mandatory (§14A).
+25. Loose files directly in `media/` — use typed subfolders (§1.4).
+26. Full agent brief in the root `CLAUDE.md` — root `CLAUDE.md` is a stub; the brief lives in `docs/` (§15).
 
 ---
 
@@ -866,12 +988,13 @@ For quick reference, the rules above as a do-not list:
 
 Items recorded for future versions of this standard:
 
-- **Ka0s-Core sibling addon.** Long-term: extract Schema runtime, AceGUI panel scaffold, slash dispatcher, Compat templates into a single `Ka0s-Core` addon (Bagnon's BagBrother model). Out of scope for v1.
+- **Ka0s-Core sibling addon.** Long-term: extract Schema runtime, AceGUI panel scaffold, slash dispatcher, Compat templates, and the debug-console + test-harness scaffolding into a single `Ka0s-Core` addon (the shared-engine model bag-replacement addons use). Out of scope for now.
 - **Shared luacheckrc base.** A `Ka0s-luacheckrc.lua` symlinked into every addon.
-- **Shared vendored libs.** Once monorepo'd, vendor each lib once at the repo root and share it across addons (Bagnon BagBrother model) rather than duplicating `libs/` per addon.
-- **Multi-zone profile model adoption** for KickCD and any future group-context addon.
+- **Shared vendored libs.** Once monorepo'd, vendor each lib once at the repo root and share it across addons rather than duplicating `libs/` per addon.
+- **Shared test scaffolding.** A copyable `tests/` skeleton (runner + WoW mocks) so new addons inherit the harness.
+- **Multi-zone profile model adoption** for group-context addons.
 - **Object pool standard** packaged as a copyable micro-lib.
 
 ---
 
-**End of standard. Authoritative as of 2026-05-03. Bump on amendment.**
+**End of standard. Authoritative as of 2026-07-12. Bump on amendment.**

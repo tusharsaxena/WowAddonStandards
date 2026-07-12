@@ -198,4 +198,37 @@ These weren't in the Ka0s-only analysis but are worth taking a position on in M4
 
 ---
 
-**Status:** This research is the standing foundation for [`01_STANDARD.md`](01_STANDARD.md). When it is refreshed, re-run the synthesis step in [`README.md`](README.md) and bump the standard's changelog.
+## 7. v2.0 refresh addendum (2026-07-12)
+
+Notes attaching the Standard v2.0 decisions to industry evidence. (This document is the *evidence*
+layer, so it names the reference addons; the normative standard describes these patterns without
+naming addons — see `01_STANDARD.md §0`.) This is a targeted addendum, not a full 10-addon
+re-survey — the v2.0 changes are mostly Ka0s-preference decisions with partial industry support.
+
+- **Retail-only single Interface — a deliberate divergence.** §2.3 above records that a **multi-flavor
+  TOC is the industry norm (8 of 10)**. Standard v2.0 **rejects** it: the Ka0s collection ships
+  **Retail only** with a single latest-Retail `## Interface:` line. This is an intentional scope
+  decision (the collection targets Retail), not an industry-aligned one — noted here so future
+  refreshes don't "correct" it back toward the ecosystem default.
+- **Headless unit tests + `luacheck` — industry-supported.** The canonical Ace3 addons ship a
+  `.luacheckrc` and lint in CI (BigWigs, WeakAuras), and the broader Lua ecosystem standard for unit
+  tests is `busted` on Lua 5.1. Standard §14A adopts a **framework-free, busted-compatible headless
+  harness** (a plain-Lua runner + WoW-API mocks) plus `luacheck` — the same toolchain, without the
+  external test-framework dependency. WoW's Lua 5.1 runtime is the reason tests target 5.1.
+- **On-screen debug console — industry-supported.** Damage meters and error-catcher addons (Details!,
+  BugSack-class) surface diagnostics in a **dedicated scrollable window** rather than the chat frame.
+  Standard §12 adopts this for any addon with a main window (scrolling console, Clear/Copy,
+  `UISpecialFrames`, reusing the addon's own skin).
+- **Preview / unlock mode — industry-supported.** Bar, nameplate, and aura addons (Plater,
+  WeakAuras-class) show **placeholder content while unlocked** so users can position frames without a
+  live event. Standard §6B adopts this as a SHOULD for addons with a positionable display.
+- **Eager settings-category registration.** Registering the Blizzard `Settings` category at load
+  (native-`Settings` and Ace addons alike, e.g. Auctionator) so the entry is always present, while
+  deferring only the panel *body*, informs §6.1. Deferring the *category* itself until first open is
+  the anti-pattern §6.9 now forbids.
+- **Docs relocation / stub root `CLAUDE.md` / typed `media/` subfolders** are house-keeping decisions
+  local to the Ka0s collection with no strong industry signal either way.
+
+---
+
+**Status:** This research is the standing foundation for [`01_STANDARD.md`](01_STANDARD.md). When it is refreshed, re-run the synthesis step in [`README.md`](README.md) and bump the standard's changelog. Last addendum: v2.0 (2026-07-12).
