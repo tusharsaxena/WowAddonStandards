@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.3, 2026-07-12)
+# Ka0s WoW Addon Standard (v2.4, 2026-07-12)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,7 @@
 
 **Changelog**
 
+- **v2.4 (2026-07-12):** **§6 options-panel refinements** from the Tier-2 tracker's settings work. **(1)** New **§6.10 Scroll container** — the body's AceGUI `ScrollFrame` **MUST** keep its vertical scrollbar shown *even when the content fits* (park + disable the thumb; don't hide the bar), so every subcategory renders at an identical body width and right margin. Hiding the bar on short pages is now an anti-pattern (§19). **(2)** **§6.6 / §6.8** — a cell-filling action `Button` in a 50/50 pair **MUST** inset to `SetRelativeWidth(0.492)` (new constant `BUTTON_PAIR_REL`), not a flush `0.5`, so AceGUI Flow's ~2px right-cell spill isn't shaved off by the `ScrollFrame` clip rect. §19 anti-patterns updated.
 - **v2.3 (2026-07-12):** **§12 debug console overhaul**, promoted from the loot-history reference implementation. The console now mandates: a **shipped monospace font** under `media/fonts/` (e.g. **JetBrains Mono**, OFL; LSM-registered) applied at **10pt**; a **tagged, colour-coded line format** — `<HH:MM:SS> | [<Tag>] <content>` with the timestamp in muted steel-blue (`6f8faf`), the `[tag]` in muted tan/gold (`c9a66b`), and the `|` separator + content in the default white — mirrored to a **code-free Copy buffer** via **two pure formatters** (`FormatPlain`/`FormatColored`) so the two never drift; a **`NS.Debug(tag, fmt, ...)`** sink with the **tag as the first argument**; a **default window size of `700×344`**; and **session-only, window-independent enabled-state** — `NS.State.debug`, default **off**, held out of SavedVariables and **reset every `/reload`**, toggled by `/<slash> debug on|off` (bare `/<slash> debug` toggles the *window* only) and an in-title-bar **`Debug: ON`/`OFF`** control (green/red). **This reverses the v2.0 "enabled-state SHOULD persist in SV" line** — debug is now session-only by default; persisting it is the documented deviation.
 - **v2.2 (2026-07-12):** Added **§3.6 No addon-suite dependencies** — a Ka0s addon MUST be fully self-contained and behave identically with no other addon installed; it MUST NOT hard-depend on, embed, or read the media/API/SavedVariables of any addon *suite* or standalone addon (ElvUI, EllesmereUI, DBM, WeakAuras, BigWigs, …). Optional, presence-guarded integration that degrades gracefully is still allowed (the shared-**library** vendoring rule of §3.3 is unchanged — libraries are not suites). §19 anti-patterns updated.
 - **v2.1 (2026-07-12):** Standardized the **root `README.md` structure** (§15.1) and the **TOC field order + file-listing structure** (§2.1, §2.5) — one canonical layout every addon follows, taken from the collection's Tier-2 modular tracker as the golden template. Added the **no-`TODO.md`** rule (§15.4): released addons track all issues/enhancements in **GitHub issues**, not a `TODO.md`; only an unreleased, in-development addon may keep a `TODO.md` during its development phase. §19 anti-patterns updated.
@@ -503,6 +504,7 @@ if #pendingRow.children >= 2 then flushRow() end
 
 - A row that is intrinsically wide (a multi-check block, a long list) **MAY** set `wide = true` to break onto its own full-width line.
 - The pairing is **schema-driven**: each row's `group` names its section (§6.7) and row order within a group drives the pairing — no per-panel layout code.
+- A widget that **fills its cell edge-to-edge** — an action `Button`, e.g. the 50/50 pair at the foot of a group (*Reset position | Reset all settings*) — **MUST** inset to **`SetRelativeWidth(0.492)`** (constant `BUTTON_PAIR_REL`, §6.8), never a flush `0.5`. AceGUI's Flow layout spills the right cell ~2px past the content width, and because the scroll content fills the `ScrollFrame` clip rect exactly (§6.10), that spill — including the button's right border — is otherwise shaved off. Label-inset controls (dropdowns, sliders, checkboxes) are immune because their art sits inset from the cell edge; a cell-filling button is not. Centralise the inset in the shared button-pair maker so every panel inherits it — never hand-set `0.5` on a paired button.
 
 ### 6.7 Section headers
 
@@ -550,6 +552,7 @@ Every Ka0s panel **MUST** use these exact pixel/font values so all addons render
 | Constant | Value | Meaning |
 |---|---|---|
 | column width | `SetRelativeWidth(0.5)` | each paired widget = half the row |
+| `BUTTON_PAIR_REL` | **0.492** | per-button width of a 50/50 action-button pair — a hair under `0.5` so the right button clears the `ScrollFrame` clip (§6.6, §6.10) |
 | `ROW_VSPACER` | **8** | spacer between rows |
 | scroll inset `TOPLEFT` | `(PADDING_X − 4, −8)` | AceGUI `ScrollFrame` vs body |
 | scroll inset `BOTTOMRIGHT` | `(−(PADDING_X + 12), 8)` | reserves the scrollbar gutter |
@@ -571,6 +574,13 @@ Every Ka0s panel **MUST** use these exact pixel/font values so all addons render
 ### 6.9 Registration timing (anti-pattern)
 
 - **MUST NOT** gate the settings-**category** registration behind a slash command, a first panel-open, or any user action. Deferring `Settings.RegisterCanvasLayoutCategory` / `RegisterAddOnCategory` until the user runs `/<slash> config` leaves the addon **missing from the options list** until they act — a real defect (a current Tier-1 group-utility addon does exactly this, deferring registration inside its `config` handler to avoid boot-time GameMenu taint). The taint-safe fix is **not** to defer registration but to register **after `Blizzard_Settings` is loaded** and keep the **body** lazy (§6.1) — the pattern both gold-standard addons use.
+
+### 6.10 Scroll container
+
+The two-column body (§6.6) renders inside a single AceGUI `ScrollFrame` per subcategory. Two rules keep every panel — short or long — rendering identically.
+
+- **Always-visible scrollbar.** The body's `ScrollFrame` **MUST** keep its vertical scrollbar shown **even when the content fits without scrolling**: park the thumb at the top and disable interaction (grey it out) rather than hiding the bar. AceGUI's stock `FixScroll` auto-hides the bar when `viewheight < height`; rebind it to keep the bar shown and inert. This reserves a consistent right-edge gutter (§6.8, scroll inset `BOTTOMRIGHT`) so a short subcategory (e.g. *General*) and a long one (e.g. *Icons*) have the **same body width and right margin** — a panel that hides its bar on short pages and shows it on long ones jitters its content width between tabs. Reference implementation (in the collection): the Tier-2 tracker's always-show-scrollbar `FixScroll` rebind.
+- **Clip-safe cell edges.** The scroll content frame fills the `ScrollFrame`'s clip rect exactly, so a widget whose art reaches the right edge of its cell is shaved by ~2px (AceGUI Flow spills the right cell past the content width). Cell-filling widgets — action buttons — therefore inset their relative width per §6.6 (`BUTTON_PAIR_REL`, §6.8); label-inset controls (dropdowns, sliders, checkboxes) are unaffected.
 
 ---
 
@@ -1103,6 +1113,8 @@ For quick reference, the rules above as a do-not list:
 27. A checked-in `TODO.md` in a **released** addon — track the backlog in GitHub issues; a `TODO.md` is allowed only in an unreleased, in-development addon during its development phase (§15.4).
 28. Non-canonical `README.md` section order, or a TOC that departs from the required field order / file-listing structure — follow §15.1 and §2.1/§2.5.
 29. Hard-depending on an addon suite or standalone addon (ElvUI/EllesmereUI/DBM/WeakAuras/…), or reading its media/API/frames/SavedVariables — addons are fully self-contained; suite integration is optional, presence-guarded, and degrades gracefully (§3.6).
+30. Hiding the options-panel scrollbar on short pages (bar shown only when content overflows) — the body `ScrollFrame` keeps its bar always shown and inert so body width is identical across subcategories (§6.10).
+31. A 50/50 paired action button left at `SetRelativeWidth(0.5)` — cell-filling buttons inset to `BUTTON_PAIR_REL` (0.492) so the right button clears the `ScrollFrame` clip (§6.6, §6.8, §6.10).
 
 ---
 
