@@ -33,16 +33,21 @@ The standard is a **synthesis** of two inputs:
    Captured in [`03_INDUSTRY_RESEARCH.md`](03_INDUSTRY_RESEARCH.md), backed by
    [`_raw/_industry/`](_raw/_industry/).
 2. **The collection's current state** — what the Ka0s addons actually do today, and which of those
-   habits are worth codifying. This snapshot is produced by an audit run as
-   `audit/<date>/02_CURRENT_STATE.md`; mine the most recent one.
+   habits are worth codifying. *Which* addons make up "the collection" is defined by the roster,
+   [`../ADDONS.md`](../ADDONS.md). Their current state is captured by an audit run — per addon in
+   `audit/<date>/<Addon>/01_CURRENT_STATE.md`, with the cross-addon comparison in that run's
+   `00_EXECUTIVE_SUMMARY.md`; mine the most recent run.
 
 ### Rebuild steps
 
 1. **Refresh the research.** Re-survey the reference addons (or add/remove some) and update
    `03_INDUSTRY_RESEARCH.md` and its `_raw/_industry/` reports. Note convergent patterns (adopt) vs
    anti-patterns (reject), with evidence links.
-2. **Read the collection's current state.** Pull the latest `audit/<date>/02_CURRENT_STATE.md` for
-   what the in-scope addons do now and which decisions are still open.
+2. **Read the collection's current state.** The in-scope addons are those in
+   [`../ADDONS.md`](../ADDONS.md); pull the latest run's per-addon
+   `audit/<date>/<Addon>/01_CURRENT_STATE.md` files (plus the comparison matrix in its
+   `00_EXECUTIVE_SUMMARY.md`) for what they do now and which decisions are still open. (The legacy
+   `2026-05-03/` run keeps this in a single `02_CURRENT_STATE.md`.)
 3. **Synthesize / revise.** Fold both inputs into `01_STANDARD.md` as prescriptive rules
    (MUST / SHOULD / MAY), each with a rationale and, where possible, a **reference implementation**
    from the collection or a cited industry source. Preserve the `§`-section numbering — other
@@ -58,6 +63,6 @@ The standard is a **synthesis** of two inputs:
 
 An audit does **not** build the standard. It takes the then-current `01_STANDARD.md` as fixed and
 checks every addon against it, producing per-addon deviations and remediation plans. The one thing an
-audit feeds back is observation: its `02_CURRENT_STATE.md` is an input to step 2 above, and a
+audit feeds back is observation: its per-addon current-state docs are an input to step 2 above, and a
 deviation that turns out to be *industry-aligned* is a signal to revise the standard rather than the
 addon. See [`../audit/README.md`](../audit/README.md).

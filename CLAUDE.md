@@ -8,16 +8,17 @@ A **research and analysis deliverable** — the house standard for the Ka0s Worl
 collection, plus the periodic audits (evidence and remediation plans) that measure the collection
 against it. It contains **documents only**. No addon source code lives here.
 
-The audited addons (AbsorbTracker, ConsumableMaster, KickCD, prettychat, WhatGroup) live in their
-own sibling repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. **Do not modify those
-addons from here** — remediation is a separate, follow-up engagement. This repo only describes what
-should change, it does not change it.
+The in-scope addons are listed in **`ADDONS.md`** (the single, editable roster) and live in their own
+sibling repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. **Do not modify those addons
+from here** — remediation is a separate, follow-up engagement. This repo only describes what should
+change, it does not change it.
 
 ## Two-part layout
 
 The repo is split into the **standard** (canonical, living) and the **audits** (periodic, frozen).
 
 ```
+ADDONS.md                           -- THE ROSTER: single editable scope list, read by both halves
 standards/                          -- THE STANDARD (living, canonical). Everything supports 01_STANDARD.md.
   README.md                         -- what's in standards/ + how to rebuild the standard
   00_EXECUTIVE_SUMMARY.md           -- one-page TL;DR of the standard
@@ -27,21 +28,31 @@ standards/                          -- THE STANDARD (living, canonical). Everyth
   _raw/_industry/                   -- per-addon raw research reports (evidence for 03_)
 audit/                              -- periodic compliance runs; see audit/README.md
   <YYYY-MM-DD>/                     -- one dated folder per run (frozen snapshot)
-    00_EXECUTIVE_SUMMARY.md         -- one-page TL;DR of this run (start here to orient)
-    01_PLAN.md                      -- this run's milestone plan
-    02_CURRENT_STATE.md             -- per-addon snapshot + comparison matrix
-    03_DEVIATIONS.md                -- per-addon gap report against the standard
-    _raw/                           -- full per-addon compliance evidence
-    remediation/                    -- per-addon TECHNICAL_DESIGN + EXECUTION_PLAN; see remediation/README.md
+    00_EXECUTIVE_SUMMARY.md         -- cross-addon TL;DR: comparison matrix + sprints (start here)
+    01_PLAN.md                      -- how this run is conducted (run-wide milestone plan)
+    <Addon>/                        -- SELF-CONTAINED per-addon folder; one agent owns it end-to-end
+      01_CURRENT_STATE.md           -- this addon's snapshot
+      02_DEVIATIONS.md              -- this addon's gap report + deviation IDs
+      03_EVIDENCE.md                -- this addon's compliance evidence
+      04_TECHNICAL_DESIGN.md        -- this addon's remediation design
+      05_EXECUTION_PLAN.md          -- this addon's remediation steps
 ```
 
-The only audit run so far is `audit/2026-05-03/`.
+Per-addon folders are self-contained by design, so runs can be worked in parallel (one agent per
+addon); only genuinely cross-addon material lives at the run root.
+
+The only audit run so far is `audit/2026-05-03/`, which predates the per-addon layout and uses the
+legacy flat layout (combined `02_CURRENT_STATE.md`/`03_DEVIATIONS.md`, flat `_raw/`,
+`remediation/<Addon>/`). It is frozen and left as-is; the per-addon layout applies from the next run.
 
 Read order for a newcomer: `audit/2026-05-03/00_EXECUTIVE_SUMMARY.md` → `standards/01_STANDARD.md` →
 the rest as needed.
 
 ## Conventions
 
+- **`ADDONS.md` is the single scope source.** Both the standards process and every audit run take the
+  list of in-scope addons from this one roster. To add/remove an addon from scope, edit that file —
+  nothing else. Don't hard-code the addon list elsewhere; point at `ADDONS.md`.
 - **`standards/01_STANDARD.md` is canonical.** When docs conflict, it wins. It uses section refs like
   `§4.5`, `§9.2` — preserve those when editing.
 - **The standard is living; audits are frozen.** `standards/` evolves in place (versioned via the
@@ -56,12 +67,17 @@ the rest as needed.
 - **The date `2026-05-03`** is an audit-run identifier: it **is** the folder name for that run, and it
   also appears in that run's document titles/headers. (Note: this repo previously flattened everything
   to the root with no dated folder — that is no longer true; audits are dated folders again.)
-- **Cross-references** use plain relative paths. From an audit doc to the standard:
-  `../../standards/01_STANDARD.md`. Within an audit run: `03_DEVIATIONS.md`, `remediation/README.md`.
+- **Cross-references** use plain relative paths; depth depends on where the doc sits. A **per-addon**
+  doc (`audit/<date>/<Addon>/…`) reaches the standard at `../../../standards/01_STANDARD.md`, its run's
+  summary at `../00_EXECUTIVE_SUMMARY.md`, and its sibling per-addon docs by bare name
+  (`02_DEVIATIONS.md`). A **run-root** doc reaches the standard at `../../standards/01_STANDARD.md`.
   From `standards/` to an audit: `../audit/<date>/…`. The standard itself should reference audit
-  concepts generically (e.g. "the deviation report") rather than hard-linking one dated run.
-- **Deviation IDs** are per-addon (AT-*, CM-*, KCD-*, PC-*, WG-*) and referenced across the reports.
-  Keep them stable; they are the shared key between a run's `03_DEVIATIONS.md` and its remediation plans.
+  concepts generically (e.g. "the deviation report") rather than hard-linking one dated run. (The
+  frozen `2026-05-03/` run uses the older flat depth — `../../standards/…` from its run-root docs.)
+- **Deviation IDs** are per-addon (AT-*, CM-*, KCD-*, LH-*, PC-*, WG-*) and referenced across the
+  reports. Keep them stable; they are the shared key between each addon's `02_DEVIATIONS.md` and its
+  remediation plans (`04_TECHNICAL_DESIGN.md` / `05_EXECUTION_PLAN.md`) in the same `<Addon>/` folder.
+  A newly-rostered addon gets its prefix assigned on its first audit run.
 
 ## Git workflow
 
@@ -80,7 +96,8 @@ run's `03_DEVIATIONS.md` and `00_EXECUTIVE_SUMMARY.md`. Most important: the "5/5
 ## Editing rules
 
 - Keep documents internally consistent — a change to the standard may ripple into an audit run's
-  `03_DEVIATIONS.md`, its remediation plans, and both `00_EXECUTIVE_SUMMARY.md` files. Update all
-  affected docs together.
+  per-addon deviation/remediation docs (`<Addon>/02_DEVIATIONS.md`, `04_TECHNICAL_DESIGN.md`,
+  `05_EXECUTION_PLAN.md`) and both `00_EXECUTIVE_SUMMARY.md` files. Update all affected docs together.
+  (In the legacy `2026-05-03/` run these are the flat `03_DEVIATIONS.md` + `remediation/` subtree.)
 - Don't invent compliance claims. Findings here are evidence-backed (citations in a run's `_raw/`);
   keep new claims sourced the same way.

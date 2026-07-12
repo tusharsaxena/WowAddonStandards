@@ -6,6 +6,33 @@ Authoritative reference: `WowAddonStandards/standards/01_STANDARD.md`. This docu
 
 ---
 
+## Kickstart walkthrough
+
+The ordered process for starting a new Ka0s addon that is **born compliant** with the current
+standard. Steps run in the **new addon's repo** unless marked *[standards repo]*.
+
+1. **Scaffold.** Run the `wow-addon:new-addon` skill (Ace3 stack, AceDB saved variables, modular
+   folder layout, MIT license, AceConsole slash command). This lays down the skeleton the rest of this
+   pack fills in.
+2. **Drop in this pack.** Put the contents of this file into the new addon's root as `CLAUDE.md`, so
+   every agent and contributor working in that repo has the full standards brief with no external
+   lookups.
+3. **Pick a tier and lay out files.** Tier 1 (flat, ≤8 files) or Tier 2 (modular) — see *Pick a tier*
+   below. Copy the vendored `libs/` set you actually `LibStub()` from an existing Ka0s addon so
+   versions stay consistent.
+4. **Fill in the starters.** Work through the *Starter snippets* (TOC, entry, `Compat`, `Locale`,
+   `Database`, `Settings`, debug, message bus, `.luacheckrc`, `.pkgmeta`) and the *Hard rules cheat
+   sheet* below. When stuck, copy from the cited *Reference files in existing Ka0s addons*.
+5. **Check Definition of Done.** Walk the checklist at the bottom before tagging `v0.1.0`.
+6. **Register in the roster.** *[standards repo]* Add the addon's row to
+   `WowAddonStandards/ADDONS.md`. This puts it in scope for the next audit and standards refresh — it
+   is the only edit needed to bring a new addon into scope.
+
+Then keep it compliant over time with the `wow-addon:` skills listed at the end of this file
+(`review`, `sync-docs`, `version-bump`, …) and re-audit it as part of the collection.
+
+---
+
 ## Identity
 
 - **Author:** add1kted2ka0s (Ka0s)
