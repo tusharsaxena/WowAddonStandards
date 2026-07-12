@@ -426,6 +426,7 @@ Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`).
 - `:Hide()` on Blizzard frames you replace (reparent to hidden parent).
 - Replacing `_G.AddMessage`.
 - Hard `## Dependencies:` (use OptionalDeps + soft fallback).
+- Hard-depending on an addon suite or standalone addon (ElvUI/EllesmereUI/DBM/WeakAuras/…), or reading its media/API/frames/SavedVariables — the addon is fully self-contained and works identically standalone; suite integration is optional, presence-guarded (`C_AddOns.IsAddOnLoaded`), `OptionalDeps`-listed, and degrades gracefully (§3.6). Vendored **libraries** are unaffected — a library is not a suite.
 - `X-License: All Rights Reserved`.
 - Files >1500 LOC.
 - Multiple senders per bus message.

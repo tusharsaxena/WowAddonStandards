@@ -121,7 +121,7 @@ WowAddonStandards/
 
 ## Status
 
-Standard is at **v1.3** and living. The latest audit run (`audit/2026-05-03/`) is complete; its
+Standard is at **v2.2** and living. The latest audit run (`audit/2026-05-03/`) is complete; its
 remediation (actually modifying the addons) is a separate, planned follow-up engagement not yet
 executed.
 

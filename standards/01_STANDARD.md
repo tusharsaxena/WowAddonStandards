@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.1, 2026-07-12)
+# Ka0s WoW Addon Standard (v2.2, 2026-07-12)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,7 @@
 
 **Changelog**
 
+- **v2.2 (2026-07-12):** Added **§3.6 No addon-suite dependencies** — a Ka0s addon MUST be fully self-contained and behave identically with no other addon installed; it MUST NOT hard-depend on, embed, or read the media/API/SavedVariables of any addon *suite* or standalone addon (ElvUI, EllesmereUI, DBM, WeakAuras, BigWigs, …). Optional, presence-guarded integration that degrades gracefully is still allowed (the shared-**library** vendoring rule of §3.3 is unchanged — libraries are not suites). §19 anti-patterns updated.
 - **v2.1 (2026-07-12):** Standardized the **root `README.md` structure** (§15.1) and the **TOC field order + file-listing structure** (§2.1, §2.5) — one canonical layout every addon follows, taken from the collection's Tier-2 modular tracker as the golden template. Added the **no-`TODO.md`** rule (§15.4): released addons track all issues/enhancements in **GitHub issues**, not a `TODO.md`; only an unreleased, in-development addon may keep a `TODO.md` during its development phase. §19 anti-patterns updated.
 - **v2.0 (2026-07-12):** Major refresh.
   - **Retail-only.** Dropped the multi-flavor apparatus. A single `## Interface:` line carries the latest Retail patch number (currently `120007`); no comma-separated flavor lists, no per-flavor TOCs, no `_Mainline`/`_Classic` data splits. §1.2, §2.1, §2.3, §11, §19 updated.
@@ -277,6 +278,15 @@ Ka0s addons **MUST ship every library vendored in `libs/` and committed to git**
 
 - **MUST NOT** privately fork an Ace3 lib. Private lib forks seen in some large UI suites (renamed copies of Ace3) block on every Ace3 update and are an anti-pattern.
 - **MUST** extend AceGUI via `AceGUI:RegisterWidgetType("Ka0s_X", ...)` if a custom widget is needed.
+
+### 3.6 No addon-suite dependencies (self-contained)
+
+A Ka0s addon **MUST** stand on its own. The vendoring rule (§3.3) makes it self-contained with respect to **shared libraries** (LibStub-registered code embedded under `libs/`); this rule makes it self-contained with respect to **other addons** — i.e. standalone addons and addon *suites* such as ElvUI, EllesmereUI, DBM, WeakAuras, BigWigs, Plater, etc. Suites are **not** dependencies. The distinction: a **library** is LibStub-registered code you vendor and own; a **suite** is a separate installed addon with its own lifecycle, and you never require it.
+
+- **MUST NOT** hard-depend on any addon suite or standalone addon: no `## Dependencies:` / `## RequiredDeps:` naming one, and no code path that assumes a suite's globals, API, callbacks, or frames exist (`ElvUI`, `DBM`, `WeakAuras`, `BigWigs`, …).
+- **MUST** be fully functional and behave **identically** with no other addon installed. Every texture, font, sound, and layout the addon needs is either vendored under `media/` (§1.4) or drawn from LibSharedMedia's built-ins — **MUST NOT** read a suite's media files, textures, fonts, or SavedVariables, and **MUST NOT** rely on a suite having skinned or repositioned any frame.
+- **MUST NOT** embed, copy, or private-fork a suite's code, media, or a suite-renamed Ace library (this is the §3.5 fork ban applied to suites — depend on nothing you did not vendor and own).
+- **MAY** *optionally* integrate with a suite that happens to be present — e.g. register an ElvUI/EllesmereUI skin for the addon's own frames, or subscribe to a DBM/BigWigs timer callback — **only when all** of the following hold: (a) the integration is presence-guarded (`C_AddOns.IsAddOnLoaded("ElvUI")`) and never assumes the suite loaded; (b) the suite is listed in `## OptionalDeps:`, never `## Dependencies:`; (c) with the suite absent the addon falls back to its own styling/behavior with no loss of core function. This is the same soft-fallback discipline required for optional libraries (§3.3–§3.4): the addon is whole on its own and the integration is pure enhancement.
 
 ---
 
@@ -1052,6 +1062,7 @@ For quick reference, the rules above as a do-not list:
 26. Full agent brief in the root `CLAUDE.md` — root `CLAUDE.md` is a stub; the brief lives in `docs/` (§15).
 27. A checked-in `TODO.md` in a **released** addon — track the backlog in GitHub issues; a `TODO.md` is allowed only in an unreleased, in-development addon during its development phase (§15.4).
 28. Non-canonical `README.md` section order, or a TOC that departs from the required field order / file-listing structure — follow §15.1 and §2.1/§2.5.
+29. Hard-depending on an addon suite or standalone addon (ElvUI/EllesmereUI/DBM/WeakAuras/…), or reading its media/API/frames/SavedVariables — addons are fully self-contained; suite integration is optional, presence-guarded, and degrades gracefully (§3.6).
 
 ---
 
