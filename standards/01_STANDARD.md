@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.4, 2026-07-12)
+# Ka0s WoW Addon Standard (v2.5, 2026-07-12)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,7 @@
 
 **Changelog**
 
+- **v2.5 (2026-07-12):** **Re-based the canonical `README.md` structure (§15.1)** on the collection's **consumables & macro manager** as the golden template (previously the Tier-2 modular tracker), adopting its layout and styling. Table headers are now **`Command | What it does`**, **`Symptom | Fix`**, and **`Version | Date | Highlights`** (Version History is most-recent-first, no longer capped at 5); the **description MAY inline a summary table** (not just a bullet list); the **`### Settings panel`** subsection MAY carry per-panel prose beneath its table; and the former **`## Critical settings`** section is replaced, in the same slot (after Usage, before FAQ), by an optional **`## How <it> works`** narrative explainer of the addon's core mechanic. The **standard-link badge** and the standalone **`## Testing`** section stay **MUST**, and the **`Tab | Covers`** settings table is retained — the reference README documents these differently, but the standard keeps them.
 - **v2.4 (2026-07-12):** **§6 options-panel refinements** from the Tier-2 tracker's settings work. **(1)** New **§6.10 Scroll container** — the body's AceGUI `ScrollFrame` **MUST** keep its vertical scrollbar shown *even when the content fits* (park + disable the thumb; don't hide the bar), so every subcategory renders at an identical body width and right margin. Hiding the bar on short pages is now an anti-pattern (§19). **(2)** **§6.6 / §6.8** — a cell-filling action `Button` in a 50/50 pair **MUST** inset to `SetRelativeWidth(0.492)` (new constant `BUTTON_PAIR_REL`), not a flush `0.5`, so AceGUI Flow's ~2px right-cell spill isn't shaved off by the `ScrollFrame` clip rect. §19 anti-patterns updated.
 - **v2.3 (2026-07-12):** **§12 debug console overhaul**, promoted from the loot-history reference implementation. The console now mandates: a **shipped monospace font** under `media/fonts/` (e.g. **JetBrains Mono**, OFL; LSM-registered) applied at **10pt**; a **tagged, colour-coded line format** — `<HH:MM:SS> | [<Tag>] <content>` with the timestamp in muted steel-blue (`6f8faf`), the `[tag]` in muted tan/gold (`c9a66b`), and the `|` separator + content in the default white — mirrored to a **code-free Copy buffer** via **two pure formatters** (`FormatPlain`/`FormatColored`) so the two never drift; a **`NS.Debug(tag, fmt, ...)`** sink with the **tag as the first argument**; a **default window size of `700×344`**; and **session-only, window-independent enabled-state** — `NS.State.debug`, default **off**, held out of SavedVariables and **reset every `/reload`**, toggled by `/<slash> debug on|off` (bare `/<slash> debug` toggles the *window* only) and an in-title-bar **`Debug: ON`/`OFF`** control (green/red). **This reverses the v2.0 "enabled-state SHOULD persist in SV" line** — debug is now session-only by default; persisting it is the documented deviation.
 - **v2.2 (2026-07-12):** Added **§3.6 No addon-suite dependencies** — a Ka0s addon MUST be fully self-contained and behave identically with no other addon installed; it MUST NOT hard-depend on, embed, or read the media/API/SavedVariables of any addon *suite* or standalone addon (ElvUI, EllesmereUI, DBM, WeakAuras, BigWigs, …). Optional, presence-guarded integration that degrades gracefully is still allowed (the shared-**library** vendoring rule of §3.3 is unchanged — libraries are not suites). §19 anti-patterns updated.
@@ -994,22 +995,22 @@ sudo luarocks install luacheck
 
 ### 15.1 Root `README.md` — canonical structure
 
-Every Ka0s `README.md` **MUST** follow one structure so all addons read identically. Reference implementation (in the collection): the Tier-2 modular tracker's README. Sections in **this exact order**:
+Every Ka0s `README.md` **MUST** follow one structure so all addons read identically. Reference implementation (in the collection): the consumables & macro manager's README. Sections in **this exact order**:
 
 1. **H1 title** — `# Ka0s <Name>`. **MUST**.
 2. **Badge row** — in order: a **`[wow]`** interface badge (in lockstep with the TOC `## Interface:`, §2.3); a **published-version** badge (CurseForge/Wago) once published; a **`[license]`** MIT badge; and a badge/line linking the **Ka0s WoW Addon Standard** (<https://github.com/tusharsaxena/WowAddonStandards>). **MUST**.
 3. **Logo** — the addon logo image. **MUST**.
-4. **Description** — 1–2 paragraphs of what the addon does and why; **MAY** inline a short feature bullet list and a closing line on how to configure it (Blizzard Settings panel + `/<slash>`). **MUST**.
+4. **Description** — 1–2 paragraphs of what the addon does and why; **MAY** inline a short feature bullet list **or a summary table** (e.g. the addon's core objects/commands at a glance) and a closing line on how to configure it (Blizzard Settings panel + `/<slash>`). **MUST**.
 5. **`## Screenshots`** — captioned images of the addon and its settings sub-panels. **SHOULD** (**MUST** once published).
 6. **`## Usage`** — **MUST**, with two subsections:
-   - **`### Slash commands`** — one intro line (short + long slash form, and the `[XY]` chat prefix), then a **Command | Purpose** table generated from `NS.COMMANDS` so it stays in lockstep with `/<slash> help` (§7.4).
-   - **`### Settings panel`** — a **Tab | Covers** table, one row per settings subcategory (§6.5).
-7. **`## Critical settings`** — **SHOULD** for addons whose behavior hinges on a few key options; `###` subsections, each naming the option's setting path.
+   - **`### Slash commands`** — one intro line (short + long slash form, and the `[XY]` chat prefix), then a **Command | What it does** table generated from `NS.COMMANDS` so it stays in lockstep with `/<slash> help` (§7.4).
+   - **`### Settings panel`** — a **Tab | Covers** table, one row per settings subcategory (§6.5). **MAY** follow the table with per-panel prose (bolded panel/section names + option bullets) where a panel is rich enough to warrant it.
+7. **`## How <it> works`** — **SHOULD** for addons whose result hinges on a non-obvious core mechanic (ranking, attribution, scheduling, pick-selection, …). A narrative explainer — a numbered pipeline or prose — of how the addon reaches its result, titled for the domain (e.g. `## How picking & ranking works`).
 8. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
-9. **`## Troubleshooting`** — **SHOULD**; a **Symptom | What to check** table.
+9. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table.
 10. **`## Issues and feature requests`** — **MUST**. A short paragraph pointing users to the addon's **GitHub issues** (`<repo>/issues`) as the **single source of truth for the backlog**, asking them to file there rather than in comments. (This is why a released addon ships no `TODO.md` — §15.4.)
 11. **`## Testing`** — **MUST**. How to verify: the headless harness (`lua tests/run.lua`), lint (`luacheck .`), and the in-game smoke-test suite (link `docs/smoke-tests.md`), with a note to run it before tagging a release or after bumping `## Interface:` / refreshing libs (§14A, §16).
-12. **`## Version History`** — **MUST**. A **Version | Date | Notes** table, most-recent first, last 5 entries.
+12. **`## Version History`** — **MUST**. A **Version | Date | Highlights** table, most-recent first.
 
 - The optional sections (5, 7, 8, 9) are **SHOULD** — omit one only when it would be empty — but when present their **relative order MUST** be preserved.
 - `wow-addon:normalize-readme` reshapes a README to this structure; `wow-addon:sync-docs` keeps the slash-command and version-history tables in lockstep with code.
