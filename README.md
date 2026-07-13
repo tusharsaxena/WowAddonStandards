@@ -102,7 +102,8 @@ WowAddonStandards/
   standards/                              -- THE STANDARD (living, canonical)
     README.md                             -- what's here + how to refresh the standard
     EXECUTIVE_SUMMARY.md               -- one-page TL;DR of the standard
-    STANDARDS.md                        -- the Ka0s WoW Addon Standard (canonical)
+    STANDARDS.md                        -- the Ka0s WoW Addon Standard: index/entry point + Sections map (canonical)
+    standards/                          -- the standard's sections, one unnumbered file each (tiered-layout.md, ...)
     NEW_ADDON_CONTEXT.md               -- drop-in CLAUDE.md pack + new-addon kickstart walkthrough
     INDUSTRY_RESEARCH.md               -- research foundation: 10 reference addons synthesized
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
