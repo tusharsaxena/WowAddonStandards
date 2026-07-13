@@ -475,7 +475,7 @@ push and never bump the version without an explicit instruction.
 9. Schema-as-single-source: one table drives panel widgets + slash + defaults reset. One write seam.
 10. Closed message bus: modules talk via `Ka0s_<Addon>_<Event>` messages, one sender each. No cross-module table reach.
 11. All deprecated-API calls live in `Compat.lua`. Modules call `NS.Compat.X`. No `WOW_PROJECT_ID` flavor branching (Retail only).
-12. Combat lockdown: gate `InCombatLockdown()` at panel-open, settings setters, secure-frame attribute writes. Defer with `PLAYER_REGEN_ENABLED`.
+12. Combat lockdown: gate `InCombatLockdown()` (secure writes only — panel-open, settings setters, secure-frame attributes); defer with `PLAYER_REGEN_ENABLED`. For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
 13. Per-frame loops: cache db values into module locals, refresh via `M:RefreshUpvalues()` on settings change.
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
 15. File LOC cap: ~1500. Peel when exceeded.

@@ -13,6 +13,15 @@
 - **MUST** guard secure-environment writes (frame `:SetAttribute`, secure-template parents, focus-frame mutations) with `InCombatLockdown()` returning early and replaying on `PLAYER_REGEN_ENABLED`.
 - Reference implementation (in the collection): the group-composition utility uses a 3-layer cascade (config open → settings register → frame show), each re-checking combat; the chat-formatting addon combat-gates its config open.
 
+**`InCombatLockdown()` vs `UnitAffectingCombat("player")` — not interchangeable.** They answer different questions and usually (but not always) agree for the player:
+
+- `InCombatLockdown()` — *"are protected actions forbidden right now?"* The authoritative gate for **secure operations**. No args (player-only); true from `PLAYER_REGEN_DISABLED` to `PLAYER_REGEN_ENABLED`.
+- `UnitAffectingCombat(unit)` — the actual **combat flag** on any unit (`"player"`, `"target"`, `"party1"`, `"boss1"`…). The tool for **gameplay/UI state** (fade an out-of-combat frame, show an in-combat indicator, check a *non-player* unit).
+
+- **MUST** gate secure writes on `InCombatLockdown()` — **MUST NOT** substitute `UnitAffectingCombat("player")`. The two can diverge at the combat boundary, and gating a secure call on the combat flag can raise *"action blocked / interface action failed"* in exactly those moments.
+- **SHOULD** use `UnitAffectingCombat(unit)` for combat-reactive display/logic — that is what "is this unit in combat?" is *for*, and it is the only option for units other than the player. Using `InCombatLockdown()` here is a bug: a purely visual show/hide gated on lockdown state reads player-only lockdown, not the unit's actual combat status. (A live AbsorbTracker bug: the bar failed to appear in combat because visibility was gated on `InCombatLockdown()` instead of `UnitAffectingCombat("player")`.)
+- **SHOULD** drive player combat *transitions* off the `PLAYER_REGEN_DISABLED` / `PLAYER_REGEN_ENABLED` events — they fire exactly at the lockdown boundary and flush any deferred-secure-write queue — rather than polling either function.
+
 ### 3. Taint-replacing Blizzard UI
 
 If your addon replaces a Blizzard frame (bag UI, bag manager, group finder window):
