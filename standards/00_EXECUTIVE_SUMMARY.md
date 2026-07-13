@@ -8,7 +8,7 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and reference it: <https://github.com/tusharsaxena/WowAddonStandards>. The standard is versioned; see the changelog at the top of `01_STANDARD.md` (current: **v1.0.0**).
+**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in four places** — the TOC `X-Standard` field, the README standard badge, the root `CLAUDE.md` "Standards compliance (read first)" section, and `docs/agent-context.md`'s "Hard rules" — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (§15.6). The standard is versioned; see the changelog at the top of `01_STANDARD.md` (current: **v1.2.0**).
 
 ## The five patterns it makes canonical
 
@@ -24,7 +24,7 @@ These were validated against the Ka0s collection and the broader ecosystem (see 
 
 1. Read [`01_STANDARD.md`](01_STANDARD.md) and approve or request edits.
 2. Drop [`02_NEW_ADDON_CONTEXT.md`](02_NEW_ADDON_CONTEXT.md) into any new addon's `CLAUDE.md` so it starts compliant.
-3. Audit existing addons against the standard periodically — run `/wow-addon:standards-audit` in each addon's repo; it writes a dated `audit/<date>/` bundle there (see the [`../AUDIT.md`](../AUDIT.md) playbook).
+3. Audit existing addons against the standard periodically — run `/wow-addon:standards-audit` in each addon's repo; it writes a dated `docs/audits/<date>/` bundle there (see the [`../AUDIT.md`](../AUDIT.md) playbook).
 
 ## Scope boundaries
 

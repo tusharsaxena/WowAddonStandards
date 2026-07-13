@@ -22,10 +22,10 @@ dated folder beside it.
 
 ## Output structure
 
-Everything lands under the audited addon's own repo root, in a single dated folder:
+Everything lands under the audited addon's own repo, in a single dated folder under `docs/`:
 
 ```
-<REPO_ROOT>/audit/<YYYY-MM-DD>/
+<REPO_ROOT>/docs/audits/<YYYY-MM-DD>/
   01_CURRENT_STATE.md      -- snapshot of the addon against the standard (what it does today)
   02_DEVIATIONS.md         -- gap report: every deviation, each with a stable ID (see below)
   03_EVIDENCE.md           -- compliance evidence, file:line citations backing each finding
@@ -50,7 +50,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 1. **Resolve the standard.** Read the canonical rules from `standards/01_STANDARD.md` in the
    `WowAddonStandards` repo (the addon's TOC `## X-Standard:` URL points here). Use the current
    version — note it (e.g. "audited against v1.0.0") in `01_CURRENT_STATE.md` so the run is reproducible.
-2. **Create the run folder.** `<REPO_ROOT>/audit/<today>/`. Never edit an existing run's folder.
+2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, packaging, docs) and record what it does
    now, citing files.
@@ -69,7 +69,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 ## Hard rules
 
 - **Read-only.** The audit produces documents only; it does not change addon code, TOC, or config.
-- **Frozen runs.** Never edit a prior `audit/<date>/`; a re-audit is a new dated folder.
+- **Frozen runs.** Never edit a prior `docs/audits/<date>/`; a re-audit is a new dated folder.
 - **Sourced findings.** Every deviation cites `file:line` evidence — no unsourced compliance claims.
 - **Stable IDs.** A deviation that recurs across runs keeps its ID and prefix.
 - **The standard wins.** When this playbook and `standards/01_STANDARD.md` disagree on *what* to

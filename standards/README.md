@@ -27,7 +27,7 @@ its substance from the docs above.
 
 The standard **evolves in place**. Every substantive change bumps the version + date and adds a
 changelog entry at the top of `01_STANDARD.md`; git history carries the rest. This is the opposite of
-an audit run, which is a frozen dated snapshot under an addon's own `audit/YYYY-MM-DD/` and is never
+an audit run, which is a frozen dated snapshot under an addon's own `docs/audits/YYYY-MM-DD/` and is never
 edited after the fact. Industry research lives here, with the standard, precisely because it is a
 *living input* to the rules — not a point-in-time compliance measurement.
 
@@ -41,7 +41,7 @@ The standard is a **synthesis** of two inputs:
 2. **The collection's current state** — what the Ka0s addons actually do today, and which of those
    habits are worth codifying. *Which* addons make up "the collection" is defined by the roster,
    [`ADDONS.md`](ADDONS.md). Their current state is captured by each addon's own most-recent audit run
-   (`/wow-addon:standards-audit` in that addon's repo) — mine its `audit/<date>/01_CURRENT_STATE.md`.
+   (`/wow-addon:standards-audit` in that addon's repo) — mine its `docs/audits/<date>/01_CURRENT_STATE.md`.
 
 ### Rebuild steps
 
@@ -50,7 +50,7 @@ The standard is a **synthesis** of two inputs:
    anti-patterns (reject), with evidence links.
 2. **Read the collection's current state.** The in-scope addons are those in
    [`ADDONS.md`](ADDONS.md); in each addon's repo, pull its latest
-   `audit/<date>/01_CURRENT_STATE.md` (and `02_DEVIATIONS.md`) for what it does now and which
+   `docs/audits/<date>/01_CURRENT_STATE.md` (and `02_DEVIATIONS.md`) for what it does now and which
    decisions are still open. Run `/wow-addon:standards-audit` first if an addon has no recent run.
 3. **Synthesize / revise.** Fold both inputs into `01_STANDARD.md` as prescriptive rules
    (MUST / SHOULD / MAY), each with a rationale and, where possible, a **reference implementation**
@@ -67,6 +67,6 @@ The standard is a **synthesis** of two inputs:
 
 An audit does **not** build the standard. Run per addon in its own repo, it takes the then-current
 `01_STANDARD.md` as fixed and checks that addon against it, producing deviations and a remediation
-plan under `audit/<date>/`. The one thing an audit feeds back is observation: an addon's current-state
+plan under `docs/audits/<date>/`. The one thing an audit feeds back is observation: an addon's current-state
 doc is an input to step 2 above, and a deviation that turns out to be *industry-aligned* is a signal
 to revise the standard rather than the addon. See the [`../AUDIT.md`](../AUDIT.md) playbook.

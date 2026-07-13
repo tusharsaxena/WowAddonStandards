@@ -164,7 +164,7 @@ Aggregated across all 10 reports:
 
 ## 5. Validation against Ka0s in-house decisions
 
-Cross-checking the 10 "decisions to lock in" from the collection's current-state analysis (each addon's own `audit/<date>/01_CURRENT_STATE.md`, produced by `/wow-addon:standards-audit` in its repo — see [`../AUDIT.md`](../AUDIT.md)) against industry practice:
+Cross-checking the 10 "decisions to lock in" from the collection's current-state analysis (each addon's own `docs/audits/<date>/01_CURRENT_STATE.md`, produced by `/wow-addon:standards-audit` in its repo — see [`../AUDIT.md`](../AUDIT.md)) against industry practice:
 
 | Decision | Industry signal | Recommendation for M4 |
 |---|---|---|

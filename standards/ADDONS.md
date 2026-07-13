@@ -36,5 +36,5 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 - **Do not modify the addons from this repo.** This repository holds the standard and the process
   playbooks only; each addon's code lives in its own repository and is changed there.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
-  `audit/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here. Changing this roster
+  `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here. Changing this roster
   affects which addons feed the next standards refresh — nothing in another repo.

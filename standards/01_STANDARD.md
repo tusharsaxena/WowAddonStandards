@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v1.0.0, 2026-07-12)
+# Ka0s WoW Addon Standard (v1.2.0, 2026-07-13)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,8 @@
 
 **Changelog**
 
+- **v1.2.0 (2026-07-13):** Audit and code-review run history moved under `docs/`: audit runs now live in **`docs/audits/<YYYY-MM-DD>/`** (was `audit/<YYYY-MM-DD>/`) and code-review runs in **`docs/reviews/<YYYY-MM-DD>/`** (was `reviews/<YYYY-MM-DD>/`) — §16 retitled "Audit & review history" and rewritten to name both locations. Rippled the path through the tiered layout trees (§1.1/§1.2), the casing list (§1.3), the `.pkgmeta`/`.luacheckrc` templates (§13/§14), and every cross-reference in the playbooks and repo docs.
+- **v1.1.0 (2026-07-13):** Documentation section (§15) made explicit and given its missing `## 15.` heading. Named the canonical `docs/` trio — `ARCHITECTURE.md`, `agent-context.md` (the full agent-context pack), `smoke-tests.md` (§15.3). Specified the exact required shape of the root `CLAUDE.md` stub, including a mandatory `## Standards compliance (read first)` section (§15.2). Added **§15.6 — Standards reference (every addon)**: the reference to this repo MUST live in four places — the TOC `X-Standard` field, the README standard badge, the `CLAUDE.md` "Standards compliance (read first)" section, and the `docs/agent-context.md` "Hard rules" — so every agent working in an addon carries it in memory and context. New anti-pattern #34.
 - **v1.0.0 (2026-07-12):** Initial release of the Ka0s WoW Addon Standard.
 
 **Audience:** future Ka0s and any agent (human or LLM) authoring or maintaining a Ka0s addon.
@@ -54,13 +56,15 @@ For utility-class addons (e.g. a small group-composition utility at ~3 files, a 
   libs/                    -- vendored Ace3 + other libs, committed to git (§3.3)
   media/                   -- typed subfolders only: logos/, screenshots/, ... (§1.4)
   tests/                   -- headless Lua 5.1 harness (§14A)
-  docs/                    -- ARCHITECTURE.md, full agent context, planning/reference docs (§15)
+  docs/                    -- ARCHITECTURE.md, agent-context.md, smoke-tests.md, planning/reference (§15)
+    audits/<YYYY-MM-DD>/   -- audit-run history (retained; §16)
+    reviews/<YYYY-MM-DD>/  -- code-review history (retained; §16)
 ```
 
 - **MUST** stay flat — no `core/`, `modules/` subfolders for source.
 - **MUST** keep each file under 1500 LOC. If a file exceeds 1000, plan a peel.
 - **MAY** peel a single oversized file into 2-3 sub-files in the same folder (e.g. `Settings_Schema.lua`, `Settings_Panel.lua`) — **MUST NOT** introduce subfolders for source.
-- Promotion to Tier 2 is mandatory once source-file count would exceed 8 (excluding `libs/`, `media/`, `docs/`, `tests/`, `audit/`).
+- Promotion to Tier 2 is mandatory once source-file count would exceed 8 (excluding `libs/`, `media/`, `docs/`, `tests/`).
 
 ### 1.2 Tier 2 — Modular (>8 files or any addon with multiple feature modules)
 
@@ -95,8 +99,9 @@ Reference implementation (in the collection): the Tier-2 modular interrupt/coold
   media/                   -- typed subfolders only (§1.4)
   libs/                    -- vendored Ace3 + other libs, committed to git (§3.3)
   tests/                   -- headless Lua 5.1 harness (§14A)
-  docs/                    -- ARCHITECTURE.md, full agent context, planning/reference docs (§15)
-  audit/<YYYY-MM-DD>/      -- audit history (retained; §16)
+  docs/                    -- ARCHITECTURE.md, agent-context.md, smoke-tests.md, planning/reference (§15)
+    audits/<YYYY-MM-DD>/   -- audit-run history (retained; §16)
+    reviews/<YYYY-MM-DD>/  -- code-review history (retained; §16)
   README.md                -- full, user-facing (stays at root)
   CLAUDE.md                -- STUB: short pointer into docs/ (§15)
   LICENSE
@@ -110,7 +115,7 @@ Reference implementation (in the collection): the Tier-2 modular interrupt/coold
 ### 1.3 Casing
 
 - Addon root folder: **PascalCase** matching the `## Title:` in TOC (minus the `Ka0s ` prefix).
-- Subfolders: **lowercase** (`core/`, `modules/`, `libs/`, `media/`, `defaults/`, `settings/`, `locales/`, `docs/`, `audit/`, `tests/`). **MUST** use `libs/` lowercase (not `Libs/`).
+- Subfolders: **lowercase** (`core/`, `modules/`, `libs/`, `media/`, `defaults/`, `settings/`, `locales/`, `docs/`, `docs/audits/`, `docs/reviews/`, `tests/`). **MUST** use `libs/` lowercase (not `Libs/`).
 - Lua files: **PascalCase.lua** (`Database.lua`, `IconGrid.lua`).
 - Non-source folders that ship: lowercase.
 
@@ -896,15 +901,14 @@ package-as: <Addon>
 ignore:
   - .luacheckrc
   - .gitignore
-  - reviews
-  - docs
+  - docs        # holds docs/audits/ and docs/reviews/ too — all dev-only
   - tests
   - _dev
   - "*.bak"
 ```
 
 - **MUST** vendor and commit every library the addon uses (§3.3). **MUST NOT** declare `externals:`; **MUST** commit `libs/` to git as part of the addon.
-- **MUST** ignore `audit/`, `_dev/`, `docs/`, `tests/`, lockfiles in the package (dev-only; not shipped to players).
+- **MUST** ignore `docs/` (which now holds the audit and review histories under `docs/audits/` and `docs/reviews/`, §16), `_dev/`, `tests/`, and lockfiles in the package (dev-only; not shipped to players).
 - **MUST NOT** use `enable-toc-creation` flavor fan-out — the addon is Retail-only with a single TOC (§2.3).
 - **MAY** use `move-folders:` only when the repo is a monorepo for multiple addons (out of scope today).
 
@@ -920,7 +924,7 @@ Every addon **MUST** ship `.luacheckrc` at the root. Base it on the common WoW-a
 std = "lua51"
 max_line_length = false
 codes = true
-exclude_files = { "libs/", "audit/", "_dev/", "tests/" }
+exclude_files = { "libs/", "docs/audits/", "docs/reviews/", "_dev/", "tests/" }
 ignore = {
   "212/self",   -- unused argument self
   "212/event",  -- unused argument event
@@ -987,7 +991,9 @@ sudo luarocks install luacheck
 
 ---
 
-**Root of the repo** ships exactly three docs (plus `LICENSE`): a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`. Everything else lives under `docs/`.
+## 15. Documentation
+
+Documentation is a **first-class compliance surface**, not an afterthought. Every Ka0s addon ships a fixed, predictable doc set so any human or agent lands in the same place in every repo. **Root of the repo** ships exactly three docs (plus `LICENSE`): a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`. Everything else lives under `docs/`.
 
 ### 15.1 Root `README.md` — canonical structure
 
@@ -1014,13 +1020,25 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 
 ### 15.2 Root `CLAUDE.md` — stub
 
-- **A STUB**: a short pointer that (a) names the tier, (b) states the addon adheres to the Ka0s WoW Addon Standard at <https://github.com/tusharsaxena/WowAddonStandards>, and (c) directs the reader into `docs/` for the full agent context. **MUST NOT** carry the full agent brief at root — that lives in `docs/`.
+**A STUB** — a short pointer, **not** the full agent brief (the brief lives in `docs/agent-context.md`, §15.3). **MUST NOT** carry the full agent brief at root (anti-pattern #26). It **MUST** contain, in this order:
+
+1. **H1 title** — `# CLAUDE.md — Ka0s <Name>`.
+2. **Tier + adherence line** — names the tier (Tier 1 / Tier 2) and states the addon adheres to the **Ka0s WoW Addon Standard** with the repo URL <https://github.com/tusharsaxena/WowAddonStandards>.
+3. **`## Standards compliance (read first)` section** — **MUST** be present, verbatim in substance (§15.6). It states that all work here MUST conform to the standard; that a change which would deviate MUST **stop and be flagged** (never silently deviate, never silently "fix" to match); and that the user decides whether it is (a) an **accepted deviation** (recorded in the addon with a reason) or (b) a **change to the standard itself** (made upstream in this repo, after which the addon follows the new rule). Closes with "when in doubt, treat conformance as a hard requirement and ask."
+4. **A "read the docs" pointer list** — directs the reader into `docs/` for the full context: `docs/agent-context.md` (full brief) and `docs/ARCHITECTURE.md` (module map), then the topic-detail docs.
+5. **The green-gate line** — the commit gate (`lua tests/run.lua` + `luacheck .`), per §14A.
+
+Reference implementation (in the collection): the absorb-shield tracker's root `CLAUDE.md`.
 
 ### 15.3 `docs/`
 
-- `docs/ARCHITECTURE.md` — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
-- The **full agent-context pack** (the detailed working notes the root `CLAUDE.md` points to).
-- `docs/smoke-tests.md` (§16) and any planning / reference / design docs — **but no `TODO.md` once released** (§15.4).
+Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
+
+- **`docs/agent-context.md`** — the **full agent-context pack**: the detailed working brief the root `CLAUDE.md` points to (stack, tier layout, hard rules, invariants, the `NS` bus, working environment, response style). This is the file that carries the full context the stub deliberately omits. Its **`## Hard rules`** section **MUST** open with the "conform to the Ka0s WoW Addon Standard" rule and point back to the root `CLAUDE.md` "Standards compliance" section (§15.6). Built by dropping in the contents of `02_NEW_ADDON_CONTEXT.md` (see that pack).
+- **`docs/ARCHITECTURE.md`** — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
+- **`docs/smoke-tests.md`** — the in-game smoke-test suite (§16), linked from the README's Testing section.
+
+Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **MUST NOT** ship a `TODO.md` once released (§15.4).
 
 ### 15.4 No `TODO.md`
 
@@ -1030,17 +1048,71 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 
 ### 15.5 Keeping docs in sync
 
-- **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `audit/` run. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
+- **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `docs/audits/` run. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
+
+### 15.6 Standards reference (every addon)
+
+Every Ka0s addon **MUST** maintain a clear, durable, in-repo reference to this standard —
+<https://github.com/tusharsaxena/WowAddonStandards> — so the standard is always **in the addon's project memory and context**: any human or agent that opens the repo (and specifically any agent that reads `CLAUDE.md` and the `docs/` brief before touching code) is told, up front, that the addon is built to this standard and how to behave when a change would deviate from it. The reference is not decorative — it is the mechanism that keeps the whole collection converged on one standard over time.
+
+The reference **MUST** appear in **all four** of these places (a Ka0s addon missing any of them is non-compliant — anti-pattern #34):
+
+1. **TOC `## X-Standard:`** — `## X-Standard: https://github.com/tusharsaxena/WowAddonStandards` (§2.1). The machine-readable declaration.
+2. **README standard badge** — the badge/line linking the standard in the README badge row (§15.1 #2). The user-facing declaration.
+3. **`CLAUDE.md` → `## Standards compliance (read first)`** — the agent-facing directive at the first doc every agent reads (§15.2 #3). **MUST** instruct the agent to **stop and flag** any change that would deviate rather than silently deviate or silently conform, and to let the user classify it as an accepted deviation (recorded in the addon) or a change to the standard itself (made upstream here, then adopted).
+4. **`docs/agent-context.md` → `## Hard rules`** — the same rule restated as the **first hard rule** in the full agent brief (§15.3), pointing back to the `CLAUDE.md` "Standards compliance" section so the two never drift.
+
+Items 1–2 already existed (§2.1, §15.1); items 3–4 are the **memory-and-context** requirement: the standard reference lives inside the two documents an agent loads as working context, not only in shipping metadata. The `/wow-addon:standards-audit` playbook checks all four.
+
+Canonical wording (adapt the `<Name>`/tier; keep the substance verbatim):
+
+```markdown
+<!-- in root CLAUDE.md -->
+## Standards compliance (read first)
+
+This repo is built to the **Ka0s WoW Addon Standard**
+(https://github.com/tusharsaxena/WowAddonStandards). All development here — features, refactors,
+doc changes — MUST conform to it. The standard is the source of truth for layout, TOC shape, the
+Ace substrate, schema-driven settings, slash/prefix conventions, locales, Compat, tests/lint, and
+doc structure.
+
+**If a change would deviate from the standard, STOP and flag the deviation explicitly.** Do not
+silently deviate and do not silently "fix" to match. Surface it and let the user decide which of
+two things it is:
+
+1. **An accepted deviation** — this addon intentionally differs; record it as a documented
+   deviation (e.g. in the TOC/README/`docs/` and in the audit bundle), with the reason.
+2. **A change to the standard itself** — the standard's definition should evolve; the update
+   belongs upstream in the WowAddonStandards repo, after which this addon conforms to the new rule.
+
+When in doubt, treat standard conformance as a hard requirement and ask.
+```
+
+```markdown
+<!-- in docs/agent-context.md, as the FIRST bullet of ## Hard rules -->
+- **Conform to the Ka0s WoW Addon Standard** (https://github.com/tusharsaxena/WowAddonStandards).
+  It is the source of truth for layout, TOC, the Ace substrate, schema-driven settings,
+  slash/prefix conventions, locales, Compat, tests/lint, and doc structure. **If a change would
+  deviate, STOP and flag it** — never silently deviate or silently conform. The user decides
+  whether it is (a) an accepted, documented deviation for this addon, or (b) a change to the
+  standard itself (updated upstream in the standards repo, then this addon follows the new rule).
+  See the root [CLAUDE.md](../CLAUDE.md) "Standards compliance" section.
+```
+
+Reference implementation (in the collection): the absorb-shield tracker carries both blocks — the `## Standards compliance (read first)` section in its root `CLAUDE.md` and the matching first `## Hard rules` bullet in its `docs/agent-context.md`.
 
 ---
 
-## 16. Audit history
+## 16. Audit & review history
 
-- **MUST** keep an **`audit/<YYYY-MM-DD>/`** folder for every audit run, in the addon's **own** repo — a frozen, dated snapshot. A re-audit is a **new** dated folder; never edit a prior run.
-- Two skills write here, each a five-artifact bundle:
-  - **`/wow-addon:standards-audit`** — compliance against this standard: `01_CURRENT_STATE.md`, `02_DEVIATIONS.md` (stable per-addon deviation IDs), `03_EVIDENCE.md`, `04_TECHNICAL_DESIGN.md`, `05_EXECUTION_PLAN.md`. The step-by-step playbook is `AUDIT.md` at the root of the standards repo. This audit is **read-only** — it produces a remediation plan, it does not change code.
-  - **`wow-addon:review`** — principal-engineer code review: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`.
-- **SHOULD** retain every prior `audit/` folder; they are the addon's institutional memory. (Runs are **kept**, not deleted after commit.)
+Audit and code-review runs are **frozen, dated snapshots** kept in the addon's **own** repo, under `docs/`. Each is a five-artifact bundle written to a new dated folder; a re-run is a **new** folder — **never** edit a prior run. The two skills write to **separate** locations:
+
+- **`/wow-addon:standards-audit`** → **`docs/audits/<YYYY-MM-DD>/`** — compliance against this standard: `01_CURRENT_STATE.md`, `02_DEVIATIONS.md` (stable per-addon deviation IDs), `03_EVIDENCE.md`, `04_TECHNICAL_DESIGN.md`, `05_EXECUTION_PLAN.md`. The step-by-step playbook is `AUDIT.md` at the root of the standards repo. This audit is **read-only** — it produces a remediation plan, it does not change code.
+- **`wow-addon:review`** → **`docs/reviews/<YYYY-MM-DD>/`** — principal-engineer code review: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`.
+
+- **MUST** write each run to a new dated folder under the correct parent (`docs/audits/` for audits, `docs/reviews/` for reviews); never edit a prior run.
+- **SHOULD** retain every prior `docs/audits/` and `docs/reviews/` folder; they are the addon's institutional memory. (Runs are **kept**, not deleted after commit.)
+- Both histories are dev-only and **MUST NOT** ship in the package — `docs/` is ignored by `.pkgmeta` (§13).
 - A review's `03_SMOKE_TESTS.md` catalogues **in-game** checks; they complement the headless unit suites (§14A), which cover testable logic.
 
 ---
@@ -1077,6 +1149,10 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 | Settings key | snake_case dotted path | `display.scale` |
 | Locale keys | English source string | `L["Reset all settings"]` |
 | Module table | `NS.<PascalCase>` | `NS.IconGrid` |
+| Root agent stub | `CLAUDE.md` (stub, incl. Standards-compliance section) | §15.2 |
+| Full agent brief | `docs/agent-context.md` (Hard rules → standard) | §15.3, §15.6 |
+| Engineer context | `docs/ARCHITECTURE.md` | §15.3 |
+| Smoke-test suite | `docs/smoke-tests.md` | §15.3, §16 |
 
 ---
 
@@ -1117,6 +1193,7 @@ For quick reference, the rules above as a do-not list:
 31. A 50/50 paired action button left at `SetRelativeWidth(0.5)` — cell-filling buttons inset to `BUTTON_PAIR_REL` (0.492) so the right button clears the `ScrollFrame` clip (§6.6, §6.8, §6.10).
 32. Two receivers of the same bus message registering on the **shared** bus object (`NS.bus`/`NS.addon` as `self`) — CallbackHandler keys callbacks by `(message, target)`, so the later registrant silently clobbers the earlier (last-registrant-wins, no error, masked by `/reload`); each receiver MUST own a distinct AceEvent target — an AceAddon module `self`, or a private `NS.NewBusTarget()` embed (§4.4).
 33. A bus test mock with no-op `RegisterMessage`/`SendMessage` — it can't catch same-target receiver clobbering; the mock MUST key by target and fan `SendMessage` out to all targets (§4.4, §14A).
+34. Missing the standards reference in **project memory and context** — a `CLAUDE.md` with no `## Standards compliance (read first)` section, or a `docs/agent-context.md` whose `## Hard rules` don't open with the conform-to-the-standard rule pointing back to that section. The reference MUST live in all four places: TOC `X-Standard`, README badge, `CLAUDE.md`, and `docs/agent-context.md` (§15.6).
 
 ---
 

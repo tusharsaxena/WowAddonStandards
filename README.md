@@ -12,7 +12,7 @@ This repo holds the house standard for the Ka0s World of Warcraft addon collecti
    [`NEW_ADDON.md`](NEW_ADDON.md) (`/wow-addon:new-addon`).
 
 The standard is the source of truth and evolves in place. **Auditing no longer happens here** — each
-addon audits *itself*, in its own repo, writing a dated `audit/<YYYY-MM-DD>/` bundle there. Which
+addon audits *itself*, in its own repo, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle there. Which
 addons make up the collection is defined in one editable place: [`standards/ADDONS.md`](standards/ADDONS.md).
 
 This repository is a **research and analysis deliverable** — it contains documents only. No addon
@@ -60,7 +60,7 @@ At a glance:
    `standards/_raw/_industry/` reports.
 2. **Read the collection's current state.** For the in-scope addons in
    [`standards/ADDONS.md`](standards/ADDONS.md), pull each addon's own most-recent
-   `audit/<date>/01_CURRENT_STATE.md` (in its repo) for what it does today.
+   `docs/audits/<date>/01_CURRENT_STATE.md` (in its repo) for what it does today.
 3. **Synthesize into the rules.** Fold both inputs into
    [`standards/01_STANDARD.md`](standards/01_STANDARD.md) as MUST/SHOULD/MAY rules, each with a
    rationale and a reference implementation. Preserve the `§`-section numbering.
@@ -75,7 +75,7 @@ authoritative steps: [`AUDIT.md`](AUDIT.md). At a glance:
 
 1. Run `/wow-addon:standards-audit` in the addon's repo.
 2. It resolves the current [`standards/01_STANDARD.md`](standards/01_STANDARD.md), snapshots the
-   addon, and writes a **frozen** dated bundle to that repo's `audit/<today>/`:
+   addon, and writes a **frozen** dated bundle to that repo's `docs/audits/<today>/`:
    `01_CURRENT_STATE`, `02_DEVIATIONS` (stable deviation IDs), `03_EVIDENCE`, `04_TECHNICAL_DESIGN`,
    `05_EXECUTION_PLAN`.
 3. The audit is **read-only** — it produces a remediation plan; executing it is a separate engagement.
@@ -108,11 +108,11 @@ WowAddonStandards/
     _raw/_industry/                       -- per-addon raw research reports (evidence)
 ```
 
-Audit runs are **not** stored here — each lives under its own addon's `audit/<YYYY-MM-DD>/` (§16).
+Audit and review runs are **not** stored here — each lives under its own addon's `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` (§16).
 
 ## Status
 
-Standard is at **v1.0.0** and living. Compliance auditing has moved out of this repo into each addon's
+Standard is at **v1.2.0** and living. Compliance auditing has moved out of this repo into each addon's
 own repository, driven by the `AUDIT.md` / `NEW_ADDON.md` playbooks that the `wow-addon` plugin
 consumes.
 

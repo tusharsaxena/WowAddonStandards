@@ -12,7 +12,7 @@ This repo does **not** run audits. Compliance auditing and new-addon scaffolding
 addon's own repo**, driven by a plugin skill that reads the playbook from here:
 
 - **`AUDIT.md`** (root) — the step-by-step spec for `/wow-addon:standards-audit`. An addon audits
-  **itself**, writing a dated `audit/<YYYY-MM-DD>/` bundle to **its own** repo root.
+  **itself**, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle inside **its own** repo.
 - **`NEW_ADDON.md`** (root) — the step-by-step spec for `/wow-addon:new-addon`. Scaffolds a new addon
   that is born compliant.
 
@@ -42,8 +42,8 @@ standards/                        -- THE STANDARD (living, canonical). Everythin
   _raw/_industry/                 -- per-addon raw research reports (evidence for 03_)
 ```
 
-Audit runs are **not** in this repo — they live under each audited addon's own `audit/<date>/` (see
-`AUDIT.md`, and §16 of the standard).
+Audit and review runs are **not** in this repo — they live under each audited addon's own
+`docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and §16 of the standard).
 
 Read order for a newcomer: `README.md` → `standards/01_STANDARD.md` → the playbooks (`AUDIT.md`,
 `NEW_ADDON.md`) → the rest as needed.
@@ -63,7 +63,7 @@ Read order for a newcomer: `README.md` → `standards/01_STANDARD.md` → the pl
   (`standards/03_INDUSTRY_RESEARCH.md` + `standards/_raw/_industry/`) is a living foundation for
   `01_STANDARD.md`; see `standards/README.md` for the rebuild process.
 - **Audits are per-repo and frozen.** A `/wow-addon:standards-audit` run writes a frozen dated
-  `audit/<YYYY-MM-DD>/` bundle (`01_CURRENT_STATE` … `05_EXECUTION_PLAN`, with stable per-addon
+  `docs/audits/<YYYY-MM-DD>/` bundle (`01_CURRENT_STATE` … `05_EXECUTION_PLAN`, with stable per-addon
   deviation-ID prefixes) into the **audited addon's** repo — never here, and never edited after the
   fact. See `AUDIT.md` for the structure.
 - **Cross-references** use plain relative paths. From `standards/` to a root playbook: `../AUDIT.md`.
