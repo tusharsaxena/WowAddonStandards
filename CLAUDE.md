@@ -32,20 +32,21 @@ NEW_ADDON.md                      -- PLAYBOOK: /wow-addon:new-addon (scaffold, b
 README.md                         -- repo overview + the three things you can do here
 CLAUDE.md                         -- this file
 LICENSE
-standards/                        -- THE STANDARD (living, canonical). Everything supports 01_STANDARD.md.
+standards/                        -- THE STANDARD (living, canonical). Everything supports STANDARDS.md.
   README.md                       -- what's in standards/ + how to rebuild the standard
-  00_EXECUTIVE_SUMMARY.md         -- one-page TL;DR of the standard
-  01_STANDARD.md                  -- THE STANDARD (canonical)
-  02_NEW_ADDON_CONTEXT.md         -- drop-in CLAUDE.md context pack for new addons (NEW_ADDON.md's detail)
-  03_INDUSTRY_RESEARCH.md         -- research foundation: patterns from 10 reference addons
+  EXECUTIVE_SUMMARY.md            -- one-page TL;DR of the standard
+  STANDARDS.md                    -- THE STANDARD: index/entry point + the Sections map (canonical)
+  standards/                      -- the standard's sections, one unnumbered file each (tiered-layout.md, ...)
+  NEW_ADDON_CONTEXT.md            -- drop-in CLAUDE.md context pack for new addons (NEW_ADDON.md's detail)
+  INDUSTRY_RESEARCH.md            -- research foundation: patterns from 10 reference addons
   ADDONS.md                       -- THE ROSTER: editable list of in-scope addons (standards-process input)
-  _raw/_industry/                 -- per-addon raw research reports (evidence for 03_)
+  _raw/_industry/                 -- per-addon raw research reports (evidence for INDUSTRY_RESEARCH.md)
 ```
 
 Audit and review runs are **not** in this repo — they live under each audited addon's own
-`docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and §16 of the standard).
+`docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and audit-review-history of the standard).
 
-Read order for a newcomer: `README.md` → `standards/01_STANDARD.md` → the playbooks (`AUDIT.md`,
+Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the playbooks (`AUDIT.md`,
 `NEW_ADDON.md`) → the rest as needed.
 
 ## Conventions
@@ -53,21 +54,30 @@ Read order for a newcomer: `README.md` → `standards/01_STANDARD.md` → the pl
 - **`standards/ADDONS.md` is the roster.** It is a **standards-process input** (which addons the
   standard codifies for, and whose current state feeds the next refresh). To change collection scope,
   edit that one file. Don't hard-code the addon list elsewhere; point at `standards/ADDONS.md`.
-- **`standards/01_STANDARD.md` is canonical.** When docs conflict, it wins. It uses section refs like
-  `§4.5`, `§9.2` — preserve those when editing. It is **living**: every substantive change bumps the
-  version + date and adds a changelog entry at its top (git history carries the rest).
+- **`standards/STANDARDS.md` is canonical.** When docs conflict, it wins. It is the **index/entry
+  point**: the normative rules are split into one file per section under `standards/standards/`
+  (unnumbered topic names — `tiered-layout.md`, `architecture.md`, …), and `STANDARDS.md` carries the
+  front matter, the reading guide, the **Sections** map, and the changelog. It is **living**: every
+  substantive change bumps the version + date and adds a changelog entry at its top (git history
+  carries the rest). When you add, split, or reorder a section, update the Sections list in
+  `STANDARDS.md`.
+- **Reference sections by `filename-§N` — always.** A whole section is its **bare filename**
+  (`architecture`, `audit-review-history`); a subsection is **`filename-§N`** (`architecture-§5`,
+  `options-ui-§10`), where `N` is that section's **local** number. The old global `§N.M` numbering is
+  retired — do **not** reintroduce it. Preserve these refs when editing, in every doc and in the
+  `wow-addon` plugin.
 - **The playbooks are thin orchestrators.** `AUDIT.md` and `NEW_ADDON.md` describe process and point
-  into `standards/` (`01_STANDARD.md` as the audit checklist; `02_NEW_ADDON_CONTEXT.md` as the scaffold
+  into `standards/` (`STANDARDS.md` as the audit checklist; `NEW_ADDON_CONTEXT.md` as the scaffold
   pack). Keep the *substance* in `standards/`; don't duplicate rules into the playbooks — they drift.
 - **Industry research is a standards-process input, not an audit step.** The reference-addon research
-  (`standards/03_INDUSTRY_RESEARCH.md` + `standards/_raw/_industry/`) is a living foundation for
-  `01_STANDARD.md`; see `standards/README.md` for the rebuild process.
+  (`standards/INDUSTRY_RESEARCH.md` + `standards/_raw/_industry/`) is a living foundation for
+  `STANDARDS.md`; see `standards/README.md` for the rebuild process.
 - **Audits are per-repo and frozen.** A `/wow-addon:standards-audit` run writes a frozen dated
   `docs/audits/<YYYY-MM-DD>/` bundle (`01_CURRENT_STATE` … `05_EXECUTION_PLAN`, with stable per-addon
   deviation-ID prefixes) into the **audited addon's** repo — never here, and never edited after the
   fact. See `AUDIT.md` for the structure.
 - **Cross-references** use plain relative paths. From `standards/` to a root playbook: `../AUDIT.md`.
-  From root to a standard doc: `standards/01_STANDARD.md`. Within `standards/`, docs reference each
+  From root to a standard doc: `standards/STANDARDS.md`. Within `standards/`, docs reference each
   other and `ADDONS.md` by bare name.
 
 ## Git workflow
@@ -80,7 +90,7 @@ Read order for a newcomer: `README.md` → `standards/01_STANDARD.md` → the pl
 ## Editing rules
 
 - Keep documents internally consistent. A change to the standard usually ripples into
-  `standards/00_EXECUTIVE_SUMMARY.md` and `standards/02_NEW_ADDON_CONTEXT.md`, and sometimes the root
+  `standards/EXECUTIVE_SUMMARY.md` and `standards/NEW_ADDON_CONTEXT.md`, and sometimes the root
   `README.md` / the playbooks. Update all affected docs together, and bump the standard's version +
   changelog.
 - Don't invent compliance claims. Findings are evidence-backed (`file:line` citations); keep new

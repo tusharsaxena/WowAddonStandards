@@ -1,8 +1,8 @@
 # New Ka0s Addon — Context Pack (v1.4.0, 2026-07-13)
 
-**Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (§15).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
+**Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
-Authoritative reference: `WowAddonStandards/standards/01_STANDARD.md`. This document is its operational distillation. Every Ka0s addon is built to the standard and references it: <https://github.com/tusharsaxena/WowAddonStandards>.
+Authoritative reference: `WowAddonStandards/standards/STANDARDS.md`. This document is its operational distillation. Every Ka0s addon is built to the standard and references it: <https://github.com/tusharsaxena/WowAddonStandards>.
 
 **Scope:** Retail (Mainline) only.
 
@@ -17,7 +17,7 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
    folder layout, MIT license, AceConsole slash command). This lays down the skeleton the rest of this
    pack fills in.
 2. **Drop in this pack.** Put the contents of this file into the new addon's `docs/` as the full agent
-   context, and leave a short root `CLAUDE.md` stub pointing to it (§15), so every agent and
+   context, and leave a short root `CLAUDE.md` stub pointing to it (documentation), so every agent and
    contributor has the full standards brief with no external lookups.
 3. **Pick a tier and lay out files.** Tier 1 (flat, ≤8 files) or Tier 2 (modular) — see *Pick a tier*
    below. Copy the vendored `libs/` set you actually `LibStub()` from an existing Ka0s addon so
@@ -26,7 +26,7 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
    `Database`, `Settings`, debug console, tests, message bus, `.luacheckrc`, `.pkgmeta`) and the
    *Hard rules cheat sheet* below. When stuck, reproduce the described patterns in *Patterns to
    reproduce*.
-5. **Write tests first.** Stand up `tests/` (§14A) and drive each behavior test-first.
+5. **Write tests first.** Stand up `tests/` (testing) and drive each behavior test-first.
 6. **Check Definition of Done.** Walk the checklist at the bottom before tagging `v0.1.0`.
 7. **Register in the roster.** *[standards repo]* Add the addon's row to
    `WowAddonStandards/standards/ADDONS.md`. This puts it in scope for the next standards refresh — it
@@ -76,9 +76,9 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
   libs/                  -- vendored, committed
   media/                 -- typed subfolders: logos/, screenshots/, ...
   tests/                 -- run.lua, loader.lua, wow_mock.lua, test_*.lua
-  docs/                  -- agent-context.md (this pack) + ARCHITECTURE.md + smoke-tests.md; no TODO.md once released (§15.4)
-    audits/<YYYY-MM-DD>/ -- retained audit-run history (§16)
-    reviews/<YYYY-MM-DD>/-- retained code-review history (§16)
+  docs/                  -- agent-context.md (this pack) + ARCHITECTURE.md + smoke-tests.md; no TODO.md once released (documentation-§4)
+    audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
+    reviews/<YYYY-MM-DD>/-- retained code-review history (audit-review-history)
 ```
 
 ## Tier 2 starter tree
@@ -109,9 +109,9 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
   media/                 -- typed subfolders (logos/, screenshots/, ...)
   libs/                  -- vendored, committed
   tests/                 -- run.lua, loader.lua, wow_mock.lua, test_*.lua
-  docs/                  -- agent-context.md, ARCHITECTURE.md, smoke-tests.md, planning; no TODO.md once released (§15.4)
-    audits/<YYYY-MM-DD>/ -- retained audit-run history (§16)
-    reviews/<YYYY-MM-DD>/-- retained code-review history (§16)
+  docs/                  -- agent-context.md, ARCHITECTURE.md, smoke-tests.md, planning; no TODO.md once released (documentation-§4)
+    audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
+    reviews/<YYYY-MM-DD>/-- retained code-review history (audit-review-history)
   README.md  (root, full)   CLAUDE.md (root, stub)   LICENSE (root)
   .luacheckrc  .pkgmeta
 ```
@@ -122,7 +122,7 @@ If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier
 
 ### TOC
 
-Fixed field order (§2.1), then a blank line, then the file listing in commented sections (§2.5):
+Fixed field order (toc-file-§1), then a blank line, then the file listing in commented sections (toc-file-§5):
 
 ```
 ## Interface: 120007
@@ -150,7 +150,7 @@ libs\AceAddon-3.0\AceAddon-3.0.xml
 locales\enUS.lua
 
 # Tier 1: one # Addon section, files in dependency order
-# (Tier 2: # Core / # Defaults / # Modules / # Settings sections instead — §2.5)
+# (Tier 2: # Core / # Defaults / # Modules / # Settings sections instead — toc-file-§5)
 Compat.lua
 Locale.lua
 <Addon>.lua
@@ -158,7 +158,7 @@ Database.lua
 Settings.lua
 ```
 
-The `## Interface:` is a **single** latest-Retail number (Retail only, §2.3); bump it each patch with `wow-addon:bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (§2.1, §2.5).
+The `## Interface:` is a **single** latest-Retail number (Retail only, toc-file-§3); bump it each patch with `wow-addon:bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
 
 ### `<Addon>.lua` (entry)
 
@@ -171,7 +171,7 @@ NS.addon = addon
 function addon:OnInitialize()
   NS:InitDB()            -- Database.lua
   NS:RunMigrations()     -- Database.lua
-  NS.Settings:Register() -- EAGER settings-category registration (§6.1) — always visible in options list
+  NS.Settings:Register() -- EAGER settings-category registration (options-ui-§1) — always visible in options list
 end
 
 function addon:OnEnable()
@@ -220,7 +220,7 @@ local addonName, NS = ...
 NS.defaults = {
   profile = { -- defaults referenced by Schema rows
     -- NOTE: the debug flag is NOT here. It is session-only (NS.State.debug,
-    -- default off, reset every /reload) and never persisted to SV (§12.5).
+    -- default off, reset every /reload) and never persisted to SV (debug-logging-§5).
   },
   global = { schemaVersion = 1 },
 }
@@ -268,8 +268,8 @@ local COMMANDS = {
   { name = "list",   desc = "List all",     fn = function() S:CliList() end },
   { name = "reset",  desc = "Reset one",    fn = function(arg) S:CliReset(arg) end },
   { name = "resetall", desc = "Reset all",  fn = function() S:CliResetAll() end },
-  { name = "preview", desc = "Toggle preview", fn = function() NS:TogglePreview() end },  -- if §6B applies
-  { name = "debug",  desc = "Window; 'on'/'off' set logging", fn = function(rest)  -- §12 (on|off|toggle)
+  { name = "preview", desc = "Toggle preview", fn = function() NS:TogglePreview() end },  -- if preview-mode applies
+  { name = "debug",  desc = "Window; 'on'/'off' set logging", fn = function(rest)  -- debug-logging (on|off|toggle)
       local a = rest and tostring(rest):lower():match("^%s*(%S*)") or ""
       if a == "on" then NS.DebugLog:SetEnabled(true)
       elseif a == "off" then NS.DebugLog:SetEnabled(false)
@@ -281,7 +281,7 @@ NS.COMMANDS = COMMANDS
 function S:Register()
   NS.addon:RegisterChatCommand("<slash>", "OnSlash")     -- 2-3 char verb
   NS.addon:RegisterChatCommand("<addonname>", "OnSlash") -- full-name alias
-  -- Register the Blizzard settings CATEGORY now (eager, §6.1) so the entry is always visible.
+  -- Register the Blizzard settings CATEGORY now (eager, options-ui-§1) so the entry is always visible.
   -- Build the panel BODY lazily on first OnShow.
 end
 
@@ -295,11 +295,11 @@ function NS.addon:OnSlash(input)
 end
 ```
 
-**Chat tag & CLI output (§7.4–§7.5).** `NS.PREFIX` is the mandatory **cyan** bracketed tag — `|cff00ffff[XY]|r` (initials `XY`; the cyan `00ffff` is required, not just an example) — exposed once and prepended to every chat line. `list`/`get`/`set` follow the canonical output shape in §7.5: `list` prints `Available settings:` then `  [page]` group headers then `    path = value` rows; `get`/`set` print the single-line `path = value` (echoing the *stored* value after a set). Values are **type-aware and unit-annotated** through one shared formatter — `<n> px`, `1.00x`, `true`/`false`, `{r, g, b, a}` — so `list` and `get`/`set` never diverge.
+**Chat tag & CLI output (slash-commands-§4–§5).** `NS.PREFIX` is the mandatory **cyan** bracketed tag — `|cff00ffff[XY]|r` (initials `XY`; the cyan `00ffff` is required, not just an example) — exposed once and prepended to every chat line. `list`/`get`/`set` follow the canonical output shape in slash-commands-§5: `list` prints `Available settings:` then `  [page]` group headers then `    path = value` rows; `get`/`set` print the single-line `path = value` (echoing the *stored* value after a set). Values are **type-aware and unit-annotated** through one shared formatter — `<n> px`, `1.00x`, `true`/`false`, `{r, g, b, a}` — so `list` and `get`/`set` never diverge.
 
-### Debug console (§12)
+### Debug console (debug-logging)
 
-Debug output routes to a **dedicated on-screen console styled like the main window**, not chat. Full reference: `01_STANDARD.md §12`. Minimal sink — note the **tag is the first argument**:
+Debug output routes to a **dedicated on-screen console styled like the main window**, not chat. Full reference: `STANDARDS.md debug-logging`. Minimal sink — note the **tag is the first argument**:
 
 ```lua
 function NS.Debug(tag, fmt, ...)
@@ -310,7 +310,7 @@ end
 -- call site: NS.Debug("Loot", "%s x%d", name, qty)
 ```
 
-**Secret-safe (§9.8) — mandatory if you ever log a combat value.** In combat, retail returns absorb/health/threat totals as opaque *secret* values that survive `tostring()` **and `..`** but raise in `table.concat`/`string.format`. An unguarded secret in a debug line crashes — and on a repeating ticker it freezes the feature until `/reload`. The `NS.PREFIX` printer (§7.4) and this sink MUST route args through one secret-safe stringifier whose detector probes `table.concat`, **not** `..`:
+**Secret-safe (events-frames-taint-§8) — mandatory if you ever log a combat value.** In combat, retail returns absorb/health/threat totals as opaque *secret* values that survive `tostring()` **and `..`** but raise in `table.concat`/`string.format`. An unguarded secret in a debug line crashes — and on a repeating ticker it freezes the feature until `/reload`. The `NS.PREFIX` printer (slash-commands-§4) and this sink MUST route args through one secret-safe stringifier whose detector probes `table.concat`, **not** `..`:
 
 ```lua
 local function probeConcat(v) return table.concat({ v }) end
@@ -324,11 +324,11 @@ end
 -- For display, hand the raw secret to AbbreviateNumbers() / widget setters — never tonumber() or `<`.
 ```
 
-The console: a `BackdropTemplate` frame (`<Addon>DebugWindow`) on `DIALOG` strata, **default size `700×344`**, draggable title bar, a `ScrollingMessageFrame` (`SetMaxLines(500)`) rendered in a **shipped monospace font** (`media/fonts/`, e.g. JetBrains Mono OFL, LSM-registered) at **10pt**. Lines follow `<HH:MM:SS> | [<Tag>] <content>` — timestamp coloured `6f8faf`, `[tag]` `c9a66b`, separator/content white; the plain **Copy buffer** mirrors the same line code-free (two pure formatters, `FormatPlain`/`FormatColored`). **Clear** + **Copy** (copy = read-through multiline `EditBox`, same font), registered in `UISpecialFrames`, reusing the addon's `SKIN`/`ApplySkin` seam (§6A).
+The console: a `BackdropTemplate` frame (`<Addon>DebugWindow`) on `DIALOG` strata, **default size `700×344`**, draggable title bar, a `ScrollingMessageFrame` (`SetMaxLines(500)`) rendered in a **shipped monospace font** (`media/fonts/`, e.g. JetBrains Mono OFL, LSM-registered) at **10pt**. Lines follow `<HH:MM:SS> | [<Tag>] <content>` — timestamp coloured `6f8faf`, `[tag]` `c9a66b`, separator/content white; the plain **Copy buffer** mirrors the same line code-free (two pure formatters, `FormatPlain`/`FormatColored`). **Clear** + **Copy** (copy = read-through multiline `EditBox`, same font), registered in `UISpecialFrames`, reusing the addon's `SKIN`/`ApplySkin` seam (standalone-windows).
 
-**Enabled-state is session-only and window-independent** (§12.5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. The `SetEnabled` seam **also appends a console line at both transitions** — `[Debug] logging enabled` / `[Debug] logging disabled` — via the raw `DebugLog:Add` (the disable line must land after the flag flips off, so it can't go through the gated `NS.Debug` sink). Tier-1 addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
+**Enabled-state is session-only and window-independent** (debug-logging-§5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. The `SetEnabled` seam **also appends a console line at both transitions** — `[Debug] logging enabled` / `[Debug] logging disabled` — via the raw `DebugLog:Add` (the disable line must land after the flag flips off, so it can't go through the gated `NS.Debug` sink). Tier-1 addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
 
-### Tests (`tests/`, §14A)
+### Tests (`tests/`, testing)
 
 Headless plain-Lua-5.1 harness. Run `lua tests/run.lua` from the repo root.
 
@@ -366,7 +366,7 @@ NS.addon:SendMessage("Ka0s_<Addon>_RosterChanged", roster)
 
 -- Consumer — MUST register on its OWN AceEvent target, never the shared bus-as-self:
 -- CallbackHandler keys callbacks by (message, target), so two receivers sharing one object
--- clobber each other (last registrant wins, silently). See 01_STANDARD §4.4.
+-- clobber each other (last registrant wins, silently). See architecture-§4.
 NS.<Module>.__ev = NS.NewBusTarget()   -- AceEvent:Embed({}); or an AceAddon module `self`
 NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
 ```
@@ -406,11 +406,11 @@ ignore:
   - "*.bak"
 ```
 
-Libraries are **vendored under `libs/` and committed** (`01_STANDARD.md §3.3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon's `libs/` so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
+Libraries are **vendored under `libs/` and committed** (`STANDARDS.md library-stack-§3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon's `libs/` so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
 
 ### Docs — root `CLAUDE.md` stub + `docs/agent-context.md`
 
-Root ships a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`; everything else lives under `docs/` (§15). The stub is short and **MUST** carry a `## Standards compliance (read first)` section; the contents of *this* pack become `docs/agent-context.md`, whose `## Hard rules` **MUST** open with the conform-to-the-standard rule pointing back to the stub (§15.6).
+Root ships a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`; everything else lives under `docs/` (documentation). The stub is short and **MUST** carry a `## Standards compliance (read first)` section; the contents of *this* pack become `docs/agent-context.md`, whose `## Hard rules` **MUST** open with the conform-to-the-standard rule pointing back to the stub (documentation-§6).
 
 ```markdown
 <!-- root CLAUDE.md (STUB — never the full brief) -->
@@ -480,17 +480,17 @@ push and never bump the version without an explicit instruction.
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
 15. File LOC cap: ~1500. Peel when exceeded.
 16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries.
-17. Debug: on-screen **console** styled like the main window (§12), not chat, if the addon has a window. Monospace font (10pt) + tagged colour-coded lines via `NS.Debug(tag, …)`; zero-alloc when off. Enabled-state is **session-only** (`NS.State.debug`, default off, reset every `/reload`; never in SV), decoupled from window visibility.
-18. Preview/test mode (§6B): addons with a positionable display SHOULD show placeholder data while unlocked and/or via `/<slash> preview`.
+17. Debug: on-screen **console** styled like the main window (debug-logging), not chat, if the addon has a window. Monospace font (10pt) + tagged colour-coded lines via `NS.Debug(tag, …)`; zero-alloc when off. Enabled-state is **session-only** (`NS.State.debug`, default off, reset every `/reload`; never in SV), decoupled from window visibility.
+18. Preview/test mode (preview-mode): addons with a positionable display SHOULD show placeholder data while unlocked and/or via `/<slash> preview`.
 19. Tests: ship a headless `tests/` harness. TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**.
-20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else under `docs/`. Canonical `docs/` trio (all addons): **`agent-context.md`** (full agent brief), `ARCHITECTURE.md`, `smoke-tests.md`; topic-detail docs as needed. Media in typed `media/` subfolders. No drift; sync before every release. (§15.3)
-20a. `README.md` follows the **canonical section order** (§15.1): title → badges (`[wow]`/version/license/standard) → logo → description → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Testing → Version History. TOC follows the fixed field order + `#`-section file listing (§2.1/§2.5).
-20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (§15.4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
-20c. **Standards reference in project memory & context** (§15.6): the reference to the standard MUST appear in **four** places — TOC `X-Standard`, README standard badge, the root `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet (pointing back to the `CLAUDE.md` section). STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
-21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (§16). Kept, not deleted.
+20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else under `docs/`. Canonical `docs/` trio (all addons): **`agent-context.md`** (full agent brief), `ARCHITECTURE.md`, `smoke-tests.md`; topic-detail docs as needed. Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
+20a. `README.md` follows the **canonical section order** (documentation-§1): title → badges (`[wow]`/version/license/standard) → logo → description → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Testing → Version History. TOC follows the fixed field order + `#`-section file listing (toc-file-§1/toc-file-§5).
+20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (documentation-§4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
+20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **four** places — TOC `X-Standard`, README standard badge, the root `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet (pointing back to the `CLAUDE.md` section). STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
+21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (audit-review-history). Kept, not deleted.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:version-bump` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
-24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, one `SKIN` + `ApplySkin` seam, pooled rows. See `01_STANDARD.md §6A`.
+24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, one `SKIN` + `ApplySkin` seam, pooled rows. See `STANDARDS.md standalone-windows`.
 
 ## Forbidden patterns
 
@@ -508,7 +508,7 @@ push and never bump the version without an explicit instruction.
 - `:Hide()` on Blizzard frames you replace (reparent to hidden parent).
 - Replacing `_G.AddMessage`.
 - Hard `## Dependencies:` (use OptionalDeps + soft fallback).
-- Hard-depending on an addon suite or standalone addon (ElvUI/EllesmereUI/DBM/WeakAuras/…), or reading its media/API/frames/SavedVariables — the addon is fully self-contained and works identically standalone; suite integration is optional, presence-guarded (`C_AddOns.IsAddOnLoaded`), `OptionalDeps`-listed, and degrades gracefully (§3.6). Vendored **libraries** are unaffected — a library is not a suite.
+- Hard-depending on an addon suite or standalone addon (ElvUI/EllesmereUI/DBM/WeakAuras/…), or reading its media/API/frames/SavedVariables — the addon is fully self-contained and works identically standalone; suite integration is optional, presence-guarded (`C_AddOns.IsAddOnLoaded`), `OptionalDeps`-listed, and degrades gracefully (library-stack-§6). Vendored **libraries** are unaffected — a library is not a suite.
 - `X-License: All Rights Reserved`.
 - Files >1500 LOC.
 - Multiple senders per bus message.
@@ -520,8 +520,8 @@ push and never bump the version without an explicit instruction.
 - Loose files directly in `media/` (use typed subfolders).
 - Full agent brief in the root `CLAUDE.md` (root is a stub; brief lives in `docs/`).
 - `TODO.md` in a **released** addon (track the backlog in GitHub issues; allowed only in an unreleased, in-development addon, deleted before first release).
-- Non-canonical `README.md` section order, or a TOC departing from the required field order / file-listing structure (§15.1, §2.1/§2.5).
-- Missing the standards reference in project memory & context: no `## Standards compliance (read first)` section in `CLAUDE.md`, or `docs/agent-context.md`'s `## Hard rules` not opening with the conform-to-the-standard rule pointing back to it (§15.6).
+- Non-canonical `README.md` section order, or a TOC departing from the required field order / file-listing structure (documentation-§1, toc-file-§1/toc-file-§5).
+- Missing the standards reference in project memory & context: no `## Standards compliance (read first)` section in `CLAUDE.md`, or `docs/agent-context.md`'s `## Hard rules` not opening with the conform-to-the-standard rule pointing back to it (documentation-§6).
 - Creating a feature branch without an explicit request (work trunk-based).
 
 ---
@@ -531,7 +531,7 @@ push and never bump the version without an explicit instruction.
 - [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, `X-Curse-Project-ID`, `X-Wago-ID`.
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`.
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors**.
-- [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (§14A).
+- [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing).
 - [ ] `Compat.lua` exists (even if scaffold); no `WOW_PROJECT_ID` flavor branching.
 - [ ] `Locale.lua` exists with metatable fallback.
 - [ ] `Database.lua` exists with `RunMigrations()` (even if no migrations yet).
@@ -539,14 +539,14 @@ push and never bump the version without an explicit instruction.
 - [ ] AceConsole `:RegisterChatCommand` registered.
 - [ ] Options panel uses `Settings.RegisterCanvasLayoutCategory`, **category registered eagerly at load** (entry always visible), **body built lazily** on first `OnShow`.
 - [ ] Combat-lockdown guard on panel-open.
-- [ ] Debug **console** (§12) — on-screen, styled like the main window; monospace font (10pt) + tagged colour-coded lines `<ts> | [<Tag>] <content>`; `/<slash> debug` toggles the window, `/<slash> debug on|off` set logging; enabled-state **session-only** (never in SV), decoupled from window visibility; title-bar `Debug: ON/OFF` toggle. (Tier-1 no-window addons MAY use chat.)
-- [ ] Preview/test mode (§6B) if the addon has a positionable display.
+- [ ] Debug **console** (debug-logging) — on-screen, styled like the main window; monospace font (10pt) + tagged colour-coded lines `<ts> | [<Tag>] <content>`; `/<slash> debug` toggles the window, `/<slash> debug on|off` set logging; enabled-state **session-only** (never in SV), decoupled from window visibility; title-bar `Debug: ON/OFF` toggle. (Tier-1 no-window addons MAY use chat.)
+- [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
 - [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; canonical `docs/` trio present (`agent-context.md`, `ARCHITECTURE.md`, `smoke-tests.md`); passes the drift check.
-- [ ] **Standards reference in memory & context (§15.6)** — all four present: TOC `X-Standard`, README standard badge, `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet pointing back to it.
-- [ ] `README.md` follows the canonical section order (§15.1), including **Usage** (Slash-commands + Settings-panel tables), **Issues and feature requests** (→ GitHub issues), **Testing**, and **Version History**.
-- [ ] TOC follows the fixed field order and `#`-section file-listing structure (§2.1/§2.5).
-- [ ] **No `TODO.md`** at release (backlog is in GitHub issues); any pre-release `docs/TODO.md` has been removed (§15.4).
+- [ ] **Standards reference in memory & context (documentation-§6)** — all four present: TOC `X-Standard`, README standard badge, `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet pointing back to it.
+- [ ] `README.md` follows the canonical section order (documentation-§1), including **Usage** (Slash-commands + Settings-panel tables), **Issues and feature requests** (→ GitHub issues), **Testing**, and **Version History**.
+- [ ] TOC follows the fixed field order and `#`-section file-listing structure (toc-file-§1/toc-file-§5).
+- [ ] **No `TODO.md`** at release (backlog is in GitHub issues); any pre-release `docs/TODO.md` has been removed (documentation-§4).
 - [ ] LICENSE = MIT full text.
 - [ ] First entry in `docs/audits/<YYYY-MM-DD>/` (even if just a "Hello world" smoke test).
 
@@ -555,8 +555,8 @@ push and never bump the version without an explicit instruction.
 ## Patterns to reproduce (described, not named)
 
 When stuck, reproduce these patterns — each already exists somewhere in the collection in the cited
-dimension. (Per the standard's §0 convention, they are described by their role, not by addon name; the
-named evidence is in `03_INDUSTRY_RESEARCH.md`.)
+dimension. (Per the standard's reading-guide convention, they are described by their role, not by addon name; the
+named evidence is in `INDUSTRY_RESEARCH.md`.)
 
 | Need | Reproduce this pattern |
 |---|---|
@@ -581,8 +581,8 @@ named evidence is in `03_INDUSTRY_RESEARCH.md`.)
 (All under `wow-addon:` prefix in your local Claude Code plugin.)
 
 - `wow-addon:new-addon` — scaffold a new addon (Ace3 stack, AceDB, modular folder layout, MIT license, slash command).
-- `wow-addon:standards-audit` — audit the current addon against the standard. Produces the `docs/audits/<DATE>/` deviation + remediation bundle (§16).
-- `wow-addon:review` — principal-engineer code review of the current addon. Produces a `docs/reviews/<DATE>/` findings bundle (§16).
+- `wow-addon:standards-audit` — audit the current addon against the standard. Produces the `docs/audits/<DATE>/` deviation + remediation bundle (audit-review-history).
+- `wow-addon:review` — principal-engineer code review of the current addon. Produces a `docs/reviews/<DATE>/` findings bundle (audit-review-history).
 - `wow-addon:sync-docs` — eliminate doc drift across README, CLAUDE.md, ARCHITECTURE.md.
 - `wow-addon:audit-conventions` — walk multiple addons and report drift in shared conventions.
 - `wow-addon:bump-interface` — bump the single TOC Interface line to the latest Retail patch.

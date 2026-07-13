@@ -27,9 +27,9 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 
 1. Add one row above (display name, folder, repository URL). Keep the table alphabetical by folder.
 2. That's it for scope. The addon is now covered by **the next standards refresh** — its current
-   habits become an input to [`01_STANDARD.md`](01_STANDARD.md) (see [`README.md`](README.md)).
+   habits become an input to [`STANDARDS.md`](STANDARDS.md) (see [`README.md`](README.md)).
 3. New addons should be scaffolded from the standard so they are born compliant — see
-   [`../NEW_ADDON.md`](../NEW_ADDON.md) and [`02_NEW_ADDON_CONTEXT.md`](02_NEW_ADDON_CONTEXT.md).
+   [`../NEW_ADDON.md`](../NEW_ADDON.md) and [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md).
 
 ## Notes
 

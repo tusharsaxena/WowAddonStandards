@@ -1,0 +1,104 @@
+# Ka0s WoW Addon Standard (v1.5.0, 2026-07-13)
+
+**Status:** Source of truth. All audit deviation reports and `NEW_ADDON_CONTEXT.md` template content derive from this standard. When the standard changes, bump the date and version at the top of this file.
+
+**Adherence:** Every Ka0s addon **MUST** be built to this standard and **MUST** reference it: <https://github.com/tusharsaxena/WowAddonStandards> (see `documentation`, `toc-file-§1`).
+
+**Audience:** future Ka0s and any agent (human or LLM) authoring or maintaining a Ka0s addon.
+
+**Substrate:** Ace3. The ecosystem and Ka0s collection are aligned on it; deviations from Ace3 are case-by-case and must be justified.
+
+**License:** MIT. Hostile licenses (`All Rights Reserved`) are forbidden.
+
+---
+
+> **This file is the entry point and index for the standard.** The normative rules are split across
+> the section files listed under [Sections](#sections) (in `standards/standards/`). To read — or
+> audit against — the **complete** standard, read this index **and then every file linked under
+> Sections**; this index alone is not the standard.
+>
+> **For tools (e.g. the `/wow-addon` plugin):** hard-code only this entry point
+> (`standards/STANDARDS.md`) and discover the section files by **following the Sections list** —
+> never hard-code an individual section filename. The standard can then be re-organized (files
+> renamed, split, added, removed) with **no change to the tool**, as long as this file keeps its
+> name and its Sections list stays current.
+
+---
+
+## Reading this document
+
+Each section uses these markers:
+
+- **MUST** — non-negotiable; deviations are bugs.
+- **SHOULD** — strongly preferred; deviations require a comment in code explaining why.
+- **MAY** — optional; pick when it fits.
+- **MUST NOT** / **SHOULD NOT** — forbidden patterns with cited reasons.
+
+**Cross-references use the `filename-§N` scheme.** Every section lives in its own file under
+`standards/standards/` and numbers its subsections **locally, from 1**. Reference a whole section by
+its **bare filename** (e.g. `architecture`, `audit-review-history`); reference a subsection as
+**`<filename>-§<n>`** (e.g. `architecture-§5`, `options-ui-§10`). This is the **only** cross-reference
+form — the old global `§N.M` numbering is retired. When you add or reorder a section, update the
+[Sections](#sections) list here.
+
+**Reference implementations are described, not named.** This normative standard **MUST NOT** name a specific addon (from the Ka0s collection or the wider ecosystem) as a reference implementation. Instead it *describes* the implementation — what it does and how — in enough detail to be actionable on its own. This keeps the standard self-contained and durable when addons change or are renamed. The **named** research evidence behind these patterns (which real addons exhibit them) lives in the companion research document, `INDUSTRY_RESEARCH.md`, which is a standards-process input rather than part of the normative standard.
+
+Where a Ka0s addon today already implements a rule well, it is called out as *"reference implementation (in the collection)"* with a description of the addon's role, never its name.
+
+---
+
+## Sections
+
+The normative standard, in reading order. **All of these are part of the standard — read every one.**
+Reference a whole section by its filename, a subsection as `filename-§N`.
+
+- **[tiered-layout](standards/tiered-layout.md)** — Tier 1 (flat, ≤8 files) vs Tier 2 (modular); folder casing; typed `media/` subfolders.
+- **[toc-file](standards/toc-file.md)** — required TOC fields + exact field order; single latest-Retail Interface; `#`-sectioned file listing.
+- **[library-stack](standards/library-stack.md)** — mandatory/optional Ace3 libs; vendor-and-commit over externals; no lib forks or suite dependencies.
+- **[architecture](standards/architecture.md)** — namespace bootstrap; AceAddon; module pattern; closed message bus; schema-as-single-source.
+- **[savedvariables](standards/savedvariables.md)** — AceDB structure; defaults; `schemaVersion` + migration runner.
+- **[options-ui](standards/options-ui.md)** — Blizzard Settings + raw AceGUI; eager category / lazy body; landing page, two-column, layout constants, scroll container.
+- **[standalone-windows](standards/standalone-windows.md)** — non-secure main windows / data browsers (no combat gate; `UISpecialFrames`; pooled rows).
+- **[preview-mode](standards/preview-mode.md)** — placeholder-data preview/test mode for positionable displays.
+- **[slash-commands](standards/slash-commands.md)** — AceConsole; schema-driven dispatch + `COMMANDS`; mandatory cyan chat tag; settings read/write output format.
+- **[localization](standards/localization.md)** — metatable-fallback `NS.L`; English-string keys; locale-gated files.
+- **[events-frames-taint](standards/events-frames-taint.md)** — AceEvent; combat lockdown; taint-safe Blizzard replacement; frame pooling; combat "secret" values.
+- **[public-api](standards/public-api.md)** — versioned `NS.API.v1` surface (only if the addon exposes one).
+- **[compat](standards/compat.md)** — a single `Compat` module owning every deprecated / cross-patch API call.
+- **[debug-logging](standards/debug-logging.md)** — the on-screen debug console (styled like the main window), not the chat frame.
+- **[packaging](standards/packaging.md)** — `.pkgmeta`: vendored libs, ignore lists, no `externals:`.
+- **[lint](standards/lint.md)** — `.luacheckrc`: config and the zero-error gate.
+- **[testing](standards/testing.md)** — headless Lua 5.1 test harness; TDD; the green commit gate.
+- **[documentation](standards/documentation.md)** — root README + stub `CLAUDE.md`; the `docs/` trio; the four-place standards reference.
+- **[audit-review-history](standards/audit-review-history.md)** — frozen dated `docs/audits/` + `docs/reviews/` bundles.
+- **[versioning-git](standards/versioning-git.md)** — semver; trunk-based git workflow; commit only on green.
+- **[naming-cheatsheet](standards/naming-cheatsheet.md)** — the naming conventions table.
+- **[anti-patterns](standards/anti-patterns.md)** — the forbidden do-not list (#1–#35).
+- **[open-evolutions](standards/open-evolutions.md)** — recorded directions for future versions.
+
+---
+
+## Related documents
+
+Discovered by following the links here — not part of the normative standard, but part of the standards process:
+
+- **[EXECUTIVE_SUMMARY.md](EXECUTIVE_SUMMARY.md)** — one-page TL;DR of the standard.
+- **[NEW_ADDON_CONTEXT.md](NEW_ADDON_CONTEXT.md)** — drop-in context pack for scaffolding a new addon (born compliant).
+- **[INDUSTRY_RESEARCH.md](INDUSTRY_RESEARCH.md)** — the research foundation the rules are synthesized from (a process input).
+- **[ADDONS.md](ADDONS.md)** — the roster of in-scope addons.
+- Process playbooks (repo root): **[../AUDIT.md](../AUDIT.md)** (`/wow-addon:standards-audit`) and **[../NEW_ADDON.md](../NEW_ADDON.md)** (`/wow-addon:new-addon`).
+
+---
+
+## Changelog
+
+- **v1.5.0 (2026-07-13):** Standard **split into per-section files** for navigability. `01_STANDARD.md` renamed to **`STANDARDS.md`** and reduced to this index/entry point (front matter, the reading guide, the Sections map, and this changelog); every numbered section moved **verbatim — no rule text changed** — into its own file under **`standards/standards/`** with an unnumbered topic name (e.g. `tiered-layout.md`, `architecture.md`, `anti-patterns.md`). "Reading this document" stays inline here. Section numbers are now **local to each file** and cross-references use the **`filename-§N`** scheme (e.g. `architecture-§5`; a whole section is just its filename, e.g. `audit-review-history`) — the old global `§N.M` numbering is retired. Sibling docs de-numbered too: `00_EXECUTIVE_SUMMARY.md`→`EXECUTIVE_SUMMARY.md`, `02_NEW_ADDON_CONTEXT.md`→`NEW_ADDON_CONTEXT.md`, `03_INDUSTRY_RESEARCH.md`→`INDUSTRY_RESEARCH.md`. Consuming tools (the `/wow-addon` plugin) now hard-code only this entry point and discover section files by following the Sections list.
+- **v1.4.0 (2026-07-13):** New **events-frames-taint-§8 — Combat-protected "secret" values**. In combat, retail returns absorb/health/threat totals as opaque *secret* values that survive `tostring()` **and the `..` operator** but raise in `table.concat`/`string.format`; an unguarded secret in a chat/debug line — especially one on a repeating ticker — crashes and can freeze the feature until `/reload`. The shared chat/debug seam (slash-commands-§4, debug-logging-§4) now MUST route every arg through a **secret-safe stringifier** whose detector probes `table.concat`, **not** `..` (a `..` probe wrongly passes secrets through). New anti-pattern #35. Drawn from a live AbsorbTracker crash where `/at debug on` in combat killed the repaint ticker.
+- **v1.3.0 (2026-07-13):** Three chat/console-output rules tightened or added, from AbsorbTracker smoke-test feedback. **slash-commands-§4** — the bracketed chat tag's colour is now **mandated cyan** (`|cff00ffff[XY]|r`), promoted from example to requirement (house style; every Ka0s addon prints the same colour). **slash-commands-§5 (new)** — canonical **settings read/write output format** for `list`/`get`/`set`. **debug-logging-§5** — the `DebugLog:SetEnabled` seam now **MUST also append a `[Debug] logging enabled|disabled` console line at both transitions** (was chat-ack only), so the console self-documents when capture started and stopped. options-ui-§2 (combat panel-open) was reviewed and left unchanged — defer-and-replay remains the norm.
+- **v1.2.0 (2026-07-13):** Audit and code-review run history moved under `docs/`: audit runs now live in **`docs/audits/<YYYY-MM-DD>/`** (was `audit/<YYYY-MM-DD>/`) and code-review runs in **`docs/reviews/<YYYY-MM-DD>/`** (was `reviews/<YYYY-MM-DD>/`) — `audit-review-history` retitled and rewritten to name both locations. Rippled the path through the tiered-layout trees (tiered-layout-§1/tiered-layout-§2), the casing list (tiered-layout-§3), the `.pkgmeta`/`.luacheckrc` templates (`packaging`/`lint`), and every cross-reference in the playbooks and repo docs.
+- **v1.1.0 (2026-07-13):** Documentation section (`documentation`) made explicit and given a proper heading. Named the canonical `docs/` trio — `ARCHITECTURE.md`, `agent-context.md` (the full agent-context pack), `smoke-tests.md` (documentation-§3). Specified the exact required shape of the root `CLAUDE.md` stub, including a mandatory `## Standards compliance (read first)` section (documentation-§2). Added **documentation-§6 — Standards reference (every addon)**: the reference to this repo MUST live in four places — the TOC `X-Standard` field, the README standard badge, the `CLAUDE.md` "Standards compliance (read first)" section, and the `docs/agent-context.md` "Hard rules" — so every agent working in an addon carries it in memory and context. New anti-pattern #34.
+- **v1.0.0 (2026-07-12):** Initial release of the Ka0s WoW Addon Standard.
+
+---
+
+**End of index. The normative rules live in the section files linked above. Authoritative as of 2026-07-13; bump on amendment.**

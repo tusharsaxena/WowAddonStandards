@@ -6,7 +6,7 @@ its output there — this `WowAddonStandards` repo holds only the rules and this
 addon's audit results.
 
 The rules being audited against are canonical in
-[`standards/01_STANDARD.md`](standards/01_STANDARD.md) (the `§`-sections and the §19 anti-pattern
+[`standards/STANDARDS.md`](standards/STANDARDS.md) (its section files and the `anti-patterns`
 list). This playbook says *how to run the audit and where to put the results*; the standard says
 *what to check*.
 
@@ -47,16 +47,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 
 ## Steps
 
-1. **Resolve the standard.** Read the canonical rules from `standards/01_STANDARD.md` in the
+1. **Resolve the standard.** Read the canonical rules from `standards/STANDARDS.md` in the
    `WowAddonStandards` repo (the addon's TOC `## X-Standard:` URL points here). Use the current
    version — note it (e.g. "audited against v1.0.0") in `01_CURRENT_STATE.md` so the run is reproducible.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, packaging, docs) and record what it does
    now, citing files.
-4. **Measure against every section + anti-pattern.** Go through each `§` of the standard and the §19
-   anti-pattern list. For each MUST/SHOULD it fails or partially meets, record a deviation.
-5. **Catalogue deviations** → `02_DEVIATIONS.md`. One row/entry per gap: the ID, the `§` violated,
+4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
+   `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
+5. **Catalogue deviations** → `02_DEVIATIONS.md`. One row/entry per gap: the ID, the section violated,
    MUST/SHOULD severity, a one-line description, and the fix direction.
 6. **Back every finding with evidence** → `03_EVIDENCE.md`. `file:line` citations that prove each
    deviation (and each compliance claim). Don't assert without a citation.
@@ -72,5 +72,5 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 - **Frozen runs.** Never edit a prior `docs/audits/<date>/`; a re-audit is a new dated folder.
 - **Sourced findings.** Every deviation cites `file:line` evidence — no unsourced compliance claims.
 - **Stable IDs.** A deviation that recurs across runs keeps its ID and prefix.
-- **The standard wins.** When this playbook and `standards/01_STANDARD.md` disagree on *what* to
+- **The standard wins.** When this playbook and `standards/STANDARDS.md` disagree on *what* to
   check, the standard is canonical; this playbook governs only *how* the run is structured.
