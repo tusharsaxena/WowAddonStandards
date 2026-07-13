@@ -32,6 +32,15 @@ NS.addon = addon  -- keep NS reference; modules read state through NS, not _G
 ```
 
 - **MUST** pass the NS table as the first arg to `:NewAddon` (Ace3 supports this) so the bootstrap and AceAddon point at the same object.
+- **A custom chat printer MUST survive the AceConsole embed.** Because `NS` *is* the addon object, `:NewAddon(NS, …, "AceConsole-3.0")` embeds AceConsole's mixins **directly onto `NS`**, and its `:Print` method **silently overwrites** any `NS.Print` a `Util`/bootstrap file defined earlier. Called as `NS.Print(msg)` (the message lands in `self`), AceConsole's `Print` renders `|cff33ff99<msg>|r:` — green text, a **trailing colon, and no cyan tag** — silently violating the mandated chat prefix (slash-commands-§4) with no error, masked by `/reload`, and invisible to any headless test whose AceAddon mock doesn't reproduce the embed. The addon **MUST** guarantee its own printer wins, one of two ways:
+  - **Name the printer `NS.Util.print`** and call *that* at every site (never a bare `NS.Print`) — the embed then has nothing to collide with. (Reference implementation in the collection: the interrupt-cooldown tracker prints exclusively through `NS.Util.print`.)
+  - **Reclaim `NS.Print` immediately after `:NewAddon`**, from the pristine copy the embed does not touch:
+    ```lua
+    local addon = AceAddon:NewAddon(NS, addonName, "AceEvent-3.0", "AceTimer-3.0", "AceConsole-3.0")
+    NS.addon = addon
+    if NS.Util and NS.Util.print then NS.Print = NS.Util.print end  -- AceConsole:Print clobbered ours; take it back
+    ```
+- **Test harness MUST model the embed.** A mock `:NewAddon` that doesn't stamp AceConsole's colliding `:Print` hides this bug — the clobber only manifests through the real embed. The AceAddon mock **MUST** stamp a `:Print` mixin onto the target (rendering `|cff33ff99<self>|r:` like the live mixin) so tests exercise the production print path. Same mock-fidelity rule as the bus receiver clobber (architecture-§4). See anti-pattern #36.
 - **SHOULD NOT** use AceAddon's per-module submodule pattern (`addon:NewModule("Foo")`) for fewer than ~10 feature modules. Direct `NS.Foo = NS.Foo or {}` per-module tables are lighter and equally testable.
 
 ### 3. Module pattern

@@ -17,6 +17,7 @@
 | Settings key | snake_case dotted path | `display.scale` |
 | Locale keys | English source string | `L["Reset all settings"]` |
 | Module table | `NS.<PascalCase>` | `NS.IconGrid` |
+| Chat printer | `NS.Util.print` — never a bare `NS.Print` when AceConsole is embedded into `NS` (its `:Print` mixin clobbers it; architecture-§2, anti-pattern #36) | `NS.Util.print("…")` |
 | Root agent stub | `CLAUDE.md` (stub, incl. Standards-compliance section) | documentation-§2 |
 | Full agent brief | `docs/agent-context.md` (Hard rules → standard) | documentation-§3, documentation-§6 |
 | Engineer context | `docs/ARCHITECTURE.md` | documentation-§3 |
