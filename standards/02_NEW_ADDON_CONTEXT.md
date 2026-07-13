@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v1.2.0, 2026-07-13)
+# New Ka0s Addon — Context Pack (v1.4.0, 2026-07-13)
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (§15).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -295,6 +295,8 @@ function NS.addon:OnSlash(input)
 end
 ```
 
+**Chat tag & CLI output (§7.4–§7.5).** `NS.PREFIX` is the mandatory **cyan** bracketed tag — `|cff00ffff[XY]|r` (initials `XY`; the cyan `00ffff` is required, not just an example) — exposed once and prepended to every chat line. `list`/`get`/`set` follow the canonical output shape in §7.5: `list` prints `Available settings:` then `  [page]` group headers then `    path = value` rows; `get`/`set` print the single-line `path = value` (echoing the *stored* value after a set). Values are **type-aware and unit-annotated** through one shared formatter — `<n> px`, `1.00x`, `true`/`false`, `{r, g, b, a}` — so `list` and `get`/`set` never diverge.
+
 ### Debug console (§12)
 
 Debug output routes to a **dedicated on-screen console styled like the main window**, not chat. Full reference: `01_STANDARD.md §12`. Minimal sink — note the **tag is the first argument**:
@@ -308,9 +310,23 @@ end
 -- call site: NS.Debug("Loot", "%s x%d", name, qty)
 ```
 
+**Secret-safe (§9.8) — mandatory if you ever log a combat value.** In combat, retail returns absorb/health/threat totals as opaque *secret* values that survive `tostring()` **and `..`** but raise in `table.concat`/`string.format`. An unguarded secret in a debug line crashes — and on a repeating ticker it freezes the feature until `/reload`. The `NS.PREFIX` printer (§7.4) and this sink MUST route args through one secret-safe stringifier whose detector probes `table.concat`, **not** `..`:
+
+```lua
+local function probeConcat(v) return table.concat({ v }) end
+function NS.IsConcatSafe(v) return (pcall(probeConcat, v)) end     -- `..` would pass secrets through
+function NS.SafeToString(v)
+  if v == nil then return "nil" end
+  if type(v) == "boolean" then return tostring(v) end
+  if NS.IsConcatSafe(v) then return tostring(v) end
+  return "<secret>"
+end
+-- For display, hand the raw secret to AbbreviateNumbers() / widget setters — never tonumber() or `<`.
+```
+
 The console: a `BackdropTemplate` frame (`<Addon>DebugWindow`) on `DIALOG` strata, **default size `700×344`**, draggable title bar, a `ScrollingMessageFrame` (`SetMaxLines(500)`) rendered in a **shipped monospace font** (`media/fonts/`, e.g. JetBrains Mono OFL, LSM-registered) at **10pt**. Lines follow `<HH:MM:SS> | [<Tag>] <content>` — timestamp coloured `6f8faf`, `[tag]` `c9a66b`, separator/content white; the plain **Copy buffer** mirrors the same line code-free (two pure formatters, `FormatPlain`/`FormatColored`). **Clear** + **Copy** (copy = read-through multiline `EditBox`, same font), registered in `UISpecialFrames`, reusing the addon's `SKIN`/`ApplySkin` seam (§6A).
 
-**Enabled-state is session-only and window-independent** (§12.5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. Tier-1 addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
+**Enabled-state is session-only and window-independent** (§12.5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. The `SetEnabled` seam **also appends a console line at both transitions** — `[Debug] logging enabled` / `[Debug] logging disabled` — via the raw `DebugLog:Add` (the disable line must land after the flag flips off, so it can't go through the gated `NS.Debug` sink). Tier-1 addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
 
 ### Tests (`tests/`, §14A)
 

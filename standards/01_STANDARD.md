@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v1.2.0, 2026-07-13)
+# Ka0s WoW Addon Standard (v1.4.0, 2026-07-13)
 
 **Status:** Source of truth. All audit deviation reports and `02_NEW_ADDON_CONTEXT.md` template content derive from this document. When the standard changes, bump the date and version at the top.
 
@@ -6,6 +6,8 @@
 
 **Changelog**
 
+- **v1.4.0 (2026-07-13):** New **§9.8 — Combat-protected "secret" values**. In combat, retail returns absorb/health/threat totals as opaque *secret* values that survive `tostring()` **and the `..` operator** but raise in `table.concat`/`string.format`; an unguarded secret in a chat/debug line — especially one on a repeating ticker — crashes and can freeze the feature until `/reload`. The shared chat/debug seam (§7.4, §12.4) now MUST route every arg through a **secret-safe stringifier** whose detector probes `table.concat`, **not** `..` (a `..` probe wrongly passes secrets through). New anti-pattern #35. Drawn from a live AbsorbTracker crash where `/at debug on` in combat killed the repaint ticker.
+- **v1.3.0 (2026-07-13):** Three chat/console-output rules tightened or added, from AbsorbTracker smoke-test feedback. **§7.4** — the bracketed chat tag's colour is now **mandated cyan** (`|cff00ffff[XY]|r`), promoted from example to requirement (house style; every Ka0s addon prints the same colour). **§7.5 (new)** — canonical **settings read/write output format** for `list`/`get`/`set`: `Available settings:` → `  [page]` group headers → `    path = value` rows with unit-formatted values, and the single-line `path = value` shape for `get`/`set`. **§12.5** — the `DebugLog:SetEnabled` seam now **MUST also append a `[Debug] logging enabled|disabled` console line at both transitions** (was chat-ack only), so the console self-documents when capture started and stopped. §6.2 (combat panel-open) was reviewed and left unchanged — defer-and-replay remains the norm.
 - **v1.2.0 (2026-07-13):** Audit and code-review run history moved under `docs/`: audit runs now live in **`docs/audits/<YYYY-MM-DD>/`** (was `audit/<YYYY-MM-DD>/`) and code-review runs in **`docs/reviews/<YYYY-MM-DD>/`** (was `reviews/<YYYY-MM-DD>/`) — §16 retitled "Audit & review history" and rewritten to name both locations. Rippled the path through the tiered layout trees (§1.1/§1.2), the casing list (§1.3), the `.pkgmeta`/`.luacheckrc` templates (§13/§14), and every cross-reference in the playbooks and repo docs.
 - **v1.1.0 (2026-07-13):** Documentation section (§15) made explicit and given its missing `## 15.` heading. Named the canonical `docs/` trio — `ARCHITECTURE.md`, `agent-context.md` (the full agent-context pack), `smoke-tests.md` (§15.3). Specified the exact required shape of the root `CLAUDE.md` stub, including a mandatory `## Standards compliance (read first)` section (§15.2). Added **§15.6 — Standards reference (every addon)**: the reference to this repo MUST live in four places — the TOC `X-Standard` field, the README standard badge, the `CLAUDE.md` "Standards compliance (read first)" section, and the `docs/agent-context.md` "Hard rules" — so every agent working in an addon carries it in memory and context. New anti-pattern #34.
 - **v1.0.0 (2026-07-12):** Initial release of the Ka0s WoW Addon Standard.
@@ -654,7 +656,8 @@ NS.COMMANDS = {
 
 Reference implementations (in the collection): the Tier-2 tracker's `printHelp` and the loot-history browser's `settings/Slash.lua`.
 
-- Every line the addon prints to chat **MUST** carry a short **bracketed tag** — the addon's initials in `[...]`, wrapped in one colour code — exposed as a **single shared constant** (`NS.PREFIX`) so every module prints identically. Format example: `|cff00ffff[XY]|r` (initials `XY` in a single colour code). **MUST NOT** hand-write `"|cff…" .. addonName .. "|r"` per call site.
+- Every line the addon prints to chat **MUST** carry a short **bracketed tag** — the addon's initials in `[...]`, wrapped in **the cyan colour code** — exposed as a **single shared constant** (`NS.PREFIX`) so every module prints identically. Required format: `|cff00ffff[XY]|r` (initials `XY`, colour `00ffff` cyan). The **cyan colour is mandatory**, not merely an example: every Ka0s addon shares the same tag colour so a user running several recognises them at a glance. **MUST NOT** hand-write `"|cff…" .. addonName .. "|r"` per call site, and **MUST NOT** substitute a different colour.
+- The printer **MUST** be **secret-safe** (§9.8): build each line from the secret-safe stringifier, not raw `tostring` / `..` / `table.concat`, so a combat-protected value logs as `<secret>` instead of raising. A printer that concatenates raw args crashes the moment it is handed a combat "secret" value.
 - The `help` index (and the fallback for an unknown verb) **MUST** be generated from `NS.COMMANDS`:
   - **Header:** `<tag> v<version> slash commands (/<alias> is an alias for /<slash>):`
   - **One row per command:** `<tag> |cffffff00/<slash> <name>|r — |cffffffff<desc>|r` — gold command, em-dash (`—`), white description.
@@ -670,6 +673,37 @@ function Sl:PrintHelp()
   end
 end
 ```
+
+### 7.5 Settings read/write output format
+
+`list`, `get`, and `set` share one canonical output shape so every Ka0s addon reads identically in chat. Every line carries `NS.PREFIX` (§7.4).
+
+- **`list`** **MUST** print a header, then one **`[page]` group header** per schema page (in a stable, declared page order), then one indented **`path = value`** row per setting under that page:
+
+  ```
+  [PFX] Available settings:
+  [PFX]   [general]
+  [PFX]     enabled = true
+  [PFX]     scale = 1.00x
+  [PFX]   [icons]
+  [PFX]     icons.primarySize = 64 px
+  [PFX]     icons.anchor = RIGHT_MIDDLE
+  ```
+
+  - Header line: `Available settings:`.
+  - Group header: **two-space** indent, page key in `[...]`.
+  - Value row: **four-space** indent, the **full schema path** on the left (nested paths dotted, e.g. `icons.primarySize`), then ` = `, then the formatted value.
+- **`get <path>`** and **`set <path> <value>`** **MUST** print the **single-line** `path = value` form (no header, no indent). A `set` **MUST** read back the *stored* value after writing, so the echo reflects any clamping/coercion.
+- **Value formatting MUST be type-aware, unit-annotated, and schema-driven** (never hand-formatted per call site):
+  - pixel / size numbers → `<n> px` (e.g. `64 px`)
+  - scale → `<n.nn>x` (e.g. `1.00x`); plain ratios / alphas → two decimals (e.g. `0.50`, `1.00`)
+  - booleans → `true` / `false`
+  - colours → `{r, g, b, a}`, two decimals each (e.g. `{1.00, 0.13, 0.13, 1.00}`)
+  - enums / strings → the raw token or display string (e.g. `RIGHT_MIDDLE`, `Bui Prototype`)
+- A **single shared formatter** (e.g. `NS.FormatSchemaValue(row, v)`) **MUST** produce these strings for both `list` and `get`/`set`, so the two paths can never diverge.
+- Unknown path → `Setting not found: <path>`; a missing / empty argument → a `Usage: …` line.
+
+Reference implementation: the Tier-2 tracker's `listSettings` / `getSetting` / `setSetting` in `settings/Slash.lua`.
 
 ---
 
@@ -772,6 +806,38 @@ if DB_AURA_ENABLED then ... end
 
 - **MUST** call `M:RefreshUpvalues()` at end of every settings setter that touches values used in the hot path. (The DB-upvalue-refresh pattern nameplate frameworks use.)
 
+### 9.8 Combat-protected "secret" values
+
+In combat, retail protects combat-sensitive return values — unit absorb/health totals, threat, some aura amounts — as **"secret" values**: an opaque token the addon cannot inspect. The trap is asymmetric and easy to get wrong:
+
+- A secret **survives `tostring()`** (returns another secret string) **and survives the `..` operator** (which silently propagates secretness) — neither raises.
+- A secret **raises the instant it reaches `table.concat`** (and `string.format`): `invalid value (secret) at index N in table for 'concat'`.
+- Engine-side consumers accept secrets fine: `AbbreviateNumbers()` formats one for display, and widget setters (`FontString:SetText`, `StatusBar:SetValue`/`SetMinMaxValues`) take them directly.
+
+Because chat/debug lines end in `table.concat`/`string.format`, an unguarded secret raises there — and if that line runs inside a **repeating timer** (a repaint ticker), the erroring callback stops rescheduling and the feature **freezes until `/reload`**. A debug log line is the classic trigger: harmless out of combat, fatal the moment combat makes the value secret.
+
+- **MUST NOT** pass a value read from a combat-protected API into `table.concat`, `string.format`, `print`, or any Lua string builder without guarding it. For **display**, hand the raw value straight to `AbbreviateNumbers()` or the widget setter — never `tonumber()` it first (returns nil / loses the value) and never compare it with `<`/`>` (raises).
+- The shared chat/debug output seam (the `NS.PREFIX` printer §7.4, the debug sink §12.4) **MUST** be secret-safe: route every argument through one **secret-safe stringifier** that substitutes a sentinel (e.g. `"<secret>"`) for any value a real `table.concat` would reject. Detection **MUST probe `table.concat`, not `..`** — a `..`-based probe reports a secret as *safe* (the operator propagates rather than raises) and lets it slip straight through to the real concat.
+
+```lua
+-- Detect via the operation that actually rejects a secret: table.concat (NOT `..`, which
+-- propagates secretness without raising). There is no public issecret() API.
+local function probeConcat(v) return table.concat({ v }) end
+function NS.IsConcatSafe(v) return (pcall(probeConcat, v)) end
+
+function NS.SafeToString(v)
+  if v == nil then return "nil" end
+  if type(v) == "boolean" then return tostring(v) end   -- never secret; concat rejects it anyway
+  if NS.IsConcatSafe(v) then return tostring(v) end
+  return "<secret>"
+end
+-- NS.Print / NS.Debug build each line from NS.SafeToString(arg) — never raw tostring / `..`.
+```
+
+- The guard **SHOULD** live once in the shared print/debug helpers so every call site inherits it; individual call sites **MUST NOT** hand-roll secret handling.
+
+Reference implementation (in the collection): the absorb tracker's `NS.IsConcatSafe` / `NS.SafeToString` in `core/Util.lua`, routed through by both `NS.Print` and `NS.DebugPrint`.
+
 ---
 
 ## 10. Public API surface
@@ -862,6 +928,7 @@ end
 
 - **MUST** be zero-allocation when off (the gate is the first line; no `string.format`, concat, or table build before it).
 - The **tag is the first argument** so every call site self-documents its category: `NS.Debug("Loot", "%s x%d", name, qty)`.
+- **MUST** be **secret-safe** (§9.8): a `...` value that can hold a combat-protected "secret" (unit absorb/health totals, etc.) must reach `string.format`/`table.concat` only through the secret-safe stringifier — otherwise the sink raises the instant it logs one in combat, and a sink on a repeating ticker freezes the feature until `/reload`.
 - **MAY** support structured dump verbs (`/<slash> debug <topic>`) for large addons.
 
 ### 12.5 Enabled-state — session-only, decoupled from the window
@@ -871,8 +938,9 @@ The enabled-state (`NS.State.debug`) is a **runtime flag, independent of the con
 - **MUST** be **session-only**: default **off**, held in `NS.State.debug` (**never** in SavedVariables), and **reset to off on every `/reload` and fresh login**. *(A persisted debug flag too easily gets left on; persisting it is the documented deviation, not the default.)*
 - Logging and the window are **independent** — capture runs even when the console is closed, so a bug can be reproduced first and the log opened after.
 - Slash (§7): `/<slash> debug` **toggles the window only** (state untouched); `/<slash> debug on` and `/<slash> debug off` set the flag. Each state change prints a `NS.PREFIX`-tagged chat ack.
+- Each state change **MUST** also append a **console line** at **both** transitions — `[Debug] logging enabled` on enable and `[Debug] logging disabled` on disable — so the log itself records when capture started and stopped. The disable line **MUST** still land after the flag has flipped off, so it is written through the console's raw append (`DebugLog:Add`), **not** through the flag-gated sink (`NS.Debug`), which would swallow it.
 - The title bar carries a **state toggle** on the left, styled like the Clear/Copy text buttons: **`Debug: ON`** in green when on, **`Debug: OFF`** in red when off. Clicking it flips the flag and the label re-renders on every state change.
-- Route **all** state changes through one `DebugLog:SetEnabled(on)` seam so the slash command and the header toggle can't diverge (single write path: set flag → refresh header → print ack).
+- Route **all** state changes through one `DebugLog:SetEnabled(on)` seam so the slash command and the header toggle can't diverge (single write path: set flag → refresh header → chat ack → console line).
 
 ### 12.6 Copy / Clear
 
@@ -1194,6 +1262,7 @@ For quick reference, the rules above as a do-not list:
 32. Two receivers of the same bus message registering on the **shared** bus object (`NS.bus`/`NS.addon` as `self`) — CallbackHandler keys callbacks by `(message, target)`, so the later registrant silently clobbers the earlier (last-registrant-wins, no error, masked by `/reload`); each receiver MUST own a distinct AceEvent target — an AceAddon module `self`, or a private `NS.NewBusTarget()` embed (§4.4).
 33. A bus test mock with no-op `RegisterMessage`/`SendMessage` — it can't catch same-target receiver clobbering; the mock MUST key by target and fan `SendMessage` out to all targets (§4.4, §14A).
 34. Missing the standards reference in **project memory and context** — a `CLAUDE.md` with no `## Standards compliance (read first)` section, or a `docs/agent-context.md` whose `## Hard rules` don't open with the conform-to-the-standard rule pointing back to that section. The reference MUST live in all four places: TOC `X-Standard`, README badge, `CLAUDE.md`, and `docs/agent-context.md` (§15.6).
+35. Feeding a combat-protected "secret" value (unit absorb/health totals, threat, …) into `table.concat`/`string.format`/`print`, or detecting one with a `..`-based probe — secrets **propagate silently through `..`** and only raise in `table.concat`, so a `..` probe passes them through; route every chat/debug arg through the shared secret-safe stringifier (§9.8).
 
 ---
 
