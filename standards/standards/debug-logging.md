@@ -70,4 +70,4 @@ The enabled-state (`NS.State.debug`) is a **runtime flag, independent of the con
 
 - **Tier-1 utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
 
-Note: user-facing chat messages (help index, command acks, errors) still `print()` to chat with `NS.PREFIX` (slash-commands-§4) — that ordinary chat seam is separate from the debug console.
+Note: user-facing chat messages (help index, command acks, errors) still go to chat through the shared `NS.Print` printer with `NS.PREFIX` (slash-commands-§4; the same single-seam, secret-safe rules apply — events-frames-taint-§8) — that ordinary chat seam is separate from the debug console.

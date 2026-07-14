@@ -28,12 +28,14 @@ NS.COMMANDS = {
   { name = "reset",   desc = "Reset one setting",     fn = function(arg) ... end },
   { name = "resetall", desc = "Reset all to defaults", fn = function() ... end },
   { name = "config",  desc = "Open options panel",    fn = function() NS.Panel:Open() end },
+  { name = "version", desc = "Print addon version",   fn = function() ... end },   -- prints `<tag> v<version>`
   { name = "preview", desc = "Toggle preview mode",   fn = function() ... end },   -- if preview-mode applies
   { name = "debug",   desc = "Window; 'on'/'off' set logging", fn = function(rest) ... end },  -- debug-logging (on|off|toggle)
 }
 ```
 
 - **MUST** render `/<slash>` (no args) as the help output, generated from this table — no hand-maintained help string. (Browser-first addons **MAY** map bare `/<slash>` to their main window instead — a documented deviation — but `/<slash> help` MUST still print the index; see slash-commands-§4.)
+- **MUST** register a **`version`** verb that prints the addon's version on its own line — `/<slash> version` → `<tag> v<version>` (the `NS.PREFIX` tag, slash-commands-§4, followed by `v` and the version string). The help header (slash-commands-§4) already carries the version, but the standalone verb is the canonical, greppable single-line answer to "what version am I running?" that every Ka0s addon answers identically. Read the version from the TOC metadata (`GetAddOnMetadata(NS.name, "Version")`) with the in-code constant as fallback, so it can't drift from the packaged manifest.
 - **MUST NOT** use `if arg == "foo" then elseif arg == "bar" then` chains.
 
 ### 4. Help output & chat tag

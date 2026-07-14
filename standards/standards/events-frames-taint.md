@@ -98,6 +98,11 @@ end
 -- NS.Print / NS.Debug build each line from NS.SafeToString(arg) — never raw tostring / `..`.
 ```
 
-- The guard **SHOULD** live once in the shared print/debug helpers so every call site inherits it; individual call sites **MUST NOT** hand-roll secret handling.
+- The addon **MUST** funnel **every** chat and debug line through a **single shared secret-safe printer** — one `NS.Print` for chat, one debug sink for the console (debug-logging-§4) — each building its line from the secret-safe stringifier. The guard then lives in exactly one place and every call site inherits it. Concretely, call sites **MUST NOT**:
+  - call the global `print()` directly (it neither carries the `NS.PREFIX` tag nor secret-stringifies its args);
+  - hand-write the `NS.PREFIX` tag per line (slash-commands-§4);
+  - hand-roll secret handling, or feed chat/debug args through `..` / `tostring` / `table.concat` before the shared printer.
 
-Reference implementation (in the collection): the absorb tracker's `NS.IsConcatSafe` / `NS.SafeToString` in `core/Util.lua`, routed through by both `NS.Print` and `NS.DebugPrint`.
+  Instead, each file does `local print = NS.Print` (and routes debug through the debug sink) and emits `print("message")` — the shared printer prepends the tag and secret-stringifies every argument. A file that calls the global `print()`, or pre-concatenates args before the printer, is **non-compliant even if it is never handed a secret today** — the next value routed through it may be one, and the whole point of the single seam is that no call site has to reason about that. Where AceConsole-3.0 is embedded, the shared `NS.Print` **MUST** be reclaimed after `NewAddon` so its `:Print` mixin cannot silently replace the secret-safe printer (architecture-§2, slash-commands-§4).
+
+Reference implementation (in the collection): the absorb tracker's `NS.IsConcatSafe` / `NS.SafeToString` in `core/Util.lua`, routed through by both `NS.Print` and `NS.DebugPrint`; the loot-history browser applies the same seam (`core/Util.lua` printer, reclaimed in `core/LootHistory.lua`).
