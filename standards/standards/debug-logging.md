@@ -56,8 +56,9 @@ The enabled-state (`NS.State.debug`) is a **runtime flag, independent of the con
 
 - **MUST** be **session-only**: default **off**, held in `NS.State.debug` (**never** in SavedVariables), and **reset to off on every `/reload` and fresh login**. *(A persisted debug flag too easily gets left on; persisting it is the documented deviation, not the default.)*
 - Logging and the window are **independent** — capture runs even when the console is closed, so a bug can be reproduced first and the log opened after.
-- Slash (slash-commands): `/<slash> debug` **toggles the window only** (state untouched); `/<slash> debug on` and `/<slash> debug off` set the flag. Each state change prints a `NS.PREFIX`-tagged chat ack.
+- Slash (slash-commands): `/<slash> debug` **toggles the window only** (state untouched); `/<slash> debug on` and `/<slash> debug off` set the flag. Each state change **MUST** print a `NS.PREFIX`-tagged chat ack whose **state word is colour-coded** — **`ON` green (`40ff40`)**, **`OFF` red (`ff4040`)** — e.g. `[XY] debug logging |cff40ff40ON|r` / `[XY] debug logging |cffff4040OFF|r`. The colours mirror the title-bar toggle's green/red (below) so the flag reads identically in chat and on the console header.
 - Each state change **MUST** also append a **console line** at **both** transitions — `[Debug] logging enabled` on enable and `[Debug] logging disabled` on disable — so the log itself records when capture started and stopped. The disable line **MUST** still land after the flag has flipped off, so it is written through the console's raw append (`DebugLog:Add`), **not** through the flag-gated sink (`NS.Debug`), which would swallow it.
+- On **enable**, the seam **MUST** additionally emit a one-line **`[Init]` session summary** to the console, immediately after the `[Debug] logging enabled` bracket: the addon **name + version**, the **schema/DB version**, and the **active profile** — e.g. `[Init] KickCD v1.2.0, schema v1, profile 'Default'`. Emit it **on enable, not at load/login**: the flag is session-only and off at login (this section), so a login-time summary would always be gated off and never render — the `SetEnabled` seam is the only point where the summary is both current and visible. This satisfies the §8 lifecycle boot-summary requirement and makes a pasted log self-identifying (which build, which schema, which profile) without asking the reporter.
 - The title bar carries a **state toggle** on the left, styled like the Clear/Copy text buttons: **`Debug: ON`** in green when on, **`Debug: OFF`** in red when off. Clicking it flips the flag and the label re-renders on every state change.
 - Route **all** state changes through one `DebugLog:SetEnabled(on)` seam so the slash command and the header toggle can't diverge (single write path: set flag → refresh header → chat ack → console line).
 
@@ -78,8 +79,10 @@ Sections 1–7 govern the console's **shape**; this section governs its **conten
 trace the addon's **main functional flows**, so a log read back after a repro tells the story of
 what the addon did — not just that it loaded. At minimum:
 
-- **Lifecycle** — load/enable (a one-line boot summary: schema version, record/row count),
-  schema **migration** (only when one actually runs), and retention/**prune**.
+- **Lifecycle** — a one-line **`[Init]` session summary** (addon + version, schema/DB version,
+  active profile, and any record/row count), emitted **when capture is enabled** — the flag is
+  off at login, so it rides the `SetEnabled` seam, not load (§5); schema **migration** (only when
+  one actually runs); and retention/**prune**.
 - **The core capture / compute flow** — the addon's reason for existing (e.g. an item recorded,
   a cast resolved, a bar shown), including the **not-recorded / no-op decisions** that explain a
   *missing* entry (why a loot line was skipped, why a value was ignored). A log that shows only
