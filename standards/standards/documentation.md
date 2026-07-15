@@ -9,7 +9,7 @@ Documentation is a **first-class compliance surface**, not an afterthought. Ever
 Every Ka0s `README.md` **MUST** follow one structure so all addons read identically. Reference implementation (in the collection): the consumables & macro manager's README. Sections in **this exact order**:
 
 1. **H1 title** — `# Ka0s <Name>`. **MUST**.
-2. **Badge row** — in order: a **`[wow]`** interface badge (in lockstep with the TOC `## Interface:`, toc-file-§3); a **published-version** badge (CurseForge/Wago) once published; a **`[license]`** MIT badge; and a badge/line linking the **Ka0s WoW Addon Standard** (<https://github.com/tusharsaxena/WowAddonStandards>). **MUST**.
+2. **Badge row** — in order: a **`[wow]`** interface badge (in lockstep with the TOC `## Interface:`, toc-file-§3); a **published-version** badge (CurseForge/Wago) once published; a **`[tests]`** X/Y pass badge (static shields.io, testing-§5); a **`[license]`** MIT badge; and a badge/line linking the **Ka0s WoW Addon Standard** (<https://github.com/tusharsaxena/WowAddonStandards>). **MUST**.
 3. **Logo** — the addon logo image. **MUST**.
 4. **Description** — 1–2 paragraphs of what the addon does and why; **MAY** inline a short feature bullet list **or a summary table** (e.g. the addon's core objects/commands at a glance) and a closing line on how to configure it (Blizzard Settings panel + `/<slash>`). **MUST**.
 5. **`## Screenshots`** — captioned images of the addon and its settings sub-panels. **SHOULD** (**MUST** once published).
@@ -20,7 +20,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 8. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
 9. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table.
 10. **`## Issues and feature requests`** — **MUST**. A short paragraph pointing users to the addon's **GitHub issues** (`<repo>/issues`) as the **single source of truth for the backlog**, asking them to file there rather than in comments. (This is why a released addon ships no `TODO.md` — documentation-§4.)
-11. **`## Testing`** — **MUST**. How to verify: the headless harness (`lua tests/run.lua`), lint (`luacheck .`), and the in-game smoke-test suite (link `docs/smoke-tests.md`), with a note to run it before tagging a release or after bumping `## Interface:` / refreshing libs (testing, audit-review-history).
+11. **`## Testing`** — **MUST**. How to verify: the headless harness (`lua tests/run.lua`), lint (`luacheck .`), the generated case inventory (`docs/test-cases.md`, testing-§5), and the in-game smoke-test suite (link `docs/smoke-tests.md`), with a note to run it before tagging a release or after bumping `## Interface:` / refreshing libs (testing, audit-review-history). The README's `[tests]` X/Y badge (testing-§5) is hand-maintained alongside the inventory.
 12. **`## Version History`** — **MUST**. A **Version | Date | Highlights** table, most-recent first.
 
 - The optional sections (5, 7, 8, 9) are **SHOULD** — omit one only when it would be empty — but when present their **relative order MUST** be preserved.
@@ -47,7 +47,7 @@ Every addon **MUST** ship this **canonical trio** under `docs/` (all three are u
 - **`docs/ARCHITECTURE.md`** — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from the README's Testing section.
 
-Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **MUST NOT** ship a `TODO.md` once released (documentation-§4).
+Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. One topic-detail doc is **required**, not optional: `docs/test-cases.md`, the generated test-case inventory (testing-§5). **MUST NOT** ship a `TODO.md` once released (documentation-§4).
 
 ### 4. No `TODO.md`
 
