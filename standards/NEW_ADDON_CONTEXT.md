@@ -195,6 +195,8 @@ NS.L = setmetatable({}, { __index = function(_, k) return k end })
 -- if GetLocale() ~= "deDE" then return end
 -- local L = NS.L
 -- L["Scale"] = "Skalierung"
+-- Input side (localization-§4): match game data on stable IDs/tokens — spellID, itemID,
+-- classFile ("PRIEST"), instanceID, Enum.* — NEVER on a localized name string.
 ```
 
 ### `Database.lua`

@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.3.0, 2026-07-15)
+# Ka0s WoW Addon Standard (v2.4.0, 2026-07-15)
 
 **Status:** Source of truth. All audit deviation reports and `NEW_ADDON_CONTEXT.md` template content derive from this standard. When the standard changes, bump the date and version at the top of this file.
 
@@ -61,7 +61,7 @@ Reference a whole section by its filename, a subsection as `filename-§N`.
 - **[standalone-windows](standards/standalone-windows.md)** — non-secure main windows / data browsers (no combat gate; `UISpecialFrames`; pooled rows).
 - **[preview-mode](standards/preview-mode.md)** — placeholder-data preview/test mode for positionable displays.
 - **[slash-commands](standards/slash-commands.md)** — AceConsole; schema-driven dispatch + `COMMANDS`; mandatory cyan chat tag; settings read/write output format.
-- **[localization](standards/localization.md)** — metatable-fallback `NS.L`; English-string keys; locale-gated files.
+- **[localization](standards/localization.md)** — metatable-fallback `NS.L`; English-string keys; locale-gated files; **and match game data on stable IDs/tokens, never on localized display strings**.
 - **[events-frames-taint](standards/events-frames-taint.md)** — AceEvent; combat lockdown; taint-safe Blizzard replacement; frame pooling; combat "secret" values.
 - **[public-api](standards/public-api.md)** — versioned `NS.API.v1` surface (only if the addon exposes one).
 - **[compat](standards/compat.md)** — a single `Compat` module owning every deprecated / cross-patch API call.
