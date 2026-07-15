@@ -40,3 +40,26 @@ sudo luarocks install luacheck
 - **MUST**, before **every** commit, run **`lua tests/run.lua`** (all suites green) **and** **`luacheck .`** (0 errors). A commit with red tests or lint errors is forbidden.
 - **MUST** add/extend a suite whenever a behavior changes — no logic change lands without a covering test.
 - Pure/testable logic (schema validation, data collection, attribution, migrations, formatting) **MUST** be exercised headlessly. Genuinely in-client behavior (frame rendering, taint) is covered by the in-game smoke tests (audit-review-history), which complement — not replace — the unit suites.
+
+### 5. Test-case inventory & coverage badge
+
+Two visible-coverage artifacts make the suite's health legible; both are **local and
+hand-runnable — no CI is required or expected**.
+
+- **MUST** ship **`docs/test-cases.md`** — a **generated** full enumeration of every test case,
+  grouped by suite, with per-suite and grand totals. It **MUST** be produced by a non-executing
+  `--list` (or equivalent) mode of the headless runner (`lua tests/run.lua --list > docs/test-cases.md`),
+  **not** hand-authored, and it is the addon's **authoritative pass count**. Reference implementation
+  (in the collection): the loot-history browser's runner grows a `--list` branch that groups the
+  registered cases by their originating `test_*.lua` suite and prints the Markdown inventory.
+- **MUST** surface a **test-pass badge** in the README badge row (documentation-§1) showing
+  **X/Y passing** (passed / total) as a **static** shields.io badge
+  (`img.shields.io/badge/tests-<X>%2F<Y>_passing-brightgreen`). **MUST NOT** require CI, a
+  dynamic/endpoint badge, or a GitHub Action to produce it.
+- **MUST** keep both in lockstep with the suite: whenever a case is added, removed, or renamed, or
+  the pass count moves — i.e. **whenever a failing test is resolved** — regenerate `docs/test-cases.md`
+  and update the README badge **as part of the same change**, never as a deferred follow-up.
+
+This complements §4: the green gate proves the suite passes on every commit; the inventory and badge
+make the coverage **visible and honest**, and are the standing defence against the count drift that
+silently creeps into hand-maintained status lines.
