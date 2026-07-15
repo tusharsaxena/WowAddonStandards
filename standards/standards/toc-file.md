@@ -44,7 +44,7 @@ The collection targets **Retail (Mainline) only**. Classic/other flavors are out
 - **MUST NOT** use a comma-separated multi-flavor Interface list, per-flavor TOC files, or `enable-toc-creation` flavor fan-out.
 - **MUST NOT** ship `_Mainline`/`_Classic` data splits. Data files are plain (`Spells.lua`, `Data*.lua`).
 - **MUST NOT** use `if WOW_PROJECT_ID == ...` ladders inline in feature code. Any genuine cross-patch version check is a Retail-patch check and is branched in `Compat.lua` behind a named flag (compat).
-- The README `[wow]` badge **MUST** show this same single Interface number and stay in lockstep with the TOC (documentation).
+- The README `[wow]` badge (canonical template `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, documentation-§1 #1) **MUST** show this same single Interface number and stay in lockstep with the TOC: bumping `## Interface:` and updating the badge is **one change**, never deferred (documentation).
 
 ### 4. File listing
 

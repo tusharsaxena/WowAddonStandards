@@ -53,8 +53,9 @@ hand-runnable — no CI is required or expected**.
   (in the collection): the loot-history browser's runner grows a `--list` branch that groups the
   registered cases by their originating `test_*.lua` suite and prints the Markdown inventory.
 - **MUST** surface a **test-pass badge** in the README badge row (documentation-§1) showing
-  **X/Y passing** (passed / total) as a **static** shields.io badge
-  (`img.shields.io/badge/tests-<X>%2F<Y>_passing-brightgreen`). **MUST NOT** require CI, a
+  **X/Y passing** (passed / total) as a **static** shields.io badge — the canonical template
+  (documentation-§1 #5) is `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`
+  (label `Tests`, colour `green`, `%2F`-encoded slash). **MUST NOT** require CI, a
   dynamic/endpoint badge, or a GitHub Action to produce it.
 - **MUST** keep both in lockstep with the suite: whenever a case is added, removed, or renamed, or
   the pass count moves — i.e. **whenever a failing test is resolved** — regenerate `docs/test-cases.md`

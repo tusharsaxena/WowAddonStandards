@@ -9,7 +9,21 @@ Documentation is a **first-class compliance surface**, not an afterthought. Ever
 Every Ka0s `README.md` **MUST** follow one structure so all addons read identically. Reference implementation (in the collection): the consumables & macro manager's README. Sections in **this exact order**:
 
 1. **H1 title** — `# Ka0s <Name>`. **MUST**.
-2. **Badge row** — in order: a **`[wow]`** interface badge (in lockstep with the TOC `## Interface:`, toc-file-§3); a **published-version** badge (CurseForge/Wago) once published; a **`[tests]`** X/Y pass badge (static shields.io, testing-§5); a **`[license]`** MIT badge; and a badge/line linking the **Ka0s WoW Addon Standard** (<https://github.com/tusharsaxena/WowAddonStandards>). **MUST**.
+2. **Badge row** — a fixed set of five shields.io badges, in **this exact order**, matching these canonical templates verbatim (label casing, colours, and `%2F`-encoding included). **MUST**. Reference implementation (in the collection): the loot-history browser's README badge row.
+
+   | # | Badge | Canonical Markdown template | Kind |
+   |---|-------|-----------------------------|------|
+   | 1 | **`[wow]`** interface | `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)` | **Dynamic data, static badge — MUST track TOC `## Interface:`** |
+   | 2 | **published version** | `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)` | Live endpoint (auto-updates); add only once published |
+   | 3 | **`[license]`** | `![License](https://img.shields.io/badge/License-MIT-orange)` | Static |
+   | 4 | **standard** (linked) | `[![Standard](https://img.shields.io/badge/Ka0s-WoW%20Addon%20Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)` | Static |
+   | 5 | **`[tests]`** pass | `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)` | **Dynamic data, static badge — MUST track the test inventory (testing-§5)** |
+
+   - Placeholders: `<Expansion>` is the current Retail expansion name and `<X.Y.Z>` the client patch the TOC `## Interface:` encodes (e.g. `Midnight_12.0.7`); `<projectId>` is the CurseForge project id; `<X>`/`<Y>` are the passed/total case counts from the generated `docs/test-cases.md` (testing-§5).
+   - The **published-version** badge (#2) is a **live** shields.io endpoint that auto-updates from the distribution site — no manual upkeep; add it only after first publish (Wago's equivalent endpoint is acceptable in its place).
+   - **Keep-in-sync rule (MUST DO).** Badges #1 (`[wow]`) and #5 (`[tests]`) render **static text** and therefore go stale silently unless updated with the data they mirror. They **MUST** be updated **in the same change** that moves their source of truth, never deferred to a follow-up:
+     - **`[wow]`** — whenever the TOC `## Interface:` is bumped (each Retail patch, `wow-addon:bump-interface`), update the badge to the same expansion/client version so the two always show one number (toc-file-§3, versioning-git).
+     - **`[tests]`** — whenever the suite changes (a case added/removed/renamed, or the pass count moves — i.e. whenever a failing test is resolved), regenerate `docs/test-cases.md` and update the badge's `<X>/<Y>` together (testing-§5).
 3. **Logo** — the addon logo image. **MUST**.
 4. **Description** — 1–2 paragraphs of what the addon does and why; **MAY** inline a short feature bullet list **or a summary table** (e.g. the addon's core objects/commands at a glance) and a closing line on how to configure it (Blizzard Settings panel + `/<slash>`). **MUST**.
 5. **`## Screenshots`** — captioned images of the addon and its settings sub-panels. **SHOULD** (**MUST** once published).
