@@ -35,7 +35,7 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
   media/                   -- typed subfolders only (layout-§3)
   libs/                    -- vendored Ace3 + other libs, committed to git (library-stack-§3)
   tests/                   -- headless Lua 5.1 harness (testing)
-  docs/                    -- ARCHITECTURE.md, agent-context.md, smoke-tests.md, planning/reference (documentation)
+  docs/                    -- ARCHITECTURE.md, agent-context.md, testing.md, smoke-tests.md, planning/reference (documentation)
     audits/<YYYY-MM-DD>/   -- audit-run history (retained; audit-review-history)
     reviews/<YYYY-MM-DD>/  -- code-review history (retained; audit-review-history)
   README.md                -- full, user-facing (stays at root)

@@ -21,4 +21,5 @@
 | Root agent stub | `CLAUDE.md` (stub, incl. Standards-compliance section) | documentation-§2 |
 | Full agent brief | `docs/agent-context.md` (Hard rules → standard) | documentation-§3, documentation-§6 |
 | Engineer context | `docs/ARCHITECTURE.md` | documentation-§3 |
+| Testing guide | `docs/testing.md` | documentation-§3, testing |
 | Smoke-test suite | `docs/smoke-tests.md` | documentation-§3, audit-review-history |

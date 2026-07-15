@@ -64,3 +64,11 @@ hand-runnable — no CI is required or expected**.
 This complements §4: the green gate proves the suite passes on every commit; the inventory and badge
 make the coverage **visible and honest**, and are the standing defence against the count drift that
 silently creeps into hand-maintained status lines.
+
+### 6. The verify-how-to doc
+
+The human-facing "how to verify this addon" page — the commands and gate above (§2/§4), the local
+toolchain (§3), and pointers to `docs/test-cases.md` (§5) and `docs/smoke-tests.md` — lives at
+**`docs/testing.md`**, a **required** doc in the canonical `docs/` quartet (documentation-§3). It is
+the contributor-facing home for material the player-facing README deliberately excludes
+(documentation-§1); the README keeps only the `[tests]` badge.

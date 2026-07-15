@@ -34,7 +34,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 6. **`## Usage`** — **MUST**, with two subsections:
    - **`### Slash commands`** — one intro line (short + long slash form, and the `[XY]` chat prefix), then a **Command | What it does** table generated from `NS.COMMANDS` so it stays in lockstep with `/<slash> help` (slash-commands-§4).
    - **`### Settings panel`** — a **Tab | Covers** table, one row per settings subcategory (options-ui-§5). **MAY** follow the table with per-panel prose (bolded panel/section names + option bullets) where a panel is rich enough to warrant it.
-7. **`## How <it> works`** — **SHOULD** for addons whose result hinges on a non-obvious core mechanic (ranking, attribution, scheduling, pick-selection, …). A narrative explainer — a numbered pipeline or prose — of how the addon reaches its result, titled for the domain (e.g. `## How picking & ranking works`).
+7. **`## How <it> works`** — **MUST**. A short, player-facing narrative — a numbered pipeline or prose — of how the addon produces what the user sees, titled for the domain (e.g. `## How picking & ranking works`, `## How the bar works`). Center it on the addon's core mechanic (ranking, attribution, scheduling, pick-selection, the value it tracks, …) and describe what happens, not the code behind it. Required even when the mechanic is simple — give the reader the one-paragraph "what's going on" rather than omit the section.
 8. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
 9. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table.
 10. **`## Issues and feature requests`** — **MUST**. A short paragraph pointing users to the addon's **GitHub issues** (`<repo>/issues`) as the **single source of truth for the backlog**, asking them to file there rather than in comments. (This is why a released addon ships no `TODO.md` — documentation-§4.)
@@ -42,7 +42,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 
 There is **no** `## Testing` section in the README (removed in the standard's v2.1.0 — it was contributor-facing). How to verify the addon — the headless harness (`lua tests/run.lua`), lint (`luacheck .`), the generated case inventory (`docs/test-cases.md`, testing-§5), and the in-game smoke tests (`docs/smoke-tests.md`) — lives entirely under `docs/` (testing, audit-review-history). The README still carries the `[tests]` X/Y badge in its badge row (item 2); the badge is the only test-related thing that belongs in the README.
 
-- The optional sections (5, 7, 8, 9) are **SHOULD** — omit one only when it would be empty — but when present their **relative order MUST** be preserved.
+- The optional sections (5, 8, 9) are **SHOULD** — omit one only when it would be empty — but when present their **relative order MUST** be preserved.
 - `wow-addon:sync-docs` keeps the README's slash-command and version-history tables in lockstep with code; `wow-addon:standards-audit` flags a README that departs from this canonical structure.
 - The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `bump-version`).
 
@@ -60,13 +60,14 @@ Reference implementation (in the collection): the absorb-shield tracker's root `
 
 ### 3. `docs/`
 
-Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
+Every addon **MUST** ship this **canonical quartet** under `docs/` (all four are universal across the collection):
 
 - **`docs/agent-context.md`** — the **full agent-context pack**: the detailed working brief the root `CLAUDE.md` points to (stack, layout, hard rules, invariants, the `NS` bus, working environment, response style). This is the file that carries the full context the stub deliberately omits. Its **`## Hard rules`** section **MUST** open with the "conform to the Ka0s WoW Addon Standard" rule and point back to the root `CLAUDE.md` "Standards compliance" section (documentation-§6). Built by dropping in the contents of `NEW_ADDON_CONTEXT.md` (see that pack).
 - **`docs/ARCHITECTURE.md`** — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
-- **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from the README's Testing section.
+- **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page.
+- **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
-Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. One topic-detail doc is **required**, not optional: `docs/test-cases.md`, the generated test-case inventory (testing-§5). **MUST NOT** ship a `TODO.md` once released (documentation-§4).
+Beyond the quartet, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. One topic-detail doc is **required**, not optional: `docs/test-cases.md`, the generated test-case inventory (testing-§5). **MUST NOT** ship a `TODO.md` once released (documentation-§4).
 
 ### 4. No `TODO.md`
 
