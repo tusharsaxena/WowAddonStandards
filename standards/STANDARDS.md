@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v1.12.0, 2026-07-15)
+# Ka0s WoW Addon Standard (v1.13.0, 2026-07-15)
 
 **Status:** Source of truth. All audit deviation reports and `NEW_ADDON_CONTEXT.md` template content derive from this standard. When the standard changes, bump the date and version at the top of this file.
 
