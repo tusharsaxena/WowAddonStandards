@@ -49,8 +49,8 @@ If your addon formats chat:
 
 ### 6. Frame creation
 
-- **MUST** prefer Lua `CreateFrame` over XML for non-templated frames in Tier 1 addons.
-- **MAY** use XML for declarative groups of similar widgets in Tier 2 (the manifest-XML pattern used by auction-house addons).
+- **MUST** prefer Lua `CreateFrame` over XML for non-templated frames.
+- **MAY** use XML for declarative groups of similar widgets (the manifest-XML pattern used by auction-house addons).
 - **MUST** use object pooling for any high-churn UI (≥10 dynamic frames): an ~80-line object-pool mixin (Acquire/Release/HideAll), the pattern party-cooldown trackers use so roster churn becomes free.
 
 ### 7. Hot-path upvalue cache

@@ -46,7 +46,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 **A STUB** — a short pointer, **not** the full agent brief (the brief lives in `docs/agent-context.md`, documentation-§3). **MUST NOT** carry the full agent brief at root (anti-pattern #26). It **MUST** contain, in this order:
 
 1. **H1 title** — `# CLAUDE.md — Ka0s <Name>`.
-2. **Tier + adherence line** — names the tier (Tier 1 / Tier 2) and states the addon adheres to the **Ka0s WoW Addon Standard** with the repo URL <https://github.com/tusharsaxena/WowAddonStandards>.
+2. **Adherence line** — states the addon adheres to the **Ka0s WoW Addon Standard** with the repo URL <https://github.com/tusharsaxena/WowAddonStandards>.
 3. **`## Standards compliance (read first)` section** — **MUST** be present, verbatim in substance (documentation-§6). It states that all work here MUST conform to the standard; that a change which would deviate MUST **stop and be flagged** (never silently deviate, never silently "fix" to match); and that the user decides whether it is (a) an **accepted deviation** (recorded in the addon with a reason) or (b) a **change to the standard itself** (made upstream in this repo, after which the addon follows the new rule). Closes with "when in doubt, treat conformance as a hard requirement and ask."
 4. **A "read the docs" pointer list** — directs the reader into `docs/` for the full context: `docs/agent-context.md` (full brief) and `docs/ARCHITECTURE.md` (module map), then the topic-detail docs.
 5. **The green-gate line** — the commit gate (`lua tests/run.lua` + `luacheck .`), per testing.
@@ -57,7 +57,7 @@ Reference implementation (in the collection): the absorb-shield tracker's root `
 
 Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
 
-- **`docs/agent-context.md`** — the **full agent-context pack**: the detailed working brief the root `CLAUDE.md` points to (stack, tier layout, hard rules, invariants, the `NS` bus, working environment, response style). This is the file that carries the full context the stub deliberately omits. Its **`## Hard rules`** section **MUST** open with the "conform to the Ka0s WoW Addon Standard" rule and point back to the root `CLAUDE.md` "Standards compliance" section (documentation-§6). Built by dropping in the contents of `NEW_ADDON_CONTEXT.md` (see that pack).
+- **`docs/agent-context.md`** — the **full agent-context pack**: the detailed working brief the root `CLAUDE.md` points to (stack, layout, hard rules, invariants, the `NS` bus, working environment, response style). This is the file that carries the full context the stub deliberately omits. Its **`## Hard rules`** section **MUST** open with the "conform to the Ka0s WoW Addon Standard" rule and point back to the root `CLAUDE.md` "Standards compliance" section (documentation-§6). Built by dropping in the contents of `NEW_ADDON_CONTEXT.md` (see that pack).
 - **`docs/ARCHITECTURE.md`** — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from the README's Testing section.
 
@@ -87,7 +87,7 @@ The reference **MUST** appear in **all four** of these places (a Ka0s addon miss
 
 Items 1–2 already existed (toc-file-§1, documentation-§1); items 3–4 are the **memory-and-context** requirement: the standard reference lives inside the two documents an agent loads as working context, not only in shipping metadata. The `/wow-addon:standards-audit` playbook checks all four.
 
-Canonical wording (adapt the `<Name>`/tier; keep the substance verbatim):
+Canonical wording (adapt the `<Name>`; keep the substance verbatim):
 
 ```markdown
 <!-- in root CLAUDE.md -->

@@ -29,7 +29,7 @@ end
 
 ### 2. Defaults
 
-- **MUST** declare in `defaults/Profile.lua` (Tier 2) or in `Settings.lua` (Tier 1).
+- **MUST** declare in `defaults/Profile.lua`.
 - **MUST** be the **only** place a default value is hardcoded. Schema rows `default =` reference these constants if reused.
 
 ### 3. Per-zone profile trees (optional)

@@ -13,7 +13,7 @@ Every addon **MUST** ship a debug seam. Debug output **MUST** route to a **dedic
 
 ### 2. Monospace font (shipped)
 
-- The console log **MUST** render in a **monospace** font so timestamps and tags line up. The addon **SHOULD ship** a monospace TTF under `media/fonts/` (tiered-layout-§4) — e.g. **JetBrains Mono** (OFL) — **vendored with its license file**, rather than depending on a user-installed font. Register it with LibSharedMedia-3.0 at load (`LSM:Register("font", "<Name>", path)`) and expose the path as a constant (e.g. `NS.Constants.FONT_MONO`).
+- The console log **MUST** render in a **monospace** font so timestamps and tags line up. The addon **SHOULD ship** a monospace TTF under `media/fonts/` (layout-§3) — e.g. **JetBrains Mono** (OFL) — **vendored with its license file**, rather than depending on a user-installed font. Register it with LibSharedMedia-3.0 at load (`LSM:Register("font", "<Name>", path)`) and expose the path as a constant (e.g. `NS.Constants.FONT_MONO`).
 - Apply it with `SetFont(NS.Constants.FONT_MONO, 10, "")` — **10pt is the reference size** — to **both** the log and the Copy `EditBox` (so the copied view matches the console).
 
 ### 3. Line format — timestamped, tagged, coloured
@@ -69,7 +69,7 @@ The enabled-state (`NS.State.debug`) is a **runtime flag, independent of the con
 
 ### 7. Fallback
 
-- **Tier-1 utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
+- **Utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
 
 Note: user-facing chat messages (help index, command acks, errors) still go to chat through the shared `NS.Print` printer with `NS.PREFIX` (slash-commands-§4; the same single-seam, secret-safe rules apply — events-frames-taint-§8) — that ordinary chat seam is separate from the debug console.
 

@@ -28,7 +28,7 @@ For quick reference, the rules above as a do-not list:
 22. Deferring settings-**category** registration until first `/config`/panel-open — register the category eagerly at load; only the body is lazy (options-ui-§1, options-ui-§9).
 23. Committing with red `lua tests/run.lua` or non-clean `luacheck .` — the commit gate is green tests + clean lint (testing).
 24. No `tests/` harness, or a logic change with no covering test — TDD is mandatory (testing).
-25. Loose files directly in `media/` — use typed subfolders (tiered-layout-§4).
+25. Loose files directly in `media/` — use typed subfolders (layout-§3).
 26. Full agent brief in the root `CLAUDE.md` — root `CLAUDE.md` is a stub; the brief lives in `docs/` (documentation).
 27. A checked-in `TODO.md` in a **released** addon — track the backlog in GitHub issues; a `TODO.md` is allowed only in an unreleased, in-development addon during its development phase (documentation-§4).
 28. Non-canonical `README.md` section order, or a TOC that departs from the required field order / file-listing structure — follow documentation-§1 and toc-file-§1/toc-file-§5.

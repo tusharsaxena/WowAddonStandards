@@ -24,7 +24,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 ## X-WoWI-ID: <id>                       -- only if WoWI listing exists
 ```
 
-- **MUST** follow the field order above so every Ka0s TOC reads identically. The file listing that follows the metadata block has its own required structure (toc-file-§5). Reference implementation (in the collection): the Tier-2 modular tracker's TOC.
+- **MUST** follow the field order above so every Ka0s TOC reads identically. The file listing that follows the metadata block has its own required structure (toc-file-§5). Reference implementation (in the collection): the modular tracker's TOC.
 - **MUST** have `X-License: MIT`. **MUST NOT** ship "All Rights Reserved".
 - **MUST** have `X-Standard:` pointing at the standards repo, declaring the addon is built to this standard.
 - **MUST** have `X-Curse-Project-ID` and `X-Wago-ID` once an addon is published anywhere.
@@ -49,11 +49,11 @@ The collection targets **Retail (Mainline) only**. Classic/other flavors are out
 ### 4. File listing
 
 - **MUST** list `.lua` files in dependency-correct order. **MUST NOT** rely on alphabetical loading.
-- **SHOULD NOT** use `embeds.xml` at Tier 1. Tier 2 **MAY** use a single `embeds.xml` if file count justifies it — remove it if it doesn't earn its keep.
+- **MAY** use a single `embeds.xml` if file count justifies it — remove it if it doesn't earn its keep.
 
 ### 5. File-listing structure (after the metadata block)
 
-The metadata block (toc-file-§1) is followed by **one blank line**, then the file listing broken into **commented sections in load order**. Every Ka0s TOC uses the same section comments so the load order is self-documenting. Reference implementation (in the collection): the Tier-2 modular tracker's TOC.
+The metadata block (toc-file-§1) is followed by **one blank line**, then the file listing broken into **commented sections in load order**. Every Ka0s TOC uses the same section comments so the load order is self-documenting. Reference implementation (in the collection): the modular tracker's TOC.
 
 ```
 # Libraries (must load first)
@@ -84,6 +84,5 @@ settings\Panel.lua
 settings\...
 ```
 
-- **MUST** use `#` section headers, in the order **Libraries → Locales → Core → Defaults → Modules → Settings**, matching the Tier-2 load order (tiered-layout-§2). Libraries always load **first**; settings **last**.
-- **Tier 1** addons keep the `# Libraries (must load first)` section, then list their flat source files (`Compat.lua`, `Locale.lua`, `<Addon>.lua`, `Database.lua`, `Settings.lua`) in dependency order under a single `# Addon` section — no `core/`/`modules/` split (tiered-layout-§1).
+- **MUST** use `#` section headers, in the order **Libraries → Locales → Core → Defaults → Modules → Settings**, matching the load order (layout-§1). Libraries always load **first**; settings **last**.
 - **MUST** end the file with a single trailing newline.

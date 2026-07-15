@@ -15,7 +15,7 @@ The house standard for the Ka0s World of Warcraft addon collection — the canon
 These were validated against the Ka0s collection and the broader ecosystem (see [`INDUSTRY_RESEARCH.md`](INDUSTRY_RESEARCH.md)) and are now mandated by the standard:
 
 1. **Schema-as-single-source-of-truth** — one schema row drives panel widget + slash + defaults reset. (`architecture-§5`, MUST)
-2. **Modular `core/ modules/ defaults/ settings/ locales/` layout** — the canonical Tier 2 reference structure. (`tiered-layout-§2`)
+2. **Modular `core/ modules/ defaults/ settings/ locales/` layout** — the canonical reference structure, used by every addon. (`layout-§1`)
 3. **Chat-formatter via `_G[GLOBALSTRING]` override** instead of hooking chat events — architecturally taint-free. (`events-frames-taint-§5`, SHOULD)
 4. **Combat-lockdown discipline** — secure frame writes defer on `PLAYER_REGEN_ENABLED`, but the options-panel open **refuses** under lockdown (grey notice, no defer-replay). (`events-frames-taint-§2`, `options-ui-§2`)
 5. **Macro firewall** — a single module is the sole caller of protected `CreateMacro`/`EditMacro` APIs. (`events-frames-taint-§4`, MUST for any addon touching protected APIs)

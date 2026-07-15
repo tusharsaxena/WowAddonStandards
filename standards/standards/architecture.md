@@ -2,7 +2,7 @@
 
 ## Architecture
 
-### 1. Namespace bootstrap (both tiers)
+### 1. Namespace bootstrap
 
 Every file **MUST** start with:
 
@@ -20,9 +20,9 @@ local C = NS.C         -- profile defaults / current values cache
 local State = NS.State -- runtime state
 ```
 
-### 2. AceAddon registration (Tier 2 / any addon using Ace3 lifecycle)
+### 2. AceAddon registration (any addon using Ace3 lifecycle)
 
-Reference implementation (in the collection): the Tier-2 tracker promotes its bootstrap namespace to an AceAddon at `core/<AddonName>.lua`.
+Reference implementation (in the collection): the modular tracker promotes its bootstrap namespace to an AceAddon at `core/<AddonName>.lua`.
 
 ```lua
 local addonName, NS = ...
@@ -57,7 +57,7 @@ function M:HandleSomething(...) ... end
 - **MUST** publish modules via `NS.<Module> = NS.<Module> or {}` (idempotent) so file load order can be re-arranged without breakage.
 - **SHOULD NOT** call into another module's table at file-load. Cross-module wiring happens after `PLAYER_LOGIN` or via the message bus.
 
-### 4. Closed message bus (Tier 2)
+### 4. Closed message bus
 
 Modules **MUST** communicate via named messages, not direct calls.
 
@@ -110,11 +110,11 @@ NS.Schema = {
 
 ### 6. Two-phase init (only when needed)
 
-For Tier 2 addons with ≥6 modules, **SHOULD** use a two-phase init pattern (as large UI suites do): an "initial" queue that runs before AceDB is ready (Compat shims, Constants), and a "regular" queue that runs after (`OnInitialize`/`OnEnable`).
+For addons with ≥6 modules, **SHOULD** use a two-phase init pattern (as large UI suites do): an "initial" queue that runs before AceDB is ready (Compat shims, Constants), and a "regular" queue that runs after (`OnInitialize`/`OnEnable`).
 
 ### 7. Prototype registry (optional)
 
-For Tier 2 addons where TOC ordering has been fragile, **MAY** use a lazy table cache (the pattern large boss-mods use for their module prototypes):
+For addons where TOC ordering has been fragile, **MAY** use a lazy table cache (the pattern large boss-mods use for their module prototypes):
 
 ```lua
 NS._prototypes = setmetatable({}, { __index = function(t, k) t[k] = {}; return t[k] end })

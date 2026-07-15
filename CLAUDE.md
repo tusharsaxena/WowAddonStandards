@@ -36,7 +36,7 @@ standards/                        -- THE STANDARD (living, canonical). Everythin
   README.md                       -- what's in standards/ + how to rebuild the standard
   EXECUTIVE_SUMMARY.md            -- one-page TL;DR of the standard
   STANDARDS.md                    -- THE STANDARD: index/entry point + the Sections map (canonical)
-  standards/                      -- the standard's sections, one unnumbered file each (tiered-layout.md, ...)
+  standards/                      -- the standard's sections, one unnumbered file each (layout.md, ...)
   NEW_ADDON_CONTEXT.md            -- drop-in CLAUDE.md context pack for new addons (NEW_ADDON.md's detail)
   INDUSTRY_RESEARCH.md            -- research foundation: patterns from 10 reference addons
   ADDONS.md                       -- THE ROSTER: editable list of in-scope addons (standards-process input)
@@ -56,7 +56,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   edit that one file. Don't hard-code the addon list elsewhere; point at `standards/ADDONS.md`.
 - **`standards/STANDARDS.md` is canonical.** When docs conflict, it wins. It is the **index/entry
   point**: the normative rules are split into one file per section under `standards/standards/`
-  (unnumbered topic names — `tiered-layout.md`, `architecture.md`, …), and `STANDARDS.md` carries the
+  (unnumbered topic names — `layout.md`, `architecture.md`, …), and `STANDARDS.md` carries the
   front matter, the reading guide, the **Sections** map, and the changelog. It is **living**: every
   substantive change bumps the version + date and adds a changelog entry at its top (git history
   carries the rest). When you add, split, or reorder a section, update the Sections list in

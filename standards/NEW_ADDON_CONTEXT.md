@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v1.4.0, 2026-07-13)
+# New Ka0s Addon — Context Pack (v2.0.0, 2026-07-15)
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -19,9 +19,9 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
 2. **Drop in this pack.** Put the contents of this file into the new addon's `docs/` as the full agent
    context, and leave a short root `CLAUDE.md` stub pointing to it (documentation), so every agent and
    contributor has the full standards brief with no external lookups.
-3. **Pick a tier and lay out files.** Tier 1 (flat, ≤8 files) or Tier 2 (modular) — see *Pick a tier*
-   below. Copy the vendored `libs/` set you actually `LibStub()` from an existing Ka0s addon so
-   versions stay consistent.
+3. **Lay out files.** Use the modular `core/ defaults/ settings/ locales/ modules/` layout — see
+   *Layout* below (it is the only layout; a small addon just has thin folders). Copy the vendored
+   `libs/` set you actually `LibStub()` from an existing Ka0s addon so versions stay consistent.
 4. **Fill in the starters.** Work through the *Starter snippets* (TOC, entry, `Compat`, `Locale`,
    `Database`, `Settings`, debug console, tests, message bus, `.luacheckrc`, `.pkgmeta`) and the
    *Hard rules cheat sheet* below. When stuck, reproduce the described patterns in *Patterns to
@@ -49,39 +49,13 @@ Then keep it compliant over time with the `wow-addon:` skills listed at the end 
 - **Folder name:** PascalCase = TOC Title's CamelCase form (minus `Ka0s `)
 - **Standard:** built to & references <https://github.com/tusharsaxena/WowAddonStandards>
 
-## Pick a tier
+## Layout
 
-- **Tier 1 (flat, ≤8 source files)** — utility addons. Reference: a small flat utility addon (a few source files, one Settings module, no `core/`/`modules/` split).
-- **Tier 2 (modular)** — multi-feature addons. Reference: the collection's Tier-2 modular tracker (`core/`, `modules/`, `defaults/`, `settings/`, `locales/`, a closed message bus).
-
-If unsure, start Tier 1; promote when file count would exceed 8. Tier 1 → Tier 2 promotion is mechanical (move files into `core/` `modules/` `defaults/` `settings/` `locales/`).
+Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ locales/ modules/` — no matter how small (layout). There is no flat variant: a three-file utility and a multi-feature suite share the same skeleton, so every repo reads identically and each file has one obvious home. A small addon simply has thin folders (a single `modules/` file, a one-row `settings/Schema.lua`), not a different structure.
 
 ---
 
-## Tier 1 starter tree
-
-```
-<Addon>/
-  <Addon>.toc
-  <Addon>.lua            -- entry, AceAddon registration, message bus init
-  Settings.lua           -- Schema rows + AceDB defaults + panel registration + slash dispatch
-  Locale.lua             -- L = setmetatable({}, {__index=function(_,k) return k end})
-  Compat.lua             -- deprecated-API shims (start as empty scaffold)
-  Database.lua           -- migration runner (start as empty function)
-  README.md              -- FULL, user-facing (root)
-  CLAUDE.md              -- STUB pointer into docs/ (root)
-  LICENSE                -- MIT full text (root)
-  .luacheckrc
-  .pkgmeta
-  libs/                  -- vendored, committed
-  media/                 -- typed subfolders: logos/, screenshots/, ...
-  tests/                 -- run.lua, loader.lua, wow_mock.lua, test_*.lua
-  docs/                  -- agent-context.md (this pack) + ARCHITECTURE.md + smoke-tests.md; no TODO.md once released (documentation-§4)
-    audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
-    reviews/<YYYY-MM-DD>/-- retained code-review history (audit-review-history)
-```
-
-## Tier 2 starter tree
+## Starter tree
 
 ```
 <Addon>/
@@ -149,13 +123,24 @@ libs\AceAddon-3.0\AceAddon-3.0.xml
 # Locales
 locales\enUS.lua
 
-# Tier 1: one # Addon section, files in dependency order
-# (Tier 2: # Core / # Defaults / # Modules / # Settings sections instead — toc-file-§5)
-Compat.lua
-Locale.lua
-<Addon>.lua
-Database.lua
-Settings.lua
+# Core
+core\Compat.lua
+core\Constants.lua
+core\State.lua
+core\Util.lua
+core\<Addon>.lua
+core\Database.lua
+
+# Defaults
+defaults\Profile.lua
+
+# Modules
+modules\<Feature>.lua
+
+# Settings (last — depend on everything else being initialized)
+settings\Schema.lua
+settings\Panel.lua
+settings\Slash.lua
 ```
 
 The `## Interface:` is a **single** latest-Retail number (Retail only, toc-file-§3); bump it each patch with `wow-addon:bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
@@ -327,7 +312,7 @@ end
 
 The console: a `BackdropTemplate` frame (`<Addon>DebugWindow`) on `DIALOG` strata, **default size `700×344`**, draggable title bar, a `ScrollingMessageFrame` (`SetMaxLines(500)`) rendered in a **shipped monospace font** (`media/fonts/`, e.g. JetBrains Mono OFL, LSM-registered) at **10pt**. Lines follow `<HH:MM:SS> | [<Tag>] <content>` — timestamp coloured `6f8faf`, `[tag]` `c9a66b`, separator/content white; the plain **Copy buffer** mirrors the same line code-free (two pure formatters, `FormatPlain`/`FormatColored`). **Clear** + **Copy** (copy = read-through multiline `EditBox`, same font), registered in `UISpecialFrames`, reusing the addon's `SKIN`/`ApplySkin` seam (standalone-windows).
 
-**Enabled-state is session-only and window-independent** (debug-logging-§5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. Each state change prints a `NS.PREFIX`-tagged chat ack whose state word is **colour-coded** — `ON` green (`40ff40`) / `OFF` red (`ff4040`) — mirroring the toggle. The `SetEnabled` seam **also appends a console line at both transitions** — `[Debug] logging enabled` / `[Debug] logging disabled` — via the raw `DebugLog:Add` (the disable line must land after the flag flips off, so it can't go through the gated `NS.Debug` sink), and on **enable** additionally emits a one-line **`[Init]` session summary** (addon + version, schema version, active profile — e.g. `[Init] KickCD v1.2.0, schema v1, profile 'Default'`) right after the enable bracket; it rides the enable seam, **not** login, because the session-only flag is off at login and a load-time summary would never render. Tier-1 addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
+**Enabled-state is session-only and window-independent** (debug-logging-§5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. Each state change prints a `NS.PREFIX`-tagged chat ack whose state word is **colour-coded** — `ON` green (`40ff40`) / `OFF` red (`ff4040`) — mirroring the toggle. The `SetEnabled` seam **also appends a console line at both transitions** — `[Debug] logging enabled` / `[Debug] logging disabled` — via the raw `DebugLog:Add` (the disable line must land after the flag flips off, so it can't go through the gated `NS.Debug` sink), and on **enable** additionally emits a one-line **`[Init]` session summary** (addon + version, schema version, active profile — e.g. `[Init] KickCD v1.2.0, schema v1, profile 'Default'`) right after the enable bracket; it rides the enable seam, **not** login, because the session-only flag is off at login and a load-time summary would never render. Addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
 
 ### Tests (`tests/`, testing)
 
@@ -417,7 +402,7 @@ Root ships a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`; everyt
 <!-- root CLAUDE.md (STUB — never the full brief) -->
 # CLAUDE.md — Ka0s <Name>
 
-**Tier <1|2>** WoW addon. Adheres to the **Ka0s WoW Addon Standard** —
+**Ka0s WoW addon.** Adheres to the **Ka0s WoW Addon Standard** —
 https://github.com/tusharsaxena/WowAddonStandards
 
 ## Standards compliance (read first)
@@ -440,7 +425,7 @@ When in doubt, treat standard conformance as a hard requirement and ask.
 
 Start here, then read the docs:
 
-- **`docs/agent-context.md`** — the full agent brief (stack, tier layout, hard rules, invariants,
+- **`docs/agent-context.md`** — the full agent brief (stack, layout, hard rules, invariants,
   the `NS` bus, working environment, response style).
 - **`docs/ARCHITECTURE.md`** — module map, settings schema, message bus, slash surface, event
   wiring, taint notes, known limitations.
@@ -542,7 +527,7 @@ push and never bump the version without an explicit instruction.
 - [ ] AceConsole `:RegisterChatCommand` registered.
 - [ ] Options panel uses `Settings.RegisterCanvasLayoutCategory`, **category registered eagerly at load** (entry always visible), **body built lazily** on first `OnShow`.
 - [ ] Combat-lockdown: secure writes defer on `PLAYER_REGEN_ENABLED`; options-panel open **refuses** under lockdown (grey notice, no defer — options-ui-§2).
-- [ ] Debug **console** (debug-logging) — on-screen, styled like the main window; monospace font (10pt) + tagged colour-coded lines `<ts> | [<Tag>] <content>`; `/<slash> debug` toggles the window, `/<slash> debug on|off` set logging (colour-coded `ON` green / `OFF` red chat ack); enabled-state **session-only** (never in SV), decoupled from window visibility; title-bar `Debug: ON/OFF` toggle; on enable emits an `[Init]` session summary (addon+version, schema, profile). (Tier-1 no-window addons MAY use chat.)
+- [ ] Debug **console** (debug-logging) — on-screen, styled like the main window; monospace font (10pt) + tagged colour-coded lines `<ts> | [<Tag>] <content>`; `/<slash> debug` toggles the window, `/<slash> debug on|off` set logging (colour-coded `ON` green / `OFF` red chat ack); enabled-state **session-only** (never in SV), decoupled from window visibility; title-bar `Debug: ON/OFF` toggle; on enable emits an `[Init]` session summary (addon+version, schema, profile). (No-window addons MAY use chat.)
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
 - [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; canonical `docs/` trio present (`agent-context.md`, `ARCHITECTURE.md`, `smoke-tests.md`); passes the drift check.
@@ -565,7 +550,7 @@ named evidence is in `INDUSTRY_RESEARCH.md`.)
 |---|---|
 | Schema structure | A single `Schema` table whose rows (`path/default/type/label/widget/validate/onChange`) drive AceDB defaults, AceGUI widgets, slash dispatch, and reset — with a boot-time validator that warns on any `path` not resolving against defaults. |
 | Macro/protected-API firewall | A single `MacroManager`-style module that is the **only** caller of `CreateMacro`/`EditMacro`; no other file touches protected macro APIs. |
-| Tier-2 modular layout | `core/` + `modules/` + `defaults/` + `settings/` + `locales/` with strict TOC load order and idempotent `NS.<Module> = NS.<Module> or {}` publication. |
+| Modular layout | `core/` + `modules/` + `defaults/` + `settings/` + `locales/` with strict TOC load order and idempotent `NS.<Module> = NS.<Module> or {}` publication. |
 | Closed message bus | A handful of `Ka0s_<Addon>_*` messages, one sender each, documented in `docs/ARCHITECTURE.md`; consumers register by name, no cross-module table reach. |
 | Compat module | One `Compat.lua` that owns every deprecated/cross-patch API call and exposes shimmed wrappers (`Compat.GetSpellInfo`, `Compat.GetSpecialization`). |
 | Taint-free chat formatting | Override `_G[GLOBALSTRING]` values rather than hooking chat events or replacing `AddMessage`; order filter registration deterministically. |

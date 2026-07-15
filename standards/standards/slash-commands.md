@@ -40,7 +40,7 @@ NS.COMMANDS = {
 
 ### 4. Help output & chat tag
 
-Reference implementations (in the collection): the Tier-2 tracker's `printHelp` and the loot-history browser's `settings/Slash.lua`.
+Reference implementations (in the collection): the modular tracker's `printHelp` and the loot-history browser's `settings/Slash.lua`.
 
 - Every line the addon prints to chat **MUST** carry a short **bracketed tag** — the addon's initials in `[...]`, wrapped in **the cyan colour code** — exposed as a **single shared constant** (`NS.PREFIX`) so every module prints identically. Required format: `|cff00ffff[XY]|r` (initials `XY`, colour `00ffff` cyan). The **cyan colour is mandatory**, not merely an example: every Ka0s addon shares the same tag colour so a user running several recognises them at a glance. **MUST NOT** hand-write `"|cff…" .. addonName .. "|r"` per call site, and **MUST NOT** substitute a different colour.
 - The printer **MUST** be **secret-safe** (events-frames-taint-§8): build each line from the secret-safe stringifier, not raw `tostring` / `..` / `table.concat`, so a combat-protected value logs as `<secret>` instead of raising. A printer that concatenates raw args crashes the moment it is handed a combat "secret" value.
@@ -101,4 +101,4 @@ end
 - A **single shared value formatter** (e.g. `NS.FormatSchemaValue(row, v)`) **MUST** produce these value strings for both `list` and `get`/`set`, so the two paths can never diverge. Likewise the coloured **`key = value` line** (gold key + white value) **MUST** come from **one shared helper** (e.g. `FormatKV(path, valueStr)`) reused by the `list` rows and the `get`/`set` echo, so the colouring can never drift between them.
 - Unknown path → `Setting not found: <path>`; a missing / empty argument → a `Usage: …` line.
 
-Reference implementation: the Tier-2 tracker's `listSettings` / `getSetting` / `setSetting` in `settings/Slash.lua`.
+Reference implementation: the modular tracker's `listSettings` / `getSetting` / `setSetting` in `settings/Slash.lua`.

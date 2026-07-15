@@ -8,7 +8,7 @@ This playbook is the entry point; the substance lives in `standards/`:
 
 - **[`standards/STANDARDS.md`](standards/STANDARDS.md)** — the canonical rules (the `§`-sections).
 - **[`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md)** — the full context pack:
-  kickstart walkthrough, tier trees, starter snippets (TOC, entry, `Compat`, `Locale`, `Database`,
+  kickstart walkthrough, the modular starter tree, starter snippets (TOC, entry, `Compat`, `Locale`, `Database`,
   `Settings`, debug console, tests, message bus, `.luacheckrc`, `.pkgmeta`), hard-rules cheat sheet,
   and the Definition-of-Done checklist. **Drop this file's contents into the new addon** (see step 2).
 
@@ -21,9 +21,9 @@ This playbook is the entry point; the substance lives in `standards/`:
    addon's `docs/` as the full agent context, and leave a short root `CLAUDE.md` **stub** that points
    to it (documentation). Now every agent and contributor has the complete standards brief with no external
    lookups.
-3. **Pick a tier and lay out files.** **Tier 1** (flat, ≤8 source files) for utility addons, or
-   **Tier 2** (modular: `core/ modules/ defaults/ settings/ locales/`) for multi-feature addons. See
-   *Pick a tier* and the starter trees in the context pack. Copy the vendored `libs/` set you actually
+3. **Lay out files.** Use the single modular layout — `core/ modules/ defaults/ settings/ locales/` —
+   for every addon regardless of size (a small addon just has thin folders). See *Layout* and the
+   starter tree in the context pack. Copy the vendored `libs/` set you actually
    `LibStub()` from an existing Ka0s addon so versions stay consistent (library-stack-§3 — libraries are vendored
    and committed).
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
