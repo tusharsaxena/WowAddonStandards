@@ -32,8 +32,10 @@ end
 
 ### 2. Combat lockdown
 
-- **MUST** check `InCombatLockdown()` before **opening** the options panel from slash; defer with `RegisterEvent("PLAYER_REGEN_ENABLED")` and one-shot replay. (This gates panel *open*, not category *registration*, which happens taint-free at load per options-ui-§1.)
-- **SHOULD** apply the same gate to any settings setter that creates/destroys frames.
+- **MUST** check `InCombatLockdown()` before **opening** the options panel — for the `config` slash verb **and** every programmatic caller. Put the gate **inside the panel-open function itself** (not only the slash dispatcher) so other addons, `/run` scripts, and future internal callers are gated too. (This gates panel *open*, not category *registration*, which happens taint-free at load per options-ui-§1.)
+- Under lockdown the addon **MUST refuse** the open: print a single `NS.PREFIX`-tagged **grey notice** and return. The canonical text is **"cannot open settings during combat — Blizzard's category-switch is protected"**. It **MUST NOT** call the protected category-switch (`Settings.OpenToCategory`) under lockdown — doing so taints the panel for the rest of the session — and **MUST NOT** silently no-op.
+- **MUST NOT** defer-and-replay the open (registering `PLAYER_REGEN_ENABLED` to auto-open when combat ends). A panel that pops itself open the instant combat drops is surprising and steals focus during post-pull recovery; the house behaviour is an explicit, greppable refusal now, and the user re-runs `/<slash> config` when they choose. *(The safe move for a taint-prone protected path is to not touch it at all and say why — distinct from a deferred **secure frame write**, which legitimately queues on `PLAYER_REGEN_ENABLED`; see events-frames-taint-§2.)* Reference implementation (in the collection): the chat-formatting addon refuses in its `OpenConfig` with exactly this grey notice.
+- **SHOULD** apply the same `InCombatLockdown()` gate to any settings setter that creates/destroys frames.
 
 ### 3. Profiles sub-page
 
