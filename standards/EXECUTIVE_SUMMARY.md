@@ -8,7 +8,7 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in four places** — the TOC `X-Standard` field, the README standard badge, the root `CLAUDE.md` "Standards compliance (read first)" section, and `docs/agent-context.md`'s "Hard rules" — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v1.7.0**).
+**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in four places** — the TOC `X-Standard` field, the README standard badge, the root `CLAUDE.md` "Standards compliance (read first)" section, and `docs/agent-context.md`'s "Hard rules" — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v1.10.0**).
 
 ## The five patterns it makes canonical
 
@@ -17,7 +17,7 @@ These were validated against the Ka0s collection and the broader ecosystem (see 
 1. **Schema-as-single-source-of-truth** — one schema row drives panel widget + slash + defaults reset. (`architecture-§5`, MUST)
 2. **Modular `core/ modules/ defaults/ settings/ locales/` layout** — the canonical Tier 2 reference structure. (`tiered-layout-§2`)
 3. **Chat-formatter via `_G[GLOBALSTRING]` override** instead of hooking chat events — architecturally taint-free. (`events-frames-taint-§5`, SHOULD)
-4. **Combat-lockdown discipline** — deferred SettingsPanel / UISpecialFrames / popup in a layered cascade. (`events-frames-taint-§2`)
+4. **Combat-lockdown discipline** — secure frame writes defer on `PLAYER_REGEN_ENABLED`, but the options-panel open **refuses** under lockdown (grey notice, no defer-replay). (`events-frames-taint-§2`, `options-ui-§2`)
 5. **Macro firewall** — a single module is the sole caller of protected `CreateMacro`/`EditMacro` APIs. (`events-frames-taint-§4`, MUST for any addon touching protected APIs)
 
 ## How to use it

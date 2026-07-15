@@ -268,6 +268,7 @@ local COMMANDS = {
   { name = "list",   desc = "List all",     fn = function() S:CliList() end },
   { name = "reset",  desc = "Reset one",    fn = function(arg) S:CliReset(arg) end },
   { name = "resetall", desc = "Reset all",  fn = function() S:CliResetAll() end },
+  { name = "version", desc = "Print addon version", fn = function() NS.Print("v" .. (GetAddOnMetadata(NS.name, "Version") or NS.VERSION)) end },  -- MUST (slash-commands-§3): TOC Version, in-code constant fallback; prints `<tag> v<version>`
   { name = "preview", desc = "Toggle preview", fn = function() NS:TogglePreview() end },  -- if preview-mode applies
   { name = "debug",  desc = "Window; 'on'/'off' set logging", fn = function(rest)  -- debug-logging (on|off|toggle)
       local a = rest and tostring(rest):lower():match("^%s*(%S*)") or ""
@@ -291,7 +292,7 @@ function NS.addon:OnSlash(input)
   for _, cmd in ipairs(COMMANDS) do
     if cmd.name == verb:lower() then return cmd.fn(rest) end
   end
-  print(NS.PREFIX .. " unknown command '" .. verb .. "'"); S:PrintHelp()
+  NS.Print("unknown command:", verb); S:PrintHelp()   -- shared secret-safe printer; never global print()/NS.PREFIX ../concat (events-frames-taint-§8)
 end
 ```
 
@@ -475,7 +476,7 @@ push and never bump the version without an explicit instruction.
 9. Schema-as-single-source: one table drives panel widgets + slash + defaults reset. One write seam.
 10. Closed message bus: modules talk via `Ka0s_<Addon>_<Event>` messages, one sender each. No cross-module table reach.
 11. All deprecated-API calls live in `Compat.lua`. Modules call `NS.Compat.X`. No `WOW_PROJECT_ID` flavor branching (Retail only).
-12. Combat lockdown: gate `InCombatLockdown()` (secure writes only — panel-open, settings setters, secure-frame attributes); defer with `PLAYER_REGEN_ENABLED`. For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
+12. Combat lockdown: gate `InCombatLockdown()` (secure writes — settings setters, secure-frame attributes) and defer those with `PLAYER_REGEN_ENABLED`. **Exception — options-panel open (options-ui-§2): refuse under lockdown, do not defer.** Print a grey `NS.PREFIX` notice ("cannot open settings during combat — Blizzard's category-switch is protected") and return; **never** `Settings.OpenToCategory` under lockdown, and **never** auto-open on `PLAYER_REGEN_ENABLED`. For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
 13. Per-frame loops: cache db values into module locals, refresh via `M:RefreshUpvalues()` on settings change.
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
 15. File LOC cap: ~1500. Peel when exceeded.
@@ -538,7 +539,7 @@ push and never bump the version without an explicit instruction.
 - [ ] Settings module exposes Schema with at least one row, single write seam, slash dispatch from `COMMANDS` table.
 - [ ] AceConsole `:RegisterChatCommand` registered.
 - [ ] Options panel uses `Settings.RegisterCanvasLayoutCategory`, **category registered eagerly at load** (entry always visible), **body built lazily** on first `OnShow`.
-- [ ] Combat-lockdown guard on panel-open.
+- [ ] Combat-lockdown: secure writes defer on `PLAYER_REGEN_ENABLED`; options-panel open **refuses** under lockdown (grey notice, no defer — options-ui-§2).
 - [ ] Debug **console** (debug-logging) — on-screen, styled like the main window; monospace font (10pt) + tagged colour-coded lines `<ts> | [<Tag>] <content>`; `/<slash> debug` toggles the window, `/<slash> debug on|off` set logging; enabled-state **session-only** (never in SV), decoupled from window visibility; title-bar `Debug: ON/OFF` toggle. (Tier-1 no-window addons MAY use chat.)
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
@@ -566,7 +567,7 @@ named evidence is in `INDUSTRY_RESEARCH.md`.)
 | Closed message bus | A handful of `Ka0s_<Addon>_*` messages, one sender each, documented in `docs/ARCHITECTURE.md`; consumers register by name, no cross-module table reach. |
 | Compat module | One `Compat.lua` that owns every deprecated/cross-patch API call and exposes shimmed wrappers (`Compat.GetSpellInfo`, `Compat.GetSpecialization`). |
 | Taint-free chat formatting | Override `_G[GLOBALSTRING]` values rather than hooking chat events or replacing `AddMessage`; order filter registration deterministically. |
-| Combat-lockdown cascade | A layered `InCombatLockdown()` guard at config-open → settings-register → frame-show, each deferring on `PLAYER_REGEN_ENABLED`. |
+| Combat-lockdown cascade | A layered `InCombatLockdown()` guard on secure writes (settings-setter → secure-frame-show), each deferring on `PLAYER_REGEN_ENABLED`. **Config-open is the exception: it refuses with a grey notice, never defers** (options-ui-§2). |
 | Eager settings registration + lazy body | Register the Blizzard **category** at load (bootstrap on `ADDON_LOADED(Blizzard_Settings)`/`PLAYER_LOGIN`, or in `OnInitialize`); build the panel body only in the first `OnShow`. |
 | On-screen debug console | A `DIALOG`-strata `700×344` `BackdropTemplate` window; a `ScrollingMessageFrame` in a shipped monospace font (10pt) with tagged, colour-coded lines (`<ts> \| [<Tag>] <content>`), Clear/Copy, `UISpecialFrames`, reusing the main window's `SKIN`/`ApplySkin`; a gated `NS.Debug(tag, …)` sink that appends there instead of chat; session-only window-independent enabled-state with a title-bar `Debug: ON/OFF` toggle. |
 | Preview/test mode | Placeholder data fed through the real render path while the display is unlocked and/or via `/<slash> preview`. |
