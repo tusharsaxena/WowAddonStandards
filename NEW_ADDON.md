@@ -32,9 +32,11 @@ This playbook is the entry point; the substance lives in `standards/`:
    registration (options-ui-§1), the debug console (debug-logging), and the message bus (architecture-§4).
 5. **Write tests first.** Stand up `tests/` (headless Lua 5.1 harness) and drive every behavior
    **test-first** (testing). `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
-6. **Write the README to the canonical structure.** Root `README.md` follows documentation-§1 (title → badges
+6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
+   (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
    incl. the standard-link badge → logo → description → Screenshots → Usage → How it works → FAQ →
-   Troubleshooting → Issues and feature requests → Testing → Version History).
+   Troubleshooting → Issues and feature requests → Version History — there is **no** `## Testing` section;
+   verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
 7. **Check the Definition of Done.** Walk the DoD checklist at the bottom of the context pack before
    tagging `v0.1.0`.
 8. **Register in the roster.** Add the addon's row to
@@ -56,4 +58,4 @@ This playbook is the entry point; the substance lives in `standards/`:
 - **The context pack is the source of detail.** Don't restate its snippets here — read them from
   `standards/NEW_ADDON_CONTEXT.md`. When the two disagree, the standard/context-pack wins.
 - **Keep it maintainable afterward** with the `wow-addon:` skills (`review`, `sync-docs`,
-  `version-bump`, `bump-interface`, `standards-audit`).
+  `bump-version`, `bump-interface`, `standards-audit`).

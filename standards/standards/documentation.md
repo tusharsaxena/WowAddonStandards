@@ -6,6 +6,10 @@ Documentation is a **first-class compliance surface**, not an afterthought. Ever
 
 ### 1. Root `README.md` — canonical structure
 
+The README is a **player-facing** document. It **MUST** be written for the person who installed the addon, not for a contributor: what the addon does, how to use it, and how to fix common problems. Developer- and contributor-facing material — the test harness, lint, build/packaging, and internal implementation detail — **MUST NOT** appear in the README; it lives under `docs/` (how to verify in `docs/testing.md`, the engineer brief in `docs/ARCHITECTURE.md` and `docs/agent-context.md`).
+
+Write it in **plain language**. Prose **MUST** be short, direct, and free of internal jargon — describe what the player sees, not the code behind it. A reader should never need a term from the codebase (schema, export contract, denormalized row, message bus, and the like) to understand the README, and should not be able to tell it was written by a machine: no stacked em-dash clauses, no hedging, no filler that restates the same point.
+
 Every Ka0s `README.md` **MUST** follow one structure so all addons read identically. Reference implementation (in the collection): the consumables & macro manager's README. Sections in **this exact order**:
 
 1. **H1 title** — `# Ka0s <Name>`. **MUST**.
@@ -34,12 +38,13 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 8. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
 9. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table.
 10. **`## Issues and feature requests`** — **MUST**. A short paragraph pointing users to the addon's **GitHub issues** (`<repo>/issues`) as the **single source of truth for the backlog**, asking them to file there rather than in comments. (This is why a released addon ships no `TODO.md` — documentation-§4.)
-11. **`## Testing`** — **MUST**. How to verify: the headless harness (`lua tests/run.lua`), lint (`luacheck .`), the generated case inventory (`docs/test-cases.md`, testing-§5), and the in-game smoke-test suite (link `docs/smoke-tests.md`), with a note to run it before tagging a release or after bumping `## Interface:` / refreshing libs (testing, audit-review-history). The README's `[tests]` X/Y badge (testing-§5) is hand-maintained alongside the inventory.
-12. **`## Version History`** — **MUST**. A **Version | Date | Highlights** table, most-recent first.
+11. **`## Version History`** — **MUST**. A **Version | Date | Highlights** table, most-recent first, written for players — user-visible changes, not internal refactors.
+
+There is **no** `## Testing` section in the README (removed in the standard's v2.1.0 — it was contributor-facing). How to verify the addon — the headless harness (`lua tests/run.lua`), lint (`luacheck .`), the generated case inventory (`docs/test-cases.md`, testing-§5), and the in-game smoke tests (`docs/smoke-tests.md`) — lives entirely under `docs/` (testing, audit-review-history). The README still carries the `[tests]` X/Y badge in its badge row (item 2); the badge is the only test-related thing that belongs in the README.
 
 - The optional sections (5, 7, 8, 9) are **SHOULD** — omit one only when it would be empty — but when present their **relative order MUST** be preserved.
-- `wow-addon:normalize-readme` reshapes a README to this structure; `wow-addon:sync-docs` keeps the slash-command and version-history tables in lockstep with code.
-- The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `version-bump`).
+- `wow-addon:sync-docs` keeps the README's slash-command and version-history tables in lockstep with code; `wow-addon:standards-audit` flags a README that departs from this canonical structure.
+- The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `bump-version`).
 
 ### 2. Root `CLAUDE.md` — stub
 

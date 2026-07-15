@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.0.0, 2026-07-15)
+# New Ka0s Addon — Context Pack (v2.1.0, 2026-07-15)
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -33,7 +33,7 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
    is the only edit needed to bring a new addon into the collection.
 
 Then keep it compliant over time with the `wow-addon:` skills listed at the end of this file
-(`review`, `sync-docs`, `version-bump`, …) and re-audit it as part of the collection.
+(`review`, `sync-docs`, `bump-version`, …) and re-audit it as part of the collection.
 
 ---
 
@@ -471,11 +471,11 @@ push and never bump the version without an explicit instruction.
 19. Tests: ship a headless `tests/` harness. TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**.
 19a. Test-case inventory & badge (testing-§5): ship a **generated** `docs/test-cases.md` (full per-suite case enumeration + totals, produced by a `--list` mode of the runner — `lua tests/run.lua --list > docs/test-cases.md`, never hand-authored; it is the authoritative pass count) and a **static** X/Y `[tests]` README badge. Regenerate the doc and update the badge **in the same change** whenever the suite changes (a case added/removed/renamed or the count moved). No CI.
 20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else under `docs/`. Canonical `docs/` trio (all addons): **`agent-context.md`** (full agent brief), `ARCHITECTURE.md`, `smoke-tests.md`; topic-detail docs as needed. Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
-20a. `README.md` follows the **canonical section order** (documentation-§1): title → badges (`[wow]` → version → license → standard → `[tests]`, that exact order and these exact templates: `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)`, `![License](https://img.shields.io/badge/License-MIT-orange)`, `[![Standard](https://img.shields.io/badge/Ka0s-WoW%20Addon%20Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)`, `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`; the `[wow]` and `[tests]` badges MUST be updated in lockstep with the TOC `## Interface:` and the test inventory respectively) → logo → description → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Testing → Version History. TOC follows the fixed field order + `#`-section file listing (toc-file-§1/toc-file-§5).
+20a. `README.md` is a **player-facing** document — written for the person who installed the addon (what it does, how to use it, how to fix common problems), in plain language, free of internal jargon and machine-generated tells; contributor material (test harness, lint, build, internals) stays out of it, under `docs/`. It follows the **canonical section order** (documentation-§1): title → badges (`[wow]` → version → license → standard → `[tests]`, that exact order and these exact templates: `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)`, `![License](https://img.shields.io/badge/License-MIT-orange)`, `[![Standard](https://img.shields.io/badge/Ka0s-WoW%20Addon%20Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)`, `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`; the `[wow]` and `[tests]` badges MUST be updated in lockstep with the TOC `## Interface:` and the test inventory respectively) → logo → description → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Version History (there is **no** `## Testing` section — verify-how-to lives in `docs/`; the README keeps only the `[tests]` badge). TOC follows the fixed field order + `#`-section file listing (toc-file-§1/toc-file-§5).
 20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (documentation-§4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
 20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **four** places — TOC `X-Standard`, README standard badge, the root `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet (pointing back to the `CLAUDE.md` section). STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
 21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (audit-review-history). Kept, not deleted.
-22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:version-bump` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
+22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
 24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, one `SKIN` + `ApplySkin` seam, pooled rows. See `STANDARDS.md standalone-windows`.
 
@@ -532,7 +532,7 @@ push and never bump the version without an explicit instruction.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
 - [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; canonical `docs/` trio present (`agent-context.md`, `ARCHITECTURE.md`, `smoke-tests.md`); passes the drift check.
 - [ ] **Standards reference in memory & context (documentation-§6)** — all four present: TOC `X-Standard`, README standard badge, `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet pointing back to it.
-- [ ] `README.md` follows the canonical section order (documentation-§1), including **Usage** (Slash-commands + Settings-panel tables), **Issues and feature requests** (→ GitHub issues), **Testing**, and **Version History**.
+- [ ] `README.md` is player-facing and plain-language (no contributor material, no `## Testing` section) and follows the canonical section order (documentation-§1), including **Usage** (Slash-commands + Settings-panel tables), **Issues and feature requests** (→ GitHub issues), and **Version History**.
 - [ ] TOC follows the fixed field order and `#`-section file-listing structure (toc-file-§1/toc-file-§5).
 - [ ] **No `TODO.md`** at release (backlog is in GitHub issues); any pre-release `docs/TODO.md` has been removed (documentation-§4).
 - [ ] LICENSE = MIT full text.
@@ -572,9 +572,7 @@ named evidence is in `INDUSTRY_RESEARCH.md`.)
 - `wow-addon:standards-audit` — audit the current addon against the standard. Produces the `docs/audits/<DATE>/` deviation + remediation bundle (audit-review-history).
 - `wow-addon:review` — principal-engineer code review of the current addon. Produces a `docs/reviews/<DATE>/` findings bundle (audit-review-history).
 - `wow-addon:sync-docs` — eliminate doc drift across README, CLAUDE.md, ARCHITECTURE.md.
-- `wow-addon:audit-conventions` — walk multiple addons and report drift in shared conventions.
 - `wow-addon:bump-interface` — bump the single TOC Interface line to the latest Retail patch.
-- `wow-addon:version-bump` — bump version everywhere (TOC, code constants, README badges + Version History, CLAUDE/ARCHITECTURE, CHANGELOG).
-- `wow-addon:normalize-readme` — reshape README to match a reference addon's section structure.
+- `wow-addon:bump-version` — bump version everywhere (TOC, code constants, README badges + Version History, CLAUDE/ARCHITECTURE, CHANGELOG).
 - `wow-addon:diff` — summarize uncommitted changes with risk assessment.
 - `wow-addon:commit` — generated-message commit.

@@ -11,7 +11,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 ## Title: Ka0s <Human Name>              -- prefix every Ka0s addon
 ## Notes: <one-line user-facing description>
 ## Author: add1kted2ka0s
-## Version: <semver>                     -- managed by version-bump skill
+## Version: <semver>                     -- managed by bump-version skill
 ## IconTexture: <path|fileID>            -- optional but encouraged
 ## SavedVariables: <Addon>DB             -- single global SV per addon
 ## OptionalDeps: Ace3, LibStub, CallbackHandler-1.0, LibSharedMedia-3.0
