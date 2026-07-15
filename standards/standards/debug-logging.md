@@ -71,3 +71,50 @@ The enabled-state (`NS.State.debug`) is a **runtime flag, independent of the con
 - **Tier-1 utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
 
 Note: user-facing chat messages (help index, command acks, errors) still go to chat through the shared `NS.Print` printer with `NS.PREFIX` (slash-commands-§4; the same single-seam, secret-safe rules apply — events-frames-taint-§8) — that ordinary chat seam is separate from the debug console.
+
+### 8. Coverage — trace the main functional flows (MUST)
+
+Sections 1–7 govern the console's **shape**; this section governs its **content**. Debug **MUST**
+trace the addon's **main functional flows**, so a log read back after a repro tells the story of
+what the addon did — not just that it loaded. At minimum:
+
+- **Lifecycle** — load/enable (a one-line boot summary: schema version, record/row count),
+  schema **migration** (only when one actually runs), and retention/**prune**.
+- **The core capture / compute flow** — the addon's reason for existing (e.g. an item recorded,
+  a cast resolved, a bar shown), including the **not-recorded / no-op decisions** that explain a
+  *missing* entry (why a loot line was skipped, why a value was ignored). A log that shows only
+  successes can't explain the bug the user is reporting.
+- **All data mutations** — user-initiated purge/delete and any bulk rewrite of stored data.
+- **View open / recompute** — the main window opening, tab switches, and each table/analytics
+  **recompute**, as a single summary line (see §9).
+- **Every settings change** — see §10.
+
+Each flow event is **one gated line**, tagged (§3). Coverage is judged by *"could I reconstruct
+what happened from the log?"*, not by line count — which §9 then bounds from the other side.
+
+### 9. Coalescing — one summary line per pass, never per item (MUST NOT)
+
+A debug sink on a **repeating path** (a bag scan, a loot window's slots, a table re-render on every
+filter keystroke, a per-frame tick) **MUST NOT** emit one line per item/slot/frame. It **MUST**
+collapse to **one summary line per pass**, carrying the counts and the scanned/affected detail in
+that single line — e.g. `Scanned 42 items, 3 new` with the id lists appended, or
+`rendered 84/1423 rows (group=zone, sort=date desc, filters=2)`. The per-item trace is spam: it
+buries the signal, and on a hot path it is a measurable cost **even gated**.
+
+The string-building for the summary **MUST** stay behind the debug gate (the zero-alloc rule, §4):
+build the id lists / counts / `table.concat` only when debug is on, never before the gate.
+*(Reference pattern in the collection: an auto-discovery pass that fired one "no category match"
+line per bag item on every bag update was collapsed to a single tagged summary line per pass —
+the scanned + newly-discovered id lists in one line — with the per-item zero-match trace dropped
+and all list-building moved behind the gate.)*
+
+### 10. Settings changes — log once, at the single write seam (MUST)
+
+Every settings mutation **MUST** be logged **once**, at the schema's single write seam
+(schema-as-single-source, architecture; the `Set` path), as `[Set] <path> = <value>`. Downstream
+reactors — modules handling the settings-changed message — **MUST NOT** re-echo the same change: a
+second `[Cfg] …` line restating a value the `[Set]` line already showed is redundant spam. A
+reactor logs **only** a *material effect* the reader cannot infer from the `[Set]` line (e.g.
+"capture disabled", "test data swapped in"), never a restatement of the new value. Window geometry
+and other non-schema view state written outside the `Set` seam are **not** settings for this rule
+and **SHOULD NOT** be logged per-change (a per-drag position write is noise).
