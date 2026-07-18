@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.3.0, 2026-07-15)
+# New Ka0s Addon — Context Pack (v2.4.0, 2026-07-18)
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -456,7 +456,7 @@ push and never bump the version without an explicit instruction.
 2. SavedVariables: `<Addon>DB`, single global, with `schemaVersion`.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
-5. TOC: single latest-Retail `## Interface:` (Retail only), plus `X-Standard`, `X-Curse-Project-ID`, `X-Wago-ID` (the last two mandatory if published).
+5. TOC: single latest-Retail `## Interface:` (Retail only), plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
 6. Slash: AceConsole `:RegisterChatCommand`. Never raw `SLASH_*`.
 7. Locale: metatable fallback `__index = function(_,k) return k end`. Never AceLocale strict.
 8. Options UI: Blizzard `Settings.RegisterCanvasLayoutCategory` + raw AceGUI body. Register the **category eagerly at load** (always visible); build the **body lazily** on first `OnShow`. Never AceConfigDialog for content; never defer registration to first `/config`.
@@ -517,7 +517,7 @@ push and never bump the version without an explicit instruction.
 
 ## Definition of done (new addon ready for v0.1.0 release)
 
-- [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, `X-Curse-Project-ID`, `X-Wago-ID`.
+- [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`.
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors**.
 - [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing).

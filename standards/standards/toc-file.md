@@ -19,15 +19,15 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 ## Category-enUS: <Combat|Group|Auction|Chat|UI|Misc>
 ## X-License: MIT
 ## X-Standard: https://github.com/tusharsaxena/WowAddonStandards
-## X-Curse-Project-ID: <id>              -- mandatory if published
-## X-Wago-ID: <id>                       -- mandatory if published
-## X-WoWI-ID: <id>                       -- only if WoWI listing exists
+## X-Curse-Project-ID: <id>              -- mandatory once published on CurseForge
+## X-Wago-ID: <id>                       -- optional; only if listed on Wago
+## X-WoWI-ID: <id>                       -- optional; only if listed on WoW Interface
 ```
 
 - **MUST** follow the field order above so every Ka0s TOC reads identically. The file listing that follows the metadata block has its own required structure (toc-file-§5). Reference implementation (in the collection): the modular tracker's TOC.
 - **MUST** have `X-License: MIT`. **MUST NOT** ship "All Rights Reserved".
 - **MUST** have `X-Standard:` pointing at the standards repo, declaring the addon is built to this standard.
-- **MUST** have `X-Curse-Project-ID` and `X-Wago-ID` once an addon is published anywhere.
+- **MUST** have `X-Curse-Project-ID` once the addon is published on CurseForge (the collection's distribution platform). `X-Wago-ID` and `X-WoWI-ID` are **optional** (**MAY**) — include each only when the addon is actually listed on that platform (Wago / WoW Interface respectively); an addon that doesn't publish there simply omits the line. Keep the field **order** above regardless (Curse → Wago → WoWI).
 - **SHOULD NOT** declare hard `Dependencies`. Use `OptionalDeps` and shim missing libs with soft fallbacks. Reference implementation (in the collection): the absorb-shield tracker ships an AceDB-missing flat-table shim and LSM-missing Blizzard fallback constants, so it loads even with no libs present.
 
 ### 2. SavedVariables naming
