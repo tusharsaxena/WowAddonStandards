@@ -9,7 +9,7 @@ Every addon **MUST** ship a debug seam. Debug output **MUST** route to a **dedic
 - A standalone `BackdropTemplate` frame (e.g. `<Addon>DebugWindow`) parented to `UIParent` on **`DIALOG`** strata so it sits **above** the addon's main window, with a draggable title bar (`"<Addon> — Debug"`), a 1px divider, and a thin close glyph.
 - **Default size `700 × 344`** — the reference width, wide enough that tagged lines rarely wrap. Movable, clamped to screen, registered in `UISpecialFrames` (ESC closes).
 - **Reuses the addon's `SKIN`/`ApplySkin` seam** (standalone-windows) so it matches the main window.
-- The log surface is a `ScrollingMessageFrame` with `SetMaxLines(500)`, mouse-wheel scroll, `SetJustifyH("LEFT")`, fading off.
+- The log surface is a `ScrollingMessageFrame` with `SetMaxLines(500)`, mouse-wheel scroll, `SetJustifyH("LEFT")`, fading off, a **right-edge scrollbar** synced to the log, and a **bottom line counter** (both **MUST** — debug-logging-§11).
 
 ### 2. Monospace font (shipped)
 
@@ -122,3 +122,15 @@ reactor logs **only** a *material effect* the reader cannot infer from the `[Set
 "capture disabled", "test data swapped in"), never a restatement of the new value. Window geometry
 and other non-schema view state written outside the `Set` seam are **not** settings for this rule
 and **SHOULD NOT** be logged per-change (a per-drag position write is noise).
+
+### 11. Scrollbar + line counter (MUST)
+
+The log surface (§1) **MUST** carry a **visible scrollbar** and a **line counter**, so the developer can read scroll position and buffer fill at a glance rather than guessing from a wheel-only wall of text.
+
+- **Scrollbar.** A `ScrollingMessageFrame` has **no native scrollbar** — it is wheel-only — so the console **MUST** add a **thin vertical `Slider`** on the log's right edge, synced **both ways** to the log's scroll offset: dragging the thumb scrolls the log, and the mouse wheel moves the thumb. As with the options-panel body (options-ui-§10), the bar is **always shown** and goes **inert** (mouse disabled, thumb parked) when the whole log fits, so the right-edge gutter stays a constant width. Guard the slider's `OnValueChanged` → `SetScrollOffset` path against re-entrancy with a `_syncing` flag so the two-way sync can't loop, and inset the log's right edge to reserve the scrollbar gutter.
+
+- **Scroll API — MUST use the Lua mixin methods.** On current retail the log is the **Lua `ScrollingMessageFrameMixin`**: drive it with **`GetMaxScrollRange()`**, **`GetScrollOffset()`**, **`SetScrollOffset(offset)`** — where **offset `0` = bottom (newest)** and **offset `== maxRange` = top (oldest)** (`ScrollUp` *increases* the offset). The old C getters **`GetNumLinesDisplayed()` / `GetCurrentScroll()` are `nil`** on this mixin and raise *"attempt to call a nil value"* — **MUST NOT** call them. Map the vertical slider (value `0` = thumb top = oldest) as `sliderValue = maxRange − offset` and, on drag, `offset = maxRange − sliderValue`. **Guard method presence** before every call (`if not (log.GetMaxScrollRange and log.GetScrollOffset) then return end`) and type-check the returns, so a headless test mock — whose stub frame returns non-numbers — stays a clean no-op.
+
+- **Line counter.** A thin **bottom status bar** — a 1px divider plus a right-aligned label in the **same monospace font** (§2) — **MUST** show the live count as **`N / MAX lines`**, where `MAX` is the log's `SetMaxLines` cap (500, §1) and `N` is the current buffered line count. Update it on **every append** and reset it to `0 / MAX` on **Clear** (§6).
+
+- **Build order (robustness).** Run the **initial** scrollbar/counter sync at the **end** of the window-build function — after the header, `RefreshHeader`, and the `UISpecialFrames` registration — so a frame-API surprise inside the sync can never abort the rest of the console's setup. (A mid-build error otherwise leaves the header label blank and ESC-to-close unregistered, because the build returns early.)
