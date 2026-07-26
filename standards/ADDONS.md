@@ -17,6 +17,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Addon | Folder | Repository |
 |---|---|---|
 | Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/absorbtracker |
+| Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger |
 | Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/consumablemaster |
 | Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/kickcd |
 | Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory |
