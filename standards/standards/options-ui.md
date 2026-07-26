@@ -60,6 +60,27 @@ local sub  = Settings.RegisterCanvasLayoutSubcategory(main, generalPanel, "Gener
 - **Logo asset:** ship a **`.tga`** (or `.blp`) under **`media/logos/`** — WoW **cannot** load `.jpg`/`.png` textures at runtime. Reference it by absolute path `Interface\AddOns\<Folder>\media\logos\<name>.tga`, display at **300×300**; source art SHOULD be power-of-two (e.g. 512×512). Keep the original `.jpg`/`.png` beside it for editing.
 - **Header (both parent and subcategory):** left-aligned title in `GameFontNormalHuge`, a gold `Options_HorizontalDivider` tinted to the title's colour, and (subcategories) a **Defaults** button top-right. Subcategory titles render as a breadcrumb **"Ka0s <Addon> ▸ <Page>"** with the arrow via `|A:common-icon-forwardarrow:16:16|a`.
 - **The Defaults button MUST be an AceGUI `Button`, not a raw `CreateFrame("Button", …, "UIPanelButtonTemplate")` parented onto the Settings canvas.** A `UIPanelButtonTemplate` button created as a **direct child of the Blizzard Settings canvas** inherits the canvas's **red** button skin; AceGUI creates its button under `UIParent` and reparents the `.frame`, sidestepping that skinning so the button keeps the standard dark/gold options look. Build it as `AceGUI:Create("Button")` → `:SetText(...)` → `:SetWidth(DEFAULTS_W)` → `btn.frame:SetParent(panel)` / `:ClearAllPoints()` / `:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -PADDING_X, -HEADER_TOP)`. The same rule applies to any other header/action button parented onto the canvas.
+- **The Defaults button MUST be *created* lazily, in the panel's first `OnShow` — never while the category is being registered.** *When* the widget is created decides how it looks, independently of *what* creates it. AceGUI is a **shared library**: UI-skinning addons (ElvUI and friends) restyle its widgets by hooking `RegisterAsWidget`, so a widget created **before** that hook is installed keeps Blizzard's stock `UI-Panel-Button-Up` art — the **red stone button** — for the rest of the session, while every widget created **after** it comes out in the skin. Category registration runs in `OnInitialize` (`ADDON_LOADED`, options-ui-§1), i.e. *during load*, so a button built there is racing every other addon's load order: an addon whose folder sorts early loses the race and renders red, one that sorts late wins and renders skinned — **with identical code in both**. Deferring creation to first `OnShow` removes the race entirely (by then every addon has loaded) and matches the rule §1 already applies to the panel **body**. Park the click handler on the panel at registration time (`panel.defaultsOnClick = fn`) and wire it in the builder, since the callback is known before the widget exists:
+
+```lua
+-- buildHeader (runs during registration): record the intent only.
+panel.wantsDefaultsButton = opts.defaultsButton and true or false
+
+-- Called at the top of every panel's OnShow; builds once.
+local function ensureDefaultsButton(panel)
+  if panel.defaultsBtn or not panel.wantsDefaultsButton or not AceGUI then return end
+  local btn = AceGUI:Create("Button")
+  if not (btn and btn.frame) then return end
+  btn:SetText("Defaults"); btn:SetWidth(DEFAULTS_W)
+  btn.frame:SetParent(panel); btn.frame:ClearAllPoints()
+  btn.frame:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -PADDING_X, -HEADER_TOP)
+  btn.frame:Show()
+  panel.defaultsBtn = btn
+  if panel.defaultsOnClick then btn:SetCallback("OnClick", panel.defaultsOnClick) end
+end
+```
+
+  **Diagnosing it:** the difference is invisible in source and visible only in the live object's **region list** — a skinned button carries extra `BORDER`/`BACKGROUND` regions over the stock set, while an unskinned one is the bare 5-region `UI-Panel-Button-Up` (fileID `130828`). An addon **SHOULD** expose this through its debug console's structured-dump verb (debug-logging-§4) rather than guessing from screenshots.
 - Bodies **MUST** build lazily in first `OnShow` (options-ui-§1) — AceGUI lays out against the panel's current width, which is 0 before the panel is first shown.
 
 ### 6. Two-column layout (default)

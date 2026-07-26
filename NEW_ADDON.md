@@ -29,7 +29,8 @@ This playbook is the entry point; the substance lives in `standards/`:
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
    context pack: the TOC (fixed field order + `#`-section file listing, toc-file-§1/toc-file-§5), entry file, compat
    shims, locale, database/migrations, schema-driven settings (architecture-§5), eager settings-category
-   registration (options-ui-§1), the debug console (debug-logging), and the message bus (architecture-§4).
+   registration with a lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5),
+   the debug console (debug-logging), and the message bus (architecture-§4).
 5. **Write tests first.** Stand up `tests/` (headless Lua 5.1 harness) and drive every behavior
    **test-first** (testing). `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
