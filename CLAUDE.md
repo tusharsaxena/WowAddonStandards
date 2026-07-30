@@ -93,5 +93,10 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   `standards/EXECUTIVE_SUMMARY.md` and `standards/NEW_ADDON_CONTEXT.md`, and sometimes the root
   `README.md` / the playbooks. Update all affected docs together, and bump the standard's version +
   changelog.
+- **Write in US English.** The standard mandates it for addons (`localization-§5`), and these documents
+  follow their own rule: `color`, `gray`, `behavior`, `center`, `canceled`, `-ize`/`-ization` — never
+  `colour`, `grey`, `behaviour`, `centre`, `cancelled`, `-ise`/`-isation`. Two exemptions: Blizzard /
+  third-party symbols are reproduced verbatim, and `standards/_raw/_industry/` is frozen research
+  evidence quoting external addons — leave its wording alone.
 - Don't invent compliance claims. Findings are evidence-backed (`file:line` citations); keep new
   claims sourced the same way.

@@ -20,6 +20,7 @@
 | Bus messages | `Ka0s_<Addon>_<Event>` | `Ka0s_ExampleBar_RosterChanged` |
 | Settings key | snake_case dotted path | `display.scale` |
 | Locale keys | English source string | `L["Reset all settings"]` |
+| English text (everywhere) | **US English** spelling — strings, labels, comments, identifiers, docs; never British (localization-§5) | `L["Bar color"]`, `NS.Util.colorize`, `gray`, `initialize` |
 | Module table | `NS.<PascalCase>` | `NS.IconGrid` |
 | Chat printer | `NS.Util.print` — never a bare `NS.Print` when AceConsole is embedded into `NS` (its `:Print` mixin clobbers it; architecture-§2, anti-pattern #36) | `NS.Util.print("…")` |
 | Root agent stub | `CLAUDE.md` (stub, incl. Standards-compliance section) | documentation-§2 |

@@ -8,7 +8,7 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in four places** — the TOC `X-Standard` field, the README standard badge, the root `CLAUDE.md` "Standards compliance (read first)" section, and `docs/agent-context.md`'s "Hard rules" — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v2.12.0**).
+**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in four places** — the TOC `X-Standard` field, the README standard badge, the root `CLAUDE.md` "Standards compliance (read first)" section, and `docs/agent-context.md`'s "Hard rules" — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v2.13.0**).
 
 ## The six patterns it makes canonical
 
@@ -17,7 +17,7 @@ These were validated against the Ka0s collection and the broader ecosystem (see 
 1. **Schema-as-single-source-of-truth** — one schema row drives panel widget + slash + defaults reset. (`architecture-§5`, MUST)
 2. **Modular `core/ modules/ defaults/ settings/ locales/` layout** — the canonical reference structure, used by every addon. (`layout-§1`)
 3. **Chat-formatter via `_G[GLOBALSTRING]` override** instead of hooking chat events — architecturally taint-free. (`events-frames-taint-§5`, SHOULD)
-4. **Combat-lockdown discipline** — secure frame writes defer on `PLAYER_REGEN_ENABLED`, but the options-panel open **refuses** under lockdown (grey notice, no defer-replay). (`events-frames-taint-§2`, `options-ui-§2`)
+4. **Combat-lockdown discipline** — secure frame writes defer on `PLAYER_REGEN_ENABLED`, but the options-panel open **refuses** under lockdown (gray notice, no defer-replay). (`events-frames-taint-§2`, `options-ui-§2`)
 5. **Macro firewall** — a single module is the sole caller of protected `CreateMacro`/`EditMacro` APIs. (`events-frames-taint-§4`, MUST for any addon touching protected APIs)
 6. **Measurable performance** — a vendored Ka0s-owned harness (`/<slash> perf`) whose two combat-gated arms differ only by whether the addon's code runs, because WoW's own profiler bills a shared frame's cost to whichever addon created it and so cannot answer *"is this cost even ours?"*. (`performance`, MUST for the wiring / SHOULD for coverage)
 

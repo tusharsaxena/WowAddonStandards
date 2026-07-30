@@ -6,6 +6,7 @@ Localization is two-directional. Sections 1–3 govern the addon's **output** �
 into the player's language via `NS.L`. Section 4 governs the addon's **input** — the game's data
 arrives *already* in the player's language, so any logic that branches on a localized display string
 silently breaks on every client whose locale differs from the author's. Both directions are mandatory.
+Section 5 fixes the **source dialect** every English string in the collection is written in.
 
 ### 1. Module shape
 
@@ -87,3 +88,57 @@ if select(8, GetInstanceInfo()) == 1637 then ...   -- Orgrimmar instanceID
 tokens (`"player"`, `"target"`), and event names (`"UNIT_AURA"`) are non-localized Blizzard identifiers,
 identical on every client — matching on them is correct and required. Only *localized display text* is
 forbidden.
+
+### 5. US English is the source dialect
+
+Every English word a Ka0s addon **authors MUST use US English spelling** — never British. This is not
+a preference expressed once in a style note; it is a rule an audit checks, and it holds across
+**every** surface the addon writes:
+
+- locale keys and their `enUS` values (`locales/enUS.lua`, localization-§1/§2);
+- everything the player reads — chat and console output, options labels, descriptions and tooltips,
+  slash help text, window titles, button captions;
+- prose in `README.md` and every file under `docs/` (documentation);
+- **code**: comments, and identifiers — module names, fields, functions, settings keys, bus message
+  names, perf bucket names (naming-cheatsheet).
+
+| Use (US) | Never (British) |
+| --- | --- |
+| `color`, `colored`, `coloring`, `colorize` | `colour`, `coloured`, `colouring`, `colourise` |
+| `gray` | `grey` |
+| `behavior` | `behaviour` |
+| `center`, `centered` | `centre`, `centred` |
+| `canceled`, `canceling` | `cancelled`, `cancelling` |
+| `initialize`, `normalize`, `serialize`, `organize`, `optimize`, `capitalization` (`-ize`/`-ization`) | `initialise`, `normalise`, `serialise`, `organise`, `optimise`, `capitalisation` (`-ise`/`-isation`) |
+| `analyze`, `catalog`, `dialog`, `defense`, `license`, `favor`, `labeled`, `traveled`, `fulfill` | `analyse`, `catalogue`, `dialogue`, `defence`, `licence`, `favour`, `labelled`, `travelled`, `fulfil` |
+
+Three reasons this is a MUST rather than taste:
+
+1. **The game's own API is US English** — `SetTextColor`, `GRAY_FONT_COLOR`, `Settings.OpenToCategory`.
+   A British-spelled identifier sits one letter from the Blizzard symbol beside it, so mixed dialects
+   turn `grep -r color` into a search that misses half the call sites it exists to find.
+2. **One dialect makes the collection greppable as a unit** — a rename, an audit, or a locale sweep
+   across every Ka0s addon is one pattern, not two.
+3. **`enUS` is the base locale** (localization-§3) and the metatable fallback every uncovered locale
+   renders through (localization-§1), so its strings are what most players actually see.
+
+- **A spelling fix in a locale key is a key change.** Keys *are* the English string (localization-§2),
+  so correcting `L["Bar colour"]` → `L["Bar color"]` **MUST** update that key in **every**
+  `locales/*.lua` file and at every call site **in the same change**. A missed translation file does
+  not error — the metatable silently falls through and renders the raw English key on that client,
+  which looks like a missing translation rather than a typo.
+
+**Exceptions — reproduce these verbatim; "correcting" them is the bug:**
+
+- **Blizzard and third-party symbols** — API names, GlobalString constants (`_G.ERR_*`), event names,
+  atlas/texture paths, `Enum.*` members, and library names (`LibStub("AceGUI-3.0")`). These are
+  identifiers, not prose, and a "fixed" one simply does not resolve.
+- **A `locales/enGB.lua` translation** **MAY** carry British spellings — that is exactly what a locale
+  file is for. `enUS` remains the source of truth; enGB is a translation of it like any other.
+- **Quoted external text** — an upstream error string, a third-party doc, a changelog line, or research
+  evidence quoted for the record keeps its original wording.
+- **Proper nouns already published** — an addon name, repo name, or CurseForge slug keeps its spelling;
+  renaming a published identifier is a breaking change, not a spelling fix.
+
+Lint cannot catch this (`luacheck` does not read English), so it is enforced by review and by
+`/wow-addon:standards-audit`, which flags a British spelling in authored text as a deviation.

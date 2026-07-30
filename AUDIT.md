@@ -13,7 +13,7 @@ list). This playbook says *how to run the audit and where to put the results*; t
 ## What an audit is
 
 A **read-only** compliance measurement: it snapshots the addon, measures it against the then-current
-standard, catalogues every deviation with evidence, and produces a remediation **plan**. An audit
+standard, catalogs every deviation with evidence, and produces a remediation **plan**. An audit
 **never modifies addon code** — remediation is a separate, follow-up engagement that executes the
 plan this audit writes.
 
@@ -56,7 +56,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    now, citing files.
 4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
    `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
-5. **Catalogue deviations** → `02_DEVIATIONS.md`. One row/entry per gap: the ID, the section violated,
+5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap: the ID, the section violated,
    MUST/SHOULD severity, a one-line description, and the fix direction.
 6. **Back every finding with evidence** → `03_EVIDENCE.md`. `file:line` citations that prove each
    deviation (and each compliance claim). Don't assert without a citation.

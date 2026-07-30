@@ -55,14 +55,14 @@ hand-runnable — no CI is required or expected**.
 - **MUST** surface a **test-pass badge** in the README badge row (documentation-§1) showing
   **X/Y passing** (passed / total) as a **static** shields.io badge — the canonical template
   (documentation-§1 #5) is `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`
-  (label `Tests`, colour `green`, `%2F`-encoded slash). **MUST NOT** require CI, a
+  (label `Tests`, color `green`, `%2F`-encoded slash). **MUST NOT** require CI, a
   dynamic/endpoint badge, or a GitHub Action to produce it.
 - **MUST** keep both in lockstep with the suite: whenever a case is added, removed, or renamed, or
   the pass count moves — i.e. **whenever a failing test is resolved** — regenerate `docs/test-cases.md`
   and update the README badge **as part of the same change**, never as a deferred follow-up.
 
 This complements §4: the green gate proves the suite passes on every commit; the inventory and badge
-make the coverage **visible and honest**, and are the standing defence against the count drift that
+make the coverage **visible and honest**, and are the standing defense against the count drift that
 silently creeps into hand-maintained status lines.
 
 ### 6. The verify-how-to doc
@@ -87,8 +87,8 @@ the contributor-facing home for material the player-facing README deliberately e
 
 ### 8. Testing an addon that consumes a shared harness
 
-When behaviour moves into a Ka0s-owned library (library-stack-§7), its unit coverage moves with it —
-the addon **MUST NOT** keep a duplicate copy of those cases, because two suites over one behaviour
+When behavior moves into a Ka0s-owned library (library-stack-§7), its unit coverage moves with it —
+the addon **MUST NOT** keep a duplicate copy of those cases, because two suites over one behavior
 means two places a fix has to land.
 
 What stays in the addon is a smaller **integration** suite proving the wiring the addon actually owns.
@@ -98,7 +98,7 @@ For the performance harness (performance) that means, at minimum:
   ones the addon means;
 - **every declared bucket is reached by a real bracket**, driving each bucket's genuine entry point. A
   declared bucket that no bracket reaches is a lie in every report, and nothing else will catch it;
-- **suspend genuinely makes this addon inert** — events unregistered, queued work cancelled, the
+- **suspend genuinely makes this addon inert** — events unregistered, queued work canceled, the
   show-decision ladder refusing (performance-§6) — and resume restores from current state;
 - the **degraded path**: with the library absent, the addon loads and its reserved verb answers instead
   of erroring (performance-§1).

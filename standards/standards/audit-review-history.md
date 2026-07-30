@@ -10,4 +10,4 @@ Audit and code-review runs are **frozen, dated snapshots** kept in the addon's *
 - **MUST** write each run to a new dated folder under the correct parent (`docs/audits/` for audits, `docs/reviews/` for reviews); never edit a prior run.
 - **SHOULD** retain every prior `docs/audits/` and `docs/reviews/` folder; they are the addon's institutional memory. (Runs are **kept**, not deleted after commit.)
 - Both histories are dev-only and **MUST NOT** ship in the package — `docs/` is ignored by `.pkgmeta` (packaging).
-- A review's `03_SMOKE_TESTS.md` catalogues **in-game** checks; they complement the headless unit suites (testing), which cover testable logic.
+- A review's `03_SMOKE_TESTS.md` catalogs **in-game** checks; they complement the headless unit suites (testing), which cover testable logic.
