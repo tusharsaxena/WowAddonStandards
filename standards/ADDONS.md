@@ -21,6 +21,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/consumablemaster |
 | Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/kickcd |
 | Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory |
+| Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster |
 | Ka0s Pretty Chat | [`../../prettychat/`](../../prettychat/) | https://github.com/tusharsaxena/prettychat |
 | Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup |
 
