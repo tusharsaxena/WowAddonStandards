@@ -20,9 +20,10 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
    | 1 | **`[wow]`** interface | `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)` | **Dynamic data, static badge — MUST track TOC `## Interface:`** |
    | 2 | **published version** | `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)` | Live endpoint (auto-updates); add only once published |
    | 3 | **`[license]`** | `![License](https://img.shields.io/badge/License-MIT-orange)` | Static |
-   | 4 | **standard** (linked) | `[![Standard](https://img.shields.io/badge/Ka0s-WoW%20Addon%20Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)` | Static |
+   | 4 | **standard** (linked) | `[![Standard](https://img.shields.io/badge/Ka0s-WoW_Addon_Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)` | Static |
    | 5 | **`[tests]`** pass | `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)` | **Dynamic data, static badge — MUST track the test inventory (testing-§5)** |
 
+   - **The standard badge uses `_`, not `%20`, for its spaces — and MUST NOT be "corrected" back.** shields.io renders both identically on GitHub, but **CurseForge does not decode the percent-escape**, so a `%20` badge shows the literal escape on the project page every player actually looks at. The underscore is the form shields.io documents for a space and is what the whole collection already used; the `%20` form was a transcription error in this template, not a decision.
    - Placeholders: `<Expansion>` is the current Retail expansion name and `<X.Y.Z>` the client patch the TOC `## Interface:` encodes (e.g. `Midnight_12.0.7`); `<projectId>` is the CurseForge project id; `<X>`/`<Y>` are the passed/total case counts from the generated `docs/test-cases.md` (testing-§5).
    - The **published-version** badge (#2) is a **live** shields.io endpoint that auto-updates from the distribution site — no manual upkeep; add it only after first publish (Wago's equivalent endpoint is acceptable in its place).
    - **Keep-in-sync rule (MUST DO).** Badges #1 (`[wow]`) and #5 (`[tests]`) render **static text** and therefore go stale silently unless updated with the data they mirror. They **MUST** be updated **in the same change** that moves their source of truth, never deferred to a follow-up:
