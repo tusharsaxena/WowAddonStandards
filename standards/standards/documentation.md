@@ -10,6 +10,22 @@ The README is a **player-facing** document. It **MUST** be written for the perso
 
 Write it in **plain language**. Prose **MUST** be short, direct, and free of internal jargon — describe what the player sees, not the code behind it. A reader should never need a term from the codebase (schema, export contract, denormalized row, message bus, and the like) to understand the README, and should not be able to tell it was written by a machine: no stacked em-dash clauses, no hedging, no filler that restates the same point. Spelling is **US English** throughout — here and in every file under `docs/` (localization-§5).
 
+The README renders on **two** surfaces, and they are not the same renderer. GitHub is where it is
+written and reviewed; **CurseForge is where players read it**, and CurseForge's renderer is stricter
+about HTML and looser about escapes. Two consequences are normative, because both fail *silently on
+the surface a maintainer never checks*:
+
+- **Angle-bracket placeholders MUST NOT appear in shipped README content.** CurseForge strips
+  `<setting>`, `<name>`, `<value>` and the like as unknown HTML tags — **including inside backticks**
+  — so `` `/bl set <setting> <value>` `` renders to players as `/bl set` with both placeholders gone,
+  while looking perfectly correct on GitHub. Write the argument bare (`` `/bl set setting value` ``);
+  keep `[…]` for genuinely optional arguments, which survives both renderers. This applies to the
+  README only — placeholders in *this* standard, in `docs/`, and in code comments are fine.
+- **Percent-escapes MUST NOT be used for spaces in badge URLs** — see the badge table below.
+
+Real HTML a README uses deliberately (`<br>` in a table cell, `<code>`, `<strong>`) is unaffected and
+**MUST NOT** be stripped by a sweep for the above.
+
 Every Ka0s `README.md` **MUST** follow one structure so all addons read identically. Reference implementation (in the collection): the consumables & macro manager's README. Sections in **this exact order**:
 
 1. **H1 title** — `# Ka0s <Name>`. **MUST**.
