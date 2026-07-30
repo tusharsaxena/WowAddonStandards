@@ -68,7 +68,13 @@ Every addon **MUST** ship this **canonical quartet** under `docs/` (all four are
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page.
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
-Beyond the quartet, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. One topic-detail doc is **required**, not optional: `docs/test-cases.md`, the generated test-case inventory (testing-§5). **MUST NOT** ship a `TODO.md` once released (documentation-§4).
+Beyond the quartet, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, `complexity.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **Three** topic-detail docs are **required**, not optional:
+
+- **`docs/test-cases.md`** — the generated test-case inventory (testing-§5).
+- **`docs/performance.md`** — the addon's own performance page: which hot paths are bracketed and why, how to run a capture (`/<slash> perf`), how to read the report, and what the harness can and cannot resolve (performance). The shared protocol and record contract live with the library — this page points there rather than restating them.
+- **`docs/perf-runs/README.md`** — the standing capture store's doc: the record naming convention, a schema summary, and a pointer to the library's canonical field-by-field contract (performance-§8). The directory it heads is cumulative rather than tied to one investigation, so runs compare across addon versions.
+
+**MUST NOT** ship a `TODO.md` once released (documentation-§4).
 
 ### 4. No `TODO.md`
 

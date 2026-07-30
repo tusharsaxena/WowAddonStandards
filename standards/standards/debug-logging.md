@@ -136,3 +136,13 @@ The log surface (§1) **MUST** carry a **visible scrollbar** and a **line counte
 - **Line counter.** A thin **bottom status bar** — a 1px divider plus a right-aligned label in the **same monospace font** (§2) — **MUST** show the live count as **`N / MAX lines`**, where `MAX` is the log's `SetMaxLines` cap (500, §1) and `N` is the current buffered line count. Update it on **every append** and reset it to `0 / MAX` on **Clear** (§6).
 
 - **Build order (robustness).** Run the **initial** scrollbar/counter sync at the **end** of the window-build function — after the header, `RefreshHeader`, and the `UISpecialFrames` registration — so a frame-API surprise inside the sync can never abort the rest of the console's setup. (A mid-build error otherwise leaves the header label blank and ESC-to-close unregistered, because the build returns early.)
+
+### 12. The console as a host surface for shared windows (MUST)
+
+The performance harness ships its own guided step panel (performance-§4), and that panel is the **library's** frame styled by the **addon**. The same relationship applies to any Ka0s-owned shared module that draws a window.
+
+- The library **MUST NOT** assume the console exists. It draws a plain frame when the host supplies no decoration.
+- The addon **MUST** decorate the shared window through the console's **own** factories rather than a lookalike — the close glyph in particular comes from the same helper the console uses (§1), so the two windows cannot drift apart. Two inline near-copies of a close button is how a collection ends up with two subtly different close buttons.
+- The addon **MUST** route the shared module's log output through the **console sink** (§4) and its chat output through the shared printer (events-frames-taint-§8), so a capture's lifecycle lines land in the same timeline as `[Combat]` entered/left. Reconstructing which window a measurement happened in, from memory, afterwards, is guesswork.
+- Output from an explicit user-initiated diagnostic run **MUST NOT** be gated on the debug flag (§5). The flag exists to keep the addon free when idle; a capture is an explicit action, and a run whose console stays empty because logging happened to be off reads as a broken feature.
+- Revealing the console is the **host's** call, not the library's: the addon supplies a "show my log window" hook the shared module calls at the few moments that warrant it (a run starting, a report or dump being asked for). A shared module that opens a window on every line it writes will pop a console over the game mid-combat.

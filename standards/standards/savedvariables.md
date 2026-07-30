@@ -35,3 +35,12 @@ end
 ### 3. Per-zone profile trees (optional)
 
 For party/group/raid/PvP context-aware addons, **SHOULD** consider a per-zone profile model: `profile.party.arena`, `profile.party.party`, `profile.party.raid`, each carrying full settings (the model used by party-cooldown trackers).
+
+### 4. The diagnostics global — the one sanctioned non-AceDB SV
+
+savedvariables-§1's "one global namespace `<Addon>DB`" has exactly **one** carve-out: the performance capture ring `<Addon>PerfDB` (performance-§5). It is a **second top-level SavedVariables global**, declared in the TOC alongside `<Addon>DB` (toc-file-§2) and written directly rather than through AceDB.
+
+- **MUST** stay **outside the AceDB tree**. Inside a profile it would be copied by "copy profile", wiped by "reset profile", and swapped out mid-capture by a profile switch. Diagnostics are not user settings and **MUST NOT** ride the settings lifecycle.
+- **MUST** be a bounded ring of most-recent captures — a hand-read snapshot store, not telemetry.
+- **MUST** carry its own schema stamp, owned by the library that writes it (performance-§8) and independent of the addon's `schemaVersion`.
+- **MUST NOT** be joined by further top-level globals. The carve-out is **narrow by construction**: one diagnostics global per addon, named after that addon. A second one needs a change to this standard, not a local decision.

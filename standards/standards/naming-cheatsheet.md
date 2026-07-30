@@ -12,6 +12,10 @@
 | Namespace upvalue | `NS` (private) | `local addonName, NS = ...` |
 | Public API | `_G[addonName].API.v1` | `ExampleBar.API.v1` |
 | SavedVariables | `<Addon>DB` | `ExampleBarDB` |
+| Diagnostics SV | `<Addon>PerfDB` — the one sanctioned non-AceDB global (savedvariables-§4) | `ExampleBarPerfDB` |
+| Perf instance | `NS.Perf`, built from a descriptor in `core/PerfSetup.lua` (performance-§1) | `Perf.Note("paintBar", ms)` |
+| Perf buckets | lowerCamelCase, named for the path they time (performance-§3) | `absorbEvent`, `repaintPass`, `paintBar` |
+| Ka0s shared lib | `LibKa0s`, one LibStub major per module (library-stack-§7) | `LibStub("LibKa0s-Perf-1.0")` |
 | Slash verbs | 2-3 lowercase | `/eb`, `/xb` |
 | Bus messages | `Ka0s_<Addon>_<Event>` | `Ka0s_ExampleBar_RosterChanged` |
 | Settings key | snake_case dotted path | `display.scale` |

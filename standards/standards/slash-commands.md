@@ -15,6 +15,7 @@ addon:RegisterChatCommand("<addonname>", "OnSlash")   -- full lowercase name ali
 
 - **MUST** use 2-3 lowercase chars as the primary verb. **SHOULD** also register the full lowercase addon name as an alias.
 - **MUST NOT** collide with existing well-known addon slashes.
+- **Reserved sub-verbs.** `get`, `set`, `list`, `reset`, `resetall`, `config`, `version`, `debug` and **`perf`** are reserved across the collection and **MUST** mean the same thing in every addon (slash-commands-§3). `perf` is the guided performance capture (performance-§4): it **MUST NOT** be re-used for anything else, and — although the run itself is implemented by a vendored library — the verb **MUST** be registered by the addon through its own `NS.COMMANDS` table, never by the library.
 
 ### 3. Dispatch
 
@@ -31,6 +32,7 @@ NS.COMMANDS = {
   { name = "version", desc = "Print addon version",   fn = function() ... end },   -- prints `<tag> v<version>`
   { name = "preview", desc = "Toggle preview mode",   fn = function() ... end },   -- if preview-mode applies
   { name = "debug",   desc = "Window; 'on'/'off' set logging", fn = function(rest) ... end },  -- debug-logging (on|off|toggle)
+  { name = "perf",    desc = "Performance capture run",  fn = function(rest) ... end },   -- performance-§4; lines come from the lib
 }
 ```
 

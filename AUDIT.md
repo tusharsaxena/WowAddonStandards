@@ -60,6 +60,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    MUST/SHOULD severity, a one-line description, and the fix direction.
 6. **Back every finding with evidence** → `03_EVIDENCE.md`. `file:line` citations that prove each
    deviation (and each compliance claim). Don't assert without a citation.
+   - **Mechanical checks belong here — run, not reasoned about.** Record the command and its real
+     output: `luacheck .`, `lua tests/run.lua`, and — for every **Ka0s-owned** vendored library
+     (library-stack-§7) — **`diff -r <LibRepo>/<Lib> <Addon>/libs/<Lib>`**, proving the vendored copy
+     has not drifted from its source repo. That last check exists because drift is otherwise
+     **invisible**: the library's suite passes against the library, the addon's suite passes against
+     the stale copy, and **both repos stay green** while the two diverge (anti-pattern #45). If the
+     sibling library repo is not present on the machine, mark the check **not run** and say so — never
+     infer it from the code looking reasonable, and never quietly skip it.
 7. **Design the remediation** → `04_TECHNICAL_DESIGN.md`. How to close the gaps: the modules/files to
    touch, the shape of the change, risks, and any ordering constraints. Reference deviation IDs.
 8. **Plan the execution** → `05_EXECUTION_PLAN.md`. Ordered, checkable remediation steps grouped into

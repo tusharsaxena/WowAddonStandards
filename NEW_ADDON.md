@@ -25,12 +25,16 @@ This playbook is the entry point; the substance lives in `standards/`:
    for every addon regardless of size (a small addon just has thin folders). See *Layout* and the
    starter tree in the context pack. Copy the vendored `libs/` set you actually
    `LibStub()` from an existing Ka0s addon so versions stay consistent (library-stack-§3 — libraries are vendored
-   and committed).
+   and committed). Vendor `libs/LibKa0s/` — the Ka0s-owned shared modules (library-stack-§7) — from the
+   **`LibKa0s` repo's own ship folder**, byte-identical, rather than from a sibling addon's copy, which
+   may itself have drifted (anti-pattern #45).
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
    context pack: the TOC (fixed field order + `#`-section file listing, toc-file-§1/toc-file-§5), entry file, compat
    shims, locale, database/migrations, schema-driven settings (architecture-§5), eager settings-category
    registration with a lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5),
-   the debug console (debug-logging), and the message bus (architecture-§4).
+   the debug console (debug-logging), the message bus (architecture-§4), and the **performance harness**
+   (performance) — `core/PerfSetup.lua`'s descriptor, gated brackets on the hot paths, the reserved
+   `perf` verb, `<Addon>PerfDB`, and `suspend`/`resume`.
 5. **Write tests first.** Stand up `tests/` (headless Lua 5.1 harness) and drive every behavior
    **test-first** (testing). `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
@@ -48,7 +52,7 @@ This playbook is the entry point; the substance lives in `standards/`:
 
 - **Author:** add1kted2ka0s (Ka0s) — **License:** MIT (always) — **Substrate:** Ace3
 - **Scope:** Retail only — a single latest-Retail `## Interface:` line (toc-file-§3)
-- **TOC `Title`:** `Ka0s <Human Name>` — **SavedVariables:** `<Addon>DB` — **Slash:** 2–3 lowercase chars
+- **TOC `Title`:** `Ka0s <Human Name>` — **SavedVariables:** `<Addon>DB` + `<Addon>PerfDB` (savedvariables-§4) — **Slash:** 2–3 lowercase chars
 - **Folder name:** PascalCase (the TOC Title's CamelCase form, minus `Ka0s `)
 - **Standard:** built to & references <https://github.com/tusharsaxena/WowAddonStandards>
 

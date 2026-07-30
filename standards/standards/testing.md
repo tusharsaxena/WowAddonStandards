@@ -72,3 +72,37 @@ toolchain (§3), and pointers to `docs/test-cases.md` (§5) and `docs/smoke-test
 **`docs/testing.md`**, a **required** doc in the canonical `docs/` quartet (documentation-§3). It is
 the contributor-facing home for material the player-facing README deliberately excludes
 (documentation-§1); the README keeps only the `[tests]` badge.
+
+### 7. Measurement runners are outside the gate
+
+`tests/perf.lua` — the offline performance scenario runner (performance-§9) — lives in `tests/` but is
+**not part of the green gate** and **MUST NOT** be run by `tests/run.lua`.
+
+- **MUST** stay out of the gate. It measures rather than verifies, and folding it in would make every
+  commit wait on it.
+- **MUST NOT** assert on wall-clock time (performance-§9). A timing assertion in a suite anyone is
+  required to pass is a flake generator, and a flaky gate teaches people to ignore red.
+- The `--list` inventory and the `[tests]` badge (§5) count the **gate's** cases. A measurement runner's
+  scenarios are not test cases and **MUST NOT** be counted in either.
+
+### 8. Testing an addon that consumes a shared harness
+
+When behaviour moves into a Ka0s-owned library (library-stack-§7), its unit coverage moves with it —
+the addon **MUST NOT** keep a duplicate copy of those cases, because two suites over one behaviour
+means two places a fix has to land.
+
+What stays in the addon is a smaller **integration** suite proving the wiring the addon actually owns.
+For the performance harness (performance) that means, at minimum:
+
+- the **descriptor is well-formed** — the instance exists, and its declared buckets and nesting are the
+  ones the addon means;
+- **every declared bucket is reached by a real bracket**, driving each bucket's genuine entry point. A
+  declared bucket that no bracket reaches is a lie in every report, and nothing else will catch it;
+- **suspend genuinely makes this addon inert** — events unregistered, queued work cancelled, the
+  show-decision ladder refusing (performance-§6) — and resume restores from current state;
+- the **degraded path**: with the library absent, the addon loads and its reserved verb answers instead
+  of erroring (performance-§1).
+
+**MUST** verify the degraded path by actually loading the addon with the library missing, not by
+hand-stubbing the namespace member the code under test reads. A test that builds the stub it then
+asserts on proves only that the test can write a table.

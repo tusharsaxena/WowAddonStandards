@@ -13,7 +13,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 ## Author: add1kted2ka0s
 ## Version: <semver>                     -- managed by bump-version skill
 ## IconTexture: <path|fileID>            -- optional but encouraged
-## SavedVariables: <Addon>DB             -- single global SV per addon
+## SavedVariables: <Addon>DB, <Addon>PerfDB   -- settings global + diagnostics ring (toc-file-§2)
 ## OptionalDeps: Ace3, LibStub, CallbackHandler-1.0, LibSharedMedia-3.0
 ## DefaultState: enabled
 ## Category-enUS: <Combat|Group|Auction|Chat|UI|Misc>
@@ -32,7 +32,8 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 
 ### 2. SavedVariables naming
 
-- **MUST** be `<Addon>DB`, single global (`<Addon>DB`). Already universal in the collection.
+- **MUST** name the settings global `<Addon>DB`. Already universal in the collection.
+- **MUST** declare exactly **two** SavedVariables globals in the order above: `<Addon>DB` (the AceDB tree) and `<Addon>PerfDB` (the performance capture ring, performance-§5). The second is the standard's **one sanctioned non-AceDB SV global** (savedvariables-§4) — a diagnostics store deliberately outside the profile tree so it never rides profile copy, reset, or switch. A **third** top-level global is non-compliant.
 - **SHOULD NOT** use `SavedVariablesPerCharacter` unless the data is genuinely per-character (most Ka0s addons run profile-per-character via AceDB; that's enough).
 - **MUST** declare a `schemaVersion` integer in defaults. **MUST** ship a `Database.lua` migration runner even if the body is empty — schema migration is a from-day-one concern.
 
@@ -61,6 +62,7 @@ libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
 libs\AceAddon-3.0\AceAddon-3.0.lua
 ...
+libs\LibKa0s\LibKa0s.xml                 -- Ka0s-owned shared modules, after Ace3 (library-stack-§7)
 
 # Locales
 locales\enUS.lua
@@ -70,6 +72,7 @@ core\Compat.lua
 core\Constants.lua
 core\State.lua
 core\Util.lua
+core\PerfSetup.lua                       -- before any module taking NS.Perf as an upvalue (performance-§1)
 core\Database.lua
 core\<Addon>.lua
 

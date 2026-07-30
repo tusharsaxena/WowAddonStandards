@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.7.0, 2026-07-26)
+# New Ka0s Addon — Context Pack (v2.8.0, 2026-07-30)
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -21,7 +21,9 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
    contributor has the full standards brief with no external lookups.
 3. **Lay out files.** Use the modular `core/ defaults/ settings/ locales/ modules/` layout — see
    *Layout* below (it is the only layout; a small addon just has thin folders). Copy the vendored
-   `libs/` set you actually `LibStub()` from an existing Ka0s addon so versions stay consistent.
+   `libs/` set you actually `LibStub()` from an existing Ka0s addon so versions stay consistent, and
+   vendor `libs/LibKa0s/` from the `LibKa0s` repo's own ship folder — **byte-identical**, never from a
+   sibling addon's possibly-stale copy (library-stack-§7).
 4. **Fill in the starters.** Work through the *Starter snippets* (TOC, entry, `Compat`, `Locale`,
    `Database`, `Settings`, debug console, tests, message bus, `.luacheckrc`, `.pkgmeta`) and the
    *Hard rules cheat sheet* below. When stuck, reproduce the described patterns in *Patterns to
@@ -66,6 +68,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     Namespace.lua
     State.lua
     Util.lua
+    PerfSetup.lua        -- NS.Perf = LibStub("LibKa0s-Perf-1.0"):New(descriptor) (performance-§1)
     <Addon>.lua          -- AceAddon registration; promotes NS to AceAddon
     Database.lua         -- AceDB + migration
   defaults/
@@ -82,8 +85,12 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     <Feature>.lua
   media/                 -- typed subfolders (logos/, screenshots/, ...)
   libs/                  -- vendored, committed
+    LibKa0s/             -- Ka0s-owned shared modules; byte-identical to its repo (library-stack-§7)
   tests/                 -- run.lua, loader.lua, wow_mock.lua, test_*.lua
-  docs/                  -- agent-context.md, ARCHITECTURE.md, smoke-tests.md, planning; no TODO.md once released (documentation-§4)
+    perf.lua             -- offline scenario runner; OUTSIDE the green gate (performance-§9)
+  docs/                  -- agent-context.md, ARCHITECTURE.md, testing.md, smoke-tests.md, planning; no TODO.md once released (documentation-§4)
+    performance.md       -- required: the addon's perf page (performance)
+    perf-runs/README.md  -- required: the standing capture store (performance-§8)
     audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
     reviews/<YYYY-MM-DD>/-- retained code-review history (audit-review-history)
   README.md  (root, full)   CLAUDE.md (root, stub)   LICENSE (root)
@@ -105,7 +112,7 @@ Fixed field order (toc-file-§1), then a blank line, then the file listing in co
 ## Author: add1kted2ka0s
 ## Version: 0.1.0
 ## IconTexture: <path|fileID>
-## SavedVariables: <Addon>DB
+## SavedVariables: <Addon>DB, <Addon>PerfDB
 ## OptionalDeps: Ace3, LibStub, CallbackHandler-1.0, LibSharedMedia-3.0
 ## DefaultState: enabled
 ## Category-enUS: <Combat|Group|Auction|Chat|UI|Misc>
@@ -119,6 +126,7 @@ libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 libs\AceAddon-3.0\AceAddon-3.0.xml
 # ...(one line per lib you LibStub)
+libs\LibKa0s\LibKa0s.xml                 -- Ka0s-owned shared modules, after Ace3
 
 # Locales
 locales\enUS.lua
@@ -128,6 +136,7 @@ core\Compat.lua
 core\Constants.lua
 core\State.lua
 core\Util.lua
+core\PerfSetup.lua                       -- before anything taking NS.Perf as an upvalue
 core\<Addon>.lua
 core\Database.lua
 
@@ -316,6 +325,51 @@ The console: a `BackdropTemplate` frame (`<Addon>DebugWindow`) on `DIALOG` strat
 
 **Enabled-state is session-only and window-independent** (debug-logging-§5): `NS.State.debug`, default off, **never in SV**, reset every `/reload`. `/<slash> debug` toggles the *window* only; `/<slash> debug on|off` set the flag via a single `DebugLog:SetEnabled(on)` seam; a left-aligned title-bar toggle shows **`Debug: ON`** (green) / **`Debug: OFF`** (red) and flips the same flag. Each state change prints a `NS.PREFIX`-tagged chat ack whose state word is **colour-coded** — `ON` green (`40ff40`) / `OFF` red (`ff4040`) — mirroring the toggle. The `SetEnabled` seam **also appends a console line at both transitions** — `[Debug] logging enabled` / `[Debug] logging disabled` — via the raw `DebugLog:Add` (the disable line must land after the flag flips off, so it can't go through the gated `NS.Debug` sink), and on **enable** additionally emits a one-line **`[Init]` session summary** (addon + version, schema version, active profile — e.g. `[Init] KickCD v1.2.0, schema v1, profile 'Default'`) right after the enable bracket; it rides the enable seam, **not** login, because the session-only flag is off at login and a load-time summary would never render. Addons with no window MAY fall back to `NS.PREFIX`-tagged chat.
 
+### Performance harness (performance)
+
+Measurement is a **vendored Ka0s-owned library**, not per-addon code — do not hand-roll a probe. Vendor `libs/LibKa0s/` (byte-identical to its source repo, library-stack-§7), list it in the TOC after Ace3, and build **one instance at load** in `core/PerfSetup.lua`:
+
+```lua
+local lib = LibStub and LibStub("LibKa0s-Perf-1.0", true)
+if not lib then
+    -- Degrade, never error: a missing diagnostics harness must not break the addon. Carry every
+    -- member the addon actually calls — the gate, the sink, and whatever the slash layer touches.
+    NS.Perf = { on = false, suspended = false, Note = function() end,
+                OnCommand = function() return { "perf harness unavailable — LibKa0s is missing" } end }
+    return
+end
+
+NS.Perf = lib:New({
+    name    = addonName,
+    version = NS.version,
+    sv      = addonName .. "PerfDB",              -- declared in the TOC (toc-file-§2)
+    slash   = "/<slash>",
+    buckets = {                                    -- declared, in report order; nesting declared
+        { key = "<event>" },
+        { key = "<pass>" },
+        { key = "<perItem>", within = "<pass>" },
+    },
+    suspend = function() --[[ unregister events, cancel queued work; visibility refuses at the
+                              source, never by hiding frames (performance-§6) ]] end,
+    resume  = function() --[[ re-register from CURRENT state, republish ]] end,
+    log     = function(line) NS.DebugLog:Add("Perf", line) end,
+    print   = function(line) NS.Print(line) end,
+    showLog = function() NS.DebugLog:Show() end,   -- host decides when the console appears
+    decorate = function(frame, api) --[[ console's own close-button factory (debug-logging-§12) ]] end,
+})
+```
+
+Then bracket the hot paths — **this exact shape**, one upvalue read + one field read + one boolean test when capture is off (performance-§2):
+
+```lua
+local Perf = NS.Perf                              -- load-time upvalue, never an NS lookup
+local t0 = Perf.on and debugprofilestop()
+-- ... work ...
+if t0 then Perf.Note("<pass>", debugprofilestop() - t0) end
+```
+
+Wire `perf` into `NS.COMMANDS` (the lib returns lines; the addon prints them) and check `Perf.suspended` as step 0 of the show-decision ladder. `<Addon>PerfDB` goes in the TOC and in `.luacheckrc`'s `globals`; `debugprofilestop` goes in `read_globals`.
+
 ### Tests (`tests/`, testing)
 
 Headless plain-Lua-5.1 harness. Run `lua tests/run.lua` from the repo root.
@@ -453,7 +507,7 @@ push and never bump the version without an explicit instruction.
 ## Hard rules cheat sheet (memorize)
 
 1. Every file starts with `local addonName, NS = ...`. No `_G[addonName] = {}`.
-2. SavedVariables: `<Addon>DB`, single global, with `schemaVersion`.
+2. SavedVariables: `<Addon>DB` with `schemaVersion`, plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
 5. TOC: single latest-Retail `## Interface:` (Retail only), plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
@@ -467,7 +521,8 @@ push and never bump the version without an explicit instruction.
 13. Per-frame loops: cache db values into module locals, refresh via `M:RefreshUpvalues()` on settings change.
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
 15. File LOC cap: ~1500. Peel when exceeded.
-16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries.
+16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries. A **Ka0s-owned** lib (`libs/LibKa0s/`) additionally **MUST** stay byte-identical to its source repo — `diff -r` empty — and every library change **MUST** be followed by a re-vendor commit here, because both repos stay green while the copies silently diverge (library-stack-§7, anti-pattern #45).
+16a. **Performance harness** (performance): vendor `LibKa0s-Perf-1.0`, build `NS.Perf` from a descriptor in `core/PerfSetup.lua` (degrading to a working stub if the lib is absent), bracket hot paths with the gated `local t0 = Perf.on and debugprofilestop()` form — **zero work when off**, evidenced by the offline zero-overhead scenario, never by a comment — declare buckets with their `within` nesting, expose the reserved **`perf`** verb through `NS.COMMANDS` (the lib returns lines; never let it register a slash), declare `<Addon>PerfDB`, and implement `suspend`/`resume` so the addon goes inert **without a `/reload`** with visibility refused at the **source** of the show decision. Never hand-roll a probe, and never let a shared harness own a frame on your behalf (anti-patterns #43/#44).
 17. Debug: on-screen **console** styled like the main window (debug-logging), not chat, if the addon has a window. Monospace font (10pt) + tagged colour-coded lines via `NS.Debug(tag, …)`; zero-alloc when off. Enabled-state is **session-only** (`NS.State.debug`, default off, reset every `/reload`; never in SV), decoupled from window visibility.
 18. Preview/test mode (preview-mode): addons with a positionable display SHOULD show placeholder data while unlocked and/or via `/<slash> preview`.
 19. Tests: ship a headless `tests/` harness. TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**.
@@ -531,6 +586,10 @@ push and never bump the version without an explicit instruction.
 - [ ] The header **Defaults button** is an AceGUI `Button` **created in the first `OnShow`** (not at registration), with its callback parked on the panel (`panel.defaultsOnClick`) and wired by the builder (options-ui-§5, anti-pattern #42).
 - [ ] Combat-lockdown: secure writes defer on `PLAYER_REGEN_ENABLED`; options-panel open **refuses** under lockdown (grey notice, no defer — options-ui-§2).
 - [ ] Debug **console** (debug-logging) — on-screen, styled like the main window; monospace font (10pt) + tagged colour-coded lines `<ts> | [<Tag>] <content>`; `/<slash> debug` toggles the window, `/<slash> debug on|off` set logging (colour-coded `ON` green / `OFF` red chat ack); enabled-state **session-only** (never in SV), decoupled from window visibility; title-bar `Debug: ON/OFF` toggle; on enable emits an `[Init]` session summary (addon+version, schema, profile). (No-window addons MAY use chat.)
+- [ ] **Performance harness wired (performance)** — `libs/LibKa0s/` vendored and byte-identical to its source repo (`diff -r` empty, library-stack-§7); `core/PerfSetup.lua` builds `NS.Perf` from a descriptor and degrades to a working stub when the lib is absent; TOC lists the lib after Ace3 and `PerfSetup.lua` before its consumers; hot paths use the gated bracket idiom (performance-§2); declared buckets with `within` nesting (performance-§3); `perf` verb in `NS.COMMANDS` (performance-§4); `<Addon>PerfDB` declared in the TOC and `.luacheckrc`; `suspend`/`resume` make the addon inert without a reload, with visibility refused **at the source** (performance-§6).
+- [ ] Integration suite covers the harness's addon-side wiring: descriptor well-formed, **every declared bucket actually reached** by a real bracket, suspend genuinely inert, and the lib-absent path exercised by loading the addon **without** the lib (testing-§8).
+- [ ] `tests/perf.lua` offline runner present, **outside** the green gate, asserting only deterministic quantities and shipping a zero-overhead scenario as evidence that instrumentation is free when capture is off (performance-§9). Its scenarios are **not** counted in `docs/test-cases.md` or the `[tests]` badge.
+- [ ] `docs/performance.md` and `docs/perf-runs/README.md` present (documentation-§3).
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
 - [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; canonical `docs/` quartet present (`agent-context.md`, `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus generated `test-cases.md`; passes the drift check.
@@ -565,6 +624,7 @@ named evidence is in `INDUSTRY_RESEARCH.md`.)
 | Lazy first-OnShow panel build | Latch (`rendered` flag) so the AceGUI body builds once, on first `OnShow`, when the panel width is non-zero. |
 | Lazy header Defaults button | `ensureDefaultsButton(panel)` at the top of every `OnShow` builds the AceGUI `Button` once, after every addon has loaded — so a UI skin's `RegisterAsWidget` hook is already in place and the button isn't left on stock red art (options-ui-§5). |
 | Soft-fallback discipline | Load-safe shims for missing optional libs (AceDB-missing flat table, LSM-missing Blizzard constants) so the addon runs with `OptionalDeps` absent. |
+| Performance capture | One descriptor in `core/PerfSetup.lua` building a per-addon instance of the vendored harness; gated brackets at the real entry points (event handler, coalesced pass, per-item work) with declared nesting; a `perf` verb whose bare form opens a step panel that offers only the next legal step; `suspend`/`resume` making the addon inert without a reload, with the suspended check as step 0 of the show-decision ladder so nothing can re-show a frame behind suspend's back. |
 
 ---
 
