@@ -54,8 +54,38 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, packaging, docs) and record what it does
    now, citing files.
+   - **Look in the right place for the shared subsystems.** The debug console, the options toolkit,
+     the slash dispatcher, the performance harness and the test framework are **not** the addon's
+     code — they are `LibKa0s` modules (library-stack-§7). What the addon owns is a **descriptor**
+     and a **degradation stub** per module, in its own setup file: `core/CoreSetup.lua`,
+     `core/DebugLogSetup.lua`, `settings/OptionsSetup.lua`, the slash descriptor (in the addon's
+     slash file), `core/PerfSetup.lua`, and `tests/_kit/` for the harness. Snapshot **those**, not a
+     search for a hand-built console.
 4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
    `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
+   - **Consuming the library is the compliant state; hand-rolling is the deviation.** An addon that
+     builds `NS.DebugLog`, `NS.Helpers`, its dispatcher or its harness from a LibKa0s descriptor is
+     **compliant** and **MUST NOT** be flagged for "not implementing" what those sections describe —
+     the sections describe behavior the library supplies. The deviation to raise is the opposite one:
+     an addon carrying its own console window, widget makers/flow engine, dispatcher/parser or test
+     framework, or a locally patched `libs/LibKa0s/` copy, is **anti-pattern #47**. Vendoring only
+     part of the library — some files of a multi-file major, or a dependent module without
+     `Core.lua` — is **anti-pattern #48**.
+   - **Check the vendoring is whole.** `libs/LibKa0s/` is the library repo's whole ship folder and
+     the TOC lists its packaged `libs\LibKa0s\LibKa0s.xml` once, in `# Libraries` after Ace3
+     (toc-file-§4/§5). A TOC listing individual `LibKa0s` `.lua` files, or a folder missing files the
+     ship folder has, is a deviation even when the addon currently works — the majors it does not use
+     today are not the ones that will break.
+   - **Check the degradation stub covers every member the addon calls.** For each setup file, list
+     the members the addon reaches on the library instance (grep the call sites) and confirm the
+     library-absent branch answers **all** of them; a stub missing one is not a fallback, it is a
+     crash moved to a rarer code path (performance-§1). Two things not to misread as inconsistency:
+     (a) the **Options** stub is deliberately **load-completing rather than member-answering** — its
+     job is to let the settings page files finish loading (they call members like the shared-media
+     value provider inside schema-row literals at file load), so it publishes real-enough load-time
+     members and no-ops the rest, and it is **correct** that it does not print an honest line per
+     member the way the other stubs do; (b) a stub that deliberately omits a member, with the reason
+     written down, is a decision, not a gap — read the comment before raising it.
 5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap: the ID, the section violated,
    MUST/SHOULD severity, a one-line description, and the fix direction.
 6. **Back every finding with evidence** → `03_EVIDENCE.md`. `file:line` citations that prove each
@@ -63,11 +93,23 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    - **Mechanical checks belong here — run, not reasoned about.** Record the command and its real
      output: `luacheck .`, `lua tests/run.lua`, and — for every **Ka0s-owned** vendored library
      (library-stack-§7) — **`diff -r <LibRepo>/<Lib> <Addon>/libs/<Lib>`**, proving the vendored copy
-     has not drifted from its source repo. That last check exists because drift is otherwise
-     **invisible**: the library's suite passes against the library, the addon's suite passes against
-     the stale copy, and **both repos stay green** while the two diverge (anti-pattern #45). If the
-     sibling library repo is not present on the machine, mark the check **not run** and say so — never
-     infer it from the code looking reasonable, and never quietly skip it.
+     has not drifted from its source repo. For `LibKa0s` that is
+     **`diff -r <LibKa0sRepo>/LibKa0s <Addon>/libs/LibKa0s`** over the **whole folder** (every module,
+     not just the ones the addon calls) plus
+     **`diff -r <LibKa0sRepo>/testkit <Addon>/tests/_kit`** for the vendored test harness — which
+     lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty. This check
+     exists because drift is otherwise **invisible**: the library's suite passes against the library,
+     the addon's suite passes against the stale copy, and **both repos stay green** while the two
+     diverge (anti-pattern #45). A non-empty diff is the evidence for a #45 deviation; a *missing*
+     file on the addon side is the evidence for **#48**. If the sibling library repo is not present on
+     the machine, mark the check **not run** and say so — never infer it from the code looking
+     reasonable, and never quietly skip it.
+   - **Evidence for a shared-subsystem finding cites the descriptor, not the behavior.** The
+     compliance claim for e.g. the debug console is `core/DebugLogSetup.lua:<line>` showing the
+     `LibStub("LibKa0s-DebugLog-1.0")` lookup, the descriptor fields, and the stub branch — plus the
+     `diff -r` line proving the vendored module is the real one. Do **not** cite the library's own
+     source as if it were the addon's implementation, and do not re-audit the library here: it is
+     audited in its own repo.
 7. **Design the remediation** → `04_TECHNICAL_DESIGN.md`. How to close the gaps: the modules/files to
    touch, the shape of the change, risks, and any ordering constraints. Reference deviation IDs.
 8. **Plan the execution** → `05_EXECUTION_PLAN.md`. Ordered, checkable remediation steps grouped into

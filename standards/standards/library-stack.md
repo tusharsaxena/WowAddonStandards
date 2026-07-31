@@ -36,7 +36,7 @@ Ka0s addons **MUST ship every library vendored in `libs/` and committed to git**
 - **MUST** vendor all Ace3 and third-party libs under `libs/` and commit them. **MUST NOT** use `.pkgmeta` `externals:` to fetch libraries.
 - **MUST** use the standard folder-per-lib layout (`libs/AceAddon-3.0/AceAddon-3.0.xml`, `libs/LibStub/LibStub.lua`, …) and load libs **first** in the TOC — the lib's `.xml` where it ships one (it pulls the lib's `.lua` + any sub-files), the `.lua` otherwise.
 - **SHOULD** copy the folder-per-lib set from an existing Ka0s addon's `libs/` so lib versions stay consistent across the suite. Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
-- **MUST** vendor only libs the addon actually `LibStub("X")` — vendor what you use, nothing more. Prune dead weight (e.g. AceConfig where only Profiles needs it; AceLocale/AceBucket/AceComm/AceHook/AceSerializer/AceTab where unloaded).
+- **MUST** vendor only libs the addon actually `LibStub("X")` — vendor what you use, nothing more. Prune dead weight (**except a Ka0s-owned umbrella such as `LibKa0s`, whose ship payload is the whole folder even where the addon wires up only some of its modules — library-stack-§7, anti-patterns #48**) (e.g. AceConfig where only Profiles needs it; AceLocale/AceBucket/AceComm/AceHook/AceSerializer/AceTab where unloaded).
 - **MAY** vendor an addon-private micro-lib (e.g. an 80-line object-pool mixin) the same way.
 
 ### 4. Lib registry pattern
@@ -59,21 +59,52 @@ A Ka0s addon **MUST** stand on its own. The vendoring rule (library-stack-§3) m
 
 ### 7. Ka0s-owned shared libs
 
-Some shared code is **authored inside the collection** rather than pulled from the ecosystem. These are still **libraries** in the library-stack-§6 sense — LibStub-registered code you vendor and own, never a dependency addon — and every rule above applies. This section adds the two rules that only bite when the library's author and its consumers are the same person.
+Some shared code is **authored inside the collection** rather than pulled from the ecosystem. These are still **libraries** in the library-stack-§6 sense — LibStub-registered code you vendor and own, never a dependency addon — and every rule above applies. This section adds the rules that only bite when the library's author and its consumers are the same person.
 
 | Lib | Purpose | Source | Embedded as |
 |---|---|---|---|
-| `LibKa0s` | umbrella for Ka0s-owned shared modules, vendored at `libs/LibKa0s/` exactly as Ace3 is; **one LibStub major per module**, e.g. `LibKa0s-Perf-1.0` (the performance harness, performance-§1) | <https://github.com/tusharsaxena/LibKa0s> — the repo's inner `LibKa0s/` folder is the ship payload; `tests/` and `docs/` stay upstream | vendored |
+| `LibKa0s` | umbrella for Ka0s-owned shared modules, vendored at `libs/LibKa0s/` exactly as Ace3 is; **one LibStub major per module**, e.g. `LibKa0s-Perf-1.0` (the performance harness, performance-§1) | <https://github.com/tusharsaxena/LibKa0s> — the repo's inner `LibKa0s/` folder is the ship payload; `tests/`, `testkit/` and `docs/` stay upstream | vendored |
 
 Vendor from **that repo's** ship folder, not from a sibling addon's `libs/` — a sibling's copy may itself have drifted (anti-patterns #45).
 
-- **MUST** vendor and TOC-list only the modules the addon actually uses (library-stack-§3), and **MUST NOT** list `LibKa0s` under `## Dependencies:` — a Ka0s addon works with no other addon installed (library-stack-§6).
+**The modules.** `LibKa0s` ships **five LibStub majors across eight files**, loaded by one aggregate `LibKa0s.xml`:
+
+| Major | Files | What it owns |
+|---|---|---|
+| `LibKa0s-Core-1.0` | `Core.lua` | secret-safe stringification (`IsConcatSafe`, `SafeToString`), the shared window skin (`SKIN`, `ApplySkin`, `MakeCloseButton`), and a prefixed chat printer built from a descriptor |
+| `LibKa0s-DebugLog-1.0` | `DebugLog.lua` | the on-screen debug console and its copy window, both line formatters, the 500-line buffer, and the enable seam (debug-logging) |
+| `LibKa0s-Slash-1.0` | `Slash.lua` | the slash dispatcher, the help renderer, the `list`/`get`/`set`/`reset` schema CLI, and the type-aware value parser (slash-commands) |
+| `LibKa0s-Options-1.0` | `Options.lua`, `OptionsWidgets.lua`, `OptionsScroll.lua` | the Blizzard settings-canvas panel shell, the widget makers for the schema row types, the two-column flow engine, and the always-shown scrollbar patch (options-ui) |
+| `LibKa0s-Perf-1.0` | `Perf.lua`, `PerfPanel.lua` | the A/B performance capture harness and its guided step panel (performance) |
+
+Hand-rolling any of these inside an addon — a private debug console, a private options toolkit, a private slash dispatcher, a private test harness — is forking the toolkit, and is exactly the duplication the umbrella exists to end (anti-patterns #47).
+
+**Ship payload vs adoption (MUST).** These are two different questions and they get opposite answers. What you **copy** is all of it; what you **wire** is only what you use.
+
+- The **ship payload is the whole folder, always**. Re-vendoring **MUST** copy the source repo's entire inner `LibKa0s/` folder over `libs/LibKa0s/` — every file, every time. **MUST NOT** copy individual module files, or "just the one that changed" (anti-patterns #48). A partial copy is precisely how cross-major minor skew gets manufactured: the addon ends up carrying a new `Perf.lua` over an old `Core.lua`, or a `Core.lua` that never arrived at all — and four of the five majors refuse to register without Core, so a partial copy costs the addon modules it was not even touching.
+- The TOC **MUST** list the single aggregate `libs\LibKa0s\LibKa0s.xml` (toc-file-§5), which is itself the file list. Naming module files individually in the TOC is the same partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file.
+- **Adoption is per module, on the addon's own schedule.** An addon wires only the modules it actually uses — one setup file per module, each resolving its major with `LibStub(major, true)` and degrading to a stub when it is absent (performance-§1 is the worked example). Carrying the source of a module the addon never wires costs a few kilobytes of never-executed file and buys the guarantee that no consumer ever has to reason about which half arrived.
+- **MUST NOT** list `LibKa0s` under `## Dependencies:` — a Ka0s addon works with no other addon installed (library-stack-§6).
+- The library repo's `testkit/` is **not** part of the ship payload. It is the headless test harness, vendored into a consumer's `tests/_kit/`, and **MUST NOT** be placed under `libs/`: everything under `libs/` is TOC-loadable and ships to the player's install, and a test harness has no business there (testing).
+
 - **MUST** use **one LibStub major per module**, not one for the whole umbrella. LibStub picks the highest **minor of a major**: under a single major, an addon vendoring a copy that predates a module would be served a lib missing that module, and every host would need presence guards. Per-module majors keep version skew narrow and make adding a module purely additive — each addon adopts on its own schedule instead of in a lockstep migration.
 - **MUST** keep a **module's descriptor / API contract additive-only** within a major. A field may be added in a later minor, never removed or repurposed: once several addons have vendored copies, you cannot know who holds what.
 
+**Inter-module dependencies (MUST).** Four of the five majors need `LibKa0s-Core-1.0` — for secret-safe stringification, the window skin, or both. The dependency is declared and enforced in exactly one direction.
+
+- A module that needs another **MUST** declare a **minimum minor floor** for it, and **MUST `return` before `LibStub:NewLibrary`** when that floor is unmet — dependency missing, or present at a lower minor. The major is then **never registered**, so `LibStub("LibKa0s-X-1.0", true)` yields nil and the module is **absent** rather than half-wired. The host's setup file sees the nil, says once that the library is missing, and falls back to its stub. That is the honest failure, and it is the only one a host can actually act on.
+- **MUST NOT** negotiate in the other direction. A module **MUST NOT** feature-detect a too-old dependency and run a reduced version of itself, and a dependent **MUST NOT** patch a member onto its dependency to satisfy the floor. Half a module is a defect that surfaces at some arbitrary later call site, in the hands of a user; an absent module surfaces at load, where the fallback already lives.
+- **Raising a floor is a breaking change to the VENDORING, not to the API.** Nothing in the signature moved, the library's own suite is green, and every consumer whose `libs/` still holds the older dependency loses the **whole module** until it re-vendors. A floor bump is therefore a re-vendor trigger, and **MUST** be called out as one in the changelog entry rather than left to be discovered in-game.
+- **A multi-file major can fail at CALL time rather than at load time**, and this is the sharpest reason the payload is whole-folder. If the shell file loads and an attach file does not, the major still registers and `:New` still succeeds: the host is handed an instance that looks whole, and stays looking whole until something reaches the missing member — possibly a panel build away, possibly only on a page the user opens twice a year. A module **MAY** ship no-op fallbacks for members hosts are expected to call unconditionally, and **SHOULD** where a host would otherwise need a guard at every call site, but no arrangement of fallbacks makes a partial copy safe. Copy the folder.
+
+**A vendored `libs/` folder is read-only (MUST).** The library is yours, which makes the temptation worse rather than better.
+
+- **MUST NOT** edit anything under `libs/` — including a one-line fix that is plainly correct and plainly urgent. A library defect found while working in a consumer is a **finding to fix upstream and re-vendor**, never a local patch.
+- The reason is the shape of the failure, not purity: the next re-vendor overwrites the patch silently, and the behavior it fixed comes back as a regression with **no cause anywhere in the consumer's history** — the change that reverted it was a file copy, not a commit anyone will find by reading the log. This is the library-stack-§5 fork ban applied to a library you own (anti-patterns #45).
+
 **Vendor sync (MUST).** Vendoring a third-party lib is a one-time copy that stays stable for months. Vendoring a lib you also author is an ongoing **sync**, and the drift window is a single afternoon.
 
-- The vendored copy **MUST** be **byte-identical** to the source repo's ship folder. `diff -r <LibRepo>/<Lib> <Addon>/libs/<Lib>` **MUST** be empty. A hand-patched `libs/` copy is a fork nobody knows about (library-stack-§5).
+- The vendored copy **MUST** be **byte-identical** to the source repo's ship folder, whole-folder and file-for-file. `diff -r <LibRepo>/<Lib> <Addon>/libs/<Lib>` **MUST** be empty — which is also what catches a partial re-vendor, since a missing or stale file shows up in the same diff.
 - A change to a Ka0s-owned lib **MUST** be followed by a **re-vendor commit in every consumer** that depends on it, and that commit **SHOULD** be its own so the sync is legible in history rather than buried in a feature diff.
 - **This is the step that gets forgotten, and nothing about "the tests are green" will catch it**: the library's suite passes against the library, and the consumer's suite passes against a stale copy that still works. Both repos stay green while the copies diverge (anti-patterns #45). The `diff -r` check belongs in the audit's evidence set (`AUDIT.md`).
 
@@ -84,4 +115,4 @@ Vendor from **that repo's** ship folder, not from a sibling addon's `libs/` — 
 - A multi-file major **MUST** pair its files by version, not merely by presence: a file that attaches to the module's main table **MUST** re-attach whenever the table underneath it came from a different copy, or a host ends up running one file from copy A and another from copy B — the mismatch the single-major layout exists to prevent.
 - The library **MUST** publish the **live minor of every file** on its table (a `MODULES` registry or equivalent), so version skew is answerable at runtime rather than by reading source. With several consumers each carrying a copy, "which half came from where?" is a question someone will need answered from in-game.
 - The lib repo's own **semver tag is a separate axis** from any file minor and **MUST NOT** be conflated with one (versioning-git).
-- The lib repo **SHOULD** make the coupling mechanical rather than remembered: a test that fails when a file's minor and the changelog entry for it disagree, and a written release order ending in *re-vendor every consumer*. — e.g. register an ElvUI/EllesmereUI skin for the addon's own frames, or subscribe to a DBM/BigWigs timer callback — **only when all** of the following hold: (a) the integration is presence-guarded (`C_AddOns.IsAddOnLoaded("ElvUI")`) and never assumes the suite loaded; (b) the suite is listed in `## OptionalDeps:`, never `## Dependencies:`; (c) with the suite absent the addon falls back to its own styling/behavior with no loss of core function. This is the same soft-fallback discipline required for optional libraries (library-stack-§3–§4): the addon is whole on its own and the integration is pure enhancement.
+- The lib repo **MUST** make the coupling mechanical rather than remembered: a test that fails when a file's minor and its changelog entry disagree, and a written release order ending in *re-vendor every consumer*. Remembered coupling fails on precisely the release where it matters — the small one, shipped in a hurry — and there is a working reference implementation of that test now (testing), so a lib repo leaving this to discipline is a choice rather than a constraint.

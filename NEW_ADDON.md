@@ -25,18 +25,51 @@ This playbook is the entry point; the substance lives in `standards/`:
    for every addon regardless of size (a small addon just has thin folders). See *Layout* and the
    starter tree in the context pack. Copy the vendored `libs/` set you actually
    `LibStub()` from an existing Ka0s addon so versions stay consistent (library-stack-§3 — libraries are vendored
-   and committed). Vendor `libs/LibKa0s/` — the Ka0s-owned shared modules (library-stack-§7) — from the
-   **`LibKa0s` repo's own ship folder**, byte-identical, rather than from a sibling addon's copy, which
-   may itself have drifted (anti-pattern #45).
+   and committed). Then vendor the two Ka0s-owned payloads (library-stack-§7) from the **`LibKa0s`
+   repo's own ship folders**, byte-identical, rather than from a sibling addon's copy, which may
+   itself have drifted (anti-pattern #45):
+   - the repo's inner **`LibKa0s/` folder → `libs/LibKa0s/`**, copied **whole** — every module, not
+     only the ones the first release calls — and TOC-listed as the single line
+     `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block **after Ace3** (toc-file-§4/§5). Copying
+     part of a multi-file major is anti-pattern #48: the dependent modules refuse to register without
+     `Core.lua` and go silently **absent**, and a shell without its attach file `:New`s successfully
+     and fails at **call** time, a panel build later.
+   - the repo's **`testkit/` folder → `tests/_kit/`** — the shared headless harness (testing). It goes
+     under `tests/`, **never** `libs/`, because it must not ship with the addon.
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
    context pack: the TOC (fixed field order + `#`-section file listing, toc-file-§1/toc-file-§5), entry file, compat
-   shims, locale, database/migrations, schema-driven settings (architecture-§5), eager settings-category
-   registration with a lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5),
-   the debug console (debug-logging), the message bus (architecture-§4), and the **performance harness**
-   (performance) — `core/PerfSetup.lua`'s descriptor, gated brackets on the hot paths, the reserved
-   `perf` verb, `<Addon>PerfDB`, and `suspend`/`resume`.
-5. **Write tests first.** Stand up `tests/` (headless Lua 5.1 harness) and drive every behavior
-   **test-first** (testing). `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
+   shims, locale, database/migrations, schema-driven settings (architecture-§5), and the message bus
+   (architecture-§4).
+   **The shared subsystems are not written here — they are consumed.** The chat printer, the debug
+   console, the options toolkit, the slash dispatcher and the performance harness are `LibKa0s`
+   modules; a new addon is born with one **setup file** per module, each holding a **descriptor** and
+   a **degradation stub** for when the library is absent, and nothing else. Hand-building any of them
+   is anti-pattern #47. In TOC load order:
+   - `core/CoreSetup.lua` — `LibKa0s-Core-1.0`: the secret-safe stringifier and the prefixed chat
+     printer (`NS.Print` / `NS.Util.print`, one function object — architecture-§2). Placed after the
+     file defining `NS.PREFIX` and before everything that prints; pass the prefix as a **function**
+     so a later change to it is not frozen in at load.
+   - `core/PerfSetup.lua` — `LibKa0s-Perf-1.0` (performance): the descriptor's declared buckets with
+     their `within` nesting, `<Addon>PerfDB` as `sv`, `suspend`/`resume`, gated brackets on the hot
+     paths, and the reserved `perf` verb dispatched by the host. Placed before any module taking
+     `local Perf = NS.Perf` as a load-time upvalue.
+   - `core/DebugLogSetup.lua` — `LibKa0s-DebugLog-1.0` (debug-logging): the frame-name prefix, the
+     title, the monospace font, the `isEnabled`/`setEnabled` pair over the addon's **own** flag, and
+     the `[Init]` session summary. Publishes the gated sink `NS.Debug`.
+   - the **slash descriptor** in `settings/Slash.lua` — `LibKa0s-Slash-1.0` (slash-commands): the
+     addon keeps its ordered `NS.COMMANDS` table and its host verbs and passes them in; the library
+     supplies the dispatcher, help renderer, formatters and the type-aware value parser.
+   - `settings/OptionsSetup.lua` — `LibKa0s-Options-1.0` (options-ui): the `get`/`set`/`applyDefault`
+     seams, `rowsForPage`/`allRows`, the color codecs, and eager settings-category registration with a
+     lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5). Loads before
+     every `settings/<page>.lua`.
+   Each stub **MUST** answer every member the addon actually calls — a stub missing one is a crash
+   moved to a rarer code path, not a fallback.
+5. **Write tests first.** Stand up `tests/` on the vendored `tests/_kit/` harness and drive every
+   behavior **test-first** (testing). Test what is **yours** — the descriptors, the degradation stubs,
+   and the addon's own logic — and do not re-test the library's internals: they are covered in the
+   `LibKa0s` repo, and a second copy of those cases is the duplication this whole arrangement exists
+   to remove. `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
    (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
    incl. the standard-link badge → logo → description → Screenshots → Usage → How it works → FAQ →
