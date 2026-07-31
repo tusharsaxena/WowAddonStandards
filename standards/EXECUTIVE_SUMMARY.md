@@ -8,7 +8,7 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in four places** — the TOC `X-Standard` field, the README standard badge, the root `CLAUDE.md` "Standards compliance (read first)" section, and `docs/agent-context.md`'s "Hard rules" — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v2.14.0**).
+**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in four places** — the TOC `X-Standard` field, the README standard badge, the root `CLAUDE.md` "Standards compliance (read first)" section, and `docs/agent-context.md`'s "Hard rules" — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v2.15.0**).
 
 ## The six patterns it makes canonical
 
@@ -31,4 +31,4 @@ These were validated against the Ka0s collection and the broader ecosystem (see 
 
 - **Retail (Mainline) only.** Classic/other flavors are out of scope; addons ship a single latest-Retail `## Interface:` line (`toc-file-§3`).
 - **CI / GitHub Actions** are intentionally out of scope per Ka0s decision. **Local** testing and linting are **in scope** — a headless Lua 5.1 harness plus `luacheck` (`testing`).
-- A long-term **`Ka0s-Core`** sibling addon (shared-engine extraction, including the debug-console + test scaffolding) is recorded as a future direction in `STANDARDS.md open-evolutions`, not pursued now.
+- Shared Ka0s-owned code ships as the vendored **`LibKa0s`** library — five LibStub majors across eight files (Core, DebugLog, Slash, Options, Perf) plus a shared `testkit/` — not as a sibling addon, because library-stack-§6 forbids requiring another addon to be installed. Addons **consume** these rather than hand-rolling them (anti-patterns #47).

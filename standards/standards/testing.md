@@ -246,6 +246,14 @@ That is strictly worse than an absent test, which at least leaves a visible gap.
   handler not registered, a note not appended, a bucket not counted — by **mutating the implementation
   and watching the case go red**, then reverting. An assertion that a table stayed empty passes just as
   happily when the code path that would have filled it was never reached at all.
+  - Mutation leaves no artifact in the repo, so this rule is **not mechanically auditable**. An audit
+    **MUST NOT** record its absence as a deviation; it records it as *unverified*. To make it
+    checkable, the case **SHOULD** carry a one-line comment naming the mutation that reddens it
+    (`-- red under: drop the ClearScroll in RenderUnitPanel`) — which is also the cheapest way for
+    the next author to re-run the check rather than re-derive it.
+  - Restore the mutated file from a `cp` backup taken immediately before, never with
+    `git checkout <file>`: mid-change the work is uncommitted, so `git checkout` reverts to HEAD and
+    destroys it. This has cost a full milestone's rewrite in this collection.
 - **MUST NOT** treat *"it raised"* as sufficient. Assert on **what** it raised; an assertion that
   something threw passes just as happily on a typo in the test itself.
 - **MUST NOT** build the object under test inside the test and then assert on it. That is §8's

@@ -83,20 +83,27 @@ Because chat/debug lines end in `table.concat`/`string.format`, an unguarded sec
 - **MUST NOT** pass a value read from a combat-protected API into `table.concat`, `string.format`, `print`, or any Lua string builder without guarding it. For **display**, hand the raw value straight to `AbbreviateNumbers()` or the widget setter — never `tonumber()` it first (returns nil / loses the value) and never compare it with `<`/`>` (raises).
 - The shared chat/debug output seam (the `NS.PREFIX` printer slash-commands-§4, the debug sink debug-logging-§4) **MUST** be secret-safe: route every argument through one **secret-safe stringifier** that substitutes a sentinel (e.g. `"<secret>"`) for any value a real `table.concat` would reject. Detection **MUST probe `table.concat`, not `..`** — a `..`-based probe reports a secret as *safe* (the operator propagates rather than raises) and lets it slip straight through to the real concat.
 
-```lua
--- Detect via the operation that actually rejects a secret: table.concat (NOT `..`, which
--- propagates secretness without raising). There is no public issecret() API.
-local function probeConcat(v) return table.concat({ v }) end
-function NS.IsConcatSafe(v) return (pcall(probeConcat, v)) end
+- The stringifier and the printer are **`LibKa0s-Core-1.0`'s**, not the addon's. An addon **MUST NOT**
+  hand-roll either (anti-patterns #47): it publishes the library's own function values from its
+  `core/CoreSetup.lua` seam — `NS.IsConcatSafe = lib.IsConcatSafe`, `NS.SafeToString = lib.SafeToString`
+  — and builds its chat printer from `lib:New{ prefix = ... }`. The sentinel is `lib.SECRET`.
 
-function NS.SafeToString(v)
-  if v == nil then return "nil" end
-  if type(v) == "boolean" then return tostring(v) end   -- never secret; concat rejects it anyway
-  if NS.IsConcatSafe(v) then return tostring(v) end
-  return "<secret>"
+```lua
+-- core/CoreSetup.lua — the seam, not the algorithm.
+local lib = LibStub and LibStub("LibKa0s-Core-1.0", true)
+if lib then
+  NS.IsConcatSafe = lib.IsConcatSafe        -- pcall-probes table.concat, NOT `..`
+  NS.SafeToString = lib.SafeToString        -- nil/boolean pass through; otherwise lib.SECRET
+  NS.Print = lib:New{ prefix = function() return NS.PREFIX end }.Print
 end
--- NS.Print / NS.Debug build each line from NS.SafeToString(arg) — never raw tostring / `..`.
+-- NS.Print / NS.Debug build each line from the library's stringifier — never raw tostring / `..`.
 ```
+
+  The library probes `table.concat` rather than `..` for the reason above, and the probe lives in one
+  place for the whole collection precisely so that no addon has to get it right twice. A degraded
+  build (library absent) falls back to the addon's own guarded implementations in the same file — that
+  branch is the **only** sanctioned place a second copy may exist, because a printer that answered
+  "not installed" instead of printing would silence every line the addon emits (debug-logging-§7).
 
 - The addon **MUST** funnel **every** chat and debug line through a **single shared secret-safe printer** — one `NS.Print` for chat, one debug sink for the console (debug-logging-§4) — each building its line from the secret-safe stringifier. The guard then lives in exactly one place and every call site inherits it. Concretely, call sites **MUST NOT**:
   - call the global `print()` directly (it neither carries the `NS.PREFIX` tag nor secret-stringifies its args);
@@ -105,4 +112,4 @@ end
 
   Instead, each file does `local print = NS.Print` (and routes debug through the debug sink) and emits `print("message")` — the shared printer prepends the tag and secret-stringifies every argument. A file that calls the global `print()`, or pre-concatenates args before the printer, is **non-compliant even if it is never handed a secret today** — the next value routed through it may be one, and the whole point of the single seam is that no call site has to reason about that. Where AceConsole-3.0 is embedded, the shared `NS.Print` **MUST** be reclaimed after `NewAddon` so its `:Print` mixin cannot silently replace the secret-safe printer (architecture-§2, slash-commands-§4).
 
-Reference implementation (in the collection): the absorb tracker's `NS.IsConcatSafe` / `NS.SafeToString` in `core/Util.lua`, routed through by both `NS.Print` and `NS.DebugPrint`; the loot-history browser applies the same seam (`core/Util.lua` printer, reclaimed in `core/LootHistory.lua`).
+Reference implementation: `LibKa0s-Core-1.0` (`Core.lua`) owns the probe, the stringifier and the prefixed printer; a consuming addon's `core/CoreSetup.lua` publishes them and reclaims `NS.Print` after `NewAddon` where AceConsole is embedded (architecture-§2). An addon that still defines its own stringifier is carrying a pre-library copy — that is the deviation, not the absence of one.
