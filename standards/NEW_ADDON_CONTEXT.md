@@ -1,4 +1,28 @@
-# New Ka0s Addon — Context Pack (v2.16.0, 2026-08-02)
+# New Ka0s Addon — Context Pack (v2.17.0, 2026-08-02)
+
+
+> ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
+>
+> This pack is **scaffolding**. It is fetched at runtime, used for the session that scaffolds an
+> addon, and **discarded**. It **MUST NOT** be copied into an addon repo — not as
+> `docs/agent-context.md`, not under any other name (documentation-§3, anti-pattern #49).
+>
+> ```sh
+> curl -fsSL https://raw.githubusercontent.com/tusharsaxena/WowAddonStandards/master/standards/NEW_ADDON_CONTEXT.md \
+>   -o "$TMPDIR/NEW_ADDON_CONTEXT.md"      # a temp dir. NEVER the addon's docs/.
+> ```
+>
+> Everything below is a **starter**: a kickstart walkthrough, a starter tree, starter snippets and a
+> "definition of done for v0.1.0". Every question it answers is answered the moment the addon
+> exists. Stored in the repo it becomes a brief that describes the addon on the day it was born,
+> forever — and because it is loaded as **working context**, a stale copy does not go quiet, it
+> gets followed. A pack still showing how to hand-write a debug console, a slash dispatcher or a
+> test harness will get one hand-written, in an addon that replaced all three with `LibKa0s`
+> (anti-pattern #47). Nothing goes red: no test covers a doc, and lint does not read prose.
+>
+> The durable per-addon context has its own required homes — the root `CLAUDE.md` stub (identity,
+> standards compliance), `docs/ARCHITECTURE.md` (what this addon *is*) and `docs/testing.md` (how
+> to verify it). Put lasting facts there. Never here.
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -109,7 +133,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     wow_mock.lua         -- thin extender over _kit/mock_base.lua
     test_*.lua           -- one suite per module
     perf.lua             -- offline scenario runner; OUTSIDE the green gate (performance-§9)
-  docs/                  -- agent-context.md, ARCHITECTURE.md, testing.md, smoke-tests.md, planning; no TODO.md once released (documentation-§4)
+  docs/                  -- ARCHITECTURE.md, testing.md, smoke-tests.md, planning; NO agent-context.md (documentation-§3); no TODO.md once released (documentation-§4)
     performance.md       -- required: the addon's perf page (performance)
     perf-runs/README.md  -- required: the standing capture store (performance-§8)
     audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
@@ -742,9 +766,9 @@ Libraries are **vendored under `libs/` and committed** (`STANDARDS.md library-st
 
 `libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because four of the five majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
 
-### Docs — root `CLAUDE.md` stub + `docs/agent-context.md`
+### Docs — root `CLAUDE.md` stub + the `docs/` trio
 
-Root ships a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`; everything else lives under `docs/` (documentation). The stub is short and **MUST** carry a `## Standards compliance (read first)` section; the contents of *this* pack become `docs/agent-context.md`, whose `## Hard rules` **MUST** open with the conform-to-the-standard rule pointing back to the stub (documentation-§6).
+Root ships a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`; everything else lives under `docs/` (documentation). The stub is short and **MUST** carry a `## Standards compliance (read first)` section (documentation-§6). **This pack is NOT copied into the addon** — see the banner at the top of this file. The `docs/` trio is `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`.
 
 ```markdown
 <!-- root CLAUDE.md (STUB — never the full brief) -->
@@ -773,26 +797,15 @@ When in doubt, treat standard conformance as a hard requirement and ask.
 
 Start here, then read the docs:
 
-- **`docs/agent-context.md`** — the full agent brief (stack, layout, hard rules, invariants,
-  the `NS` bus, working environment, response style).
 - **`docs/ARCHITECTURE.md`** — module map, settings schema, message bus, slash surface, event
-  wiring, taint notes, known limitations.
+  wiring, taint notes, known limitations. What this addon actually is.
+- **`docs/testing.md`** — how to verify: the headless harness, lint, and the green commit gate.
 - Topic detail in `docs/` as needed (`schema.md`, `settings-panel.md`, `smoke-tests.md`, …).
 
 Green gate before every commit: `lua tests/run.lua` and `luacheck .` (0/0). Never auto-stage/commit/
 push and never bump the version without an explicit instruction.
 ```
 
-```markdown
-<!-- docs/agent-context.md — the FIRST bullet of ## Hard rules -->
-- **Conform to the Ka0s WoW Addon Standard** (https://github.com/tusharsaxena/WowAddonStandards).
-  It is the source of truth for layout, TOC, the Ace substrate, schema-driven settings, slash/prefix
-  conventions, locales, Compat, tests/lint, and doc structure. **If a change would deviate, STOP and
-  flag it** — never silently deviate or silently conform. The user decides whether it is (a) an
-  accepted, documented deviation for this addon, or (b) a change to the standard itself (updated
-  upstream in the standards repo, then this addon follows the new rule). See the root
-  [CLAUDE.md](../CLAUDE.md) "Standards compliance" section.
-```
 
 ---
 
@@ -822,10 +835,10 @@ push and never bump the version without an explicit instruction.
 18. Preview/test mode (preview-mode): addons with a positionable display SHOULD show placeholder data while unlocked and/or via `/<slash> preview`.
 19. Tests: **vendor the shared kit** — the LibKa0s repo's root-level `testkit/` → `tests/_kit/`, never `libs/`, never edited locally (testing-§1). `tests/run.lua` keeps only the load list, the lifecycle kick and the suite list; `tests/wow_mock.lua` is a **thin extender** over `_kit/mock_base.lua`. Derive the addon's file list from the **TOC** and spell out the vendored library files explicitly, in XML order (testing-§9). TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**.
 19a. Test-case inventory & badge (testing-§5): ship a **generated** `docs/test-cases.md` (full per-suite case enumeration + totals, produced by a `--list` mode of the runner — `lua tests/run.lua --list > docs/test-cases.md`, never hand-authored; it is the authoritative pass count) and a **static** X/Y `[tests]` README badge. Regenerate the doc and update the badge **in the same change** whenever the suite changes (a case added/removed/renamed or the count moved). No CI.
-20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else under `docs/`. Canonical `docs/` quartet (all addons): **`agent-context.md`** (full agent brief), `ARCHITECTURE.md`, `testing.md` (verify-how-to), `smoke-tests.md`; plus the generated `test-cases.md` (testing-§5) and topic-detail docs as needed. Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
+20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else under `docs/`. Canonical `docs/` **trio** (all addons): `ARCHITECTURE.md`, `testing.md` (verify-how-to), `smoke-tests.md`; plus the generated `test-cases.md` (testing-§5) and topic-detail docs as needed. **MUST NOT** ship `docs/agent-context.md` — this pack is fetched at runtime, never stored (documentation-§3, anti-pattern #49). Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
 20a. `README.md` is a **player-facing** document that renders on **CurseForge as well as GitHub** — so it **MUST NOT** use `<…>` angle-bracket placeholders anywhere (CurseForge strips them as HTML even inside backticks; write the argument bare, keep `[…]` for optional ones) nor percent-escapes for spaces in badge URLs. Deliberate HTML like `<br>` is fine. It is a document — written for the person who installed the addon (what it does, how to use it, how to fix common problems), in plain language, free of internal jargon and machine-generated tells; contributor material (test harness, lint, build, internals) stays out of it, under `docs/`. It follows the **canonical section order** (documentation-§1): title → badges (`[wow]` → version → license → standard → `[tests]`, that exact order and these exact templates: `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)`, `![License](https://img.shields.io/badge/License-MIT-orange)`, `[![Standard](https://img.shields.io/badge/Ka0s-WoW_Addon_Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)`, `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`; the `[wow]` and `[tests]` badges MUST be updated in lockstep with the TOC `## Interface:` and the test inventory respectively) → logo → description → **What's new in `<X.Y.Z>`** (top user-facing highlights of the current release, mirroring the newest Version History row; rolled forward on every version bump) → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Version History (there is **no** `## Testing` section — verify-how-to lives in `docs/`; the README keeps only the `[tests]` badge). TOC follows the fixed field order + `#`-section file listing (toc-file-§1/toc-file-§5).
 20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (documentation-§4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
-20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **four** places — TOC `X-Standard`, README standard badge, the root `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet (pointing back to the `CLAUDE.md` section). STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
+20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **three** places — TOC `X-Standard`, README standard badge, and the root `CLAUDE.md` `## Standards compliance (read first)` section. There is no fourth place; the old one was a file the standard now forbids. STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
 21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (audit-review-history). Kept, not deleted.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
@@ -866,7 +879,8 @@ push and never bump the version without an explicit instruction.
 - Full agent brief in the root `CLAUDE.md` (root is a stub; brief lives in `docs/`).
 - `TODO.md` in a **released** addon (track the backlog in GitHub issues; allowed only in an unreleased, in-development addon, deleted before first release).
 - Non-canonical `README.md` section order, or a TOC departing from the required field order / file-listing structure (documentation-§1, toc-file-§1/toc-file-§5).
-- Missing the standards reference in project memory & context: no `## Standards compliance (read first)` section in `CLAUDE.md`, or `docs/agent-context.md`'s `## Hard rules` not opening with the conform-to-the-standard rule pointing back to it (documentation-§6).
+- Missing the standards reference in project memory & context: no `## Standards compliance (read first)` section in `CLAUDE.md` (documentation-§6).
+- Shipping this pack in the repo as `docs/agent-context.md` or under any other name (documentation-§3, anti-pattern #49).
 - British spelling in authored English text — `colour`/`grey`/`behaviour`/`centre`/`cancelled`/`-ise`/`-isation` in a locale key or value, a player-visible string, a comment, an identifier, or docs (localization-§5, anti-pattern #46).
 - Creating a feature branch without an explicit request (work trunk-based).
 
@@ -901,8 +915,8 @@ push and never bump the version without an explicit instruction.
 - [ ] `docs/performance.md` and `docs/perf-runs/README.md` present (documentation-§3).
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
-- [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; canonical `docs/` quartet present (`agent-context.md`, `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus generated `test-cases.md`; passes the drift check.
-- [ ] **Standards reference in memory & context (documentation-§6)** — all four present: TOC `X-Standard`, README standard badge, `CLAUDE.md` `## Standards compliance (read first)` section, and `docs/agent-context.md`'s first `## Hard rules` bullet pointing back to it.
+- [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; canonical `docs/` **trio** present (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus generated `test-cases.md`; **no `docs/agent-context.md`**; passes the drift check.
+- [ ] **Standards reference in memory & context (documentation-§6)** — all three present: TOC `X-Standard`, README standard badge, and the root `CLAUDE.md` `## Standards compliance (read first)` section.
 - [ ] `README.md` is player-facing and plain-language (no contributor material, no `## Testing` section) and follows the canonical section order (documentation-§1), including a **`## What's new in <X.Y.Z>`** highlights section above the screenshots (mirrors the top Version History row; rolled forward on each version bump), **Usage** (Slash-commands + Settings-panel tables), **Issues and feature requests** (→ GitHub issues), and **Version History**.
 - [ ] TOC follows the fixed field order and `#`-section file-listing structure (toc-file-§1/toc-file-§5).
 - [ ] **No `TODO.md`** at release (backlog is in GitHub issues); any pre-release `docs/TODO.md` has been removed (documentation-§4).

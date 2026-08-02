@@ -17,10 +17,14 @@ This playbook is the entry point; the substance lives in `standards/`:
 1. **Scaffold the skeleton.** Lay down the Ace3 stack: AceAddon registration, AceDB saved variables,
    the modular folder layout, MIT `LICENSE`, and an AceConsole slash command. This is the skeleton the
    rest of the pack fills in.
-2. **Drop in the context pack.** Put the *contents* of `standards/NEW_ADDON_CONTEXT.md` into the new
-   addon's `docs/` as the full agent context, and leave a short root `CLAUDE.md` **stub** that points
-   to it (documentation). Now every agent and contributor has the complete standards brief with no external
-   lookups.
+2. **Read the context pack — do NOT copy it in.** Fetch `standards/NEW_ADDON_CONTEXT.md` to a
+   **temp directory**, work from it for this session, and discard it. It **MUST NOT** be written
+   into the addon under any name (documentation-§3, anti-pattern #49): it is scaffolding, every
+   question it answers is answered the moment the addon exists, and a stored copy is loaded as
+   working context — so a stale one gets *followed*, not ignored. Leave a short root `CLAUDE.md`
+   **stub** carrying identity and `## Standards compliance (read first)`, and put the durable
+   per-addon context where the standard requires it: `docs/ARCHITECTURE.md` (what this addon is)
+   and `docs/testing.md` (how to verify it).
 3. **Lay out files.** Use the single modular layout — `core/ modules/ defaults/ settings/ locales/` —
    for every addon regardless of size (a small addon just has thin folders). See *Layout* and the
    starter tree in the context pack. Copy the vendored `libs/` set you actually
