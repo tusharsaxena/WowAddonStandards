@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.15.0, 2026-07-31)
+# New Ka0s Addon — Context Pack (v2.16.0, 2026-08-02)
 
 **Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
@@ -829,7 +829,7 @@ push and never bump the version without an explicit instruction.
 21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (audit-review-history). Kept, not deleted.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
-24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. See `STANDARDS.md standalone-windows`.
+24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px grey highlight just inside it, plus a gold title and a grey divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See `STANDARDS.md standalone-windows-§2`.
 
 ## Forbidden patterns
 
