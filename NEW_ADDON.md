@@ -10,7 +10,7 @@ This playbook is the entry point; the substance lives in `standards/`:
 - **[`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md)** — the full context pack:
   kickstart walkthrough, the modular starter tree, starter snippets (TOC, entry, `Compat`, `Locale`, `Database`,
   `Settings`, debug console, tests, message bus, `.luacheckrc`, `.pkgmeta`), hard-rules cheat sheet,
-  and the Definition-of-Done checklist. **Drop this file's contents into the new addon** (see step 2).
+  and the Definition-of-Done checklist. **It is scaffolding you read, never a file you ship** (see step 2).
 
 ## Steps
 

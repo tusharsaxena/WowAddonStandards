@@ -88,7 +88,7 @@ if every case in it can fail.
 
 The human-facing "how to verify this addon" page — the commands and gate above (§2/§4), the local
 toolchain (§3), and pointers to `docs/test-cases.md` (§5) and `docs/smoke-tests.md` — lives at
-**`docs/testing.md`**, a **required** doc in the canonical `docs/` quartet (documentation-§3). It is
+**`docs/testing.md`**, a **required** doc in the canonical `docs/` trio (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; documentation-§3). It is
 the contributor-facing home for material the player-facing README deliberately excludes
 (documentation-§1); the README keeps only the `[tests]` badge.
 

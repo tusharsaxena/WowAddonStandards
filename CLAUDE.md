@@ -37,7 +37,7 @@ standards/                        -- THE STANDARD (living, canonical). Everythin
   EXECUTIVE_SUMMARY.md            -- one-page TL;DR of the standard
   STANDARDS.md                    -- THE STANDARD: index/entry point + the Sections map (canonical)
   standards/                      -- the standard's sections, one unnumbered file each (layout.md, ...)
-  NEW_ADDON_CONTEXT.md            -- drop-in CLAUDE.md context pack for new addons (NEW_ADDON.md's detail)
+  NEW_ADDON_CONTEXT.md            -- new-addon scaffolding pack (NEW_ADDON.md's detail); fetched, never stored
   INDUSTRY_RESEARCH.md            -- research foundation: patterns from 10 reference addons
   ADDONS.md                       -- THE ROSTER: editable list of in-scope addons (standards-process input)
   _raw/_industry/                 -- per-addon raw research reports (evidence for INDUSTRY_RESEARCH.md)

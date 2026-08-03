@@ -84,9 +84,9 @@ authoritative steps: [`AUDIT.md`](AUDIT.md). At a glance:
 ## C. Start a new addon
 
 Scaffold a new Ka0s addon that is compliant from day one. Full walkthrough: [`NEW_ADDON.md`](NEW_ADDON.md).
-In short: run `/wow-addon:new-addon` to scaffold the Ace3 skeleton, drop the
-[`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) pack into the addon's `docs/`,
-build against the standard, and add the addon's row to [`standards/ADDONS.md`](standards/ADDONS.md).
+In short: run `/wow-addon:new-addon` to scaffold the Ace3 skeleton, build against the standard
+working from the [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) pack — which is
+fetched to a temp directory and **never** written into the addon (documentation-§3), and add the addon's row to [`standards/ADDONS.md`](standards/ADDONS.md).
 
 ---
 
@@ -104,7 +104,7 @@ WowAddonStandards/
     EXECUTIVE_SUMMARY.md               -- one-page TL;DR of the standard
     STANDARDS.md                        -- the Ka0s WoW Addon Standard: index/entry point + Sections map (canonical)
     standards/                          -- the standard's sections, one unnumbered file each (layout.md, ...)
-    NEW_ADDON_CONTEXT.md               -- drop-in CLAUDE.md pack + new-addon kickstart walkthrough
+    NEW_ADDON_CONTEXT.md               -- new-addon kickstart pack; fetched at runtime, never stored in an addon
     INDUSTRY_RESEARCH.md               -- research foundation: 10 reference addons synthesized
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
     _raw/_industry/                       -- per-addon raw research reports (evidence)

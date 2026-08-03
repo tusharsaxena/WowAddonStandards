@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.17.0, 2026-08-02)
+# New Ka0s Addon — Context Pack (v2.17.1, 2026-08-03)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -24,7 +24,7 @@
 > standards compliance), `docs/ARCHITECTURE.md` (what this addon *is*) and `docs/testing.md` (how
 > to verify it). Put lasting facts there. Never here.
 
-**Drop this file's *contents* into the new addon's `docs/` as the full agent context, and leave a short `CLAUDE.md` stub at the addon root that points to it (documentation).** Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
+**Work from this file in a temp directory for the scaffolding session, then discard it — it MUST NOT be written into the addon under any name (documentation-§3, anti-pattern #49).** Leave a short `CLAUDE.md` stub at the addon root, and put the durable per-addon context in `docs/ARCHITECTURE.md` and `docs/testing.md` (documentation). Self-contained — no external lookups required for an LLM or new contributor to scaffold a fully standards-compliant addon.
 
 Authoritative reference: `WowAddonStandards/standards/STANDARDS.md`. This document is its operational distillation. Every Ka0s addon is built to the standard and references it: <https://github.com/tusharsaxena/WowAddonStandards>.
 
@@ -40,9 +40,10 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
 1. **Scaffold.** Run the `wow-addon:new-addon` skill (Ace3 stack, AceDB saved variables, modular
    folder layout, MIT license, AceConsole slash command). This lays down the skeleton the rest of this
    pack fills in.
-2. **Drop in this pack.** Put the contents of this file into the new addon's `docs/` as the full agent
-   context, and leave a short root `CLAUDE.md` stub pointing to it (documentation), so every agent and
-   contributor has the full standards brief with no external lookups.
+2. **Work from this pack — never write it in.** Read it from your temp copy and build from it; it
+   **MUST NOT** be written into the addon under any name (documentation-§3, anti-pattern #49). Leave
+   a short root `CLAUDE.md` stub — the repo's only agent brief — and put the durable per-addon
+   context in `docs/ARCHITECTURE.md` and `docs/testing.md` (documentation).
 3. **Lay out files.** Use the modular `core/ defaults/ settings/ locales/ modules/` layout — see
    *Layout* below (it is the only layout; a small addon just has thin folders). Copy the vendored
    `libs/` set you actually `LibStub()` from an existing Ka0s addon so versions stay consistent, then
