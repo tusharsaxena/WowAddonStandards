@@ -4,9 +4,9 @@ Guidance for AI agents working in this repository.
 
 ## What this repo is
 
-The **house standard** for the Ka0s World of Warcraft addon collection, plus the two **process
-playbooks** the `wow-addon` plugin consumes. It contains **documents only** — no addon source code
-lives here.
+The **house standard** for the Ka0s World of Warcraft addon collection, plus the three **process
+playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md` and `NEW_ADDON.md`. It
+contains **documents only** — no addon source code lives here.
 
 This repo does **not** run audits. Compliance auditing and new-addon scaffolding happen **in each
 addon's own repo**, driven by a plugin skill that reads the playbook from here:
@@ -19,7 +19,7 @@ addon's own repo**, driven by a plugin skill that reads the playbook from here:
 - **`NEW_ADDON.md`** (root) — the step-by-step spec for `/wow-addon:new-addon`. Scaffolds a new addon
   that is born compliant.
 
-Both are **thin orchestrators**: they say *how* the process runs and defer all substance to the
+All three are **thin orchestrators**: they say *how* the process runs and defer all substance to the
 canonical docs under `standards/`. The plugin lives in a separate repo
 (<https://github.com/tusharsaxena/wow-addon>) and is updated there to consume these files.
 
@@ -102,7 +102,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.19.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.21.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7); the **`docs/`
   canonical trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; and the **five required
   topic-detail docs** — `test-cases.md`, `performance.md`, `perf-runs/README.md`,
@@ -111,5 +111,13 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   git history is the trend line — and a full run bundle is produced at **release**, never as a
   commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see
   one in an addon, it is pre-adoption, not a doc to sync.
+- **The two checkpoints gate differently, on purpose (v2.21.0).** A **commit** is gated on `lint` +
+  the harness and nothing else (testing-§4, unchanged) — a threshold on every commit is routed
+  around with `--no-verify`, after which it protects nothing. The **tag** is gated on all four
+  suites plus `suites.complexity.warnings == 0`, i.e. zero functions above CCN 15
+  (automated-tests-§3, *The release gate*). The runner's exit code is unchanged, because the same
+  vendored script is the commit gate; the release gate is evaluated by `/wow-addon:bump-version`
+  from the run's `manifest.json`, and a `skip` blocks as NOT EVALUATED rather than reading as a
+  pass. Don't restate this as "perf and complexity never gate" without saying which checkpoint.
 - Don't invent compliance claims. Findings are evidence-backed (`file:line` citations); keep new
   claims sourced the same way.

@@ -44,3 +44,31 @@ savedvariables-§1's "one global namespace `<Addon>DB`" has exactly **one** carv
 - **MUST** be a bounded ring of most-recent captures — a hand-read snapshot store, not telemetry.
 - **MUST** carry its own schema stamp, owned by the library that writes it (performance-§8) and independent of the addon's `schemaVersion`.
 - **MUST NOT** be joined by further top-level globals. The carve-out is **narrow by construction**: one diagnostics global per addon, named after that addon. A second one needs a change to this standard, not a local decision.
+
+### 5. Defaulting a stored value: `== nil`, not `or` (MUST)
+
+`stored.k or D.k` is the shortest way to write "use the default when unset", and it is wrong for every
+field whose stored value can legitimately be **falsy or empty**. Lua's `or` cannot distinguish *unset*
+from *set to `false`*, and the same one-liner spelled over a table of fields silently launders three
+different user choices into the default:
+
+- a stored **`false`** — the user turned the thing off, and `or` turns it back on;
+- an **empty string** — a cleared custom path or label, restored to the shipped one on next read;
+- an **empty table/set** — "I deselected every option", restored to the full default selection.
+
+`0` is truthy in Lua and so survives `or`, which is exactly what makes this bug hard to spot: the
+numeric fields a reader spot-checks all behave, and the boolean and empty-collection fields do not.
+
+- **MUST** test absence with **`== nil`** when defaulting any field where a falsy or empty stored value
+  is a meaningful user choice. `if stored.k == nil then t.k = D.k else t.k = stored.k end`, or a
+  `pick(v, d)` helper applied over a defaults table.
+- **MUST** carve out and comment the fields where empty is deliberate, at the point of defaulting. An
+  addon that means "an empty accent-edge set is a choice, not an unset field" **MUST** say so where the
+  defaulting happens, because the next mechanical sweep over that table is what would otherwise undo it.
+- **MUST NOT** introduce `or`-defaulting while refactoring for complexity. `or` is one decision to
+  `lizard` and `if ... == nil` is one as well, so the metric does not favor either — but a refactor
+  that rewrites a careful `== nil` ladder into a compact `or` table has changed behavior for every
+  falsy field in it (performance-§11, anti-patterns #54).
+- `AceDB`'s own defaults merge follows `nil`-ness, not truthiness, so a hand-written `or` layer on top
+  of AceDB disagrees with the library underneath it about what "unset" means — in the one direction
+  the user notices, since AceDB restores their `false` and the addon's own read overrides it.

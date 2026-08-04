@@ -154,6 +154,26 @@ table at all, it renders as literal pipes.
 | `name` | 21 | `path/File.lua` | **Peel next / Accepted — why / Already tracked as `<id>`** |
 ```
 
+**At a release, the functions table reads "None." by construction** — the release gate is all four
+suites plus **zero functions above CCN 15** (`automated-tests-§3`), so a bundle produced for a tag
+that passed cannot have a warned function in it. A non-empty functions table in a release bundle means
+the gate was not run or not honored, and that is the finding. Between releases the table is ordinary
+and its dispositions are read normally.
+
+A disposition is a decision with a shelf life, not a label that renews itself. An entry carried as
+**Accepted** across **three consecutive release runs** is either fixed or converted into a tracked
+deviation with an ID and an owner — after which the disposition reads *Already tracked as `<id>`*
+and the argument is not re-had every release. A watch list where everything is accepted costs
+maintenance and carries no signal, and one too long to read in a single pass is itself the finding:
+that is a backlog, and a backlog needs scheduling (automated-tests-§4, performance-§10,
+anti-pattern #53).
+
+When reading these numbers, remember `lizard` counts every `and`/`or` short-circuit as a decision.
+In Lua that means a run of `t.k = rec.k or D.k` defaulting lines scores high with no visible
+branching at all, so a large CCN usually means *this function defaults or guards a lot of fields*
+rather than *this function has tangled control flow* — and the two want different fixes
+(performance-§10). What a refactor triggered by this list may and may not do is performance-§11.
+
 **Files by `layout-§1` band** — the band is a **column**, not a heading, so any number of bands
 renders uniformly and sorts together. Today's bands are `1000–1500 (on notice)` and `> 1500 (over
 cap)`, but the standard may add or move one, and a column absorbs that without restructuring every
@@ -198,8 +218,10 @@ Print, in chat:
   the *next* run's analysis says so; this one stands as what was believed at the time.
 - **Never edit the vendored runner** (`tests/_kit/`). A kit problem is fixed in `LibKa0s` and
   re-vendored; a local patch is reverted silently by the next re-vendor.
-- **Never turn perf or complexity into a gate**, and never report them as one. They are measured and
-  recorded (`automated-tests-§3`). A complexity warning count is not a failure and must not be
-  presented as one.
+- **Never make this run itself gate on perf or complexity**, and never report a run as failed because
+  of them. They are measured and recorded (`automated-tests-§3`); a complexity warning count does not
+  fail a run and must not be presented as one. The **release** is gated on all four plus zero CCN > 15,
+  but that gate belongs to `/wow-addon:bump-version`, which reads this run's `manifest.json` — never to
+  the runner, whose exit code stays unchanged because the same script is the commit gate.
 - **Never hand-write a number into a bundle.** Everything in it came from a tool. A hand-edited record
   is worse than an absent one, because it reads as measured.

@@ -116,3 +116,49 @@ Hand-rolling any of these inside an addon — a private debug console, a private
 - The library **MUST** publish the **live minor of every file** on its table (a `MODULES` registry or equivalent), so version skew is answerable at runtime rather than by reading source. With several consumers each carrying a copy, "which half came from where?" is a question someone will need answered from in-game.
 - The lib repo's own **semver tag is a separate axis** from any file minor and **MUST NOT** be conflated with one (versioning-git).
 - The lib repo **MUST** make the coupling mechanical rather than remembered: a test that fails when a file's minor and its changelog entry disagree, and a written release order ending in *re-vendor every consumer*. Remembered coupling fails on precisely the release where it matters — the small one, shipped in a hurry — and there is a working reference implementation of that test now (testing), so a lib repo leaving this to discipline is a choice rather than a constraint.
+
+**What earns promotion into a Ka0s-owned lib (MUST).** anti-patterns #47 forbids hand-rolling what a
+`LibKa0s` module already provides. This is the counterweight, and it is needed just as badly: the
+opposite failure — promoting a shape that only *looks* shared — is harder to reverse, because the
+additive-only rule above means a wrong abstraction is surface the library keeps forever.
+
+A shape **MUST** clear all three bars before it moves upstream:
+
+1. **Two or more consumers, with the same semantics** — not merely the same shape. Two addons filtering
+   records is not two consumers of one filter; two addons calling `frame:SetPoint` through the same
+   guard is.
+2. **No per-consumer escape hatches.** If adopting it requires a behavior flag per consumer, those
+   flags *are* the consumers' divergence re-encoded as configuration, and the library now owns a
+   decision it cannot make. One optional presentation argument is fine; a flag that changes what the
+   function *does* is the tell.
+3. **A stable abstraction, not a coincidence of today's code.** Ask what would have to change for the
+   shared version to be wrong, and whether that change is plausible this year.
+
+And the rule that catches the most tempting mistake:
+
+- **MUST NOT** promote on frequency alone. **High frequency plus low semantic content is the signature
+  of a shape that should stay inline.** The collection's most-repeated shape is the optional-object
+  guard (`if obj and obj.method then obj:method(...) end`) at 400+ sites across nine repos — and it
+  must not be promoted, because a `CallIf(obj, "method", ...)` helper turns a compile-time method call
+  into a stringly-typed lookup that is invisible to `grep`-for-callers and to `luacheck`, and because
+  those guards exist for **three different reasons** (an API absent on this client build, an optional
+  module not yet loaded, a headless mock with holes) that one spelling would erase at every site.
+- **MUST NOT** promote a shape whose consumers disagree about **correctness**, as opposed to
+  presentation. The worked example is the schema-migration runner, nominated from eight repos and
+  rejected: those eight hold five incompatible variants that disagree on who stamps the version (the
+  runner, or each step), when (per step, or once at the end), whether a failed step still stamps, and
+  what a missing step does — and in one addon the premise is that the stamp **cannot be trusted at
+  all**, because AceDB's defaults merge backfills `schemaVersion` to current the moment `db.global` is
+  first read, masking a legacy account as already-current. A shared runner needs five escape hatches to
+  own an eight-line loop, and the blast radius of getting it wrong is silent corruption of users'
+  SavedVariables. **Duplication was the cheaper answer**, and the complexity win it was nominated for
+  was available locally anyway (anti-patterns #55).
+- **SHOULD** record a rejection with its reason where the next author will look, not just the
+  acceptances. A candidate rejected once will be re-nominated — the shape really does look shared —
+  and the reason is the only thing that stops the second attempt from succeeding.
+- **A promotion into `Core` is not free** even when it is right: the other majors declare a **minimum
+  minor floor** on Core, and raising a floor is a breaking change to the vendoring (library-stack-§7,
+  above). So a helper added to `Core` **MAY** ship for hosts immediately while the library's own
+  sibling modules keep their duplicate copy until a floor raise is being made for other reasons. That
+  is a deliberate, documented duplication, and it **MUST** be commented as one at both copies rather
+  than left to look like an oversight.

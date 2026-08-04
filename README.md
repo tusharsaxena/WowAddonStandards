@@ -1,7 +1,8 @@
 # WoW Addon Standards — Ka0s Collection
 
-This repo holds the house standard for the Ka0s World of Warcraft addon collection, plus the two
-**process playbooks** the `wow-addon` plugin consumes:
+This repo holds the house standard for the Ka0s World of Warcraft addon collection, plus the three
+**process playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md` and
+`NEW_ADDON.md`:
 
 1. **Define the standard.** A detailed house standard — built from industry research and the
    collection's own best patterns — covering not just technical design but **UX and user-behavior
@@ -21,7 +22,7 @@ source code lives here, and this work never modifies the addons themselves.
 
 > The plugin that invokes these playbooks lives in a **separate repo**,
 > <https://github.com/tusharsaxena/wow-addon>, and is updated there to consume `AUDIT.md` /
-> `NEW_ADDON.md` and the `standards/` docs from here.
+> `AUTOMATED_TESTS.md` / `NEW_ADDON.md` and the `standards/` docs from here.
 
 ## The three things you can do here
 
@@ -38,7 +39,8 @@ The addons the standard codifies rules for are listed in
 **[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster. Edit that one file to
 change collection scope.
 
-- **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) (currently 6 Ka0s addons).
+- **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 8 Ka0s addons: Absorb
+  Tracker, Bank Ledger, Consumable Master, KickCD, Loot History, Panel Master, Pretty Chat, WhatGroup.
 - **Reference addons studied for the standard (10):** DBM, BigWigs, Auctionator, Plater, Plumber,
   Details!, WeakAuras, ElvUI, Bagnon, OmniCD — see
   [`standards/INDUSTRY_RESEARCH.md`](standards/INDUSTRY_RESEARCH.md).
@@ -96,6 +98,7 @@ fetched to a temp directory and **never** written into the addon (documentation-
 ```
 WowAddonStandards/
   AUDIT.md                                -- PLAYBOOK: /wow-addon:standards-audit (per-addon self-audit)
+  AUTOMATED_TESTS.md                      -- PLAYBOOK: /wow-addon:automated-tests (per-addon test record)
   NEW_ADDON.md                            -- PLAYBOOK: /wow-addon:new-addon (scaffold, born compliant)
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
@@ -115,9 +118,9 @@ Audit and review runs are **not** stored here — each lives under its own addon
 
 ## Status
 
-Standard is at **v2.18.0** and living. Compliance auditing has moved out of this repo into each addon's
-own repository, driven by the `AUDIT.md` / `NEW_ADDON.md` playbooks that the `wow-addon` plugin
-consumes.
+Standard is at **v2.21.0** and living. Compliance auditing has moved out of this repo into each addon's
+own repository, driven by the `AUDIT.md` / `AUTOMATED_TESTS.md` / `NEW_ADDON.md` playbooks that the
+`wow-addon` plugin consumes.
 
 ## License
 
