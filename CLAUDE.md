@@ -82,10 +82,8 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 
 ## Git workflow
 
-- **Never create a branch in this repo automatically.** Work directly on the current branch (usually
-  `master`) — trunk-based. Only create a branch when the user **explicitly asks** for one.
-- **Never push, and never commit unless the user asks.** Approval to commit or branch once does not
-  carry over to the next change.
+- **Trunk-based.** Work directly on the current branch (usually `master`) by default; branch when a
+  changeset genuinely warrants isolation.
 
 ## Editing rules
 
