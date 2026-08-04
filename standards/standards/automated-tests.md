@@ -114,11 +114,16 @@ without saying so.
 - **MUST NOT** silently recreate the file when its column set has changed. Rewriting the header
   drops every previous row — the one thing a trend line must never do. A runner that cannot append
   says so and leaves the file alone.
-- **MUST** carry the current complexity **watch list** below the table: every function `lizard` warned
-  on and every file in `layout-§1`'s 1000–1500 on-notice band, each with a one-line disposition —
-  *accepted and why*, *peel next*, or *already tracked as `<deviation-id>`*. Anything that **newly**
-  crossed since the previous run appears with its disposition. A regeneration that yields no
-  disposition for what newly crossed has performed the ritual and skipped the point.
+- **MUST** carry the current complexity **watch list** below the table, as **two tables with header
+  rows**: warned functions (Function / CCN / Location / Disposition), and files by `layout-§1` band
+  (**Band** / File / LOC / Disposition). Each carries a one-line disposition — *accepted and why*,
+  *peel next*, or *already tracked as `<deviation-id>`* — and anything that **newly** crossed since
+  the previous run says so. A regeneration that yields no disposition for what newly crossed has
+  performed the ritual and skipped the point.
+- The band is a **column, not a heading**. Two bands exist today (1000–1500 on notice, over the 1500
+  cap) and the standard may add or move one; a column absorbs that, whereas a heading per band makes
+  every addon's record need restructuring when it changes. It also keeps a file that moved between
+  bands on one line in the diff rather than two.
 - **MUST** carry a short standing section for each of the **other three** suites as well — test
   suite, lint, perf. The complexity watch list existed first and it is easy to leave it the only
   prose, but a record whose only narrative is about complexity teaches the reader that the other

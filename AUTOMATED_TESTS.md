@@ -102,10 +102,9 @@ so; silence reads as "not checked".>
 
 ## Complexity watch list
 
-<Every function lizard warned on and every file in layout-§1's 1000–1500 band, each with a one-line
-disposition: accepted and why / peel next / already tracked as <deviation-id>. Anything that NEWLY
-crossed since the previous run is marked as such. An empty list is a RESULT — write "None." rather
-than dropping the heading.>
+<Two tables, both WITH HEADER ROWS — see Step 3 for the exact shape. Functions: Function / CCN /
+Location / Disposition. Files: Band / File / LOC / Disposition, band as a column so more bands than
+today's two render uniformly. "None." rather than dropping a heading.>
 
 ## Actions
 
@@ -144,9 +143,31 @@ transient tooling gap, and it should read as one.
 
 ### `## Complexity watch list`
 
-Every function `lizard` warned on and every file in the on-notice LOC band, each with a one-line
-disposition. Anything that **newly** crossed since the previous run, marked as such. `None.` if
-empty — an empty watch list is a result, not a reason to drop the heading.
+Two tables, both with headers — a bare row of pipes with no header line does not render as a
+table at all, it renders as literal pipes.
+
+**Functions `lizard` warned on:**
+
+```markdown
+| Function | CCN | Location | Disposition |
+|---|---|---|---|
+| `name` | 21 | `path/File.lua` | **Peel next / Accepted — why / Already tracked as `<id>`** |
+```
+
+**Files by `layout-§1` band** — the band is a **column**, not a heading, so any number of bands
+renders uniformly and sorts together. Today's bands are `1000–1500 (on notice)` and `> 1500 (over
+cap)`, but the standard may add or move one, and a column absorbs that without restructuring every
+addon's record:
+
+```markdown
+| Band | File | LOC | Disposition |
+|---|---|---|---|
+| 1000–1500 (on notice) | `tests/test_x.lua` | 1256 | accepted — case count, not tangle |
+| > 1500 (over cap) | `data/Generated.lua` | 2893 | already tracked as `<id>` |
+```
+
+Anything that **newly** crossed since the previous run is marked as such in its disposition. `None.`
+where a table would be empty — an empty watch list is a **result**, not a reason to drop the heading.
 
 Carry forward a disposition that is still true rather than re-arguing it; a watch list that reads
 differently every release teaches the reader that none of it is settled.
