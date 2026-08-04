@@ -7,9 +7,10 @@ This repo holds the house standard for the Ka0s World of Warcraft addon collecti
    collection's own best patterns — covering not just technical design but **UX and user-behavior
    patterns**: slash-command handling, settings-panel look and feel, debug-mode conventions,
    standalone windows, packaging, localization, and more. → [`standards/`](standards/)
-2. **Ship the process playbooks.** Two thin orchestrator specs the plugin fetches and runs **inside
-   each addon's own repo**: → [`AUDIT.md`](AUDIT.md) (`/wow-addon:standards-audit`) and
-   [`NEW_ADDON.md`](NEW_ADDON.md) (`/wow-addon:new-addon`).
+2. **Ship the process playbooks.** Three thin orchestrator specs the plugin fetches and runs **inside
+   each addon's own repo**: → [`AUDIT.md`](AUDIT.md) (`/wow-addon:standards-audit`),
+   [`NEW_ADDON.md`](NEW_ADDON.md) (`/wow-addon:new-addon`) and
+   [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`).
 
 The standard is the source of truth and evolves in place. **Auditing no longer happens here** — each
 addon audits *itself*, in its own repo, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle there. Which

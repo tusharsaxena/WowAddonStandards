@@ -17,8 +17,9 @@ context pack for scaffolding new addons. Compliance auditing is **not** run from
 | [`_raw/_industry/`](_raw/_industry/) | Per-addon raw research reports — the evidence base behind `INDUSTRY_RESEARCH.md`. |
 
 The two **process playbooks** live at the repo root (predictable paths for the `wow-addon` plugin to
-fetch): [`../AUDIT.md`](../AUDIT.md) (`/wow-addon:standards-audit`) and
-[`../NEW_ADDON.md`](../NEW_ADDON.md) (`/wow-addon:new-addon`). Each is a thin orchestrator that draws
+fetch): [`../AUDIT.md`](../AUDIT.md) (`/wow-addon:standards-audit`),
+[`../NEW_ADDON.md`](../NEW_ADDON.md) (`/wow-addon:new-addon`) and
+[`../AUTOMATED_TESTS.md`](../AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`). Each is a thin orchestrator that draws
 its substance from the docs above.
 
 `STANDARDS.md` is the source of truth. When any document here disagrees with it, it wins.

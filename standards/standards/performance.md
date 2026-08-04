@@ -97,13 +97,23 @@ A capture is two **combat-gated windows** over comparable fights, differing only
 
 ### 8. Record schema and `docs/perf-runs/` (MUST)
 
+> **Scope, as of `automated-tests`:** this directory is now the **in-game** capture store. Offline
+> runs are produced by the vendored runner and land in that run's bundle under
+> `docs/automated-tests/<run>/` with the rest of the suites. In-game captures cannot be produced by
+> a script — a human runs the `perf` verb in a live client and exports the record — so they keep the
+> standing cumulative store described here, and its `README.md` says so plainly.
+
 - **MUST** emit records in the **library's versioned record schema**, whose field-by-field contract lives with the lib. The addon does not define the shape; one reader handles a record from any Ka0s addon, which is the point.
 - **MUST** stamp the emitting addon and its version into the record, so a record identifies itself outside the file it came from.
-- **MUST** commit captures worth keeping under **`docs/perf-runs/`**, named `<YYYY-MM-DD>-<source>-<label>.json`, with a `README.md` in that directory documenting the naming, a schema summary, and a pointer to the lib's canonical contract. The directory is **standing and cumulative** — not tied to one investigation — so runs compare across addon versions.
+- **MUST** commit **in-game** captures worth keeping under **`docs/perf-runs/`**, named `<YYYY-MM-DD>-ingame-<label>.json`, with a `README.md` in that directory documenting the naming, a schema summary, a pointer to the lib's canonical contract, and the fact that offline runs live in `docs/automated-tests/` (automated-tests-§7). The directory is **standing and cumulative** — not tied to one investigation — so in-game runs compare across addon versions.
 - **MUST** treat committed records as **evidence**: the raw capture outlives the write-up that interprets it, and an interpretation without its record is an assertion.
 - **SHOULD** write the interpretation up under `docs/investigations/<YYYY-MM-DD>-<topic>/` when a capture is used to answer a question, and treat dated investigation bundles as frozen once written (audit-review-history).
 
 ### 9. The offline scenario runner (`tests/perf.lua`)
+
+> **Invocation, as of `automated-tests`:** the vendored runner drives this as its `perf` suite and
+> records the output in the run bundle. Running it directly stays supported and unchanged; what the
+> runner adds is that the result is *kept*. It remains outside the green gate either way.
 
 A second, **offline** harness measures what a live client cannot measure repeatably: allocation and call counts per iteration of a hot path.
 
@@ -115,6 +125,15 @@ A second, **offline** harness measures what a live client cannot measure repeata
 - Scenario output **SHOULD** state plainly that timings are for orientation only — compare scenarios within a run, never across machines.
 
 ### 10. Complexity reporting (MUST ship; refreshed at release)
+
+> **Superseded in part by `automated-tests`.** The measurement, the fixed invocation, the release
+> checkpoint and the watch-list discipline below are all unchanged and still normative. What moved
+> is **where the output lands**: the raw report is `complexity.txt` in each run bundle
+> (automated-tests-§1), and the watch list plus the trend line are
+> `docs/automated-tests/RESULTS.md`, one file overwritten in place (automated-tests-§4). **A
+> standalone `docs/complexity.md` is retired** (automated-tests-§7). Read every rule below with
+> `docs/complexity.md` replaced by that pair — including the single-path rule, which `RESULTS.md`
+> now carries and which is exactly why the trend line did not move into the dated bundles.
 
 The complexity report is the collection's standing answer to *"where is this addon getting hard to change?"* — and its value is almost entirely in the **difference between two releases**. One report is a page of numbers nobody acts on; the same path showing a function that went from CCN 9 to CCN 24 since the last tag is a finding with a name attached. That is why this section fixes three things that a bare "run `lizard` sometimes" left open: **the path**, **the exact invocation**, and **the moment it is regenerated**. Two reports produced by different invocations are not comparable, and a report nobody regenerates is a fossil that reads like a fact.
 

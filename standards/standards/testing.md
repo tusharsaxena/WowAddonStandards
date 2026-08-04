@@ -55,7 +55,7 @@ There is no LuaFileSystem dependency and there **SHOULD NOT** be one: the kit's 
 ### 4. TDD & the commit gate
 
 - **MUST** be test-first: write or extend a **failing** test that pins the intended behavior, then implement until it passes.
-- **MUST**, before **every** commit, run **`lua tests/run.lua`** (all suites green) **and** **`luacheck .`** (0 errors). A commit with red tests or lint errors is forbidden.
+- **MUST**, before **every** commit, run **`lua tests/run.lua`** (all suites green) **and** **`luacheck .`** (0 errors). A commit with red tests or lint errors is forbidden. The vendored runner's `--suite lint --suite tests --no-bundle` is exactly this pair and writes nothing, so it may be used for the gate; the **full** four-suite bundle is a release artifact and **MUST NOT** gate a commit (automated-tests-§3/§6).
 - **MUST** add/extend a suite whenever a behavior changes — no logic change lands without a covering test.
 - Pure/testable logic (schema validation, data collection, attribution, migrations, formatting) **MUST** be exercised headlessly. Genuinely in-client behavior (frame rendering, taint) is covered by the in-game smoke tests (audit-review-history), which complement — not replace — the unit suites.
 
@@ -93,6 +93,10 @@ the contributor-facing home for material the player-facing README deliberately e
 (documentation-§1); the README keeps only the `[tests]` badge.
 
 ### 7. Measurement runners are outside the gate
+
+> As of `automated-tests`, the vendored runner drives this file as its non-gating `perf` suite and
+> keeps the output. That changes where the result is *recorded*, not whether it gates: it does not,
+> and a perf result **MUST NOT** turn a run red (automated-tests-§3).
 
 `tests/perf.lua` — the offline performance scenario runner (performance-§9) — lives in `tests/` but is
 **not part of the green gate** and **MUST NOT** be run by `tests/run.lua`.

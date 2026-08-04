@@ -13,6 +13,9 @@ addon's own repo**, driven by a plugin skill that reads the playbook from here:
 
 - **`AUDIT.md`** (root) — the step-by-step spec for `/wow-addon:standards-audit`. An addon audits
   **itself**, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle inside **its own** repo.
+- **`AUTOMATED_TESTS.md`** (root) — the step-by-step spec for `/wow-addon:automated-tests`. An addon
+  records **itself**, writing a frozen `docs/automated-tests/<YYYY-MM-DD-HHMMSS>/` bundle inside
+  **its own** repo.
 - **`NEW_ADDON.md`** (root) — the step-by-step spec for `/wow-addon:new-addon`. Scaffolds a new addon
   that is born compliant.
 
@@ -28,6 +31,7 @@ here.**
 
 ```
 AUDIT.md                          -- PLAYBOOK: /wow-addon:standards-audit (per-addon self-audit)
+AUTOMATED_TESTS.md                -- PLAYBOOK: /wow-addon:automated-tests (per-addon test record)
 NEW_ADDON.md                      -- PLAYBOOK: /wow-addon:new-addon (scaffold, born compliant)
 README.md                         -- repo overview + the three things you can do here
 CLAUDE.md                         -- this file
@@ -47,7 +51,7 @@ Audit and review runs are **not** in this repo — they live under each audited 
 `docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and audit-review-history of the standard).
 
 Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the playbooks (`AUDIT.md`,
-`NEW_ADDON.md`) → the rest as needed.
+`NEW_ADDON.md`, `AUTOMATED_TESTS.md`) → the rest as needed.
 
 ## Conventions
 
@@ -66,7 +70,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   `options-ui-§10`), where `N` is that section's **local** number. The old global `§N.M` numbering is
   retired — do **not** reintroduce it. Preserve these refs when editing, in every doc and in the
   `wow-addon` plugin.
-- **The playbooks are thin orchestrators.** `AUDIT.md` and `NEW_ADDON.md` describe process and point
+- **The playbooks are thin orchestrators.** `AUDIT.md`, `NEW_ADDON.md` and `AUTOMATED_TESTS.md` describe process and point
   into `standards/` (`STANDARDS.md` as the audit checklist; `NEW_ADDON_CONTEXT.md` as the scaffold
   pack). Keep the *substance* in `standards/`; don't duplicate rules into the playbooks — they drift.
 - **Industry research is a standards-process input, not an audit step.** The reference-addon research
@@ -98,11 +102,14 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.18.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.19.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7); the **`docs/`
-  canonical trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; and the **four required
-  topic-detail docs** — `test-cases.md`, `performance.md`, `perf-runs/README.md`, `complexity.md`
-  (documentation-§3). `docs/complexity.md` is generated, one file overwritten in place, refreshed at
-  **release** (never a commit gate) — performance-§10.
+  canonical trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; and the **five required
+  topic-detail docs** — `test-cases.md`, `performance.md`, `perf-runs/README.md`,
+  `automated-tests/README.md`, `automated-tests/RESULTS.md` (documentation-§3).
+  `docs/automated-tests/RESULTS.md` is generated, one file overwritten in place — its single-path
+  git history is the trend line — and a full run bundle is produced at **release**, never as a
+  commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see
+  one in an addon, it is pre-adoption, not a doc to sync.
 - Don't invent compliance claims. Findings are evidence-backed (`file:line` citations); keep new
   claims sourced the same way.
