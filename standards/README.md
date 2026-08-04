@@ -60,7 +60,10 @@ The standard is a **synthesis** of two inputs:
    `STANDARDS.md` describing what changed and why.
 5. **Ripple the change.** A rule change usually touches
    [`EXECUTIVE_SUMMARY.md`](EXECUTIVE_SUMMARY.md) and
-   [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md); keep them in sync. Existing audit runs (in the
+   [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md), and sometimes this file, the repo root
+   [`../README.md`](../README.md) (its **Status** line names the current version) and the playbooks;
+   keep them in sync. A rule that changes the addon's **doc set** — the root docs, the `docs/` trio,
+   the required topic-detail docs — ripples into all of them at once. Existing audit runs (in the
    addons' own repos) stay frozen — each addon's *next* audit re-measures it against the revised standard.
 
 ### Where audits fit
