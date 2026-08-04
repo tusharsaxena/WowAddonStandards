@@ -90,12 +90,17 @@ This playbook is the entry point; the substance lives in `standards/`:
    section is normally "World of Warcraft (Retail); nothing else", because every library is vendored
    (library-stack). It answers *what to install*; `docs/testing.md` answers *how to verify* — point at
    it rather than restating it.
-8. **Generate the first complexity report.** Run the standard's exact invocation from the repo root —
-   `lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .` — and commit the result as **`docs/complexity.md`**
-   with its generated-file header and a `## Watch list` (performance-§10). Do this **before** tagging
-   `v0.1.0`: the report's value is the diff between releases, so the first release is what gives every
-   later one something to diff against. One file, overwritten in place at each release — never dated,
-   never a directory — and never hand-edited. It is not a commit gate.
+8. **Produce the first automated-test bundle.** Run the **vendored** runner from the repo root —
+   `tests/_kit/run-automated-tests.sh --release 0.1.0` — which writes a frozen
+   `docs/automated-tests/<YYYYMMDD-HHMMSS>/` bundle across all four out-of-game suites (lint, tests,
+   perf, complexity) and rolls the run into `docs/automated-tests/RESULTS.md`. Then write the bundle's
+   `ANALYSIS.md` and the `RESULTS.md` standing sections by hand — the runner does not
+   (`../AUTOMATED_TESTS.md`, Steps 2–3). Do this **before** tagging `v0.1.0`: the record's value is the
+   diff between releases, so the first release is what gives every later one something to diff against.
+   **`docs/complexity.md` is retired** (automated-tests-§7) — do not create one; the raw `lizard` output
+   is the bundle's `complexity.txt` and the trend line is `RESULTS.md`. The **tag** is gated on all four
+   suites passing plus zero functions above CCN 15 (automated-tests-§3); the **commit** gate stays
+   lint + the harness only (testing-§4).
 9. **Check the Definition of Done.** Walk the DoD checklist at the bottom of the context pack before
    tagging `v0.1.0`.
 10. **Register in the roster.** Add the addon's row to
