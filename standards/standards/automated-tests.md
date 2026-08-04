@@ -74,11 +74,13 @@ This is the section's load-bearing rule, and it is a deliberate refusal to do th
 
 - **`lint`** (`luacheck .`) and **`tests`** (`lua tests/run.lua`) are **gating**. They answer
   *is it correct*, they are deterministic, and testing-§4 already makes them the green commit gate.
-- **`perf`** (`lua tests/perf.lua`) and **`complexity`** (`lizard`) are **recorded, never gating**.
-  They answer *what does it cost* and *where is it getting hard to change* — questions whose answers
-  are read, compared and argued with, not thresholded.
+- **`perf`** (`lua tests/perf.lua`) and **`complexity`** (`lizard`) are **recorded — they never fail a
+  run and never gate a commit**. They answer *what does it cost* and *where is it getting hard to
+  change* — questions whose answers are read, compared and argued with, not thresholded. At the
+  **release** they do gate, and that is a separate checkpoint evaluated by a separate actor: see *The
+  release gate* below.
 
-**MUST NOT** fail a run on a perf or complexity result. `performance-§9` and `performance-§10` already
+**MUST NOT** fail a **run**, or block a **commit**, on a perf or complexity result. `performance-§9` and `performance-§10` already
 say this for each tool separately, and the reason survives consolidation intact: a threshold that
 fails a run teaches everyone to reach for `--no-verify`, after which the gate protects nothing and the
 habit remains. Folding these two into a red/green battery because they now live beside two suites that
@@ -93,6 +95,44 @@ worse than a red one, because it is believed.
 Verdicts: **`red`** — a gating suite failed. **`amber`** — a gating suite was skipped, or `perf` failed
 its own deterministic assertions. **`green`** — gating suites passed and nothing went unmeasured
 without saying so.
+
+#### The release gate: all four, and it is not the commit gate (MUST)
+
+Everything above is about **the run**, and about **commits**. A **release** is a different checkpoint
+with a different failure mode, and there all four suites gate.
+
+- **MUST NOT** cut a release — bump the version, roll `## What's new`, tag — unless the release run's
+  `manifest.json` shows **all four** suites at `pass`, and `suites.complexity.warnings` at **0**.
+  Concretely: `lint` pass (which already means **zero warnings and zero errors**, since `luacheck`
+  exits non-zero on either), `tests` pass with zero failures, `perf` pass, and `complexity` pass with
+  **no function above CCN 15**.
+- **MUST** treat a **skip** as a gate that did **not pass**. A release claiming zero CCN > 15 on a run
+  where `lizard` never executed is an unmeasured claim, and automated-tests-§3's own rule — a skip is
+  never a pass — is what makes it one. The remedy is to install the tool and re-run, not to read the
+  skip as clean. The one narrow exception is `perf` skipped because the addon **ships no
+  `tests/perf.lua`**: nothing was there to run, which is a different fact from a scenario that failed
+  or a tool that was missing, and it **MUST** be stated as such in the release notes.
+- **MUST NOT** move this gate to commit time, and **MUST NOT** change the runner's exit code to
+  implement it. `performance-§9`/`§10` and automated-tests-§3's `never gating` are retained **verbatim
+  and deliberately**, and the runner stays exactly as specified — the same script is the commit gate
+  (testing-§4), so a threshold added inside it would land on every commit. The release gate is
+  evaluated by the **release command**, reading the manifest the run already writes.
+
+**Why this is consistent with the rule it appears to reverse.** The argument against thresholding perf
+and complexity is an argument about **commit** gates specifically: a gate on every commit is routed
+around with `--no-verify`, after which it protects nothing and the habit remains. A release has no
+such escape hatch — it is infrequent, deliberate, already the moment the addon is looked at whole
+(performance-§10), and the one point where an unmeasured claim becomes a claim made **to users**.
+Between commits the numbers stay advisory and argued with, which is what keeps them honest; at the tag
+they have to be true. Shipping a release with a known failing test or an unmeasured complexity number
+is not a judgment call the release notes can absorb.
+
+- **MUST** report **every** failed gate, not the first one. A release blocked for a lint error that
+  turns out to also have four failing tests and a CCN 62 function has been stopped once and should be
+  understood once — a gate that stops at the first failure produces three more rounds of the same
+  interruption.
+- **MUST NOT** bump, tag or push anything when a gate fails. A partial bump — the TOC moved, the tag
+  not cut — is worse than a clean refusal, because the next run starts from a state nobody chose.
 
 ### 4. `RESULTS.md` — the trend line (MUST)
 
@@ -160,6 +200,9 @@ without saying so.
 - **MUST NOT** gate commits on the full bundle. The green gate stays what testing-§4 defines — lint and
   the harness — and the fast path for that is `--suite lint --suite tests --no-bundle`, which writes
   nothing.
+- **The release itself IS gated on all four**, on the bundle this checkpoint produces
+  (automated-tests-§3, *The release gate*). The two checkpoints are deliberately different: commits are
+  gated on the two deterministic suites, the tag is gated on all four plus zero CCN > 15.
 - **MAY** run any subset at any time (`--suite complexity`, say, while deciding where to refactor).
   Subset runs are ordinary and expected; the record is cheap and the alternative is measuring without
   keeping the answer.

@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.20.0, 2026-08-04)
+# New Ka0s Addon — Context Pack (v2.21.0, 2026-08-04)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -987,7 +987,9 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - A fourth doc at root, or a missing one: root is `README.md` + `CLAUDE.md` + `DEPENDENCIES.md` + `LICENSE` (documentation-§7).
 - `pip install <tool>` as an install instruction (fails on Ubuntu 24.04's PEP 668 marker — use `pipx`), or any dependency listed without the evidence for it (anti-pattern #50).
 - A dated `docs/complexity/<date>.md` pile, a locally tuned `lizard` invocation, a hand-edited complexity report, or a regenerated one with no watch-list disposition for what newly crossed a threshold (anti-pattern #51).
-- Gating commits on the complexity report — the checkpoint is **release**, not commit (performance-§10).
+- Gating **commits** on the complexity report — that checkpoint is lint + the harness only (performance-§10, testing-§4). The **release** is a different gate: all four suites plus zero functions above CCN 15, evaluated by the release command from the run's manifest before it edits anything, with a `skip` counting as NOT EVALUATED rather than a pass (automated-tests-§3).
+- Implementing the release gate by editing the vendored runner's exit code — the same script is the commit gate, so the threshold would fire on every commit (automated-tests-§3).
+- Bumping a version, rolling `## What's new` or cutting a tag on a run where a gate failed or a suite went unmeasured.
 - A complexity watch list where every entry reads **"accepted"** — a disposition has a shelf life; carried across three consecutive release runs it is fixed or converted to a tracked deviation with an ID (anti-pattern #53).
 - Refactoring to move a CCN number rather than to make the code readable — a body dumped into a `part2`/`doTheRest` helper so the wrapper scores well, or a dispatch table built **inside** the function it serves, which trades branches for a per-call allocation (anti-pattern #52, performance-§11).
 - `t.k = stored.k or D.k` over a settings table — `or` cannot tell *unset* from *stored `false`*, `""` or an empty set, so the user's "off" comes back on. Test with `== nil` (savedvariables-§5, anti-pattern #54).
