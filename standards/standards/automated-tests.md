@@ -120,6 +120,11 @@ without saying so.
   *peel next*, or *already tracked as `<deviation-id>`* — and anything that **newly** crossed since
   the previous run says so. A regeneration that yields no disposition for what newly crossed has
   performed the ritual and skipped the point.
+- **MUST NOT** carry an entry as *accepted* indefinitely. A disposition is a decision with a shelf
+  life (performance-§10): an entry accepted across **three consecutive release runs** is either fixed
+  or converted into a tracked deviation with an ID and an owner, and the watch list then points at the
+  tracker. Left alone, "accepted" is the disposition every entry drifts into, and a list where
+  everything is accepted costs maintenance and carries no signal (anti-patterns #53).
 - The band is a **column, not a heading**. Two bands exist today (1000–1500 on notice, over the 1500
   cap) and the standard may add or move one; a column absorbs that, whereas a heading per band makes
   every addon's record need restructuring when it changes. It also keeps a file that moved between

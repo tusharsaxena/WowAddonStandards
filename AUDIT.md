@@ -107,16 +107,35 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      reasonable, and never quietly skip it.
    - **The complexity report is measured, not read.** Run the standard's exact invocation from the
      repo root — **`lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`** — and compare the result
-     against the committed **`docs/complexity.md`** (performance-§10), recording the **drift**: which
-     functions crossed a `lizard` threshold or which files entered layout-§1's 1000–1500 LOC band
-     since the committed report was generated, and how stale that report's own header dates it. Run
-     the invocation **verbatim** — a locally "improved" one produces numbers that cannot be compared
-     with the committed report, which is the whole point of the check. A report whose numbers no
-     longer match the code is stale (anti-pattern #51); a hand-edited one is worse, because it reads
-     as measured. The checkpoint is **release, not commit**, so a stale report is a finding about the
-     release process — never a reason to flag the addon for failing to gate commits on complexity. If
+     against the **latest run bundle's `complexity.txt`** and the watch list in
+     **`docs/automated-tests/RESULTS.md`** (automated-tests-§1/§4; `docs/complexity.md` was retired in
+     v2.19.0 — an addon still carrying one is pre-adoption, and that is the finding). Record the
+     **drift**: which functions crossed a `lizard` threshold or which files entered layout-§1's
+     1000–1500 LOC band since the latest bundle, and how stale that bundle's stamp dates it. Run the
+     invocation **verbatim** — a locally "improved" one produces numbers that cannot be compared with
+     the recorded run, which is the whole point of the check. A record whose numbers no longer match
+     the code is stale (anti-pattern #51); a hand-edited one is worse, because it reads as measured.
+     The checkpoint is **release, not commit**, so a stale record is a finding about the release
+     process — never a reason to flag the addon for failing to gate commits on complexity. If
      `lizard` is not installed on the machine, mark the check **not run** and say so — never reason
      the numbers out from reading the code, and never quietly skip it.
+   - **Read the watch list as a decision record, not an inventory.** Count the entries whose
+     disposition is **Accepted**, and check the previous runs' `RESULTS.md` rows in git history for how
+     many consecutive release runs each has carried that disposition. Three or more is a deviation
+     (anti-pattern #53): the entry is owed either a fix or a tracked deviation ID. A watch list where
+     **every** entry reads "accepted", or one too long to read in a single pass, is the finding
+     regardless of any individual entry's merit — that is a backlog wearing a watch list's clothes.
+     Note also that `lizard` counts every `and`/`or` short-circuit as a decision, so a high CCN in Lua
+     is usually dense **defaulting or guarding** rather than tangled control flow (performance-§10);
+     say which it is when reporting a warned function, because the two carry different risk.
+   - **A complexity refactor is audited against performance-§11, not just against the number.** Where
+     the diff since the last audit contains refactors driven by the watch list, check for the shapes the
+     standard forbids: a body dumped into one helper whose name describes nothing a reader would
+     recognize (anti-pattern #52), a dispatch or defaults table built **inside** the function rather
+     than at module level — a per-call allocation traded for branches, and worse on any per-frame path
+     (#43) — an untested function refactored with no characterization test pinning its prior behavior
+     (testing-§13), and `t.k = stored.k or D.k` introduced over fields whose stored `false`/`""`/empty
+     set is a user choice (savedvariables-§5, anti-pattern #54).
    - **Evidence for a shared-subsystem finding cites the descriptor, not the behavior.** The
      compliance claim for e.g. the debug console is `core/DebugLogSetup.lua:<line>` showing the
      `LibStub("LibKa0s-DebugLog-1.0")` lookup, the descriptor fields, and the stub branch — plus the

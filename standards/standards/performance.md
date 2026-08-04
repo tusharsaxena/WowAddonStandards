@@ -159,6 +159,42 @@ The complexity report is the collection's standing answer to *"where is this add
   ```
 - **MUST** carry a **`## Watch list`** above the raw output, naming every function `lizard` warned on (its default thresholds: CCN > 15, length > 1000, parameters > 100) and every file in layout-§1's **1000–1500 LOC on-notice band**, each with a one-line disposition — *accepted and why*, *peel next*, or *already tracked as `<deviation-id>`*. The raw table alone gets skimmed; a short list with dispositions is what actually gets read, and it is what makes the next release's diff meaningful. An empty watch list is a **result** — write "None." rather than dropping the heading.
 
+#### Reading a Lua complexity number (the `and`/`or` tax)
+
+`lizard` counts every `and` and `or` short-circuit as a decision, and in Lua that is where most of a
+function's score comes from. This is not a detail — it decides whether the number means anything and
+what the fix is, and an agent that does not know it will read the report exactly backwards.
+
+- A run of twelve `t.k = rec.k or D.k` field-defaulting lines is **CCN 13 with no visible branching at
+  all**. So is a stack of `if not x then return end` guards, and so is a `(a == b) and x or y` render
+  ternary. A high number in Lua usually means *this function defaults or guards a lot of fields*, not
+  *this function has tangled control flow* — and the two want completely different fixes.
+- Read the number against the body before acting on it. A 40-branch `Sanitize` that is one flat list
+  of `or` defaults is mechanical to fix and was never hard to read; a 19-branch function with four
+  nested loops and an early return in each is the one that actually needs care. The metric ranks them
+  the other way around.
+- **MUST NOT** "fix" a score by rewriting `x = a or b` as `if a ~= nil then x = a else x = b end`.
+  That is the same decision count, three times the lines, and it is the tell that the report is being
+  gamed rather than read (anti-patterns #52). The fix for repeated defaulting is a **data table plus
+  one loop** (performance-§11), which removes the decisions instead of respelling them.
+
+#### A disposition is a decision with a shelf life
+
+- **MUST NOT** let *accepted* become permanent by default. A disposition records a decision taken at
+  a moment; it does not renew itself. An entry carried as "accepted" across **three consecutive
+  release runs** **MUST** be either fixed, or converted into a tracked deviation with an ID and a
+  named owner (audit-review-history) — at which point the watch list points at the tracker rather
+  than re-litigating it every release.
+- The failure this prevents is not hypothetical and it is quiet. A collection-wide sweep in 2026-08
+  found **86 functions over CCN 15 across nine repos**, essentially all of them carrying a standing
+  "accepted" disposition — one addon had 20, another 20, another 14. Every one had been a reasonable
+  call in isolation. Together they made the watch list unreadable: the next genuinely alarming
+  function would have arrived into a list of eighty-six and been indistinguishable from them, which is
+  the same as having no watch list while paying to maintain one (anti-patterns #53).
+- **SHOULD** keep the list short enough to read in one pass. When it is not, that is itself the
+  finding — a watch list that no longer fits on a screen has stopped being a watch list and become a
+  backlog, and a backlog needs scheduling, not another disposition line.
+
 #### The checkpoint: release, not commit
 
 - **MUST NOT** gate commits on it. It is a **report**, read when deciding where to refactor — a threshold that fails a build turns a useful signal into an obstacle to route around, and cyclomatic complexity is a hint rather than a verdict. A pre-commit complexity gate is the fastest way to teach a collection to reach for `--no-verify`, after which the gate protects nothing and the habit remains.
@@ -166,3 +202,48 @@ The complexity report is the collection's standing answer to *"where is this add
 - **MUST** record, in that release's watch list, any function that **newly crossed** a `lizard` threshold or any file that **newly entered** the 1000–1500 band since the previous report, with its disposition. Degradation that is noticed and knowingly accepted is a decision; degradation that is regenerated over in silence is the report failing at its only job.
 - **SHOULD** regenerate mid-cycle when a change is what pushes a function over — recording it with the change that caused it is worth more than rediscovering it at release, when the author has moved on and the cause is one commit among thirty.
 - `lizard` is an optional local dev tool, like `luacheck` (see DEPENDENCIES.md, documentation-§7). **Absent tooling means the report is stale, not that the addon is non-compliant** — but the staleness **MUST** be visible: leave the previous report committed with its original header (which dates itself), and say so in the release notes rather than deleting the file or hand-editing its numbers. A hand-edited complexity report is worse than an absent one, because it reads as measured.
+
+### 11. Acting on a complexity finding (MUST when you act; the report itself never gates)
+
+performance-§10 governs the **measurement**. This governs the **response** — the refactor a watch-list
+entry eventually triggers — because a behavior-preserving refactor undertaken to move a number is the
+single easiest way to ship a regression with nothing red to say so. Nothing here obliges an addon to
+act on any particular finding; it constrains what acting looks like once you do.
+
+**The permitted shapes.** A complexity refactor **MUST** be one of these four, in this order of
+preference. They are the ones that remove decisions rather than relocating them:
+
+1. **Module-level table-driven dispatch** replacing an `if`/`elseif` chain.
+2. **A named file-local helper** extracted for a self-contained block — where the block has a name a
+   reader would recognize.
+3. **A data table plus one loop** replacing repeated field defaulting or validation. This is the fix
+   for the `and`/`or` tax (performance-§10) and it is the one that applies most often.
+4. **Splitting a builder** that assembles N independent sub-parts into N small builders.
+
+**What the refactor MUST NOT do:**
+
+- **MUST NOT** move a body wholesale into one helper so the wrapper scores well. A helper whose name
+  does not describe a thing a reader would recognize — `part2`, `doTheRest`, `handleEverythingElse` —
+  is metric-gaming, and it makes the code worse in exchange for a number (anti-patterns #52).
+- **MUST NOT** allocate per call. A dispatch or defaults table introduced by a refactor **MUST** be
+  built once at file load, at module level. Building it inside the function converts a complexity
+  problem into an allocation problem, and on a per-frame or per-row path that is a strictly worse
+  trade than the branches it replaced (performance-§2, anti-patterns #43).
+- **MUST NOT** change behavior, including fixing a bug noticed along the way. A behavior change hidden
+  inside a large mechanical refactor is unreviewable — the diff is all noise and the one line that
+  matters looks like the rest of it. Record what you found, land the refactor, fix it in its own
+  change.
+- **MUST NOT** drop a comment that records **why**, especially one documenting a past bug. Those lines
+  are the most valuable text in a mature addon and a refactor is the most common way they are lost:
+  the code they explain moves, and the comment stays behind attached to nothing.
+
+**Verify against something (MUST).** A refactor of code with no test is not verifiable, and "the suite
+still passes" means nothing when the suite never covered the function.
+
+- **MUST** pin current behavior with a **characterization test** before refactoring a warned function
+  that has no coverage, and run it **against the unrefactored code** first (testing-§13). A test
+  written after the refactor asserts the new behavior and proves only that the new code does what the
+  new code does.
+- **MUST** treat chat output strings, event registrations, SavedVariables keys and shapes, and slash
+  output as the contract. These are what a user and a sibling addon actually see, and none of them are
+  covered by "it still loads".

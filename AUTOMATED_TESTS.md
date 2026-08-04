@@ -154,6 +154,20 @@ table at all, it renders as literal pipes.
 | `name` | 21 | `path/File.lua` | **Peel next / Accepted — why / Already tracked as `<id>`** |
 ```
 
+A disposition is a decision with a shelf life, not a label that renews itself. An entry carried as
+**Accepted** across **three consecutive release runs** is either fixed or converted into a tracked
+deviation with an ID and an owner — after which the disposition reads *Already tracked as `<id>`*
+and the argument is not re-had every release. A watch list where everything is accepted costs
+maintenance and carries no signal, and one too long to read in a single pass is itself the finding:
+that is a backlog, and a backlog needs scheduling (automated-tests-§4, performance-§10,
+anti-pattern #53).
+
+When reading these numbers, remember `lizard` counts every `and`/`or` short-circuit as a decision.
+In Lua that means a run of `t.k = rec.k or D.k` defaulting lines scores high with no visible
+branching at all, so a large CCN usually means *this function defaults or guards a lot of fields*
+rather than *this function has tangled control flow* — and the two want different fixes
+(performance-§10). What a refactor triggered by this list may and may not do is performance-§11.
+
 **Files by `layout-§1` band** — the band is a **column**, not a heading, so any number of bands
 renders uniformly and sorts together. Today's bands are `1000–1500 (on notice)` and `> 1500 (over
 cap)`, but the standard may add or move one, and a column absorbs that without restructuring every

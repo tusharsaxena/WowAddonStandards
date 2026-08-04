@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.19.0, 2026-08-04)
+# New Ka0s Addon — Context Pack (v2.20.0, 2026-08-04)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -988,6 +988,11 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - `pip install <tool>` as an install instruction (fails on Ubuntu 24.04's PEP 668 marker — use `pipx`), or any dependency listed without the evidence for it (anti-pattern #50).
 - A dated `docs/complexity/<date>.md` pile, a locally tuned `lizard` invocation, a hand-edited complexity report, or a regenerated one with no watch-list disposition for what newly crossed a threshold (anti-pattern #51).
 - Gating commits on the complexity report — the checkpoint is **release**, not commit (performance-§10).
+- A complexity watch list where every entry reads **"accepted"** — a disposition has a shelf life; carried across three consecutive release runs it is fixed or converted to a tracked deviation with an ID (anti-pattern #53).
+- Refactoring to move a CCN number rather than to make the code readable — a body dumped into a `part2`/`doTheRest` helper so the wrapper scores well, or a dispatch table built **inside** the function it serves, which trades branches for a per-call allocation (anti-pattern #52, performance-§11).
+- `t.k = stored.k or D.k` over a settings table — `or` cannot tell *unset* from *stored `false`*, `""` or an empty set, so the user's "off" comes back on. Test with `== nil` (savedvariables-§5, anti-pattern #54).
+- Refactoring an untested function without first pinning its behavior in a characterization test **run against the unrefactored code** (testing-§13).
+- Promoting a shape into `LibKa0s` because it is repeated rather than shared — one needing a behavior flag per consumer, or promoted on raw frequency where the shape carries almost no meaning (anti-pattern #55, library-stack-§7).
 - `TODO.md` in a **released** addon (track the backlog in GitHub issues; allowed only in an unreleased, in-development addon, deleted before first release).
 - Non-canonical `README.md` section order, or a TOC departing from the required field order / file-listing structure (documentation-§1, toc-file-§1/toc-file-§5).
 - Missing the standards reference in project memory & context: no `## Standards compliance (read first)` section in `CLAUDE.md` (documentation-§6).

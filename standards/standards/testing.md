@@ -268,3 +268,31 @@ That is strictly worse than an absent test, which at least leaves a visible gap.
 This is not theoretical: **unfalsifiable assertions were found in four separate milestones** of the
 LibKa0s extraction — each written in good faith, each green, each proving nothing. The mutation costs
 seconds at the moment the test is written, and effectively never happens afterward.
+
+### 13. Characterization tests before a behavior-preserving refactor (MUST)
+
+testing-§4's TDD rule governs **new behavior**: write the failing test, then the code. A refactor is
+the opposite problem — the behavior already exists and the whole point is that it must not change —
+and it needs its own rule, because the obvious move is wrong. Refactoring first and testing afterwards
+produces a test that asserts whatever the new code happens to do, which proves only that the new code
+does what the new code does.
+
+- **MUST**, before refactoring a function that has **no coverage**, write a **characterization test**
+  that pins its current behavior, and **run it against the unrefactored code** and watch it pass. That
+  passing run is the entire value: it is the moment the test is known to describe the old behavior
+  rather than the author's belief about it.
+- **MUST** pin what a caller can actually observe — return values across the interesting input classes,
+  the chat lines emitted, the SavedVariables keys written, the order of side effects. Not internal
+  structure, which the refactor is allowed to change.
+- **MUST NOT** weaken or delete an existing test to make a refactor pass. A test that goes red during a
+  behavior-preserving refactor has done its job and is reporting a behavior change; the fix is in the
+  refactor.
+- **SHOULD** keep the characterization test after the refactor lands. It was written to protect one
+  change, but it documents a contract that had none, and the function was untested for a reason that
+  has not gone away.
+- Where a function is genuinely unreachable headlessly — a `StaticPopup` handler needing a live frame,
+  a render path needing real widget geometry — **MUST** extract the pure logic first, test **that**, and
+  say so in the change. "It cannot be tested" is a claim about the current shape, not about the logic.
+- A collection-wide complexity sweep in 2026-08 found **16 of 86** warned functions with no coverage at
+  all. Those are, by construction, the functions a refactor is least safe to attempt and most likely to
+  be aimed at: complexity and untestedness have the same cause (performance-§11).
