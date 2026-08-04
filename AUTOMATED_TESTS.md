@@ -45,7 +45,7 @@ Two standing rules:
 - **Do not soften a skip into a pass.** "luacheck unavailable" is not "lint clean".
 
 ```markdown
-# Analysis — <YYYY-MM-DD-HHMMSS>
+# Analysis — <YYYYMMDD-HHMMSS>
 
 - **Addon:** <name> <version>
 - **Verdict:** <green|amber|red>

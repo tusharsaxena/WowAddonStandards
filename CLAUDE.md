@@ -14,7 +14,7 @@ addon's own repo**, driven by a plugin skill that reads the playbook from here:
 - **`AUDIT.md`** (root) — the step-by-step spec for `/wow-addon:standards-audit`. An addon audits
   **itself**, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle inside **its own** repo.
 - **`AUTOMATED_TESTS.md`** (root) — the step-by-step spec for `/wow-addon:automated-tests`. An addon
-  records **itself**, writing a frozen `docs/automated-tests/<YYYY-MM-DD-HHMMSS>/` bundle inside
+  records **itself**, writing a frozen `docs/automated-tests/<YYYYMMDD-HHMMSS>/` bundle inside
   **its own** repo.
 - **`NEW_ADDON.md`** (root) — the step-by-step spec for `/wow-addon:new-addon`. Scaffolds a new addon
   that is born compliant.

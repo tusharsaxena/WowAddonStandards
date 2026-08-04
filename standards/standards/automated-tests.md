@@ -13,16 +13,23 @@ land, in what shape, and what may fail a run — that is what is specified here.
 
 ### 1. The bundle (MUST)
 
-- **MUST** record every run under **`docs/automated-tests/<YYYY-MM-DD-HHMMSS>/`** — one directory per
+- **MUST** record every run under **`docs/automated-tests/<YYYYMMDD-HHMMSS>/`** — one directory per
   run, **frozen once written**, never edited afterwards (audit-review-history applies the same rule to
   audits and reviews, for the same reason: an amended record is no longer evidence).
+- **MUST** stamp the directory in **local time**, not UTC. A record is read by the person who ran it,
+  usually minutes later, and a folder name that disagrees with their clock costs a mental conversion
+  on every glance. The manifest's `startedAt` carries an explicit UTC **offset** (`2026-08-04T17:03:11+05:30`),
+  so the instant stays unambiguous once the record outlives the machine that produced it — local for
+  reading, offset for arithmetic. Note that "local" is the *machine's* timezone: a host left on
+  `Etc/UTC` stamps UTC and is behaving correctly, so a developer expecting their own wall clock sets
+  the system timezone rather than the runner.
 - **MUST** carry, per run, one file per suite that produced output, plus a machine-readable manifest:
 
   ```
   docs/automated-tests/
     README.md                     -- what this is and how to run it
     RESULTS.md                    -- the trend line; overwritten in place (§4)
-    <YYYY-MM-DD-HHMMSS>/
+    <YYYYMMDD-HHMMSS>/
       manifest.json               -- every suite's status and counts (§3)
       ANALYSIS.md                 -- the write-up (§5)
       lint.txt                    -- luacheck output
