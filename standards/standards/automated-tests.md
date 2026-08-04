@@ -102,14 +102,29 @@ without saying so.
   applied to the complexity report and the same reason: a dated pile scatters across files the one
   comparison the record exists to make. Consolidating the *evidence* into per-run bundles is only safe
   because this file keeps the *comparison* on one path.
-- **MUST** carry, per row: the run stamp (linking its bundle), the addon version, and each suite's
-  headline figure — lint warnings/errors, tests passed/total, perf status, complexity warning count
-  and max CCN — plus the verdict.
+- **MUST** carry, per row: the run stamp (linking its bundle), the addon version, the verdict, and
+  each suite's headline figures — lint warnings/errors and files checked, tests passed/total, perf
+  status, and for complexity **both totals and averages**: NLOC, functions, avg NLOC/function, avg
+  CCN, max CCN and the warning count. An average without its total, or a total without its average,
+  cannot be read across a change in size.
+- **MUST** distinguish a suite that was **not selected** from one that was **skipped**. A subset run
+  whose row reads `0/0` for tests is indistinguishable from a full run that found no tests, and the
+  trend line carries that forever. Not-selected and tool-absent are different facts about why a
+  number is missing, and both are different from zero.
+- **MUST NOT** silently recreate the file when its column set has changed. Rewriting the header
+  drops every previous row — the one thing a trend line must never do. A runner that cannot append
+  says so and leaves the file alone.
 - **MUST** carry the current complexity **watch list** below the table: every function `lizard` warned
   on and every file in `layout-§1`'s 1000–1500 on-notice band, each with a one-line disposition —
   *accepted and why*, *peel next*, or *already tracked as `<deviation-id>`*. Anything that **newly**
   crossed since the previous run appears with its disposition. A regeneration that yields no
   disposition for what newly crossed has performed the ritual and skipped the point.
+- **MUST** carry a short standing section for each of the **other three** suites as well — test
+  suite, lint, perf. The complexity watch list existed first and it is easy to leave it the only
+  prose, but a record whose only narrative is about complexity teaches the reader that the other
+  three suites are just pass/fail lights. They are not: a suite count that has not moved in six
+  releases, a lint config with a broad exclusion, and an addon with no perf scenarios at all are
+  each worth a sentence that the table cannot carry.
 
 ### 5. `ANALYSIS.md` — the write-up (MUST at release, SHOULD otherwise)
 

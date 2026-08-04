@@ -113,15 +113,40 @@ than dropping the heading.>
 the addon's own tracking — a deviation ID or a review finding — says that it is new here.>
 ```
 
-## Step 3 — Refresh the `RESULTS.md` watch list
+## Step 3 — Refresh the `RESULTS.md` standing sections
 
-The runner prepends the table row. The **watch list below the table** is written by the reader
-(`automated-tests-§4`) and describes the **current** state, not this run's diff:
+The runner prepends the table row. Everything **below** the table is written by the reader
+(`automated-tests-§4`) and describes the **current** state, not this run's diff.
 
-- Every function `lizard` warned on and every file in the on-notice LOC band, each with a one-line
-  disposition.
-- Anything that **newly** crossed since the previous run, marked as such.
-- `None.` if the list is empty — an empty watch list is a result, not a reason to drop the heading.
+Four sections, one per suite. The complexity watch list came first and it is easy to leave it the
+only prose — but a record whose only narrative is about complexity teaches the reader that the other
+three suites are pass/fail lights, and they are not.
+
+### `## Test suite`
+
+Case count and what it covers. Worth a sentence when: the count has **not moved** across several
+runs (a suite that stopped growing while the addon did is a coverage gap, and the table cannot show
+it); a whole area is covered only by in-game smoke tests; or the count jumped and it is worth saying
+why. Name the generated inventory (`test-cases.md`) as the authority.
+
+### `## Lint`
+
+Clean or not, over how many files, and **what the config excludes**. A `0/0` row means nothing
+without knowing what was in scope — a `.luacheckrc` with a broad `exclude_files` can make an addon
+permanently green over half its source, and that is invisible in the table.
+
+### `## Perf`
+
+The scenarios and what they pin. If the addon ships **no** `tests/perf.lua`, say so plainly and say
+what that costs: the run is silent about runtime cost, and `performance-§9`'s zero-overhead evidence
+does not exist for this addon. A permanent `skip` is a standing fact about the addon, not a
+transient tooling gap, and it should read as one.
+
+### `## Complexity watch list`
+
+Every function `lizard` warned on and every file in the on-notice LOC band, each with a one-line
+disposition. Anything that **newly** crossed since the previous run, marked as such. `None.` if
+empty — an empty watch list is a result, not a reason to drop the heading.
 
 Carry forward a disposition that is still true rather than re-arguing it; a watch list that reads
 differently every release teaches the reader that none of it is settled.
