@@ -59,12 +59,37 @@ move since the previous run, and is there anything to act on.>
 
 ## Suites
 
-| Suite | Status | Result | Moved since <previous run> |
-|---|---|---|---|
-| lint | | | |
-| tests | | | |
-| perf | | | |
-| complexity | | | |
+Every row links its artifact, so a reader can get from a figure to the evidence in one click. A
+skipped suite links nothing — there is no artifact — and says what was not measured.
+
+| Suite | Status | Result | Artifact | Moved since <previous run> |
+|---|---|---|---|---|
+| lint | | <warnings> warnings / <errors> errors in <files> files | [`lint.txt`](lint.txt) | |
+| tests | | <passed> passed, <failed> failed, <total> total | [`tests.txt`](tests.txt) · [`test-cases.md`](test-cases.md) | |
+| perf | | <scenarios> scenarios | [`perf.txt`](perf.txt) · [`perf.json`](perf.json) | |
+| complexity | | see below | [`complexity.txt`](complexity.txt) | |
+
+**Complexity is reported in full**, because a single figure cannot be compared across a change in
+size. Give every field of `lizard`'s footer — totals *and* averages — plus the two derived counts:
+
+| Metric | Value |
+|---|---|
+| Total NLOC | |
+| Functions | |
+| Avg NLOC / function | |
+| Avg CCN | |
+| Max CCN | |
+| Avg tokens / function | |
+| Warnings (CCN > 15) | |
+| Warning rate (`Fun Rt` / `nloc Rt`) | |
+| Files in the 1000–1500 band | |
+| Files over the 1500 cap | |
+
+The averages are the point. A **total** that rose because the addon grew is a different fact from an
+**average** that rose because it got denser, and only the second is a complexity signal — reporting
+totals alone makes a growing addon look like a degrading one, every release, until nobody reads the
+row. Every value comes from `manifest.json`'s `suites.complexity`, which records all eight footer
+fields.
 
 For each suite that is not a clean pass, one short paragraph: what the output says, and whether it is
 a regression, a pre-existing condition, or a skip.

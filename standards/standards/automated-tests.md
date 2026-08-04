@@ -117,6 +117,12 @@ without saying so.
   run whose verdict is not `green` or whose numbers moved.
 - **MUST** follow the uniform prompt in the root **`AUTOMATED_TESTS.md`** playbook, so every addon's
   write-up has the same shape and two addons' analyses can be read against each other.
+- **MUST** link each suite's artifact from the row that reports it, so a reader gets from a figure to
+  the evidence in one click, and **MUST** report `complexity` with **totals and averages both** —
+  every field of `lizard`'s footer, which `manifest.json` records. A total that rose because the addon
+  grew is a different fact from an average that rose because it got denser, and only the second is a
+  complexity signal; totals alone make a growing addon look like a degrading one every release, until
+  nobody reads the row.
 - **MUST** be evidence-backed against the bundle it sits in — a claim about a number cites the file in
   the same directory that carries it. The analysis is frozen with its evidence; if the reading was
   wrong, the *next* run's analysis says so, and this one stands as what was believed at the time.
