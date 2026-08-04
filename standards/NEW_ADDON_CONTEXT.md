@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.17.1, 2026-08-03)
+# New Ka0s Addon — Context Pack (v2.18.0, 2026-08-04)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -57,7 +57,8 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
      inside it, so there is no `LibKa0s/testkit/` to copy from. It goes under `tests/`, **never**
      `libs/`, because it must not ship to the player (testing-§1).
 4. **Fill in the starters.** Work through the *Starter snippets* (TOC, entry, `Compat`, `Locale`,
-   `Database`, `Schema`, the five setup files, tests, message bus, `.luacheckrc`, `.pkgmeta`) and the
+   `Database`, `Schema`, the five setup files, tests, message bus, `.luacheckrc`, `.pkgmeta`,
+   `DEPENDENCIES.md`) and the
    *Hard rules cheat sheet* below. **The shared subsystems are consumed, not written**: the chat
    printer, the debug console, the slash dispatcher, the options toolkit and the performance harness
    are `LibKa0s` modules, and the addon is born with one **setup file** per module — a **descriptor**
@@ -137,9 +138,10 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
   docs/                  -- ARCHITECTURE.md, testing.md, smoke-tests.md, planning; NO agent-context.md (documentation-§3); no TODO.md once released (documentation-§4)
     performance.md       -- required: the addon's perf page (performance)
     perf-runs/README.md  -- required: the standing capture store (performance-§8)
+    complexity.md        -- required: the GENERATED lizard report, overwritten in place (performance-§10)
     audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
     reviews/<YYYY-MM-DD>/-- retained code-review history (audit-review-history)
-  README.md  (root, full)   CLAUDE.md (root, stub)   LICENSE (root)
+  README.md (root, full)  CLAUDE.md (root, stub)  DEPENDENCIES.md (root)  LICENSE (root)
   .luacheckrc  .pkgmeta
 ```
 
@@ -707,7 +709,8 @@ list), never by hand-stubbing the member under test. And a test that cannot fail
 test: prove any negative assertion by mutating the implementation and watching it go red
 (testing-§12).
 
-Local toolchain:
+Local toolchain (the full list, with `lizard` and its `pipx` workaround, is the root
+`DEPENDENCIES.md` — see its starter snippet below):
 
 ```sh
 sudo apt-get update && sudo apt-get install -y lua5.1 luarocks
@@ -767,9 +770,9 @@ Libraries are **vendored under `libs/` and committed** (`STANDARDS.md library-st
 
 `libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because four of the five majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
 
-### Docs — root `CLAUDE.md` stub + the `docs/` trio
+### Docs — the root three + the `docs/` trio
 
-Root ships a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`; everything else lives under `docs/` (documentation). The stub is short and **MUST** carry a `## Standards compliance (read first)` section (documentation-§6). **This pack is NOT copied into the addon** — see the banner at the top of this file. The `docs/` trio is `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`.
+Root ships exactly three docs plus `LICENSE`, and never a fourth: a **full** `README.md`, a **stub** `CLAUDE.md`, and `DEPENDENCIES.md` (documentation, documentation-§7). Everything else lives under `docs/`. The stub is short and **MUST** carry a `## Standards compliance (read first)` section (documentation-§6). **This pack is NOT copied into the addon** — see the banner at the top of this file. The `docs/` trio is `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; four topic-detail docs are required alongside it — `test-cases.md`, `performance.md`, `perf-runs/README.md` and `complexity.md` (documentation-§3).
 
 ```markdown
 <!-- root CLAUDE.md (STUB — never the full brief) -->
@@ -807,6 +810,104 @@ Green gate before every commit: `lua tests/run.lua` and `luacheck .` (0/0). Neve
 push and never bump the version without an explicit instruction.
 ```
 
+### Root `DEPENDENCIES.md` — the toolchain contract
+
+The one doc a **new machine** needs first, which is exactly when the reader cannot yet run the addon
+to find out what is missing. It sits at root, next to `README.md`, and answers *what to install*;
+`docs/testing.md` answers *how to verify* — neither repeats the other (documentation-§7).
+
+Fill in the blanks below, and **delete nothing but the placeholders**. Three rules do the work: every
+entry names the **evidence** for itself (a file:line, a script's import, a documented command — a
+speculative entry is worse than an omission), the three groups stay **separate** because most readers
+need only one of them, and every install line is one that **actually works on WSL2 / Ubuntu** with a
+one-line verification beside it. A `pip install lizard` on Ubuntu 24.04 fails on PEP 668's
+`EXTERNALLY-MANAGED` marker — the reader concludes the tool is unavailable rather than that the doc
+is stale, which is anti-pattern #50.
+
+The baseline for a new Ka0s addon is: **lua5.1 + luac, luacheck (via luarocks), lizard (via pipx),
+git, a POSIX shell** — and, for most addons, **no release or asset tooling at all**. Say so plainly
+rather than deleting the heading: "none" is a result.
+
+````markdown
+# Dependencies — Ka0s <Name>
+
+What you need installed to build, run, test or release this addon. Commands are for
+**WSL2 / Ubuntu** (the collection's development environment). How to *verify* the addon once
+you are set up is `docs/testing.md`; this file only covers *what to install*.
+
+Every entry says what needs it and how that is known. Anything only plausibly required is
+marked as such rather than listed as a requirement.
+
+## Runtime (in-game) — what a player needs
+
+- **World of Warcraft (Retail).** Single `## Interface:` line in `<Addon>.toc` — Retail only.
+- **Nothing else.** Every library is vendored under `libs/` and committed (library-stack), so the
+  player installs no separate library addon. `## OptionalDeps:` names the vendored libs for load
+  ordering, not as things to download.
+- *(If the addon has a real optional integration, name it here with its `IsAddOnLoaded` guard's
+  file:line, and say what degrades without it.)*
+
+## Development — the contributor toolchain
+
+| Tool | Version | Needed for | Evidence |
+|---|---|---|---|
+| `lua5.1` (+ `luac`) | **5.1 exactly** | the headless suite, `lua tests/run.lua` | `tests/_kit/loader.lua` uses `setfenv` |
+| `luacheck` | any recent | `luacheck .`, the other half of the green gate | `.luacheckrc` at the repo root |
+| `lizard` | any recent | `docs/complexity.md` (performance-§10) | the command in that file's generated header |
+| `git` | any recent | vendoring, `diff -r` against the LibKa0s repo | library-stack-§7 |
+| POSIX shell | any | the commands in this file and in `docs/testing.md` | — |
+
+**Lua 5.1 is a requirement, not a preference.** The harness sandboxes each source file with
+`setfenv`, which was removed in 5.2 — "5.2 will probably work" is false and costs an hour to
+disprove.
+
+```sh
+# Lua 5.1 and luacheck
+sudo apt-get update
+sudo apt-get install -y lua5.1 luarocks
+sudo luarocks install luacheck
+
+# lizard — via pipx, NOT pip. Ubuntu 24.04 marks its Python EXTERNALLY-MANAGED (PEP 668),
+# so `pip install lizard` fails; pipx installs it into its own venv and puts it on PATH.
+sudo apt-get install -y pipx
+pipx ensurepath          # then open a new shell, or: source ~/.bashrc
+pipx install lizard
+
+# verify — each of these must print a version
+lua5.1 -v                # Lua 5.1.5 …   (if `lua` is not 5.1, use lua5.1 explicitly)
+luacheck --version
+lizard --version
+git --version
+```
+
+Versions are pinned only where a version matters: `lua5.1` is hard, `luacheck` and `lizard` are
+"any recent" and pinning them would be false precision.
+
+## Release / assets
+
+**None.** This addon is packaged from the committed tree — nothing is generated at build time,
+and no image or font tooling is needed to produce what ships. **None of this group is required to
+build, run or test the addon.**
+
+*(If that ever stops being true — a Python script that regenerates an atlas, a vendored binary and
+the system library it links against — list it here with the script's import as evidence, and keep
+the "not needed to build, run or test" sentence.)*
+
+## Am I set up correctly?
+
+```sh
+lua tests/run.lua                                     # the suite — must be green
+luacheck .                                            # must be 0 warnings / 0 errors
+lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .     # the complexity report (release-time)
+```
+
+See `docs/testing.md` for what those commands mean and when each is run.
+````
+
+Keep it current **in the change that adds the import**, not at the next audit: a dependency list that
+is wrong is the specific failure that makes a new contributor's first hour their last. It is checked
+at release with the rest of the doc set (documentation-§5). And listing a library here never licenses
+fetching it at build time — libraries are vendored and committed (documentation-§7).
 
 ---
 
@@ -831,19 +932,21 @@ push and never bump the version without an explicit instruction.
 15. File LOC cap: ~1500. Peel when exceeded.
 16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries. **`libs/LibKa0s/` is copied WHOLE, every time** — every module, even unwired ones; a partial copy costs the addon majors it was not even touching (anti-pattern #48) — TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml`, and kept **byte-identical** to its source repo (`diff -r` empty), with a re-vendor commit here after every library change, because both repos stay green while the copies silently diverge (library-stack-§7, anti-pattern #45). Nothing under `libs/` is ever edited locally.
 16b. **Consume, never fork** (anti-pattern #47): the chat printer, the debug console, the slash dispatcher, the options toolkit, the performance harness and the test harness are `LibKa0s`. Adopting one is a **descriptor plus a degradation stub** in the addon's own setup file. Anything genuinely missing goes back into the library as an **additive** descriptor field so every consumer gets it — never a local patch, and never a private lookalike.
-16a. **Performance harness** (performance): vendor `LibKa0s-Perf-1.0`, build `NS.Perf` from a descriptor in `core/PerfSetup.lua` (degrading to a working stub if the lib is absent), bracket hot paths with the gated `local t0 = Perf.on and debugprofilestop()` form — **zero work when off**, evidenced by the offline zero-overhead scenario, never by a comment — declare buckets with their `within` nesting, expose the reserved **`perf`** verb through `NS.COMMANDS` (the lib returns lines; never let it register a slash), declare `<Addon>PerfDB`, and implement `suspend`/`resume` so the addon goes inert **without a `/reload`** with visibility refused at the **source** of the show decision. Never hand-roll a probe, and never let a shared harness own a frame on your behalf (anti-patterns #43/#44).
+16a. **Performance harness** (performance): vendor `LibKa0s-Perf-1.0`, build `NS.Perf` from a descriptor in `core/PerfSetup.lua` (degrading to a working stub if the lib is absent), bracket hot paths with the gated `local t0 = Perf.on and debugprofilestop()` form — **zero work when off**, evidenced by the offline zero-overhead scenario, never by a comment — declare buckets with their `within` nesting, expose the reserved **`perf`** verb through `NS.COMMANDS` (the lib returns lines; never let it register a slash), declare `<Addon>PerfDB`, and implement `suspend`/`resume` so the addon goes inert **without a `/reload`** with visibility refused at the **source** of the show decision. Never hand-roll a probe, and never let a shared harness own a frame on your behalf (anti-patterns #43/#44). The **static** half of the same question — where the addon is getting hard to change — is the `lizard` report at `docs/complexity.md`, regenerated at every release (rule 20e, performance-§10).
 17. Debug: **consume `LibKa0s-DebugLog-1.0`** — one instance from a descriptor in `core/DebugLogSetup.lua`, with `NS.Debug` bound **bare** off it (debug-logging-§1). The window, both formatters, the 500-line buffer, the scrollbar, the counter and the enable seam are the library's; the addon owns the shipped monospace font (10pt), the flag, the `[Init]` summary and which flows are worth tracing. Enabled-state is **session-only** (`NS.State.debug`, default off, reset every `/reload`; never in SV, never copied into the library), decoupled from window visibility. Call the sink tag-first with the format deferred, coalesce to one line per pass, and log a settings change once, at the write seam.
 18. Preview/test mode (preview-mode): addons with a positionable display SHOULD show placeholder data while unlocked and/or via `/<slash> preview`.
 19. Tests: **vendor the shared kit** — the LibKa0s repo's root-level `testkit/` → `tests/_kit/`, never `libs/`, never edited locally (testing-§1). `tests/run.lua` keeps only the load list, the lifecycle kick and the suite list; `tests/wow_mock.lua` is a **thin extender** over `_kit/mock_base.lua`. Derive the addon's file list from the **TOC** and spell out the vendored library files explicitly, in XML order (testing-§9). TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**.
 19a. Test-case inventory & badge (testing-§5): ship a **generated** `docs/test-cases.md` (full per-suite case enumeration + totals, produced by a `--list` mode of the runner — `lua tests/run.lua --list > docs/test-cases.md`, never hand-authored; it is the authoritative pass count) and a **static** X/Y `[tests]` README badge. Regenerate the doc and update the badge **in the same change** whenever the suite changes (a case added/removed/renamed or the count moved). No CI.
-20. Docs: root = full `README.md` + **stub** `CLAUDE.md` + `LICENSE`; everything else under `docs/`. Canonical `docs/` **trio** (all addons): `ARCHITECTURE.md`, `testing.md` (verify-how-to), `smoke-tests.md`; plus the generated `test-cases.md` (testing-§5) and topic-detail docs as needed. **MUST NOT** ship `docs/agent-context.md` — this pack is fetched at runtime, never stored (documentation-§3, anti-pattern #49). Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
+20. Docs: root ships **exactly three** docs plus `LICENSE`, and never a fourth — full `README.md`, **stub** `CLAUDE.md`, `DEPENDENCIES.md` (documentation-§7); everything else under `docs/`. Canonical `docs/` **trio** (all addons): `ARCHITECTURE.md`, `testing.md` (verify-how-to), `smoke-tests.md`. **Four** topic-detail docs are required, not optional: generated `test-cases.md` (testing-§5), `performance.md`, `perf-runs/README.md` (performance-§8) and generated `complexity.md` (performance-§10); further topic-detail docs as needed. **MUST NOT** ship `docs/agent-context.md` — this pack is fetched at runtime, never stored (documentation-§3, anti-pattern #49). Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
+20d. **`DEPENDENCIES.md` at root** (documentation-§7): every piece of software needed to build, run, test or release the addon, each with the **evidence** for it (file:line, a script's import, a documented command — never a speculative entry), split **runtime / development / release-and-assets** because most readers need one group only, with copy-pasteable **WSL2 / Ubuntu** install commands that actually work and a one-line **verification** per tool. `lua5.1` is a hard version requirement (the harness uses `setfenv`); `luacheck`/`lizard` are "any recent". `pip install lizard` **fails** on Ubuntu 24.04 (PEP 668 `EXTERNALLY-MANAGED`) — use `pipx install lizard`. Refresh it in the change that adds the dependency, not at the next audit; an undocumented or drifted toolchain is anti-pattern #50.
+20e. **Complexity report** (performance-§10): commit `docs/complexity.md` — **one** file overwritten in place, never dated, never a directory, so git history is the trend line — generated from the repo root by exactly `lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`, with no added flags, no re-tuned thresholds and no narrowed path (a locally "improved" invocation makes the report un-diffable against every earlier one). It carries the generated-file header (date, tool version, command, standard version) and a **`## Watch list`** above the raw output naming everything `lizard` warned on plus every file in the 1000–1500 LOC on-notice band, each with a disposition — "None." when empty. The checkpoint is **release, not commit**: regenerate and read the diff in the same change that bumps the version, **before** the tag, and record anything that newly crossed a threshold. **Never gate commits on it** — a failing complexity gate teaches the collection to reach for `--no-verify`. Never hand-edit it; when `lizard` is absent leave the previous report standing with its own date and say so in the release notes (anti-pattern #51).
 20a. `README.md` is a **player-facing** document that renders on **CurseForge as well as GitHub** — so it **MUST NOT** use `<…>` angle-bracket placeholders anywhere (CurseForge strips them as HTML even inside backticks; write the argument bare, keep `[…]` for optional ones) nor percent-escapes for spaces in badge URLs. Deliberate HTML like `<br>` is fine. It is a document — written for the person who installed the addon (what it does, how to use it, how to fix common problems), in plain language, free of internal jargon and machine-generated tells; contributor material (test harness, lint, build, internals) stays out of it, under `docs/`. It follows the **canonical section order** (documentation-§1): title → badges (`[wow]` → version → license → standard → `[tests]`, that exact order and these exact templates: `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)`, `![License](https://img.shields.io/badge/License-MIT-orange)`, `[![Standard](https://img.shields.io/badge/Ka0s-WoW_Addon_Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)`, `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`; the `[wow]` and `[tests]` badges MUST be updated in lockstep with the TOC `## Interface:` and the test inventory respectively) → logo → description → **What's new in `<X.Y.Z>`** (top user-facing highlights of the current release, mirroring the newest Version History row; rolled forward on every version bump) → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Version History (there is **no** `## Testing` section — verify-how-to lives in `docs/`; the README keeps only the `[tests]` badge). TOC follows the fixed field order + `#`-section file listing (toc-file-§1/toc-file-§5).
 20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (documentation-§4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
 20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **three** places — TOC `X-Standard`, README standard badge, and the root `CLAUDE.md` `## Standards compliance (read first)` section. There is no fourth place; the old one was a file the standard now forbids. STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
 21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (audit-review-history). Kept, not deleted.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
-24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px grey highlight just inside it, plus a gold title and a grey divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See `STANDARDS.md standalone-windows-§2`.
+24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px gray highlight just inside it, plus a gold title and a gray divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See `STANDARDS.md standalone-windows-§2`.
 
 ## Forbidden patterns
 
@@ -877,7 +980,11 @@ push and never bump the version without an explicit instruction.
 - User-supplied Lua execution.
 - Committing with red `lua tests/run.lua` or non-clean `luacheck .`; a logic change with no covering test.
 - Loose files directly in `media/` (use typed subfolders).
-- Full agent brief in the root `CLAUDE.md` (root is a stub; brief lives in `docs/`).
+- Full agent brief in the root `CLAUDE.md` (root is a stub; there is no in-repo brief — `docs/ARCHITECTURE.md` and `docs/testing.md` carry the durable context).
+- A fourth doc at root, or a missing one: root is `README.md` + `CLAUDE.md` + `DEPENDENCIES.md` + `LICENSE` (documentation-§7).
+- `pip install <tool>` as an install instruction (fails on Ubuntu 24.04's PEP 668 marker — use `pipx`), or any dependency listed without the evidence for it (anti-pattern #50).
+- A dated `docs/complexity/<date>.md` pile, a locally tuned `lizard` invocation, a hand-edited complexity report, or a regenerated one with no watch-list disposition for what newly crossed a threshold (anti-pattern #51).
+- Gating commits on the complexity report — the checkpoint is **release**, not commit (performance-§10).
 - `TODO.md` in a **released** addon (track the backlog in GitHub issues; allowed only in an unreleased, in-development addon, deleted before first release).
 - Non-canonical `README.md` section order, or a TOC departing from the required field order / file-listing structure (documentation-§1, toc-file-§1/toc-file-§5).
 - Missing the standards reference in project memory & context: no `## Standards compliance (read first)` section in `CLAUDE.md` (documentation-§6).
@@ -914,9 +1021,11 @@ push and never bump the version without an explicit instruction.
 - [ ] Integration suite covers the addon-side wiring of **every** adopted module — descriptors well-formed, **every declared perf bucket actually reached** by a real bracket, suspend genuinely inert, and each lib-absent path exercised by loading the addon **without** the lib rather than by hand-stubbing (testing-§8). No duplicate of the library's own cases (they live in the `LibKa0s` repo), and every negative assertion proven falsifiable by mutation (testing-§12).
 - [ ] `tests/perf.lua` offline runner present, **outside** the green gate, asserting only deterministic quantities and shipping a zero-overhead scenario as evidence that instrumentation is free when capture is off (performance-§9). Its scenarios are **not** counted in `docs/test-cases.md` or the `[tests]` badge.
 - [ ] `docs/performance.md` and `docs/perf-runs/README.md` present (documentation-§3).
+- [ ] **`docs/complexity.md` generated**, never hand-written, by exactly `lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .` run from the repo root — one file overwritten in place (not dated, not a directory) — carrying the generated-file header (date, `lizard` version, the command, the standard version) and a **`## Watch list`** above the raw output with a disposition for everything the tool warned on and every file in the 1000–1500 LOC band ("None." if empty). Regenerated at every **release**, before the tag; commits are **not** gated on it (performance-§10, anti-pattern #51).
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
-- [ ] Root = full `README.md` (with `[wow]` badge + standard link) + **stub** `CLAUDE.md` + `LICENSE`; canonical `docs/` **trio** present (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus generated `test-cases.md`; **no `docs/agent-context.md`**; passes the drift check.
+- [ ] Root = the three docs plus `LICENSE`, and nothing else: full `README.md` (with `[wow]` badge + standard link), **stub** `CLAUDE.md`, `DEPENDENCIES.md`. Canonical `docs/` **trio** present (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus the four required topic-detail docs (`test-cases.md`, `performance.md`, `perf-runs/README.md`, `complexity.md`); **no `docs/agent-context.md`**; passes the drift check.
+- [ ] **Root `DEPENDENCIES.md` present and evidence-based** (documentation-§7) — runtime / development / release-and-assets kept separate, every entry naming what needs it and how that is known, WSL2/Ubuntu install commands that actually run (`pipx install lizard`, **never** `pip install lizard` — PEP 668) with a one-line verification per tool, `lua5.1` stated as a hard requirement with its reason (`setfenv`), and the release/assets group saying "none" plainly when the addon has no such tooling.
 - [ ] **Standards reference in memory & context (documentation-§6)** — all three present: TOC `X-Standard`, README standard badge, and the root `CLAUDE.md` `## Standards compliance (read first)` section.
 - [ ] `README.md` is player-facing and plain-language (no contributor material, no `## Testing` section) and follows the canonical section order (documentation-§1), including a **`## What's new in <X.Y.Z>`** highlights section above the screenshots (mirrors the top Version History row; rolled forward on each version bump), **Usage** (Slash-commands + Settings-panel tables), **Issues and feature requests** (→ GitHub issues), and **Version History**.
 - [ ] TOC follows the fixed field order and `#`-section file-listing structure (toc-file-§1/toc-file-§5).

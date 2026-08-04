@@ -23,8 +23,10 @@ This playbook is the entry point; the substance lives in `standards/`:
    question it answers is answered the moment the addon exists, and a stored copy is loaded as
    working context — so a stale one gets *followed*, not ignored. Leave a short root `CLAUDE.md`
    **stub** carrying identity and `## Standards compliance (read first)`, and put the durable
-   per-addon context where the standard requires it: `docs/ARCHITECTURE.md` (what this addon is)
-   and `docs/testing.md` (how to verify it).
+   per-addon context where the standard requires it: `docs/ARCHITECTURE.md` (what this addon is),
+   `docs/testing.md` (how to verify it), and root `DEPENDENCIES.md` (what to install to work on it —
+   step 7). The root ships exactly those three docs plus `LICENSE` — `README.md`, the `CLAUDE.md`
+   stub, `DEPENDENCIES.md` — and never a fourth (documentation).
 3. **Lay out files.** Use the single modular layout — `core/ modules/ defaults/ settings/ locales/` —
    for every addon regardless of size (a small addon just has thin folders). See *Layout* and the
    starter tree in the context pack. Copy the vendored `libs/` set you actually
@@ -79,11 +81,26 @@ This playbook is the entry point; the substance lives in `standards/`:
    incl. the standard-link badge → logo → description → Screenshots → Usage → How it works → FAQ →
    Troubleshooting → Issues and feature requests → Version History — there is **no** `## Testing` section;
    verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
-7. **Check the Definition of Done.** Walk the DoD checklist at the bottom of the context pack before
+7. **Write the root `DEPENDENCIES.md`.** The toolchain contract (documentation-§7): every piece of
+   software needed to build, run, test or release this addon, split into **runtime (in-game)**,
+   **development** and **release / assets**, with copy-pasteable WSL2 / Ubuntu install commands and a
+   one-line verification command per tool. Write it from **evidence** — the TOC's dependency fields, a
+   script's imports, the command the harness actually runs — never from what a new addon usually
+   needs; a speculative entry costs the reader's trust in the whole list. A new addon's honest runtime
+   section is normally "World of Warcraft (Retail); nothing else", because every library is vendored
+   (library-stack). It answers *what to install*; `docs/testing.md` answers *how to verify* — point at
+   it rather than restating it.
+8. **Generate the first complexity report.** Run the standard's exact invocation from the repo root —
+   `lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .` — and commit the result as **`docs/complexity.md`**
+   with its generated-file header and a `## Watch list` (performance-§10). Do this **before** tagging
+   `v0.1.0`: the report's value is the diff between releases, so the first release is what gives every
+   later one something to diff against. One file, overwritten in place at each release — never dated,
+   never a directory — and never hand-edited. It is not a commit gate.
+9. **Check the Definition of Done.** Walk the DoD checklist at the bottom of the context pack before
    tagging `v0.1.0`.
-8. **Register in the roster.** Add the addon's row to
-   [`standards/ADDONS.md`](standards/ADDONS.md) in the `WowAddonStandards` repo. This is the one edit
-   that brings the addon into the collection's scope for the next standards refresh.
+10. **Register in the roster.** Add the addon's row to
+    [`standards/ADDONS.md`](standards/ADDONS.md) in the `WowAddonStandards` repo. This is the one edit
+    that brings the addon into the collection's scope for the next standards refresh.
 
 ## Identity (defaults every Ka0s addon uses)
 

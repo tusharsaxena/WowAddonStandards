@@ -86,7 +86,7 @@ authoritative steps: [`AUDIT.md`](AUDIT.md). At a glance:
 Scaffold a new Ka0s addon that is compliant from day one. Full walkthrough: [`NEW_ADDON.md`](NEW_ADDON.md).
 In short: run `/wow-addon:new-addon` to scaffold the Ace3 skeleton, build against the standard
 working from the [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) pack — which is
-fetched to a temp directory and **never** written into the addon (documentation-§3), and add the addon's row to [`standards/ADDONS.md`](standards/ADDONS.md).
+fetched to a temp directory and **never** written into the addon (documentation-§3), and add the addon's row to [`standards/ADDONS.md`](standards/ADDONS.md). A born-compliant addon ships three root docs plus `LICENSE` — a full `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§7) — over the canonical `docs/` trio (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`).
 
 ---
 
@@ -114,7 +114,7 @@ Audit and review runs are **not** stored here — each lives under its own addon
 
 ## Status
 
-Standard is at **v2.16.0** and living. Compliance auditing has moved out of this repo into each addon's
+Standard is at **v2.18.0** and living. Compliance auditing has moved out of this repo into each addon's
 own repository, driven by the `AUDIT.md` / `NEW_ADDON.md` playbooks that the `wow-addon` plugin
 consumes.
 

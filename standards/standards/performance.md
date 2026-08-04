@@ -114,9 +114,36 @@ A second, **offline** harness measures what a live client cannot measure repeata
 - **SHOULD** keep the scenarios per-addon. They are about that addon's own hot paths, so they stay in the addon rather than moving into the shared lib.
 - Scenario output **SHOULD** state plainly that timings are for orientation only — compare scenarios within a run, never across machines.
 
-### 10. Complexity reporting (SHOULD)
+### 10. Complexity reporting (MUST ship; refreshed at release)
 
-- **SHOULD** run `lizard` over the addon's own source, **excluding `libs/`**, and commit the report as **`docs/complexity.md`** (a topic-detail doc, documentation-§3).
-- **MUST NOT** gate commits on it. It is a **report**, read when deciding where to refactor — a threshold that fails a build turns a useful signal into an obstacle to route around, and cyclomatic complexity is a hint rather than a verdict.
-- **SHOULD** regenerate it when a file it names changes materially, and **SHOULD** state in the file that it is generated and how.
-- `lizard` is an optional local dev tool, like `luacheck` — absent tooling means the report is stale, not that the addon is non-compliant.
+The complexity report is the collection's standing answer to *"where is this addon getting hard to change?"* — and its value is almost entirely in the **difference between two releases**. One report is a page of numbers nobody acts on; the same path showing a function that went from CCN 9 to CCN 24 since the last tag is a finding with a name attached. That is why this section fixes three things that a bare "run `lizard` sometimes" left open: **the path**, **the exact invocation**, and **the moment it is regenerated**. Two reports produced by different invocations are not comparable, and a report nobody regenerates is a fossil that reads like a fact.
+
+- **MUST** commit the report at **`docs/complexity.md`** — one file, **overwritten in place**, never dated and never a directory. The **git history of that single path is the trend line**; a `docs/complexity/<YYYY-MM-DD>.md` pile would scatter across files the one comparison the report exists to make. It is a required topic-detail doc (documentation-§3).
+- **MUST** generate it with this exact invocation, run from the repo root:
+
+  ```bash
+  lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .
+  ```
+
+  The two exclusions are the **vendored** trees — `libs/` and the shared harness at `tests/_kit/` are not this addon's surface (library-stack-§7, testing-§1), and including them swamps the addon's own numbers with library code that no consumer may edit. The addon's **own** `tests/` are measured: a test file that has become as tangled as the module it covers is exactly the signal this report is for. Do not add flags, do not re-tune thresholds per addon, and do not narrow the path to a subfolder — a locally "improved" invocation produces a report that cannot be diffed against the one before it, which costs more than any flag gains.
+- **MUST** carry a generated-file header naming the tool version, the date, the command and the standard version, so a reader can tell staleness from a glance and reproduce the run without guessing:
+
+  ```markdown
+  # Complexity report
+
+  <!-- GENERATED — do not hand-edit. Regenerate per performance-§10. -->
+
+  - **Generated:** <YYYY-MM-DD>
+  - **Tool:** lizard <version>
+  - **Command:** `lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`
+  - **Standard:** v<X.Y.Z>
+  ```
+- **MUST** carry a **`## Watch list`** above the raw output, naming every function `lizard` warned on (its default thresholds: CCN > 15, length > 1000, parameters > 100) and every file in layout-§1's **1000–1500 LOC on-notice band**, each with a one-line disposition — *accepted and why*, *peel next*, or *already tracked as `<deviation-id>`*. The raw table alone gets skimmed; a short list with dispositions is what actually gets read, and it is what makes the next release's diff meaningful. An empty watch list is a **result** — write "None." rather than dropping the heading.
+
+#### The checkpoint: release, not commit
+
+- **MUST NOT** gate commits on it. It is a **report**, read when deciding where to refactor — a threshold that fails a build turns a useful signal into an obstacle to route around, and cyclomatic complexity is a hint rather than a verdict. A pre-commit complexity gate is the fastest way to teach a collection to reach for `--no-verify`, after which the gate protects nothing and the habit remains.
+- **MUST** regenerate the report and review its diff **as part of every release** — in the same change that bumps the version and rolls the README's `## What's new` and `## Version History` forward (versioning-git, documentation-§1), **before** the tag. This is the checkpoint: releases are already the moment the addon is looked at whole, they are infrequent enough that the diff carries signal, and the regenerated report lands in the release commit where the trend line stays readable.
+- **MUST** record, in that release's watch list, any function that **newly crossed** a `lizard` threshold or any file that **newly entered** the 1000–1500 band since the previous report, with its disposition. Degradation that is noticed and knowingly accepted is a decision; degradation that is regenerated over in silence is the report failing at its only job.
+- **SHOULD** regenerate mid-cycle when a change is what pushes a function over — recording it with the change that caused it is worth more than rediscovering it at release, when the author has moved on and the cause is one commit among thirty.
+- `lizard` is an optional local dev tool, like `luacheck` (see DEPENDENCIES.md, documentation-§7). **Absent tooling means the report is stale, not that the addon is non-compliant** — but the staleness **MUST** be visible: leave the previous report committed with its original header (which dates itself), and say so in the release notes rather than deleting the file or hand-editing its numbers. A hand-edited complexity report is worse than an absent one, because it reads as measured.

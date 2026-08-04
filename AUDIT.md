@@ -52,8 +52,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    version — note it (e.g. "audited against v1.0.0") in `01_CURRENT_STATE.md` so the run is reproducible.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
-   TOC, libraries, patterns, settings, slash, debug, tests, packaging, docs) and record what it does
-   now, citing files.
+   TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, the root doc set
+   — `README.md`, the `CLAUDE.md` stub and `DEPENDENCIES.md` (documentation-§1/§2/§7) — and `docs/`)
+   and record what it does now, citing files.
    - **Look in the right place for the shared subsystems.** The debug console, the options toolkit,
      the slash dispatcher, the performance harness and the test framework are **not** the addon's
      code — they are `LibKa0s` modules (library-stack-§7). What the addon owns is a **descriptor**
@@ -104,6 +105,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      file on the addon side is the evidence for **#48**. If the sibling library repo is not present on
      the machine, mark the check **not run** and say so — never infer it from the code looking
      reasonable, and never quietly skip it.
+   - **The complexity report is measured, not read.** Run the standard's exact invocation from the
+     repo root — **`lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`** — and compare the result
+     against the committed **`docs/complexity.md`** (performance-§10), recording the **drift**: which
+     functions crossed a `lizard` threshold or which files entered layout-§1's 1000–1500 LOC band
+     since the committed report was generated, and how stale that report's own header dates it. Run
+     the invocation **verbatim** — a locally "improved" one produces numbers that cannot be compared
+     with the committed report, which is the whole point of the check. A report whose numbers no
+     longer match the code is stale (anti-pattern #51); a hand-edited one is worse, because it reads
+     as measured. The checkpoint is **release, not commit**, so a stale report is a finding about the
+     release process — never a reason to flag the addon for failing to gate commits on complexity. If
+     `lizard` is not installed on the machine, mark the check **not run** and say so — never reason
+     the numbers out from reading the code, and never quietly skip it.
    - **Evidence for a shared-subsystem finding cites the descriptor, not the behavior.** The
      compliance claim for e.g. the debug console is `core/DebugLogSetup.lua:<line>` showing the
      `LibStub("LibKa0s-DebugLog-1.0")` lookup, the descriptor fields, and the stub branch — plus the

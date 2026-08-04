@@ -2,7 +2,7 @@
 
 ## Documentation
 
-Documentation is a **first-class compliance surface**, not an afterthought. Every Ka0s addon ships a fixed, predictable doc set so any human or agent lands in the same place in every repo. **Root of the repo** ships exactly three docs (plus `LICENSE`): a **full** `README.md`, a **stub** `CLAUDE.md`, and `LICENSE`. Everything else lives under `docs/`.
+Documentation is a **first-class compliance surface**, not an afterthought. Every Ka0s addon ships a fixed, predictable doc set so any human or agent lands in the same place in every repo. **Root of the repo** ships exactly three docs plus `LICENSE`, and never a fourth doc: a **full** `README.md` (documentation-§1), a **stub** `CLAUDE.md` (documentation-§2), and `DEPENDENCIES.md` (documentation-§7). Everything else lives under `docs/`.
 
 ### 1. Root `README.md` — canonical structure
 
@@ -84,11 +84,12 @@ Every addon **MUST** ship this **canonical trio** under `docs/` (all three are u
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page.
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
-Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, `complexity.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **Three** topic-detail docs are **required**, not optional:
+Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **Four** topic-detail docs are **required**, not optional — `test-cases.md`, `performance.md`, `perf-runs/README.md` and `complexity.md`:
 
 - **`docs/test-cases.md`** — the generated test-case inventory (testing-§5).
 - **`docs/performance.md`** — the addon's own performance page: which hot paths are bracketed and why, how to run a capture (`/<slash> perf`), how to read the report, and what the harness can and cannot resolve (performance). The shared protocol and record contract live with the library — this page points there rather than restating them.
 - **`docs/perf-runs/README.md`** — the standing capture store's doc: the record naming convention, a schema summary, and a pointer to the library's canonical field-by-field contract (performance-§8). The directory it heads is cumulative rather than tied to one investigation, so runs compare across addon versions.
+- **`docs/complexity.md`** — the generated `lizard` complexity report, one file overwritten in place so its git history is the trend line, refreshed at every release with a watch list of what crossed a threshold since the last one (performance-§10). It is **generated**, never hand-edited.
 
 **MUST NOT** ship a `TODO.md` once released (documentation-§4).
 
@@ -180,3 +181,20 @@ When in doubt, treat standard conformance as a hard requirement and ask.
 
 
 Reference implementation (in the collection): the absorb-shield tracker's root `CLAUDE.md` carries the `## Standards compliance (read first)` section verbatim in substance.
+
+### 7. Root `DEPENDENCIES.md` — the toolchain contract
+
+Every addon **MUST** ship a root **`DEPENDENCIES.md`** naming every piece of software needed to build, run, test or release it, with **copy-pasteable install instructions for WSL2 / Ubuntu** — the collection's development environment.
+
+Why root, and why its own file. Before this rule the answer to *"what do I need installed to work on this addon?"* was spread across `docs/testing.md`'s local-toolchain section, a line in `CLAUDE.md`, the `.toc`'s `## OptionalDeps`, and — for anything a script needed — nowhere at all. Each of those places is correct about its own slice and silent about the rest, so the only way to learn the full set was to run something and read the error. That is a fine way to discover a missing `luacheck`; it is a poor way to discover that a script wants Python with Pillow, or that a vendored binary needs a system library. A dependency list is also the one doc a **new machine** needs first, which is exactly when the reader cannot yet run the addon to find out. It sits at **root**, next to `README.md`, because a contributor arriving at the repo page must not have to know that `docs/` exists to get set up.
+
+- **MUST** be **evidence-based**. Every entry names what needs it and how that is known — a file:line, a script's import, a documented command. Speculative entries are worse than omissions: a reader who installs three things that turn out to be unnecessary stops trusting the list, and then misses the one that mattered. Something only *plausibly* required is recorded as such, in words, or left out.
+- **MUST** separate **runtime** from **development** from **release**, because most readers need only one group:
+  1. **Runtime (in-game)** — what the *player* needs. Required and optional addon dependencies from the TOC (`## Dependencies`, `## OptionalDeps`), and the fact that every library is **vendored** under `libs/` so the player installs nothing extra (library-stack). For most Ka0s addons this section's honest content is "World of Warcraft (Retail); nothing else."
+  2. **Development** — the toolchain a contributor installs: the Lua interpreter **at the version the harness actually requires**, `luacheck`, `lizard`, and anything the tests shell out to (`git`, POSIX `ls`). State the Lua version as a **requirement with its reason**, not a preference — the headless harness uses `setfenv`, which is Lua 5.1-only, so "5.2 will probably work" is false and costs an hour to disprove.
+  3. **Release / assets** — anything needed only to package or to regenerate committed assets: Python and its packages, image tooling, vendored binaries and the system libraries they link against. **MUST** state plainly that these are **not** needed to build, run or test the addon, so a contributor does not install a graphics stack to fix a typo.
+- **MUST** give the install commands, verbatim and runnable, for **WSL2 / Ubuntu**, including the workaround where the plain command fails on a current release. Ubuntu 24.04 marks its Python `EXTERNALLY-MANAGED` (PEP 668), so `pip install <tool>` **fails** — the instruction that works is `pipx`, and a `DEPENDENCIES.md` that says `pip install lizard` is a broken instruction that looks correct. **MUST** also give the one-line **verification** command per tool (`lua -v`, `luacheck --version`, `lizard --version`) — an install instruction without a way to confirm it worked sends the reader to the test suite to find out.
+- **MUST** name **versions where a version matters** and say when it does not. `lua5.1` is a hard requirement; `lizard` and `luacheck` are "any recent" and pinning them would be false precision.
+- **SHOULD** end with the exact **commands this repo is verified with** — lint, the headless suite, the complexity report — so the document doubles as the "am I set up correctly?" check. These point at `docs/testing.md` (documentation-§3) rather than restating its content; `DEPENDENCIES.md` answers *what to install*, `docs/testing.md` answers *how to verify*, and neither repeats the other.
+- **MUST NOT** drift. It is **checked at release** alongside the rest of the doc set (documentation-§5): a new script, a new import, or a dropped tool changes this file in the same change. A dependency list that is wrong is the specific failure mode that makes a new contributor's first hour their last.
+- **MUST NOT** be a substitute for vendoring. Libraries are vendored and committed (library-stack, packaging); listing a library here does **not** license fetching it at build time.
