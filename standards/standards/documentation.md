@@ -70,7 +70,7 @@ There is **no** `## Testing` section in the README (removed in the standard's v2
 
 1. **H1 title** — `# CLAUDE.md — Ka0s <Name>`.
 2. **Adherence line** — states the addon adheres to the **Ka0s WoW Addon Standard** with the repo URL <https://github.com/tusharsaxena/WowAddonStandards>.
-3. **`## Standards compliance (read first)` section** — **MUST** be present, verbatim in substance (documentation-§6). It states that all work here MUST conform to the standard; that a change which would deviate MUST **stop and be flagged** (never silently deviate, never silently "fix" to match); and that the user decides whether it is (a) an **accepted deviation** (recorded in the addon with a reason) or (b) a **change to the standard itself** (made upstream in this repo, after which the addon follows the new rule). Closes with "when in doubt, treat conformance as a hard requirement and ask."
+3. **`## Standards compliance (read first)` section** — **MUST** be present, verbatim in substance (documentation-§6). It states that all work here MUST conform to the standard; that a change which would deviate MUST **stop and be flagged** (never silently deviate, never silently "fix" to match); and that the user decides whether it is (a) an **accepted deviation** (recorded as a row in `docs/ARCHITECTURE.md` → `## Documented deviations`, with its `filename-§N` Rule, its reason and its re-check trigger — documentation-§3) or (b) a **change to the standard itself** (made upstream in this repo, after which the addon follows the new rule). Closes with "when in doubt, treat conformance as a hard requirement and ask."
 4. **A "read the docs" pointer list** — directs the reader into `docs/` for the full context: `docs/ARCHITECTURE.md` (module map — what this addon actually is), `docs/testing.md` (how to verify), then the topic-detail docs. **MUST NOT** point at a `docs/agent-context.md`; that file does not exist in a Ka0s addon (documentation-§3).
 5. **The green-gate line** — the commit gate (`lua tests/run.lua` + `luacheck .`), per testing.
 
@@ -80,9 +80,45 @@ Reference implementation (in the collection): the absorb-shield tracker's root `
 
 Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
 
-- **`docs/ARCHITECTURE.md`** — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
+- **`docs/ARCHITECTURE.md`** — engineer context. **Nine** mandated sections, all nine named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema**, **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, and **`## Documented deviations`** — the register specified immediately below.
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page.
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
+
+#### `## Documented deviations` — the single home for a ratified deviation (MUST)
+
+`documentation-§2` and `documentation-§6` both instruct an agent to *record it as a documented
+deviation* and, until now, named no file. The result was predictable: every repo invented its own home —
+a table in `ARCHITECTURE.md` here, `docs/scope.md` there, a paragraph in root `CLAUDE.md`, a
+`docs/pending/LEDGER.md` entry — and two failures followed from the same cause. An audit that cannot
+find a ratified decision **re-files it as an open MUST failure**, so the same argument is had every
+cycle; and a register nobody re-reads goes stale in the dangerous direction, accumulating entries for
+behavior the standard has since mandated or permitted, which reads as deviation and is not.
+
+- **MUST** carry `## Documented deviations` in `docs/ARCHITECTURE.md` — the ninth mandated section,
+  present even when empty (write "None." rather than omitting the heading; an absent section is
+  indistinguishable from an unwritten one).
+- **MUST** use this **exact row shape**:
+
+  ```markdown
+  | Rule | What differs | Why | Decided | Re-check trigger |
+  |---|---|---|---|---|
+  | `performance-§12` | No perf harness wired | No in-combat code path; sweep at <commit> | 2026-08-05 | The first OnUpdate, repeating ticker or in-combat event handler |
+  ```
+
+  **Rule** is a `filename-§N` reference into this standard — not a paraphrase, because a paraphrase
+  cannot be checked against the rule it claims to deviate from. **Decided** is a date. **Re-check
+  trigger** is the **condition that ends the deviation**, stated so a reader can tell whether it has
+  already fired; `performance-§12`'s exemption is the model. A row without a trigger is a permanent
+  opt-out wearing a table's clothes.
+- **This is the single home.** A decision **MAY** be *reasoned* at length in `docs/pending/LEDGER.md`,
+  an audit bundle or a review bundle, and the row **SHOULD** cite that id in **Why** — but **a deviation
+  not in the register is not ratified**. A ledger entry declining a rule with no corresponding register
+  row is itself the deviation, and an audit files it as one.
+- **MUST NOT** be a graveyard. An entry whose cited rule the standard has since changed — so the
+  behavior is now mandated or permitted outright — **MUST** be retired, and an audit that finds one
+  reports it (audit-review-history). A register that only ever grows stops being read, and a register
+  nobody reads is worse than none, because its existence is taken as evidence that the deviations are
+  known.
 
 Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **Five** topic-detail docs are **required**, not optional — `test-cases.md`, `performance.md`, `perf-runs/README.md`, `automated-tests/README.md` and `automated-tests/RESULTS.md` — of which **four are unconditional and one, `perf-runs/README.md`, is required only while the performance harness is wired** (performance-§12). The count is never written bare for exactly this reason: an addon holding a recorded no-combat-path exemption ships **four**, and naming them is what keeps that from reading as a missing doc.
 
@@ -152,7 +188,7 @@ The reference **MUST** appear in **all three** of these places (a Ka0s addon mis
 
 1. **TOC `## X-Standard:`** — `## X-Standard: https://github.com/tusharsaxena/WowAddonStandards` (toc-file-§1). The machine-readable declaration.
 2. **README standard badge** — the badge/line linking the standard in the README badge row (documentation-§1 #2). The user-facing declaration.
-3. **`CLAUDE.md` → `## Standards compliance (read first)`** — the agent-facing directive at the first doc every agent reads (documentation-§2 #3). **MUST** instruct the agent to **stop and flag** any change that would deviate rather than silently deviate or silently conform, and to let the user classify it as an accepted deviation (recorded in the addon) or a change to the standard itself (made upstream here, then adopted).
+3. **`CLAUDE.md` → `## Standards compliance (read first)`** — the agent-facing directive at the first doc every agent reads (documentation-§2 #3). **MUST** instruct the agent to **stop and flag** any change that would deviate rather than silently deviate or silently conform, and to let the user classify it as an accepted deviation (recorded as a row in the addon's `## Documented deviations` register — documentation-§3) or a change to the standard itself (made upstream here, then adopted).
 
 Items 1–2 already existed (toc-file-§1, documentation-§1); item 3 is the **memory-and-context** requirement: the standard reference lives inside the document an agent loads as working context, not only in shipping metadata. The `/wow-addon:standards-audit` playbook checks all three.
 
@@ -174,8 +210,11 @@ doc structure.
 silently deviate and do not silently "fix" to match. Surface it and let the user decide which of
 two things it is:
 
-1. **An accepted deviation** — this addon intentionally differs; record it as a documented
-   deviation (e.g. in the TOC/README/`docs/` and in the audit bundle), with the reason.
+1. **An accepted deviation** — this addon intentionally differs; record it as a row in
+   `docs/ARCHITECTURE.md` → `## Documented deviations`, shaped
+   `| Rule | What differs | Why | Decided | Re-check trigger |`, where Rule is the `filename-§N`
+   reference. That register is the single home: the reasoning may live in `docs/pending/LEDGER.md`
+   or an audit bundle and the row cites it, but a deviation not in the register is not ratified.
 2. **A change to the standard itself** — the standard's definition should evolve; the update
    belongs upstream in the WowAddonStandards repo, after which this addon conforms to the new rule.
 

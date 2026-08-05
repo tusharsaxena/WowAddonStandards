@@ -11,3 +11,29 @@ Audit and code-review runs are **frozen, dated snapshots** kept in the addon's *
 - **SHOULD** retain every prior `docs/audits/` and `docs/reviews/` folder; they are the addon's institutional memory. (Runs are **kept**, not deleted after commit.)
 - Both histories are dev-only and **MUST NOT** ship in the package — `docs/` is ignored by `.pkgmeta` (packaging).
 - A review's `03_SMOKE_TESTS.md` catalogs **in-game** checks; they complement the headless unit suites (testing), which cover testable logic.
+
+### The deviation register is an input to an audit, not a finding of one
+
+*(This section carries no numbered subsections; cite it as `audit-review-history`.)*
+
+`documentation-§3` gives a ratified deviation exactly one home: `## Documented deviations` in
+`docs/ARCHITECTURE.md`. An audit that does not read it re-derives decisions already made and files them
+as open failures — which is how one ratified decline becomes the same High row in every bundle forever.
+Two MUSTs, pointing in opposite directions on purpose: the first stops the register being re-litigated,
+the second stops it becoming a place to hide.
+
+- **MUST read the register first**, before filing anything, and record a matching entry as **accepted,
+  with its id** — never as an open MUST failure. The audit still *names* the deviation, because a
+  reader of the bundle needs to know it exists; what it **MUST NOT** do is count it toward the MUST
+  tally or ask for it to be fixed. A decision recorded exactly where this standard asks for it is
+  **compliance**, and an audit reporting it as a defect is reporting on its own reading. Conversely, a
+  decision reasoned only in `docs/pending/LEDGER.md`, a root `CLAUDE.md` note or `docs/scope.md`, with
+  **no** register row, is **not** ratified — that missing row is itself the finding, and the audit
+  files it.
+- **MUST report as a finding any register entry whose cited rule the standard has since changed** — so
+  the behavior the row records as a deviation is now mandated, permitted outright, or governed by a
+  different rule. The Rule column is a `filename-§N` reference precisely so this check is mechanical:
+  resolve every row's citation against the current standard and report the rows that no longer say
+  what the row claims. Without it the register accumulates compliant behavior, and a reader who trusts
+  it is misled by the one document whose whole purpose is to be trusted. Retiring such a row is a doc
+  change, not a re-decision.
