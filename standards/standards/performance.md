@@ -18,7 +18,10 @@ The measurement harness is a **Ka0s-owned shared library**, not per-addon code. 
 
 ### 2. The bracket idiom (MUST)
 
-Instrumentation lives at the addon's own entry points, as a gated bracket around the work:
+Instrumentation lives at the addon's own entry points, as a gated bracket around the work. There are
+**two** sanctioned shapes, and which applies is decided by the region's **exits**, not by taste.
+
+**Shape A — the inline bracket. For a single-exit region. This is the default.**
 
 ```lua
 local Perf = NS.Perf                                    -- load-time upvalue, not an NS lookup
@@ -30,7 +33,43 @@ local function doRepaint()
 end
 ```
 
-- **MUST** use this exact shape. When capture is off it costs **one upvalue read, one field read and one boolean test** — no call, no table lookup through `NS`, no allocation. It is the same gating discipline the debug sink follows (debug-logging-§4).
+With capture off this costs **one upvalue read, one field read and one boolean test** — **no call**, no
+table lookup through `NS`, no allocation. That is the same gating discipline the debug sink follows
+(debug-logging-§4), and it is why this shape is the default on anything running per frame or per
+combat-log event.
+
+**Shape B — the `P.Open(key)` / `P.Close(key)` pair. For a multi-exit region.**
+
+```lua
+local Perf = NS.Perf                                    -- the same load-time upvalue
+
+local function handleEvent(unit)
+    Perf.Open("absorbEvent")
+    if not NS.Units[unit] then Perf.Close("absorbEvent"); return end   -- every exit closes
+    -- ... the work ...
+    Perf.Close("absorbEvent")
+end
+```
+
+`Open` **MUST** take the bucket key. A slot with no identity cannot be matched to its `Close`, cannot
+be reported when it leaks, and cannot name a parent for a bracket opened inside it (performance-§3).
+
+**State the pair's cost honestly.** Shape B is **not** free when capture is off: it costs **two real Lua
+calls, plus the boolean test inside each**, against Shape A's **none**. Any claim that the pair costs
+"one boolean test and nothing else" is false, and a docstring saying so is a defect to fix rather than a
+description to trust. What the pair buys is that a region with four exits does not repeat
+`if t0 then Perf.Note(...) end` at four of them — which is exactly where the unclosed-exit bug comes
+from in practice.
+
+- **MUST** use one of these two shapes, not a third. Shape A on a single-exit region; Shape B where the
+  region has **two or more exits** and repeating the inline close at each is what would go wrong.
+- **MUST NOT** use Shape B on a per-frame or per-event hot path whose dormant cost must be exactly one
+  boolean test. Where a multi-exit region is also a hot path, restructure it to a single exit and use
+  Shape A: two calls per frame is a cost you chose, not one the idiom owes you.
+- **MUST** take the **load-time upvalue** (`local Perf = NS.Perf`) in **both** shapes. A per-call
+  `NS.Perf` lookup is a table lookup on the hot path and defeats the gate whichever shape wraps it.
+- **MUST** close a Shape B bracket on **every** exit — early returns and error paths included. An
+  unclosed bracket is a defect the library reports, not a silent undercount (performance-§3).
 - **MUST** keep the gate a plain **boolean field** on the instance and the sink a plain **dot-callable** function. A colon method, a metatable `__index`, or an accessor on the hot path defeats the point.
 - **MUST NOT** allocate, concatenate, format, or call anything else inside a bracket while capture is off. Building a label, a table, or a string "ready for when capture starts" is an unconditional cost paid on every frame forever (anti-patterns #43).
 - **MUST** treat the offline runner's zero-overhead scenario (performance-§9) as the **required evidence** for this rule. The claim "instrumentation is free when off" is not a comment; it is a measured, committed number.
@@ -54,6 +93,28 @@ buckets = {
 - **MUST NOT** sum a parent bucket and its children. Nested totals are not disjoint; the parent already contains the child's time. The report labels this structurally, and a bucket set with no nesting says nothing rather than printing a hollow disclaimer.
 - **SHOULD** bracket the addon's real hot paths and nothing else: the event handler that fires per combat-log event, the coalesced repaint/render pass, and the per-item work inside it. Bracketing a settings read that runs twice a session adds a row that will always read `0.000`.
 - A bucket that no bracket ever reaches is a **lie in every report**. The addon's own test suite **MUST** pin that each declared bucket is actually reached (testing, performance-§9).
+
+**A declared `within` MUST be verifiable.** The descriptor above is a **claim about where the work
+runs**, written once and then read months later beside numbers it is supposed to explain. Until now
+nothing checked it, so a wrong `within` was indistinguishable from a right one — and a wrong one is
+worse than no declaration, because a reader who trusts it subtracts the wrong parent's time.
+
+- The record **MUST** carry **observed** containment beside the declared value. Containment is supplied
+  at the **recording** call — `Perf.Note(key, ms, parentKey)` — and defaults to the declared parent when
+  the third argument is omitted. The report then distinguishes three states per nested bucket:
+  *observed inside `<parent>`*, *declared `<parent>`, not observed*, and *declared `<x>` but observed
+  inside `<y>`* — the last being a defect in the descriptor or in the call site, and reported as one.
+- The library **MUST NOT** assert containment it did not observe. A nesting note for a parent that was
+  never observed **MUST** say the parent is declared and unobserved rather than stating the containment
+  as fact, and it **MUST** refuse the note outright where declared and observed disagree.
+- A Shape B bracket **MUST** be closed on every exit (performance-§2). An unclosed bracket is not a
+  small undercount to be absorbed silently — the region's time is missing from the parent it was inside,
+  so **every** derived figure in that capture is wrong by an unknown amount. The library reports the
+  leak; the addon fixes the exit.
+- **Do not "fix" a wrong `within` by deleting it.** Dropping the declaration where the work genuinely is
+  nested substitutes one false claim (wrong parent) for another (no nesting, so the totals are
+  disjoint), and the second is harder to spot because nothing contradicts it. Correct it to the parent
+  the work actually runs inside, and pass that parent at the call site so the record can confirm it.
 
 ### 4. The `perf` slash verb (MUST)
 
