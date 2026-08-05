@@ -31,6 +31,7 @@ L["Scale"] = "Skalierung"
 - **MAY** use AceLocale-3.0 in non-strict mode if you prefer it. Strict mode is forbidden.
 - **MUST** gate non-enUS files with `if GetLocale() ~= "<locale>" then return end` at top of file. (Loading every locale for every player — a QoL-addon anti-pattern — is wasteful.)
 - **SHOULD** put derived-key aliases in `locales/PostLoad.lua`: `L["Use original"] = L["Original"]`. Translators don't duplicate work.
+- **SHOULD** route every user-facing string through `NS.L` — settings labels and tooltips, chat lines, slash help, error text. This is **the routing SHOULD**, and localization-§3 states the two **terminal** compliant states it can end in. Note that concatenating a routed fragment with an unrouted one (`L["Scale"] .. ": " .. v`) leaves the sentence unroutable for a translator, so route the whole sentence with a format placeholder instead.
 
 ### 2. Source-of-truth keys
 
@@ -41,6 +42,31 @@ L["Scale"] = "Skalierung"
 
 - **MUST** at minimum ship `enUS.lua`. Any additional locale is opt-in.
 - **MUST NOT** rely on Blizzard `_G` strings as a substitute for a locale module. (Leaning on `_G` strings is acceptable for a tiny utility addon but it should still ship a locale module shell.)
+
+**The routing SHOULD has two terminal compliant states.** Both MUSTs above are unconditional — the
+`NS.L` seam is exported (localization-§1) and `enUS.lua` ships — and neither is affected by anything
+here. What follows governs only localization-§1's routing SHOULD.
+
+An addon is **compliant, and the matter is closed**, in either of these states:
+
+1. **Routed.** User-facing strings go through `NS.L`.
+2. **English-only, recorded.** The addon has decided it ships English only, and that decision is a row
+   in its `## Documented deviations` register (documentation-§3) citing `localization-§1`, with a
+   **re-check trigger**: *the first non-English locale file added to `locales/`*.
+
+An addon in state 2 is **compliant, not open**. An audit reads the register first, records the row as
+accepted with its id, and **MUST NOT** re-file the routing SHOULD against it (audit-review-history).
+
+The reason this is written down: four of eight addons in the collection independently reached state 2
+and met both MUSTs while leaving the SHOULD open, so four audits filed the same row and four
+remediation plans deferred it. A SHOULD that a majority of adopters decline the same way, for the same
+reason, is mis-specified — the decline is the answer, and it needs a place to be final. The register row
+is that place, and the re-check trigger is what stops "English-only" from silently outliving the
+decision: the moment a `deDE.lua` lands, the row's trigger has fired and the routing work is owed.
+
+**A recorded decision is not a licence to leave the seam unused.** Strings the addon *does* route stay
+routed, and `enUS.lua` **MUST NOT** accumulate keys nothing reads — a dead key is a claim about
+coverage that is not true (documentation-§5). Delete it or wire it.
 
 ### 4. Match game data on IDs, not localized strings
 
