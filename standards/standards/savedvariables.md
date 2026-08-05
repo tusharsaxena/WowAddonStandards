@@ -40,6 +40,8 @@ For party/group/raid/PvP context-aware addons, **SHOULD** consider a per-zone pr
 
 savedvariables-§1's "one global namespace `<Addon>DB`" has exactly **one** carve-out: the performance capture ring `<Addon>PerfDB` (performance-§5). It is a **second top-level SavedVariables global**, declared in the TOC alongside `<Addon>DB` (toc-file-§2) and written directly rather than through AceDB.
 
+The carve-out is **permission, not an obligation of its own**. It exists because performance-§5 requires the ring; an addon holding a recorded **no-combat-path exemption** (performance-§12) does not create the ring and therefore **MUST NOT** declare the global — an SV global nothing ever writes is a persisted empty table and a lie in the TOC. Such an addon is back to savedvariables-§1's single `<Addon>DB`, with no deviation to record beyond the register row the exemption already carries.
+
 - **MUST** stay **outside the AceDB tree**. Inside a profile it would be copied by "copy profile", wiped by "reset profile", and swapped out mid-capture by a profile switch. Diagnostics are not user settings and **MUST NOT** ride the settings lifecycle.
 - **MUST** be a bounded ring of most-recent captures — a hand-read snapshot store, not telemetry.
 - **MUST** carry its own schema stamp, owned by the library that writes it (performance-§8) and independent of the addon's `schemaVersion`.

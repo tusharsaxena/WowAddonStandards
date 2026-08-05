@@ -92,6 +92,14 @@ a failure. An absent `luacheck`, `lizard` or Lua 5.1 means the suite did not run
 addon is clean and it does not mean the addon is broken. A green run that silently measured nothing is
 worse than a red one, because it is believed.
 
+**Exactly two `skipReason` values are sanctioned for `perf`**, and both describe *nothing to run* rather
+than *nothing measured*: **(1)** the addon ships no `tests/perf.lua`; **(2)** the addon holds a recorded
+**no-combat-path exemption** (performance-§12), which is why it ships no `tests/perf.lua`. The second is
+the more informative of the two and **MUST** be recorded when it applies, naming `performance-§12`, so a
+reader of the bundle can tell a ratified exemption from a suite somebody forgot to write. Neither
+sanctions a silent skip: both are still written into the run's `skipReason` and both still surface in
+the release notes.
+
 Verdicts: **`red`** — a gating suite failed. **`amber`** — a gating suite was skipped, or `perf` failed
 its own deterministic assertions. **`green`** — gating suites passed and nothing went unmeasured
 without saying so.
@@ -111,7 +119,11 @@ with a different failure mode, and there all four suites gate.
   never a pass — is what makes it one. The remedy is to install the tool and re-run, not to read the
   skip as clean. The one narrow exception is `perf` skipped because the addon **ships no
   `tests/perf.lua`**: nothing was there to run, which is a different fact from a scenario that failed
-  or a tool that was missing, and it **MUST** be stated as such in the release notes.
+  or a tool that was missing, and it **MUST** be stated as such in the release notes. That exception
+  covers both of §3's sanctioned `perf` skip reasons, including the **performance-§12 exemption** — an
+  exempt addon's release notes name the exemption rather than the bare absence, because *"this addon
+  brackets nothing and here is the ratified reason"* is the sentence a reader needs; the skip still
+  **MUST** be said out loud either way.
 - **MUST NOT** move this gate to commit time, and **MUST NOT** change the runner's exit code to
   implement it. `performance-§9`/`§10` and automated-tests-§3's `never gating` are retained **verbatim
   and deliberately**, and the runner stays exactly as specified — the same script is the commit gate

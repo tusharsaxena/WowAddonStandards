@@ -119,7 +119,11 @@ performance harness: the debug console, the slash dispatcher, the options shell 
 are all tested where they live.
 
 What stays in the addon is a smaller **integration** suite proving the wiring the addon actually owns.
-At minimum, per adopted module:
+At minimum, **per adopted module** — the list below is per module the addon actually adopts, so the
+three perf-specific entries apply only where the performance harness is wired. An addon holding a
+recorded **no-combat-path exemption** (performance-§12) has no instance, no declared buckets and no
+suspend contract, so it carries none of them, and a suite asserting on them there would be asserting on
+a stub it wrote itself. Its remaining adopted modules are covered exactly as below:
 
 - the **descriptor is well-formed** — the instance exists, and the fields the addon passes are the ones
   it means. For the performance harness that includes its declared buckets and their nesting;

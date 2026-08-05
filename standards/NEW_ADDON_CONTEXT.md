@@ -599,6 +599,8 @@ descriptor expresses rather than code to write.
 
 ### Performance harness (performance)
 
+> **Scaffold with the wiring.** performance-§12's no-combat-path exemption is claimed from a **committed sweep** of the addon's real event handlers, and a new addon has neither the sweep nor any idea what it will grow into — so a v0.1.0 is born **wired**, and the exemption is a later, recorded decision (a register row in `docs/ARCHITECTURE.md`), never a scaffolding shortcut.
+
 Measurement is a **vendored Ka0s-owned library**, not per-addon code — do not hand-roll a probe. Vendor `libs/LibKa0s/` (byte-identical to its source repo, library-stack-§7), list it in the TOC after Ace3, and build **one instance at load** in `core/PerfSetup.lua`:
 
 ```lua
