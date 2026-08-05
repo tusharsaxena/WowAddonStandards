@@ -61,6 +61,24 @@ function M:HandleSomething(...) ... end
 
 Modules **MUST** communicate via named messages, not direct calls.
 
+**Applicability.** This MUST binds an addon with **two or more feature modules**, or **any module that
+registers game events**. Below that threshold — one feature module and no event traffic — direct calls
+are **permitted**, and `docs/ARCHITECTURE.md`'s `## Message Bus` section (documentation-§3) **MUST**
+record that there is no bus and why, in a sentence or two.
+
+The condition is stated because the rule's entire rationale is the CallbackHandler same-target clobber
+described below, and that hazard **cannot arise** with a single feature module and no events: there is
+no second party to name a message to, and no second receiver to be overwritten. Without the condition
+the MUST is unsatisfiable in principle for a single-module addon — it would be re-filed as a deviation
+against every such addon, forever, including every future one. That is a defect in the **rule**, which
+is why it is fixed here rather than absorbed one addon at a time by the deviation register
+(documentation-§3).
+
+Crossing the threshold is a real event, not a formality: the second feature module, or the first module
+to register a game event, is the point at which the bus **MUST** exist. An addon sitting just under the
+threshold **SHOULD** say so in that `## Message Bus` section, so the next author adding a module knows
+what the addition costs.
+
 ```lua
 -- Producer (one per message; send on any embed — SendMessage fans out to all receivers)
 NS.bus:SendMessage("Ka0s_<Addon>_RosterChanged", roster)
