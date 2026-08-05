@@ -273,6 +273,25 @@ check.)*
   the retired form tells the reader "this is old" while these send the reader to a section that does
   not exist and looks current doing it. Range-check against the section file's own heading count.
 
+**Some section files have no numbered subsections, and are cited by BARE FILENAME.** These carry a
+single `## <Topic>` heading and prose beneath it, sometimes with unnumbered `###` headings. There is no
+`§N` to name, so **any** `filename-§N` citation against one of them is out-of-range by construction —
+the MUST grade above — no matter which number is used. Cite them as `lint`, `packaging`,
+`standalone-windows`; where a specific passage matters, name its heading in words
+(*`standalone-windows`, "The Ka0s window edge"*).
+
+The full set, as measured by `grep -c '^### [0-9]' standards/standards/<file>` returning 0 — **eleven**
+files, named rather than counted:
+
+`anti-patterns`, `audit-review-history`, `compat`, `lint`, `naming-cheatsheet`, `open-evolutions`,
+`packaging`, `preview-mode`, `public-api`, `standalone-windows`, `versioning-git`.
+
+An unnumbered `###` heading is **not** a section number. `standalone-windows` and
+`audit-review-history` each carry one, and counting it as "§2" is exactly the mistake this list exists
+to stop: the count shifts the moment a heading is added above it, so the citation silently comes to
+mean something else. If one of these files ever gains numbered subsections, it leaves this list in the
+same change.
+
 **Frozen bundles are exempt and MUST NOT be swept.** Anything under `docs/audits/`, `docs/reviews/` or
 `docs/automated-tests/` is a point-in-time record and its notation is part of what it recorded —
 the same carve-out `standards/_raw/_industry/` already has. Rewriting a citation inside a frozen bundle
