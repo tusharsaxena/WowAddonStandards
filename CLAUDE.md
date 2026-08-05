@@ -23,9 +23,10 @@ All three are **thin orchestrators**: they say *how* the process runs and defer 
 canonical docs under `standards/`. The plugin lives in a separate repo
 (<https://github.com/tusharsaxena/wow-addon>) and is updated there to consume these files.
 
-The in-scope addons are listed in **`standards/ADDONS.md`** (the roster) and live in their own sibling
-repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. **Do not modify those addons from
-here.**
+The in-scope repos are listed in **`standards/ADDONS.md`** (the roster) and live in their own sibling
+repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`: the addon table, and a second table of
+**Ka0s-owned library repos**, which are audited against library-stack-§7's applicability list rather
+than the addon rule set. **Do not modify those repos from here.**
 
 ## Layout
 
@@ -70,6 +71,15 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   `options-ui-§10`), where `N` is that section's **local** number. The old global `§N.M` numbering is
   retired — do **not** reintroduce it. Preserve these refs when editing, in every doc and in the
   `wow-addon` plugin.
+- **Eleven section files have no numbered subsections and take the bare filename only
+  (documentation-§6).** Measured by `grep -c '^### [0-9]' standards/standards/<file>` returning 0, they
+  are: `anti-patterns`, `audit-review-history`, `compat`, `lint`, `naming-cheatsheet`,
+  `open-evolutions`, `packaging`, `preview-mode`, `public-api`, `standalone-windows`,
+  `versioning-git`. **Any** `filename-§N` against one of them is out-of-range by construction and a
+  **MUST** fix, whatever the number — an unnumbered `###` heading is not a section number. Where a
+  specific passage matters, name its heading in words (*standalone-windows, "The Ka0s window edge"*).
+  This repo's own prose is held to the rule it publishes; if one of the eleven ever gains numbered
+  subsections, it leaves the list in the same change.
 - **The playbooks are thin orchestrators.** `AUDIT.md`, `NEW_ADDON.md` and `AUTOMATED_TESTS.md` describe process and point
   into `standards/` (`STANDARDS.md` as the audit checklist; `NEW_ADDON_CONTEXT.md` as the scaffold
   pack). Keep the *substance* in `standards/`; don't duplicate rules into the playbooks — they drift.
