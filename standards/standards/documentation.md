@@ -4,6 +4,21 @@
 
 Documentation is a **first-class compliance surface**, not an afterthought. Every Ka0s addon ships a fixed, predictable doc set so any human or agent lands in the same place in every repo. **Root of the repo** ships exactly three docs plus `LICENSE`, and never a fourth doc: a **full** `README.md` (documentation-§1), a **stub** `CLAUDE.md` (documentation-§2), and `DEPENDENCIES.md` (documentation-§7). Everything else lives under `docs/`.
 
+**`CHANGELOG.md` is named explicitly, because the count alone left it arguable.**
+
+- **In an addon repo, a root `CHANGELOG.md` is FORBIDDEN.** The player-facing history already has two
+  homes the standard mandates — `## What's new` and `## Version History` in the README
+  (documentation-§1, items 5 and 12) — and a second history is precisely the drift the never-a-fourth-doc
+  rule exists to prevent. `/wow-addon:bump-version` rolls those two README sections for an addon and
+  writes no `CHANGELOG.md`.
+- **In a Ka0s-owned library repo, a root `CHANGELOG.md` is REQUIRED** (library-stack-§7's applicability
+  list). testing-§10's versioning suite **MUST** assert that the changelog accounts for the version
+  every file is at, and it has nowhere else to look. A library has no player README to carry the history
+  instead.
+
+State the rule, not the count: an audit finding a root `CHANGELOG.md` cites this sentence, not "that is
+a fourth doc."
+
 ### 1. Root `README.md` — canonical structure
 
 The README is a **player-facing** document. It **MUST** be written for the person who installed the addon, not for a contributor: what the addon does, how to use it, and how to fix common problems. Developer- and contributor-facing material — the test harness, lint, build/packaging, and internal implementation detail — **MUST NOT** appear in the README; it lives under `docs/` (how to verify in `docs/testing.md`, the engineer brief in `docs/ARCHITECTURE.md`).
@@ -83,6 +98,12 @@ Every addon **MUST** ship this **canonical trio** under `docs/` (all three are u
 - **`docs/ARCHITECTURE.md`** — engineer context. **Nine** mandated sections, all nine named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema**, **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, and **`## Documented deviations`** — the register specified immediately below.
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page. Where it tabulates the four out-of-game suites, the table **MUST** carry the **checkpoint** per suite — run/commit versus the tag — and **MUST NOT** leave a `Gates? no — recorded only` cell unqualified, since that is true of a commit and false of a release (testing-§6, automated-tests-§3/§4).
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
+
+**`docs/` is not where a forbidden root doc goes to live.** documentation-§1 forbids `CHANGELOG.md` at
+an **addon** root; moving it to `docs/CHANGELOG.md` does not satisfy that rule, it only hides the second
+history one directory down. An addon has one history, in the README's `## What's new` and
+`## Version History`. (A **library** repo's required `CHANGELOG.md` stays at **root**, where
+testing-§10's versioning suite reads it.)
 
 #### `## Documented deviations` — the single home for a ratified deviation (MUST)
 
