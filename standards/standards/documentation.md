@@ -224,6 +224,53 @@ When in doubt, treat standard conformance as a hard requirement and ask.
 
 Reference implementation (in the collection): the absorb-shield tracker's root `CLAUDE.md` carries the `## Standards compliance (read first)` section verbatim in substance.
 
+**Citing the standard.** The three places above are *the reference to the standard*. This is the
+narrower question of how an individual **citation** is written when authored text points at a specific
+rule.
+
+A reference to the standard in any authored text the repo owns — code comments, `.luacheckrc` and
+`.pkgmeta` headers, `docs/` pages, commit-message bodies — **SHOULD** use the `filename-§N` form
+(documentation-§5): the section file's basename without `.md`, then `-§`, then the section's **local**
+number. `performance-§10` — not the retired dotted global form `§N.M`, not `STANDARDS.md` plus a
+dotted number, not an abbreviated filename (`perf-` for `performance`).
+
+*(This document deliberately never writes a literal dotted number. The sweep below is a plain regex
+over the whole repo, and a normative document that spells out the form it forbids reddens its own
+check.)*
+
+**A reference that cannot resolve is the defect**, and it comes in two grades:
+
+- **Retired global `§N.M` notation is a SHOULD.** The split standard replaced one document's global
+  numbering with per-file local numbering, so a dotted global number no longer names anything. It is a **SHOULD**
+  rather than a MUST because it is uniformly wrong in a way a reader decodes at a glance and a machine
+  sweeps mechanically — `/wow-addon:revendor-standards` does exactly that. Sweep it; do not hand-triage
+  it.
+- **A malformed or out-of-range reference is a MUST fix.** Malformed means it does not parse as
+  `filename-§N` at all (`slash-commands-§:`); out-of-range means the file exists but has no such
+  section — a citation numbered `§41` against `options-ui.md`, which carries §1–§11. Both are worse
+  than the retired form, because
+  the retired form tells the reader "this is old" while these send the reader to a section that does
+  not exist and looks current doing it. Range-check against the section file's own heading count.
+
+**Frozen bundles are exempt and MUST NOT be swept.** Anything under `docs/audits/`, `docs/reviews/` or
+`docs/automated-tests/` is a point-in-time record and its notation is part of what it recorded —
+the same carve-out `standards/_raw/_industry/` already has. Rewriting a citation inside a frozen bundle
+corrupts evidence to satisfy a cosmetic rule.
+
+**Reporting shape (MUST).** An audit records the notation sweep as **one** rolled-up finding carrying
+the **command that produces the current count**, e.g.
+
+```sh
+grep -rEn '§[0-9]+\.[0-9]' . \
+  --exclude-dir=libs --exclude-dir=_kit \
+  --exclude-dir=audits --exclude-dir=reviews --exclude-dir=automated-tests
+```
+
+— never a per-site enumeration. Hand-counted enumerations are what two separate audits of this
+collection got wrong, in both directions, on the same rule; the command is reproducible and the list is
+not. Out-of-range and malformed references, being the MUST half, are enumerated individually — there are
+few of them and each needs a decision.
+
 ### 7. Root `DEPENDENCIES.md` — the toolchain contract
 
 Every addon **MUST** ship a root **`DEPENDENCIES.md`** naming every piece of software needed to build, run, test or release it, with **copy-pasteable install instructions for WSL2 / Ubuntu** — the collection's development environment.
