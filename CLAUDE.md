@@ -102,11 +102,16 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.21.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
-  `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7); the **`docs/`
-  canonical trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; and the **five required
+  list. As of v2.22.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
+  `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
+  root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
+  `testing.md`, `smoke-tests.md`, where `ARCHITECTURE.md` carries nine mandated sections ending in
+  `## Documented deviations`, the single home of a ratified deviation; and the **required
   topic-detail docs** — `test-cases.md`, `performance.md`, `perf-runs/README.md`,
-  `automated-tests/README.md`, `automated-tests/RESULTS.md` (documentation-§3).
+  `automated-tests/README.md`, `automated-tests/RESULTS.md`, of which the first, second, fourth and
+  fifth are unconditional and `perf-runs/README.md` is required only while the performance harness
+  is wired, so an addon holding a recorded performance-§12 exemption ships four (documentation-§3).
   `docs/automated-tests/RESULTS.md` is generated, one file overwritten in place — its single-path
   git history is the trend line — and a full run bundle is produced at **release**, never as a
   commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see

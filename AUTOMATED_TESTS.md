@@ -42,7 +42,10 @@ Two standing rules:
   bundle. If a suite was skipped, the analysis says what was not measured and why — a write-up that
   reads as complete over a run that measured three of four suites is the failure mode this whole
   section exists to prevent.
-- **Do not soften a skip into a pass.** "luacheck unavailable" is not "lint clean".
+- **Do not soften a skip into a pass.** "luacheck unavailable" is not "lint clean". The same rule
+  applies one level down, at the **case**: a test case that could not run reports a **skip** carrying
+  its reason (`Kit.skip`, testing-§11), and it is folded into neither the passed figure nor the
+  failed one (testing-§5, automated-tests-§4).
 
 ```markdown
 # Analysis — <YYYYMMDD-HHMMSS>
@@ -65,7 +68,7 @@ skipped suite links nothing — there is no artifact — and says what was not m
 | Suite | Status | Result | Artifact | Moved since <previous run> |
 |---|---|---|---|---|
 | lint | | <warnings> warnings / <errors> errors in <files> files | [`lint.txt`](lint.txt) | |
-| tests | | <passed> passed, <failed> failed, <total> total | [`tests.txt`](tests.txt) · [`test-cases.md`](test-cases.md) | |
+| tests | | <passed> passed, <skipped> skipped, <failed> failed, <total> total | [`tests.txt`](tests.txt) · [`test-cases.md`](test-cases.md) | |
 | perf | | <scenarios> scenarios | [`perf.txt`](perf.txt) · [`perf.json`](perf.json) | |
 | complexity | | see below | [`complexity.txt`](complexity.txt) | |
 
@@ -136,10 +139,15 @@ permanently green over half its source, and that is invisible in the table.
 
 ### `## Perf`
 
-The scenarios and what they pin. If the addon ships **no** `tests/perf.lua`, say so plainly and say
-what that costs: the run is silent about runtime cost, and `performance-§9`'s zero-overhead evidence
-does not exist for this addon. A permanent `skip` is a standing fact about the addon, not a
-transient tooling gap, and it should read as one.
+The scenarios and what they pin. A permanent `skip` is a standing fact about the addon, not a
+transient tooling gap, and it should read as one. Two reasons are sanctioned (automated-tests-§3),
+and the write-up says **which**, because they mean different things:
+
+- the addon ships **no** `tests/perf.lua` — the run is silent about runtime cost, and
+  `performance-§9`'s zero-overhead evidence does not exist for this addon;
+- the addon holds a recorded **performance-§12 no-combat-path exemption** — it brackets nothing by
+  design, the reason is ratified in its `## Documented deviations` register, and the skip is cited
+  to that row rather than left to read as an unmeasured addon.
 
 ### `## Complexity watch list`
 
@@ -205,8 +213,13 @@ bump, **before** the tag (`automated-tests-§6`), and:
 
 Print, in chat:
 
-- One line per suite: name — status — headline figure — and `(recorded, non-gating)` for perf and
-  complexity, so nobody reads a complexity number as a gate.
+- One line per suite: name — status — headline figure — **and the checkpoint, not the verdict alone**
+  (automated-tests-§4). `lint` and `tests` gate **the run and the commit**; `perf` and `complexity`
+  gate **neither**; the **tag** is gated on all four at pass plus zero functions above CCN 15,
+  evaluated by `/wow-addon:bump-version` from this run's `manifest.json`, where a `skip` is **NOT
+  EVALUATED** rather than a pass. A bare `(recorded, non-gating)` is the half-truth this replaces —
+  it is true of the commit and false of the tag, and it is what teaches a reader that a complexity
+  number never matters.
 - The verdict, and the bundle path.
 - Anything that newly crossed a threshold, with its disposition.
 - Any suite that was **skipped**, with what is missing and its install hint. Never let a skip pass

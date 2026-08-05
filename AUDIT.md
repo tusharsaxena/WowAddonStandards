@@ -71,6 +71,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      search for a hand-built console.
 4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
    `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
+   - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
+     `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
+     `audit-review-history` binds this run twice, in opposite directions. A gap matching a register
+     row is recorded as **accepted, citing that row's rule and Decided date** — never re-filed as an
+     open MUST failure, or the same ratified decline returns every cycle. And any row whose **cited
+     rule the standard has since changed** is reported, so the register cannot quietly accumulate
+     entries for behavior the standard now mandates. A reasoning trail in a pending ledger or an
+     earlier bundle is not a substitute: a deviation with no register row is not ratified, and a
+     ledger decline with no row is itself a finding.
    - **Consuming the library is the compliant state; hand-rolling is the deviation.** An addon that
      builds `NS.DebugLog`, `NS.Helpers`, its dispatcher or its harness from a LibKa0s descriptor is
      **compliant** and **MUST NOT** be flagged for "not implementing" what those sections describe —

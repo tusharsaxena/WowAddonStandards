@@ -26,7 +26,11 @@ This playbook is the entry point; the substance lives in `standards/`:
    per-addon context where the standard requires it: `docs/ARCHITECTURE.md` (what this addon is),
    `docs/testing.md` (how to verify it), and root `DEPENDENCIES.md` (what to install to work on it —
    step 7). The root ships exactly those three docs plus `LICENSE` — `README.md`, the `CLAUDE.md`
-   stub, `DEPENDENCIES.md` — and never a fourth (documentation).
+   stub, `DEPENDENCIES.md` — and never a fourth. In particular, **never scaffold a `CHANGELOG.md`**:
+   at an addon root it is forbidden, because the player-facing history is already mandated twice in
+   the README's `## What's new` and `## Version History`, and moving it to `docs/CHANGELOG.md` is the
+   same second history one directory down. It is required only at a **Ka0s-owned library** root,
+   which this playbook does not scaffold (documentation-§1/§3, library-stack-§7).
 3. **Lay out files.** Use the single modular layout — `core/ modules/ defaults/ settings/ locales/` —
    for every addon regardless of size (a small addon just has thin folders). See *Layout* and the
    starter tree in the context pack. Copy the vendored `libs/` set you actually
