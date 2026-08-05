@@ -168,6 +168,23 @@ is not a judgment call the release notes can absorb.
   whose row reads `0/0` for tests is indistinguishable from a full run that found no tests, and the
   trend line carries that forever. Not-selected and tool-absent are different facts about why a
   number is missing, and both are different from zero.
+- **The generated lead-in MUST name the checkpoint for each suite, not merely the verdict.** The
+  prose the runner writes above the table is not decoration — it is the sentence eight repos quote
+  back — and *"perf and complexity never fail a run"* is true and, standing alone, misleading, because
+  it reads as *"these two never gate anything"* while §3's release gate says otherwise. The emitted
+  text **MUST** state, per suite:
+  - **`lint`** and **`tests`** — gate the **run** and gate the **commit** (testing-§4);
+  - **`perf`** and **`complexity`** — never fail a run and never block a commit; they are recorded;
+  - the **tag** — gated on **all four** suites at `pass` plus **zero** functions above **CCN 15**
+    (§3, *The release gate*), evaluated by the release command from the run's `manifest.json`, where a
+    **`skip` is NOT EVALUATED rather than a pass**.
+  A verdict without its checkpoint is the half-truth this bullet exists to end, and because the lead-in
+  is **runner-generated**, one addon cannot fix its own copy — testing-§1 forbids editing the vendored
+  kit. The fix lands in the kit and reaches every repo on its next re-vendor.
+- The manifest **MUST** carry the same fact in machine-readable form: a **`gates`** object naming both
+  checkpoints per suite rather than a bare `gating` boolean, which cannot express *"not at commit, yes
+  at the tag"* and is what let the generated prose drift. The legacy boolean **MAY** be retained for
+  one revision for readers that still key on it, and **MUST NOT** be the field a new reader consults.
 - **MUST NOT** silently recreate the file when its column set has changed. Rewriting the header
   drops every previous row — the one thing a trend line must never do. A runner that cannot append
   says so and leaves the file alone.

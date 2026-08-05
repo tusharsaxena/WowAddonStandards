@@ -97,6 +97,20 @@ toolchain (§3), and pointers to `docs/test-cases.md` (§5) and `docs/smoke-test
 the contributor-facing home for material the player-facing README deliberately excludes
 (documentation-§1); the README keeps only the `[tests]` badge.
 
+**The gate table MUST carry the checkpoint per suite.** Where that page tabulates the four out-of-game
+suites, a *Gates?* column reading `no — recorded only` **MUST NOT** stand unqualified: it is true of a
+**run** and of a **commit**, and false of the **tag**. Each row **MUST** name both checkpoints —
+`lint` and `tests` gate the run and the commit (§4); `perf` and `complexity` gate **neither**, but the
+**release** is gated on all four at `pass` plus zero functions above CCN 15
+(automated-tests-§3, *The release gate*), where a `skip` is **not evaluated** rather than a pass. This
+is the hand-written half of the same rule automated-tests-§4 puts on the runner's generated `RESULTS.md`
+lead-in; the two halves say the same thing in different files, and only this one is the addon's to
+edit.
+
+This adds no obligation to restate the release gate's **mechanics** — that is the release command's
+job, evaluated from the run's `manifest.json`. It forbids one specific sentence: a per-suite verdict
+with no checkpoint attached, which collectively reads as *"these two never gate anything"*.
+
 ### 7. Measurement runners are outside the gate
 
 > As of `automated-tests`, the vendored runner drives this file as its non-gating `perf` suite and
