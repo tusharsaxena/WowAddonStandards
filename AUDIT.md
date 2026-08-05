@@ -94,8 +94,49 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      members and no-ops the rest, and it is **correct** that it does not print an honest line per
      member the way the other stubs do; (b) a stub that deliberately omits a member, with the reason
      written down, is a decision, not a gap — read the comment before raising it.
-5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap: the ID, the section violated,
-   MUST/SHOULD severity, a one-line description, and the fix direction.
+5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap, carrying five things: the **ID**;
+   the **section violated**, written as `filename-§N` (documentation-§5/§6 — and by **bare filename**
+   for the eleven section files that carry no numbered subsections); the **impact grade**; a **one-line
+   description**; and the **fix direction**.
+
+   **Grade by impact, not rule strength.** The grade answers *what can go wrong, and to whom* — never
+   *was the word MUST or SHOULD*. A MUST is a statement about how firmly the standard holds a rule; it
+   is not a prediction about consequences, and grading the two as if they were the same thing is what
+   produces an audit whose High list is mostly documentation.
+
+   | Grade | What earns it |
+   |---|---|
+   | **High** | Something a **user**, their **SavedVariables**, or their **session** can hit **today**: a crash or Lua error on a reachable path, corrupted or silently dropped saved data, a feature that stops working until `/reload`, a user-visible wrong value, a taint or combat-lockdown failure. |
+   | **Medium** | Reachable, but degraded rather than broken — a fallback that is worse than it should be, a wrong or missing message on a path users do reach, a real defect gated behind an uncommon action. |
+   | **Low** | Not reachable by a user in the current code: a latent risk, a structural or convention gap, a doc or config file that is wrong. |
+   | **Info** | Observation, or a decision recorded elsewhere and confirmed here. |
+
+   A **doc-only or config-only failure is Low or Info even when the rule it fails is a MUST** — and the
+   entry **MUST still name that MUST**, so the grade never reads as the rule being optional. A missing
+   `## Documented deviations` heading is a MUST failure and it is Low: no user can reach a heading. Say
+   both.
+
+   Where a section states its own **applicability condition** or names a **terminal compliant state**
+   (architecture-§4, localization-§3, events-frames-taint-§8, performance-§12), check the condition
+   **before** grading — an addon outside a rule's scope is compliant, not deviant, and is not an entry
+   at all.
+
+   **One root, derived dependents listed under it.** Where several observations follow from a **single
+   unadopted subsystem or single upstream cause**, file **one root deviation** and list the rest as
+   dependents shaped `derived from <ID>`. Dependents are **excluded from the headline tally** and from
+   the MUST count. Without this rule one declined subsystem inflates into a dozen rows, the headline
+   number stops meaning anything, and the actual decision — adopt the subsystem or record why not — is
+   buried among its consequences.
+
+   A dependent **graduates** to a root of its own when **any** of these holds, and the graduation is
+   stated in the entry:
+   - the root is **closed or accepted** and the dependent survives it;
+   - the dependent is reachable by a user **independently** of the root — it would still be a defect if
+     the subsystem were adopted tomorrow;
+   - the dependent's own impact grade is **higher** than the root's. A High never hides under a Low.
+
+   Report both numbers, never one: the **headline tally** (roots only) and the **total including
+   dependents**. A tally whose basis is not stated is the failure this rule exists to prevent.
 6. **Back every finding with evidence** → `03_EVIDENCE.md`. `file:line` citations that prove each
    deviation (and each compliance claim). Don't assert without a citation.
    - **Mechanical checks belong here — run, not reasoned about.** Record the command and its real
