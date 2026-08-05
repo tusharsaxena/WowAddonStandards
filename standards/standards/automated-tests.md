@@ -65,8 +65,28 @@ land, in what shape, and what may fail a run — that is what is specified here.
   kernel look for an interpreter literally named `bash\r`, and every `case`/`in` becomes a syntax
   error. Without this line the vendored runner is broken on **every** checkout rather than in one
   contributor's, and it fails identically for everyone — which reads as "the script is wrong" and
-  sends the reader to the wrong repo. `cp` also does not reliably carry the executable bit, so
-  re-vendoring ends with `chmod +x tests/_kit/run-automated-tests.sh`.
+  sends the reader to the wrong repo.
+- **MUST** end re-vendoring by setting the executable bit **in the git index**, not in the working
+  tree:
+
+  ```sh
+  git update-index --chmod=+x tests/_kit/run-automated-tests.sh
+  ```
+
+  `cp` does not reliably carry the executable bit, and the mode that survives a **clone** is the one
+  git recorded — `git ls-files -s` must report **`100755`**, not `100644`. **`chmod +x` is not
+  sufficient and, in this collection, does nothing at all**, which is the trap: every repo here sits on
+  a **WSL DrvFs** mount that reports *every* file as `rwxrwxrwx`, so `ls -l` shows the bit already set
+  and a `chmod` appears to succeed; and every repo has **`core.fileMode=false`**, so git ignores the
+  working tree's mode even when it does change. Both signals a reader would trust are therefore silent
+  about the real state, and the instruction that used to close this bullet — `chmod +x …` — failed
+  identically in **9 of 9 repos**, every one of them recording `100644` while every working tree
+  claimed the file was executable.
+- **MUST** assert the recorded mode mechanically rather than remembering it: the repo's
+  **vendored-payload gate** — the consumer-side gate of testing-§11, or `tests/test_kitsync.lua` in the
+  library repo — **MUST** assert that `run-automated-tests.sh` is recorded as `100755`. Nine identical
+  failures against an explicit MUST is what a rule with no test looks like, and this is the one
+  property of the payload that no amount of reading the working tree can confirm.
 
 ### 3. What gates, and what only records (MUST)
 
