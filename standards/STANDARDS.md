@@ -75,7 +75,7 @@ Reference a whole section by its filename, a subsection as `filename-§N`.
 - **[audit-review-history](standards/audit-review-history.md)** — frozen dated `docs/audits/` + `docs/reviews/` bundles.
 - **[versioning-git](standards/versioning-git.md)** — semver; trunk-based git workflow; commit only on green.
 - **[naming-cheatsheet](standards/naming-cheatsheet.md)** — the naming conventions table.
-- **[anti-patterns](standards/anti-patterns.md)** — the forbidden do-not list (#1–#55).
+- **[anti-patterns](standards/anti-patterns.md)** — the forbidden do-not list (#1–#56).
 - **[open-evolutions](standards/open-evolutions.md)** — recorded directions for future versions.
 
 ---

@@ -147,6 +147,38 @@ asserts on proves only that the test can write a table. A module whose dependenc
 loadable as a real scenario: feed the loader a deliberately partial file list and let the host's own
 setup file take its fallback.
 
+**Stub-surface parity (MUST).** The degraded-path case above proves the addon *loads*. That is not the
+failure that ships. The failure that ships is a degradation stub whose **member set** has drifted from
+what the host actually calls, which loads perfectly and then raises at the moment a user reaches the
+one path that calls the missing member — anti-patterns #56.
+
+- **MUST** carry, **per adopted LibKa0s module**, a **stub-surface parity case**: a declared list of the
+  members the addon reaches on that instance, asserted **present on both arms** — the live instance and
+  the library-absent stub. Both arms, not just the stub: a list that has drifted from the live surface
+  asserts nothing about either.
+- **MUST** derive the member list by **grep**, and **MUST** name the grep that produced it **in the
+  case's comment** — `-- members from: grep -rno "NS\.Slash[:.][A-Za-z]*" core/ modules/ settings/`.
+  The next author then re-runs one command instead of re-deriving the list by reading, which is the
+  step that does not happen and the reason the list rots.
+- **MUST** produce the degraded arm by **feeding the loader a deliberately partial file list**, never by
+  hand-stubbing the namespace member under test. This is the paragraph above in its specific form: a
+  case that writes the stub it then asserts on proves only that the test can write a table, and it
+  proves it *especially* convincingly for a parity assertion, where the hand-written stub is by
+  construction built from the same list the assertion checks.
+- **MUST** treat a member present but **`nil`-valued** as a divergence, and **SHOULD** report **every**
+  divergence in one message rather than raising on the first. A stub missing four members should cost
+  one round of this, not four.
+- The options stub's **load-completing** exception (options-ui-§1) narrows what the members must **do**,
+  not **which members must exist**. An options stub is permitted to complete the load and answer
+  inertly; it is **not** permitted to be missing a member the host calls. Both of the reproduced
+  ConsumableMaster failures hid behind that exception, which is why it is stated here rather than left
+  to be inferred.
+
+The class is not hypothetical and no green suite sees it, because no suite loads the addon degraded:
+`ConsumableMaster/settings/Panel.lua:571-572` and `:643`/`:833` reproduce as a session-long error loop
+with a settings write landing **before** the raise, and `PanelMaster/settings/Slash.lua:316` is a stub
+missing a `FormatKV` the host calls from five sites.
+
 ### 9. Load lists MUST be derived from the TOC
 
 A repo typically names its files in load order in several places — the TOC (what the client actually
