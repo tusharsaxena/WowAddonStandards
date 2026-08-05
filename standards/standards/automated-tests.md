@@ -155,10 +155,15 @@ is not a judgment call the release notes can absorb.
   comparison the record exists to make. Consolidating the *evidence* into per-run bundles is only safe
   because this file keeps the *comparison* on one path.
 - **MUST** carry, per row: the run stamp (linking its bundle), the addon version, the verdict, and
-  each suite's headline figures — lint warnings/errors and files checked, tests passed/total, perf
-  status, and for complexity **both totals and averages**: NLOC, functions, avg NLOC/function, avg
-  CCN, max CCN and the warning count. An average without its total, or a total without its average,
-  cannot be read across a change in size.
+  each suite's headline figures — lint warnings/errors and files checked, tests
+  **passed/skipped/total**, perf status, and for complexity **both totals and averages**: NLOC,
+  functions, avg NLOC/function, avg CCN, max CCN and the warning count. An average without its total,
+  or a total without its average, cannot be read across a change in size.
+- The `tests` column **MUST** carry the **skipped** figure alongside passed and total, and **MUST NOT**
+  fold a skip into either. A case that could not run — the sibling checkout a vendored-payload gate
+  needs is absent, say (testing-§11) — is neither a pass nor a failure, and a trend line that reports
+  `41/41` on a run where two cases never looked is claiming coverage that was not exercised. Same rule
+  as this section's suite-level one, one level down: a skip is recorded as a skip, never as a pass.
 - **MUST** distinguish a suite that was **not selected** from one that was **skipped**. A subset run
   whose row reads `0/0` for tests is indistinguishable from a full run that found no tests, and the
   trend line carries that forever. Not-selected and tool-absent are different facts about why a

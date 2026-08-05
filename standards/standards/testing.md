@@ -78,6 +78,11 @@ hand-runnable — no CI is required or expected**.
 - **MUST** keep both in lockstep with the suite: whenever a case is added, removed, or renamed, or
   the pass count moves — i.e. **whenever a failing test is resolved** — regenerate `docs/test-cases.md`
   and update the README badge **as part of the same change**, never as a deferred follow-up.
+- Both figures count **passes**. A case that registered as a **skip** (`Kit.skip`, §11) **MUST** be
+  shown as a skip — in the inventory, with its reason — and **MUST NOT** be folded into either the
+  passed count or the total. Counting a skip as a pass is the badge asserting a thing nobody measured;
+  counting it as a failure makes a fresh clone red for a condition it cannot fix. The inventory is the
+  place where *"this case did not run, and here is why"* is legible, so that is where it goes.
 
 This complements §4: the green gate proves the suite passes on every commit; the inventory and badge
 make the coverage **visible and honest**, and are the standing defense against the count drift that
@@ -217,10 +222,23 @@ Reference implementation (in the collection): `LibKa0s`'s `tests/test_versioning
   first missing entry leaves the rest unchecked — which is how this suite's own first run reported one
   gap while hiding a second.
 
-### 11. A vendored kit is gated by a byte-identity test, not a remembered `diff`
+### 11. A vendored payload is gated by a byte-identity test, not a remembered `diff`
 
 Vendoring something you also author is an ongoing **sync**, not a one-time copy (library-stack-§7), and
 a release checklist's manual `diff -r` is a step that gets skipped.
+
+There are **two** such gates and this section covers **both halves**. They differ in what they compare
+and therefore in what they are allowed to normalize, and conflating them is how the second one ends up
+either absent or silently broken:
+
+- **the library-side kit-sync gate** — the library repo's source `testkit/` against its **own** vendored
+  `tests/_kit/`. Both sides are working-tree directories **in one checkout**;
+- **the consumer-side vendored-payload gate** — a consuming repo's `libs/LibKa0s/` against the library
+  repo's ship folder in a **sibling checkout**. Here one side is a working tree and the other is
+  whatever the sibling checkout can be asked for, and the precondition — that the sibling exists — is
+  not always met.
+
+#### The library-side kit-sync gate
 
 - **MUST** carry a **kit-sync suite** in the library repo comparing the source `testkit/` against its
   own vendored `tests/_kit/` — the manual diff, mechanical. Reference implementation: `LibKa0s`'s
@@ -232,17 +250,57 @@ a release checklist's manual `diff -r` is a step that gets skipped.
   added to one and not the other is caught even though every existing file still matches — and
   **byte-identical content** for every one of them, **`README.md` included**. The file that actually
   diverged was a README, so a check restricted to `*.lua` would have caught nothing.
-- **MUST** compare **raw bytes**, read in binary mode, with **no line-ending normalization**. A repo
-  that pins its line endings has already had a copy arrive through a normalizing path; a check that
-  normalizes cannot see it.
-- **MUST** fail, not pass, when the gate **cannot run**. If the directory listing yields nothing, the
-  check could not look — and a gate that goes quiet when it cannot look is worse than no gate.
+- **MUST** compare **raw bytes**, read in binary mode, with **no line-ending normalization**. This MUST
+  is scoped to a comparison where **both sides are the same representation** — here, two working-tree
+  directories in one checkout, both governed by the same `.gitattributes`, so a byte difference is a
+  real difference and nothing else. A repo that pins its line endings has already had a copy arrive
+  through a normalizing path; a check that normalizes cannot see it. *The consumer-side
+  vendored-payload gate* below states the one carve-out, and it is a carve-out precisely because that
+  comparison is **not** same-representation.
+- **MUST** fail, not pass, when the gate **cannot run**. Both directories are in this checkout, so a
+  directory listing that yields nothing is a broken gate, not an absent precondition: the check could
+  not look, and a gate that goes quiet when it cannot look is worse than no gate.
 - **MUST** name the file and say **where and how** it differs. *"The kit is out of sync"* on its own
   costs the next person the manual diff the test exists to remove.
 
 The rule is here because the failure already shipped: a documentation pass improved `testkit/README.md`,
 did not re-vendor it, and released the divergence with **three documents asserting the gate was
 passing**. Both copies keep working when they drift, so both suites stayed green (anti-patterns #45).
+
+#### The consumer-side vendored-payload gate
+
+- Every repo vendoring a Ka0s-owned library **MUST** carry a gate comparing its `libs/<Lib>/` against
+  the library repo's ship folder in the sibling checkout. The library-side gate proves the library repo
+  is self-consistent; it says nothing about whether **this** addon's copy is current, which is the
+  divergence anti-patterns #45 is actually about.
+- **The comparison is blob-versus-worktree, and exactly one normalization is permitted and required.**
+  The sibling side is read as a **`git show <ref>:<path>` blob**, which is LF **by construction** —
+  git stores normalized content — while the local side is a **working tree** pinned to CRLF by
+  `.gitattributes` in almost every repo in this collection. Measured on a live pair:
+  `git -C LibKa0s show HEAD:LibKa0s/Core.lua | tr -cd '\r' | wc -c` → **0**;
+  `tr -cd '\r' < AbsorbTracker/libs/LibKa0s/Core.lua | wc -c` → **322**. The two sides are therefore
+  **not** the same representation, and the library-side no-normalization MUST above does not reach here. The gate
+  **MUST** strip **CR from the working-tree side and nothing else** — which compares the file against
+  the blob it round-trips to — **or**, equivalently and normalization-free, compare
+  `git hash-object <local file>` against the sibling's blob sha. It **MUST NOT** apply any other
+  normalization: no whitespace trimming, no trailing-newline fixup, no case folding. A real fork in
+  content still fails, which is the property both forms preserve.
+  - **MUST** carry that reasoning in the case's own header comment. Without it the next author reads
+    a lone `gsub("\r", "")` as sloppiness and deletes it, at which point the gate reddens on every
+    checkout and gets deleted next.
+- **MUST** register as a **skip carrying its reason** when the precondition is absent — the sibling
+  checkout is not there, or the ref cannot be resolved. It **MUST NOT** register as a pass, and it
+  **MUST NOT** fail: a fresh clone with no sibling has not proven the payload is current and has not
+  proven it is stale, and a gate that reddens on every fresh clone is a gate people learn to ignore.
+  This is the same doctrine `automated-tests-§3` already applies to an absent tool — a missing tool is
+  recorded as a skip with its reason, never as a pass or a failure — extended from suites to cases.
+- The primitive is the kit's **`Kit.skip(reason)`**. `Kit.skip` is a **third status**: counted
+  separately from passed and failed, surfaced by `Kit.run` and by the `--list` renderer, and it
+  **MUST NOT** change the process exit code. A skip is not a failure, so it does not break the green
+  commit gate (§4).
+- The reason **MUST** be visible in the case's **own recorded result** — the printed line, the `--list`
+  inventory, `docs/test-cases.md` — and not only in a header comment. A reason a reader has to open the
+  source to find is a reason the person reading the run output does not have.
 
 ### 12. A test that cannot fail is worse than no test
 
