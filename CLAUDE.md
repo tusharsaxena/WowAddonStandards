@@ -23,9 +23,10 @@ All three are **thin orchestrators**: they say *how* the process runs and defer 
 canonical docs under `standards/`. The plugin lives in a separate repo
 (<https://github.com/tusharsaxena/wow-addon>) and is updated there to consume these files.
 
-The in-scope addons are listed in **`standards/ADDONS.md`** (the roster) and live in their own sibling
-repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. **Do not modify those addons from
-here.**
+The in-scope repos are listed in **`standards/ADDONS.md`** (the roster) and live in their own sibling
+repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`: the addon table, and a second table of
+**Ka0s-owned library repos**, which are audited against library-stack-§7's applicability list rather
+than the addon rule set. **Do not modify those repos from here.**
 
 ## Layout
 
@@ -70,6 +71,15 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   `options-ui-§10`), where `N` is that section's **local** number. The old global `§N.M` numbering is
   retired — do **not** reintroduce it. Preserve these refs when editing, in every doc and in the
   `wow-addon` plugin.
+- **Eleven section files have no numbered subsections and take the bare filename only
+  (documentation-§6).** Measured by `grep -c '^### [0-9]' standards/standards/<file>` returning 0, they
+  are: `anti-patterns`, `audit-review-history`, `compat`, `lint`, `naming-cheatsheet`,
+  `open-evolutions`, `packaging`, `preview-mode`, `public-api`, `standalone-windows`,
+  `versioning-git`. **Any** `filename-§N` against one of them is out-of-range by construction and a
+  **MUST** fix, whatever the number — an unnumbered `###` heading is not a section number. Where a
+  specific passage matters, name its heading in words (*standalone-windows, "The Ka0s window edge"*).
+  This repo's own prose is held to the rule it publishes; if one of the eleven ever gains numbered
+  subsections, it leaves the list in the same change.
 - **The playbooks are thin orchestrators.** `AUDIT.md`, `NEW_ADDON.md` and `AUTOMATED_TESTS.md` describe process and point
   into `standards/` (`STANDARDS.md` as the audit checklist; `NEW_ADDON_CONTEXT.md` as the scaffold
   pack). Keep the *substance* in `standards/`; don't duplicate rules into the playbooks — they drift.
@@ -102,11 +112,16 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.21.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
-  `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7); the **`docs/`
-  canonical trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; and the **five required
+  list. As of v2.22.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
+  `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
+  root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
+  `testing.md`, `smoke-tests.md`, where `ARCHITECTURE.md` carries nine mandated sections ending in
+  `## Documented deviations`, the single home of a ratified deviation; and the **required
   topic-detail docs** — `test-cases.md`, `performance.md`, `perf-runs/README.md`,
-  `automated-tests/README.md`, `automated-tests/RESULTS.md` (documentation-§3).
+  `automated-tests/README.md`, `automated-tests/RESULTS.md`, of which the first, second, fourth and
+  fifth are unconditional and `perf-runs/README.md` is required only while the performance harness
+  is wired, so an addon holding a recorded performance-§12 exemption ships four (documentation-§3).
   `docs/automated-tests/RESULTS.md` is generated, one file overwritten in place — its single-path
   git history is the trend line — and a full run bundle is produced at **release**, never as a
   commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see

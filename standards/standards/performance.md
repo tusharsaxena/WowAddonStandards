@@ -4,13 +4,13 @@
 
 Every Ka0s addon **MUST** be able to answer *"how much does this addon cost, and is this cost even ours?"* on demand, in a live client, in a form the user can paste back. That question cannot be answered from WoW's built-in Addon Profiler alone: the profiler bills a **shared** library's dispatch frame to whichever addon created it, so enabling and disabling addons moves the blame around, and the first-alphabetical Ace addon in an install absorbs cost that belongs to its siblings. The only trustworthy answer comes from an A/B on the **same fight** with load order and shared-frame ownership held fixed — which is what the harness this section mandates provides.
 
-**Adoption strength.** **MUST** for the **wiring** — vendor the instrumentation lib, create one instance at load, expose the `perf` verb, declare `<Addon>PerfDB`, implement the `suspend`/`resume` contract. **SHOULD** for **coverage** — which hot paths get buckets is genuinely addon-specific, and some addons have almost no hot path. MUST on the wiring is what makes captures comparable across the collection and makes *"run `/<slash> perf` and send me the JSON"* true of **any** Ka0s addon.
+**Adoption strength.** **MUST** for the **wiring** — vendor the instrumentation lib, create one instance at load, expose the `perf` verb, declare `<Addon>PerfDB`, implement the `suspend`/`resume` contract. **SHOULD** for **coverage** — which hot paths get buckets is genuinely addon-specific, and some addons have almost no hot path. MUST on the wiring is what makes captures comparable across the collection and makes *"run `/<slash> perf` and send me the JSON"* true of **any** Ka0s addon. The wiring MUST has exactly **one** exit, and it is narrow, evidenced and recorded rather than local: an addon that runs no code while the player is in combat may claim the **no-combat-path exemption** (performance-§12), which suspends the wiring but not the whole-folder vendoring, the reserved `perf` verb, `docs/performance.md`, or the release-notes skip line.
 
 ### 1. The instrumentation lib
 
 The measurement harness is a **Ka0s-owned shared library**, not per-addon code. Addons **MUST NOT** hand-roll a private probe.
 
-- **MUST** vendor **`LibKa0s-Perf-1.0`** (the `Perf` module of `LibKa0s`) under `libs/LibKa0s/`, listed directly in the TOC's `# Libraries` section after Ace3 (toc-file-§4, library-stack-§7).
+- **MUST** vendor **`LibKa0s-Perf-1.0`** (the `Perf` module of `LibKa0s`) under `libs/LibKa0s/`, listed directly in the TOC's `# Libraries` section after Ace3 (toc-file-§4, library-stack-§7). This bullet holds even under performance-§12's exemption: the ship folder is vendored whole or not at all (anti-patterns #48), so an exempt addon still carries `Perf.lua`; what it drops is the instance below, not the file.
 - **MUST** create **one instance per addon at load**, from a descriptor, and stash it on the namespace — resolved **silently**, then guarded: `local lib = LibStub and LibStub("LibKa0s-Perf-1.0", true)`, and `NS.Perf = lib:New(descriptor)` only `if lib`. A bare `LibStub(major)` **raises** when the major is absent, and the silent form without the guard indexes `nil` — either one errors on exactly the path the next bullet exists to make survivable. In its own core file (`core/PerfSetup.lua`), positioned in the TOC **before** any module that takes `local Perf = NS.Perf` as a load-time upvalue.
 - **MUST** degrade rather than error when the lib is absent: the setup file falls back to a stub carrying every member the addon actually calls (the hot-path gate field, the bracket sink, and whatever the slash layer and the show-decision ladder touch) so a missing diagnostics harness cannot break the addon's own function. A stub that omits a member the slash layer calls is not a fallback — it is a crash moved to a rarer code path.
 - **MUST NOT** share a frame between instances. Every frame the harness creates — the sampler, the step panel — belongs to the calling host. A lib-level shared frame reproduces the exact attribution pathology the harness exists to defeat: the measuring instrument corrupting the attribution it was built to fix (anti-patterns #44).
@@ -18,7 +18,10 @@ The measurement harness is a **Ka0s-owned shared library**, not per-addon code. 
 
 ### 2. The bracket idiom (MUST)
 
-Instrumentation lives at the addon's own entry points, as a gated bracket around the work:
+Instrumentation lives at the addon's own entry points, as a gated bracket around the work. There are
+**two** sanctioned shapes, and which applies is decided by the region's **exits**, not by taste.
+
+**Shape A — the inline bracket. For a single-exit region. This is the default.**
 
 ```lua
 local Perf = NS.Perf                                    -- load-time upvalue, not an NS lookup
@@ -30,7 +33,43 @@ local function doRepaint()
 end
 ```
 
-- **MUST** use this exact shape. When capture is off it costs **one upvalue read, one field read and one boolean test** — no call, no table lookup through `NS`, no allocation. It is the same gating discipline the debug sink follows (debug-logging-§4).
+With capture off this costs **one upvalue read, one field read and one boolean test** — **no call**, no
+table lookup through `NS`, no allocation. That is the same gating discipline the debug sink follows
+(debug-logging-§4), and it is why this shape is the default on anything running per frame or per
+combat-log event.
+
+**Shape B — the `P.Open(key)` / `P.Close(key)` pair. For a multi-exit region.**
+
+```lua
+local Perf = NS.Perf                                    -- the same load-time upvalue
+
+local function handleEvent(unit)
+    Perf.Open("absorbEvent")
+    if not NS.Units[unit] then Perf.Close("absorbEvent"); return end   -- every exit closes
+    -- ... the work ...
+    Perf.Close("absorbEvent")
+end
+```
+
+`Open` **MUST** take the bucket key. A slot with no identity cannot be matched to its `Close`, cannot
+be reported when it leaks, and cannot name a parent for a bracket opened inside it (performance-§3).
+
+**State the pair's cost honestly.** Shape B is **not** free when capture is off: it costs **two real Lua
+calls, plus the boolean test inside each**, against Shape A's **none**. Any claim that the pair costs
+"one boolean test and nothing else" is false, and a docstring saying so is a defect to fix rather than a
+description to trust. What the pair buys is that a region with four exits does not repeat
+`if t0 then Perf.Note(...) end` at four of them — which is exactly where the unclosed-exit bug comes
+from in practice.
+
+- **MUST** use one of these two shapes, not a third. Shape A on a single-exit region; Shape B where the
+  region has **two or more exits** and repeating the inline close at each is what would go wrong.
+- **MUST NOT** use Shape B on a per-frame or per-event hot path whose dormant cost must be exactly one
+  boolean test. Where a multi-exit region is also a hot path, restructure it to a single exit and use
+  Shape A: two calls per frame is a cost you chose, not one the idiom owes you.
+- **MUST** take the **load-time upvalue** (`local Perf = NS.Perf`) in **both** shapes. A per-call
+  `NS.Perf` lookup is a table lookup on the hot path and defeats the gate whichever shape wraps it.
+- **MUST** close a Shape B bracket on **every** exit — early returns and error paths included. An
+  unclosed bracket is a defect the library reports, not a silent undercount (performance-§3).
 - **MUST** keep the gate a plain **boolean field** on the instance and the sink a plain **dot-callable** function. A colon method, a metatable `__index`, or an accessor on the hot path defeats the point.
 - **MUST NOT** allocate, concatenate, format, or call anything else inside a bracket while capture is off. Building a label, a table, or a string "ready for when capture starts" is an unconditional cost paid on every frame forever (anti-patterns #43).
 - **MUST** treat the offline runner's zero-overhead scenario (performance-§9) as the **required evidence** for this rule. The claim "instrumentation is free when off" is not a comment; it is a measured, committed number.
@@ -54,6 +93,28 @@ buckets = {
 - **MUST NOT** sum a parent bucket and its children. Nested totals are not disjoint; the parent already contains the child's time. The report labels this structurally, and a bucket set with no nesting says nothing rather than printing a hollow disclaimer.
 - **SHOULD** bracket the addon's real hot paths and nothing else: the event handler that fires per combat-log event, the coalesced repaint/render pass, and the per-item work inside it. Bracketing a settings read that runs twice a session adds a row that will always read `0.000`.
 - A bucket that no bracket ever reaches is a **lie in every report**. The addon's own test suite **MUST** pin that each declared bucket is actually reached (testing, performance-§9).
+
+**A declared `within` MUST be verifiable.** The descriptor above is a **claim about where the work
+runs**, written once and then read months later beside numbers it is supposed to explain. Until now
+nothing checked it, so a wrong `within` was indistinguishable from a right one — and a wrong one is
+worse than no declaration, because a reader who trusts it subtracts the wrong parent's time.
+
+- The record **MUST** carry **observed** containment beside the declared value. Containment is supplied
+  at the **recording** call — `Perf.Note(key, ms, parentKey)` — and defaults to the declared parent when
+  the third argument is omitted. The report then distinguishes three states per nested bucket:
+  *observed inside `<parent>`*, *declared `<parent>`, not observed*, and *declared `<x>` but observed
+  inside `<y>`* — the last being a defect in the descriptor or in the call site, and reported as one.
+- The library **MUST NOT** assert containment it did not observe. A nesting note for a parent that was
+  never observed **MUST** say the parent is declared and unobserved rather than stating the containment
+  as fact, and it **MUST** refuse the note outright where declared and observed disagree.
+- A Shape B bracket **MUST** be closed on every exit (performance-§2). An unclosed bracket is not a
+  small undercount to be absorbed silently — the region's time is missing from the parent it was inside,
+  so **every** derived figure in that capture is wrong by an unknown amount. The library reports the
+  leak; the addon fixes the exit.
+- **Do not "fix" a wrong `within` by deleting it.** Dropping the declaration where the work genuinely is
+  nested substitutes one false claim (wrong parent) for another (no nesting, so the totals are
+  disjoint), and the second is harder to spot because nothing contradicts it. Correct it to the parent
+  the work actually runs inside, and pass that parent at the call site so the record can confirm it.
 
 ### 4. The `perf` slash verb (MUST)
 
@@ -247,3 +308,69 @@ still passes" means nothing when the suite never covered the function.
 - **MUST** treat chat output strings, event registrations, SavedVariables keys and shapes, and slash
   output as the contract. These are what a user and a sibling addon actually see, and none of them are
   covered by "it still loads".
+
+### 12. When the wiring does not apply — the no-combat-path exemption (MUST qualify, MUST record)
+
+The *Adoption strength* above makes the **wiring** an unconditional MUST, and for an addon with a hot
+path that is right. For an addon that runs **no code while the player is in combat** it is not: the
+capture protocol opens its windows on the player's combat state (performance-§7), so every declared
+bucket reads `0.000` by construction — which performance-§3 itself calls *a lie in every report* — and
+`suspend` (performance-§6) makes the addon inert for exactly the window it was supposed to record. The
+wiring MUST'd in the abstract produces, in that addon, a `perf` verb dispatching into an instance with
+nothing to say and a `<Addon>PerfDB` nothing ever writes. This section is the narrow, recorded exit.
+
+**The qualifying test (MUST).** An addon is exempt only when criterion **(a)** holds **and** it names
+whichever of **(b)** or **(c)** applies:
+
+- **(a) — no combat path.** The addon has **no `OnUpdate` handler, no repeating ticker, and no event
+  handler doing more than occasional work while the player is in combat.** This **MUST** be proven by a
+  **committed whole-repo sweep** of `RegisterEvent` / `SetScript("OnUpdate"` / `C_Timer`, naming the
+  per-event work for each hit. The sweep is the evidence; the claim without it is an assertion, and it
+  is the half most likely to have quietly stopped being true.
+- **(b)** — the two arms cannot differ: every declared bucket would read `0.000` by construction.
+- **(c)** — `suspend` would suppress the data the addon exists to record.
+
+**What the exemption suspends.** For a qualifying addon these stop being MUSTs:
+
+- performance-§1's instance and its `core/PerfSetup.lua` setup file;
+- performance-§4's `perf` **verb registration**;
+- performance-§5's `<Addon>PerfDB` SavedVariables global (so the addon declares **one** SV global, not
+  two — toc-file-§2, savedvariables-§4);
+- performance-§6's suspend/resume contract;
+- performance-§9's `tests/perf.lua` offline runner;
+- documentation-§3's `docs/perf-runs/README.md`, and with it the `docs/perf-runs/` store itself
+  (performance-§8) — there are no in-game captures to keep.
+
+**What it does NOT suspend.** All four of these survive the exemption, and three of them are the ones an
+addon is most likely to drop by mistake:
+
+- **Whole-folder vendoring of `libs/LibKa0s/`** (library-stack-§7, anti-patterns #48). The addon still
+  consumes Core, DebugLog, Slash and Options out of the same ship folder; the folder is copied whole or
+  not at all, and dropping `Perf.lua` because this section no longer applies is the partial re-vendoring
+  the anti-pattern names.
+- **`perf` stays a reserved verb** (slash-commands-§2). It is reserved so it can never mean anything
+  else in any Ka0s addon; an exempt addon simply does not register it.
+- **`docs/performance.md` stays required** (documentation-§3) and shrinks to a **one-screen page**
+  stating that the addon brackets nothing, which of (b)/(c) applies, and where the sweep lives. The
+  question *"how much does this addon cost?"* still gets an answer; the answer is *"nothing measurable,
+  and here is why we know"*.
+- **`automated-tests-§3`'s `perf: skip` release-notes line stays.** The exemption is why there is no
+  `tests/perf.lua`; it is not permission to let the skip read as measured.
+
+**The re-check trigger (MUST).** The exemption is **conditional on (a) still being true**. The first
+`OnUpdate` handler, repeating ticker, or in-combat event handler doing real work **re-arms the full
+wiring MUST**, and the recorded entry **MUST** say so in those words. An exemption without its trigger
+is a permanent opt-out, and the change that ends it is exactly the change nobody will re-read this
+section during.
+
+**Recorded once, in the register (MUST).** The exemption is claimed **once**, as a row in the addon's
+`## Documented deviations` register in `docs/ARCHITECTURE.md` (documentation-§3), citing
+`performance-§12` as the Rule, the sweep commit as the Why, and the trigger above as the Re-check
+trigger. It **MUST NOT** be re-argued per audit: an audit reads the register first and records a
+ratified entry as accepted with its id (audit-review-history). A decline reasoned only in
+`docs/pending/LEDGER.md` is **not** an exemption — the ledger may hold the reasoning and the row may
+cite it, but a deviation not in the register is not ratified.
+
+**Not exempt by default.** A new addon scaffolds **with** the wiring (NEW_ADDON_CONTEXT.md): it has no
+sweep yet, and it does not know what it will grow into. The exemption is claimed from evidence, after
+the fact, or not at all.

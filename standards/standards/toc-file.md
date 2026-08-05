@@ -16,7 +16,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 ## SavedVariables: <Addon>DB, <Addon>PerfDB   -- settings global + diagnostics ring (toc-file-§2)
 ## OptionalDeps: Ace3, LibStub, CallbackHandler-1.0, LibSharedMedia-3.0
 ## DefaultState: enabled
-## Category-enUS: <Combat|Group|Auction|Chat|UI|Misc>
+## Category-enUS: <a category string the client accepts>   -- see the note below the block
 ## X-License: MIT
 ## X-Standard: https://github.com/tusharsaxena/WowAddonStandards
 ## X-Curse-Project-ID: <id>              -- mandatory once published on CurseForge
@@ -30,10 +30,26 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 - **MUST** have `X-Curse-Project-ID` once the addon is published on CurseForge (the collection's distribution platform). `X-Wago-ID` and `X-WoWI-ID` are **optional** (**MAY**) — include each only when the addon is actually listed on that platform (Wago / WoW Interface respectively); an addon that doesn't publish there simply omits the line. Keep the field **order** above regardless (Curse → Wago → WoWI).
 - **SHOULD NOT** declare hard `Dependencies`. Use `OptionalDeps` and shim missing libs with soft fallbacks. Reference implementation (in the collection): the absorb-shield tracker ships an AceDB-missing flat-table shim and LSM-missing Blizzard fallback constants, so it loads even with no libs present.
 
+**`Category-enUS` — the value MUST be a string the client accepts, and any list here is illustrative.**
+The category set is **Blizzard's**, not this standard's, and it changes between client builds. The
+normative requirement is only that the value is a category string the current client accepts, spelled
+exactly as Blizzard spells it — including the ampersand and the spaces in the multi-word ones.
+
+Commonly used, as an **illustration and not an enumeration**: `Combat`, `Group`, `Auction`, `Chat`,
+`UI`, `Misc`, `Chat & Communication`, `Roleplay`, `Quests & Leveling`, `Professions`, `Map & Minimap`,
+`Class`, `Unit Frames`, `Action Bars`, `Tooltip`, `Buffs & Debuffs`, `Combat Log`, `PvP`, `Data
+Broker`, `Development Tools`.
+
+An earlier version of this section listed six values as a closed set. That was the incomplete half of
+the disagreement: `Chat & Communication` is a real Blizzard category, and narrowing an addon's TOC to
+`Chat` to satisfy the enumeration would list it under a category Blizzard does not use. **Do not file a
+deviation against a `Category-enUS` value on the strength of a list in this document** — check it
+against the client.
+
 ### 2. SavedVariables naming
 
 - **MUST** name the settings global `<Addon>DB`. Already universal in the collection.
-- **MUST** declare exactly **two** SavedVariables globals in the order above: `<Addon>DB` (the AceDB tree) and `<Addon>PerfDB` (the performance capture ring, performance-§5). The second is the standard's **one sanctioned non-AceDB SV global** (savedvariables-§4) — a diagnostics store deliberately outside the profile tree so it never rides profile copy, reset, or switch. A **third** top-level global is non-compliant.
+- **MUST** declare exactly **two** SavedVariables globals in the order above **when the performance harness is wired**: `<Addon>DB` (the AceDB tree) and `<Addon>PerfDB` (the performance capture ring, performance-§5). The second is the standard's **one sanctioned non-AceDB SV global** (savedvariables-§4) — a diagnostics store deliberately outside the profile tree so it never rides profile copy, reset, or switch. An addon holding a recorded **no-combat-path exemption** (performance-§12) declares **one**: `<Addon>DB` alone, because nothing would ever write the ring. So: **two when wired, one when exempt, never three** — a **third** top-level global is non-compliant either way, and a `<Addon>PerfDB` declared by an exempt addon is a global nothing writes.
 - **SHOULD NOT** use `SavedVariablesPerCharacter` unless the data is genuinely per-character (most Ka0s addons run profile-per-character via AceDB; that's enough).
 - **MUST** declare a `schemaVersion` integer in defaults. **MUST** ship a `Database.lua` migration runner even if the body is empty — schema migration is a from-day-one concern.
 
@@ -89,3 +105,23 @@ settings\...
 
 - **MUST** use `#` section headers, in the order **Libraries → Locales → Core → Defaults → Modules → Settings**, matching the load order (layout-§1). Libraries always load **first**; settings **last**.
 - **MUST** end the file with a single trailing newline.
+
+**The file sequence *within* a section is illustrative, not normative.** The block above is a reference
+implementation. Read it as one: the two MUSTs are the **section-header order** and the single trailing
+newline, and nothing else in that block is a rule.
+
+Specifically, the within-`core/` sequence shown — `Compat → Constants → State → Util → PerfSetup →
+Database → <Addon>` — is **not** an ordered MUST, and it is **not achievable** in every addon. An addon
+whose `Namespace.lua` bootstraps the `NS` table that `Compat.lua` and `Constants.lua` then attach to
+**cannot** put `Compat` first; the bootstrap has to load before the files that extend it. Filing that as
+a MUST failure is filing the reference implementation's incidental order as a rule.
+
+What the within-section order **MUST** satisfy is the load-order constraints the code actually has —
+the bootstrap before whatever attaches to it, `core\PerfSetup.lua` before any module taking `NS.Perf`
+as a load-time upvalue (performance-§1, performance-§2) — and nothing more.
+
+- An addon whose bootstrap forces a different within-section order **MUST** state the reason in a
+  **comment in the TOC itself**, immediately above the affected lines, where the next reader and the
+  next auditor both already are.
+- With that comment present the ordering is **compliant** and needs no deviation-register row: a
+  register row records a departure from a rule, and there is no rule here to depart from.

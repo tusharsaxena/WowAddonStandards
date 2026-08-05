@@ -65,8 +65,28 @@ land, in what shape, and what may fail a run — that is what is specified here.
   kernel look for an interpreter literally named `bash\r`, and every `case`/`in` becomes a syntax
   error. Without this line the vendored runner is broken on **every** checkout rather than in one
   contributor's, and it fails identically for everyone — which reads as "the script is wrong" and
-  sends the reader to the wrong repo. `cp` also does not reliably carry the executable bit, so
-  re-vendoring ends with `chmod +x tests/_kit/run-automated-tests.sh`.
+  sends the reader to the wrong repo.
+- **MUST** end re-vendoring by setting the executable bit **in the git index**, not in the working
+  tree:
+
+  ```sh
+  git update-index --chmod=+x tests/_kit/run-automated-tests.sh
+  ```
+
+  `cp` does not reliably carry the executable bit, and the mode that survives a **clone** is the one
+  git recorded — `git ls-files -s` must report **`100755`**, not `100644`. **`chmod +x` is not
+  sufficient and, in this collection, does nothing at all**, which is the trap: every repo here sits on
+  a **WSL DrvFs** mount that reports *every* file as `rwxrwxrwx`, so `ls -l` shows the bit already set
+  and a `chmod` appears to succeed; and every repo has **`core.fileMode=false`**, so git ignores the
+  working tree's mode even when it does change. Both signals a reader would trust are therefore silent
+  about the real state, and the instruction that used to close this bullet — `chmod +x …` — failed
+  identically in **9 of 9 repos**, every one of them recording `100644` while every working tree
+  claimed the file was executable.
+- **MUST** assert the recorded mode mechanically rather than remembering it: the repo's
+  **vendored-payload gate** — the consumer-side gate of testing-§11, or `tests/test_kitsync.lua` in the
+  library repo — **MUST** assert that `run-automated-tests.sh` is recorded as `100755`. Nine identical
+  failures against an explicit MUST is what a rule with no test looks like, and this is the one
+  property of the payload that no amount of reading the working tree can confirm.
 
 ### 3. What gates, and what only records (MUST)
 
@@ -92,6 +112,14 @@ a failure. An absent `luacheck`, `lizard` or Lua 5.1 means the suite did not run
 addon is clean and it does not mean the addon is broken. A green run that silently measured nothing is
 worse than a red one, because it is believed.
 
+**Exactly two `skipReason` values are sanctioned for `perf`**, and both describe *nothing to run* rather
+than *nothing measured*: **(1)** the addon ships no `tests/perf.lua`; **(2)** the addon holds a recorded
+**no-combat-path exemption** (performance-§12), which is why it ships no `tests/perf.lua`. The second is
+the more informative of the two and **MUST** be recorded when it applies, naming `performance-§12`, so a
+reader of the bundle can tell a ratified exemption from a suite somebody forgot to write. Neither
+sanctions a silent skip: both are still written into the run's `skipReason` and both still surface in
+the release notes.
+
 Verdicts: **`red`** — a gating suite failed. **`amber`** — a gating suite was skipped, or `perf` failed
 its own deterministic assertions. **`green`** — gating suites passed and nothing went unmeasured
 without saying so.
@@ -111,7 +139,11 @@ with a different failure mode, and there all four suites gate.
   never a pass — is what makes it one. The remedy is to install the tool and re-run, not to read the
   skip as clean. The one narrow exception is `perf` skipped because the addon **ships no
   `tests/perf.lua`**: nothing was there to run, which is a different fact from a scenario that failed
-  or a tool that was missing, and it **MUST** be stated as such in the release notes.
+  or a tool that was missing, and it **MUST** be stated as such in the release notes. That exception
+  covers both of §3's sanctioned `perf` skip reasons, including the **performance-§12 exemption** — an
+  exempt addon's release notes name the exemption rather than the bare absence, because *"this addon
+  brackets nothing and here is the ratified reason"* is the sentence a reader needs; the skip still
+  **MUST** be said out loud either way.
 - **MUST NOT** move this gate to commit time, and **MUST NOT** change the runner's exit code to
   implement it. `performance-§9`/`§10` and automated-tests-§3's `never gating` are retained **verbatim
   and deliberately**, and the runner stays exactly as specified — the same script is the commit gate
@@ -143,14 +175,36 @@ is not a judgment call the release notes can absorb.
   comparison the record exists to make. Consolidating the *evidence* into per-run bundles is only safe
   because this file keeps the *comparison* on one path.
 - **MUST** carry, per row: the run stamp (linking its bundle), the addon version, the verdict, and
-  each suite's headline figures — lint warnings/errors and files checked, tests passed/total, perf
-  status, and for complexity **both totals and averages**: NLOC, functions, avg NLOC/function, avg
-  CCN, max CCN and the warning count. An average without its total, or a total without its average,
-  cannot be read across a change in size.
+  each suite's headline figures — lint warnings/errors and files checked, tests
+  **passed/skipped/total**, perf status, and for complexity **both totals and averages**: NLOC,
+  functions, avg NLOC/function, avg CCN, max CCN and the warning count. An average without its total,
+  or a total without its average, cannot be read across a change in size.
+- The `tests` column **MUST** carry the **skipped** figure alongside passed and total, and **MUST NOT**
+  fold a skip into either. A case that could not run — the sibling checkout a vendored-payload gate
+  needs is absent, say (testing-§11) — is neither a pass nor a failure, and a trend line that reports
+  `41/41` on a run where two cases never looked is claiming coverage that was not exercised. Same rule
+  as this section's suite-level one, one level down: a skip is recorded as a skip, never as a pass.
 - **MUST** distinguish a suite that was **not selected** from one that was **skipped**. A subset run
   whose row reads `0/0` for tests is indistinguishable from a full run that found no tests, and the
   trend line carries that forever. Not-selected and tool-absent are different facts about why a
   number is missing, and both are different from zero.
+- **The generated lead-in MUST name the checkpoint for each suite, not merely the verdict.** The
+  prose the runner writes above the table is not decoration — it is the sentence eight repos quote
+  back — and *"perf and complexity never fail a run"* is true and, standing alone, misleading, because
+  it reads as *"these two never gate anything"* while §3's release gate says otherwise. The emitted
+  text **MUST** state, per suite:
+  - **`lint`** and **`tests`** — gate the **run** and gate the **commit** (testing-§4);
+  - **`perf`** and **`complexity`** — never fail a run and never block a commit; they are recorded;
+  - the **tag** — gated on **all four** suites at `pass` plus **zero** functions above **CCN 15**
+    (§3, *The release gate*), evaluated by the release command from the run's `manifest.json`, where a
+    **`skip` is NOT EVALUATED rather than a pass**.
+  A verdict without its checkpoint is the half-truth this bullet exists to end, and because the lead-in
+  is **runner-generated**, one addon cannot fix its own copy — testing-§1 forbids editing the vendored
+  kit. The fix lands in the kit and reaches every repo on its next re-vendor.
+- The manifest **MUST** carry the same fact in machine-readable form: a **`gates`** object naming both
+  checkpoints per suite rather than a bare `gating` boolean, which cannot express *"not at commit, yes
+  at the tag"* and is what let the generated prose drift. The legacy boolean **MAY** be retained for
+  one revision for readers that still key on it, and **MUST NOT** be the field a new reader consults.
 - **MUST NOT** silently recreate the file when its column set has changed. Rewriting the header
   drops every previous row — the one thing a trend line must never do. A runner that cannot append
   says so and leaves the file alone.

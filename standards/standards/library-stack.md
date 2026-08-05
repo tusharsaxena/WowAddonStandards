@@ -162,3 +162,49 @@ And the rule that catches the most tempting mistake:
   sibling modules keep their duplicate copy until a floor raise is being made for other reasons. That
   is a deliberate, documented duplication, and it **MUST** be commented as one at both copies rather
   than left to look like an oversight.
+
+**Applicability — what binds the library repo itself (MUST).** Everything above governs how an *addon*
+vendors and consumes a Ka0s-owned lib. The **library's own repository** — `LibKa0s` today — is also in
+scope for this standard, but it is not an addon: it has no TOC, no player-facing README, no settings
+panel and no install. Auditing it against the addon rule set manufactures findings the standard never
+meant. The three lists below are the ones an audit of a Ka0s-owned library repo uses instead
+(`ADDONS.md` lists which repos those are).
+
+**Applies, unchanged:**
+
+| Section | Why it binds a library repo |
+|---|---|
+| testing-§1, testing-§9, testing-§10, testing-§11 | The headless suite, the derived-and-pinned load lists, the versioning suite, and the kit-sync gate are the library's core quality contract — testing-§10 names this repo as the reference implementation for exactly that family of gates. |
+| `lint` | `luacheck .` is 0 warnings / 0 errors here as everywhere. |
+| `automated-tests` | The four out-of-game suites and the `docs/automated-tests/` record are repo-shaped, not addon-shaped. |
+| `versioning-git` | Semver tags, branch and commit discipline. The repo's tag axis stays separate from any file minor (above). |
+| localization-§5 | US English in authored comments, docstrings and strings — a British spelling vendored into eight consumers is eight findings. |
+| documentation-§5 | The `filename-§N` citation scheme and documentation-§6's citation rules. |
+| documentation-§7 | A root `DEPENDENCIES.md`: a new machine needs the toolchain list as much for a library as for an addon. |
+
+**Does not apply:**
+
+- **documentation-§1's player-facing README structure and badge row.** A library has no players. Its
+  `README.md` is a consumer-facing document and is structured for that audience.
+- **documentation-§2's addon `CLAUDE.md` stub as written.** The stub's shape assumes an addon; see the
+  substitution below.
+- **documentation-§3's `docs/` trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md` — **and the
+  five required topic-detail docs** (`test-cases.md`, `performance.md`, `perf-runs/README.md`,
+  `automated-tests/README.md`, `automated-tests/RESULTS.md`). These describe an addon's runtime shape
+  and its in-game verification, and a library has neither.
+- **`toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`.** There
+  is no TOC, no settings canvas, no slash surface, no on-screen display, no SavedVariables file and no
+  CurseForge package. Each of these binds the *consumer* that wires the module, and is audited there.
+
+**Substitutes — the library repo MUST carry these instead:**
+
+1. A root **`CLAUDE.md`** carrying `## Standards compliance (read first)`. Of documentation-§6's three
+   places a standards reference lives, this is the only one that exists in a repo with no TOC
+   `## X-Standard:` line and no player README badge row, so it is where the pointer goes.
+2. A root **`DEPENDENCIES.md`** (documentation-§7, above — listed in both lists deliberately: it is the
+   substitute *and* it is simply required).
+3. A **`README.md` pointer to the standard**, naming the version the repo is written against.
+
+A root **`CHANGELOG.md` is required** here and forbidden at an addon root — see documentation-§1, and
+testing-§10, whose versioning suite asserts that the changelog accounts for the version every file is
+at and has nowhere else to look.

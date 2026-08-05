@@ -25,6 +25,17 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Pretty Chat | [`../../prettychat/`](../../prettychat/) | https://github.com/tusharsaxena/prettychat |
 | Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup |
 
+## Ka0s-owned library repos
+
+Shared code authored inside the collection lives in its **own** repository and is vendored into the
+addons (library-stack-§7). Such a repo **is** in scope for the standards process and is audited — but
+against **library-stack-§7's applicability list**, not the addon rule set: it has no TOC, no
+player-facing README, no settings panel and no install, so the addon-shaped sections do not bind it.
+
+| Library repo | Folder | Repository |
+|---|---|---|
+| LibKa0s | [`../../LibKa0s/`](../../LibKa0s/) | https://github.com/tusharsaxena/LibKa0s |
+
 ## Adding an addon
 
 1. Add one row above (display name, folder, repository URL). Keep the table alphabetical by folder.

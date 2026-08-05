@@ -35,12 +35,16 @@ source code lives here, and this work never modifies the addons themselves.
 
 ## Scope
 
-The addons the standard codifies rules for are listed in
-**[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster. Edit that one file to
-change collection scope.
+The repos the standard codifies rules for are listed in
+**[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster, in two tables. Edit
+that one file to change collection scope.
 
 - **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 8 Ka0s addons: Absorb
   Tracker, Bank Ledger, Consumable Master, KickCD, Loot History, Panel Master, Pretty Chat, WhatGroup.
+- **Plus the Ka0s-owned library repos** those addons vendor — currently 1: LibKa0s. A library repo is
+  in scope for the standards process and is audited, but against **library-stack-§7's applicability
+  list** rather than the addon rule set: no TOC, no player-facing README, no settings panel, no
+  install, so the addon-shaped sections do not bind it.
 - **Reference addons studied for the standard (10):** DBM, BigWigs, Auctionator, Plater, Plumber,
   Details!, WeakAuras, ElvUI, Bagnon, OmniCD — see
   [`standards/INDUSTRY_RESEARCH.md`](standards/INDUSTRY_RESEARCH.md).
@@ -118,7 +122,7 @@ Audit and review runs are **not** stored here — each lives under its own addon
 
 ## Status
 
-Standard is at **v2.21.0** and living. Compliance auditing has moved out of this repo into each addon's
+Standard is at **v2.22.0** and living. Compliance auditing has moved out of this repo into each addon's
 own repository, driven by the `AUDIT.md` / `AUTOMATED_TESTS.md` / `NEW_ADDON.md` playbooks that the
 `wow-addon` plugin consumes.
 

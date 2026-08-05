@@ -78,6 +78,11 @@ hand-runnable — no CI is required or expected**.
 - **MUST** keep both in lockstep with the suite: whenever a case is added, removed, or renamed, or
   the pass count moves — i.e. **whenever a failing test is resolved** — regenerate `docs/test-cases.md`
   and update the README badge **as part of the same change**, never as a deferred follow-up.
+- Both figures count **passes**. A case that registered as a **skip** (`Kit.skip`, §11) **MUST** be
+  shown as a skip — in the inventory, with its reason — and **MUST NOT** be folded into either the
+  passed count or the total. Counting a skip as a pass is the badge asserting a thing nobody measured;
+  counting it as a failure makes a fresh clone red for a condition it cannot fix. The inventory is the
+  place where *"this case did not run, and here is why"* is legible, so that is where it goes.
 
 This complements §4: the green gate proves the suite passes on every commit; the inventory and badge
 make the coverage **visible and honest**, and are the standing defense against the count drift that
@@ -91,6 +96,20 @@ toolchain (§3), and pointers to `docs/test-cases.md` (§5) and `docs/smoke-test
 **`docs/testing.md`**, a **required** doc in the canonical `docs/` trio (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`; documentation-§3). It is
 the contributor-facing home for material the player-facing README deliberately excludes
 (documentation-§1); the README keeps only the `[tests]` badge.
+
+**The gate table MUST carry the checkpoint per suite.** Where that page tabulates the four out-of-game
+suites, a *Gates?* column reading `no — recorded only` **MUST NOT** stand unqualified: it is true of a
+**run** and of a **commit**, and false of the **tag**. Each row **MUST** name both checkpoints —
+`lint` and `tests` gate the run and the commit (§4); `perf` and `complexity` gate **neither**, but the
+**release** is gated on all four at `pass` plus zero functions above CCN 15
+(automated-tests-§3, *The release gate*), where a `skip` is **not evaluated** rather than a pass. This
+is the hand-written half of the same rule automated-tests-§4 puts on the runner's generated `RESULTS.md`
+lead-in; the two halves say the same thing in different files, and only this one is the addon's to
+edit.
+
+This adds no obligation to restate the release gate's **mechanics** — that is the release command's
+job, evaluated from the run's `manifest.json`. It forbids one specific sentence: a per-suite verdict
+with no checkpoint attached, which collectively reads as *"these two never gate anything"*.
 
 ### 7. Measurement runners are outside the gate
 
@@ -119,7 +138,11 @@ performance harness: the debug console, the slash dispatcher, the options shell 
 are all tested where they live.
 
 What stays in the addon is a smaller **integration** suite proving the wiring the addon actually owns.
-At minimum, per adopted module:
+At minimum, **per adopted module** — the list below is per module the addon actually adopts, so the
+three perf-specific entries apply only where the performance harness is wired. An addon holding a
+recorded **no-combat-path exemption** (performance-§12) has no instance, no declared buckets and no
+suspend contract, so it carries none of them, and a suite asserting on them there would be asserting on
+a stub it wrote itself. Its remaining adopted modules are covered exactly as below:
 
 - the **descriptor is well-formed** — the instance exists, and the fields the addon passes are the ones
   it means. For the performance harness that includes its declared buckets and their nesting;
@@ -137,6 +160,38 @@ asserts on proves only that the test can write a table. A module whose dependenc
 **before** `LibStub:NewLibrary` is **absent rather than half-wired** (library-stack-§7), so this is
 loadable as a real scenario: feed the loader a deliberately partial file list and let the host's own
 setup file take its fallback.
+
+**Stub-surface parity (MUST).** The degraded-path case above proves the addon *loads*. That is not the
+failure that ships. The failure that ships is a degradation stub whose **member set** has drifted from
+what the host actually calls, which loads perfectly and then raises at the moment a user reaches the
+one path that calls the missing member — anti-patterns #56.
+
+- **MUST** carry, **per adopted LibKa0s module**, a **stub-surface parity case**: a declared list of the
+  members the addon reaches on that instance, asserted **present on both arms** — the live instance and
+  the library-absent stub. Both arms, not just the stub: a list that has drifted from the live surface
+  asserts nothing about either.
+- **MUST** derive the member list by **grep**, and **MUST** name the grep that produced it **in the
+  case's comment** — `-- members from: grep -rno "NS\.Slash[:.][A-Za-z]*" core/ modules/ settings/`.
+  The next author then re-runs one command instead of re-deriving the list by reading, which is the
+  step that does not happen and the reason the list rots.
+- **MUST** produce the degraded arm by **feeding the loader a deliberately partial file list**, never by
+  hand-stubbing the namespace member under test. This is the paragraph above in its specific form: a
+  case that writes the stub it then asserts on proves only that the test can write a table, and it
+  proves it *especially* convincingly for a parity assertion, where the hand-written stub is by
+  construction built from the same list the assertion checks.
+- **MUST** treat a member present but **`nil`-valued** as a divergence, and **SHOULD** report **every**
+  divergence in one message rather than raising on the first. A stub missing four members should cost
+  one round of this, not four.
+- The options stub's **load-completing** exception (options-ui-§1) narrows what the members must **do**,
+  not **which members must exist**. An options stub is permitted to complete the load and answer
+  inertly; it is **not** permitted to be missing a member the host calls. Both of the reproduced
+  ConsumableMaster failures hid behind that exception, which is why it is stated here rather than left
+  to be inferred.
+
+The class is not hypothetical and no green suite sees it, because no suite loads the addon degraded:
+`ConsumableMaster/settings/Panel.lua:571-572` and `:643`/`:833` reproduce as a session-long error loop
+with a settings write landing **before** the raise, and `PanelMaster/settings/Slash.lua:316` is a stub
+missing a `FormatKV` the host calls from five sites.
 
 ### 9. Load lists MUST be derived from the TOC
 
@@ -156,8 +211,27 @@ all of them are under the green gate.
   derivation), that every derived path exists on disk, and that no `libs/` path leaked in. An ungated
   runner such as `tests/perf.lua` is pinned by **reading its source** for the derivation call, since
   the gate does not run it.
+- **MUST** pin the **suite list** — the third list, and the one this section used to be silent about.
+  The ordered list of `test_*.lua` paths handed to `Kit.run` is as hand-maintained as the other two and
+  is under exactly the same green gate that cannot see it go wrong. Pin it **in both directions**, with
+  distinct messages per direction:
+  - every `tests/test_*.lua` **on disk** appears in the declared list — otherwise a new suite is
+    written, committed, and never runs;
+  - every path **in the declared list** exists on disk — otherwise a renamed or deleted suite stops
+    contributing cases while the run stays green.
+  A runner that **auto-discovers** its suites from the directory satisfies this by construction and
+  carries no declared list to pin; the rule binds a runner that **declares** one. Two repos already
+  ship exactly this gate and are the **existing reference implementations** to copy rather than
+  reinvent — this is not a rule nobody has written yet:
+  **BankLedger** (`tests/test_harness.lua:22-32`), and
+  **PanelMaster** (`tests/test_harness.lua:19-32`).
+- The matching kit-side rule: **`loadSuites` MUST report a listed-but-absent suite as a skip carrying
+  its reason** (`Kit.skip`, §11) rather than silently omitting it. That keeps the affordance the
+  silence was protecting — a suite can be listed while it is still being written — while a renamed
+  suite stops disappearing without a trace. The write-in-progress case stays expressible as an explicit
+  `{ name = …, pending = … }` entry, which registers as a skip and says so.
 
-The rule exists because both failure modes are **silent, and both happened during the LibKa0s
+The rule exists because these failure modes are **silent, and the first two happened during the LibKa0s
 extraction**:
 
 - a suite named in the runner's list but missing from disk is **skipped, not failed** — deliberately,
@@ -165,10 +239,16 @@ extraction**:
   contributing cases while the run stays green and the count barely moves;
 - a **library file omitted** from the load list makes the dependent module refuse to register (its
   dependency guard returns before `LibStub:NewLibrary`, library-stack-§7), so the host's setup file
-  falls back to its stub and the suite happily measures **the stub** — green, and testing nothing.
+  falls back to its stub and the suite happily measures **the stub** — green, and testing nothing;
+- and the third, which is the first one's mirror image: a suite **on disk but absent from the declared
+  list** is never registered at all, so it contributes nothing while looking, in the repo, exactly like
+  a suite that runs. The count does not fall — it simply never rose — which is why nobody notices, and
+  why this direction needs its own case rather than being the other one read backwards.
 
-Neither shows up in the pass/fail line. Derivation is what makes them impossible rather than merely
-noticed.
+None of the three shows up in the pass/fail line. Derivation is what makes the first two impossible
+rather than merely noticed; for the third, where no derivation is possible because the list *is* the
+declaration, a two-directional case is the substitute — and `loadSuites` reporting a skip instead of
+silence is what stops the first from being invisible in the meantime.
 
 ### 10. The versioning suite (repos that publish per-file LibStub minors)
 
@@ -213,10 +293,23 @@ Reference implementation (in the collection): `LibKa0s`'s `tests/test_versioning
   first missing entry leaves the rest unchecked — which is how this suite's own first run reported one
   gap while hiding a second.
 
-### 11. A vendored kit is gated by a byte-identity test, not a remembered `diff`
+### 11. A vendored payload is gated by a byte-identity test, not a remembered `diff`
 
 Vendoring something you also author is an ongoing **sync**, not a one-time copy (library-stack-§7), and
 a release checklist's manual `diff -r` is a step that gets skipped.
+
+There are **two** such gates and this section covers **both halves**. They differ in what they compare
+and therefore in what they are allowed to normalize, and conflating them is how the second one ends up
+either absent or silently broken:
+
+- **the library-side kit-sync gate** — the library repo's source `testkit/` against its **own** vendored
+  `tests/_kit/`. Both sides are working-tree directories **in one checkout**;
+- **the consumer-side vendored-payload gate** — a consuming repo's `libs/LibKa0s/` against the library
+  repo's ship folder in a **sibling checkout**. Here one side is a working tree and the other is
+  whatever the sibling checkout can be asked for, and the precondition — that the sibling exists — is
+  not always met.
+
+#### The library-side kit-sync gate
 
 - **MUST** carry a **kit-sync suite** in the library repo comparing the source `testkit/` against its
   own vendored `tests/_kit/` — the manual diff, mechanical. Reference implementation: `LibKa0s`'s
@@ -228,17 +321,57 @@ a release checklist's manual `diff -r` is a step that gets skipped.
   added to one and not the other is caught even though every existing file still matches — and
   **byte-identical content** for every one of them, **`README.md` included**. The file that actually
   diverged was a README, so a check restricted to `*.lua` would have caught nothing.
-- **MUST** compare **raw bytes**, read in binary mode, with **no line-ending normalization**. A repo
-  that pins its line endings has already had a copy arrive through a normalizing path; a check that
-  normalizes cannot see it.
-- **MUST** fail, not pass, when the gate **cannot run**. If the directory listing yields nothing, the
-  check could not look — and a gate that goes quiet when it cannot look is worse than no gate.
+- **MUST** compare **raw bytes**, read in binary mode, with **no line-ending normalization**. This MUST
+  is scoped to a comparison where **both sides are the same representation** — here, two working-tree
+  directories in one checkout, both governed by the same `.gitattributes`, so a byte difference is a
+  real difference and nothing else. A repo that pins its line endings has already had a copy arrive
+  through a normalizing path; a check that normalizes cannot see it. *The consumer-side
+  vendored-payload gate* below states the one carve-out, and it is a carve-out precisely because that
+  comparison is **not** same-representation.
+- **MUST** fail, not pass, when the gate **cannot run**. Both directories are in this checkout, so a
+  directory listing that yields nothing is a broken gate, not an absent precondition: the check could
+  not look, and a gate that goes quiet when it cannot look is worse than no gate.
 - **MUST** name the file and say **where and how** it differs. *"The kit is out of sync"* on its own
   costs the next person the manual diff the test exists to remove.
 
 The rule is here because the failure already shipped: a documentation pass improved `testkit/README.md`,
 did not re-vendor it, and released the divergence with **three documents asserting the gate was
 passing**. Both copies keep working when they drift, so both suites stayed green (anti-patterns #45).
+
+#### The consumer-side vendored-payload gate
+
+- Every repo vendoring a Ka0s-owned library **MUST** carry a gate comparing its `libs/<Lib>/` against
+  the library repo's ship folder in the sibling checkout. The library-side gate proves the library repo
+  is self-consistent; it says nothing about whether **this** addon's copy is current, which is the
+  divergence anti-patterns #45 is actually about.
+- **The comparison is blob-versus-worktree, and exactly one normalization is permitted and required.**
+  The sibling side is read as a **`git show <ref>:<path>` blob**, which is LF **by construction** —
+  git stores normalized content — while the local side is a **working tree** pinned to CRLF by
+  `.gitattributes` in almost every repo in this collection. Measured on a live pair:
+  `git -C LibKa0s show HEAD:LibKa0s/Core.lua | tr -cd '\r' | wc -c` → **0**;
+  `tr -cd '\r' < AbsorbTracker/libs/LibKa0s/Core.lua | wc -c` → **322**. The two sides are therefore
+  **not** the same representation, and the library-side no-normalization MUST above does not reach here. The gate
+  **MUST** strip **CR from the working-tree side and nothing else** — which compares the file against
+  the blob it round-trips to — **or**, equivalently and normalization-free, compare
+  `git hash-object <local file>` against the sibling's blob sha. It **MUST NOT** apply any other
+  normalization: no whitespace trimming, no trailing-newline fixup, no case folding. A real fork in
+  content still fails, which is the property both forms preserve.
+  - **MUST** carry that reasoning in the case's own header comment. Without it the next author reads
+    a lone `gsub("\r", "")` as sloppiness and deletes it, at which point the gate reddens on every
+    checkout and gets deleted next.
+- **MUST** register as a **skip carrying its reason** when the precondition is absent — the sibling
+  checkout is not there, or the ref cannot be resolved. It **MUST NOT** register as a pass, and it
+  **MUST NOT** fail: a fresh clone with no sibling has not proven the payload is current and has not
+  proven it is stale, and a gate that reddens on every fresh clone is a gate people learn to ignore.
+  This is the same doctrine `automated-tests-§3` already applies to an absent tool — a missing tool is
+  recorded as a skip with its reason, never as a pass or a failure — extended from suites to cases.
+- The primitive is the kit's **`Kit.skip(reason)`**. `Kit.skip` is a **third status**: counted
+  separately from passed and failed, surfaced by `Kit.run` and by the `--list` renderer, and it
+  **MUST NOT** change the process exit code. A skip is not a failure, so it does not break the green
+  commit gate (§4).
+- The reason **MUST** be visible in the case's **own recorded result** — the printed line, the `--list`
+  inventory, `docs/test-cases.md` — and not only in a header comment. A reason a reader has to open the
+  source to find is a reason the person reading the run output does not have.
 
 ### 12. A test that cannot fail is worse than no test
 

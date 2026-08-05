@@ -108,8 +108,61 @@ end
 - The addon **MUST** funnel **every** chat and debug line through a **single shared secret-safe printer** — one `NS.Print` for chat, one debug sink for the console (debug-logging-§4) — each building its line from the secret-safe stringifier. The guard then lives in exactly one place and every call site inherits it. Concretely, call sites **MUST NOT**:
   - call the global `print()` directly (it neither carries the `NS.PREFIX` tag nor secret-stringifies its args);
   - hand-write the `NS.PREFIX` tag per line (slash-commands-§4);
-  - hand-roll secret handling, or feed chat/debug args through `..` / `tostring` / `table.concat` before the shared printer.
+  - hand-roll secret handling — the stringifier is the library's, in one place, for the whole collection;
+  - feed chat/debug args through `..` / `tostring` / `table.concat` before the shared printer — **within the scope stated below**.
 
-  Instead, each file does `local print = NS.Print` (and routes debug through the debug sink) and emits `print("message")` — the shared printer prepends the tag and secret-stringifies every argument. A file that calls the global `print()`, or pre-concatenates args before the printer, is **non-compliant even if it is never handed a secret today** — the next value routed through it may be one, and the whole point of the single seam is that no call site has to reason about that. Where AceConsole-3.0 is embedded, the shared `NS.Print` **MUST** be reclaimed after `NewAddon` so its `:Print` mixin cannot silently replace the secret-safe printer (architecture-§2, slash-commands-§4).
+  Instead, each file does `local print = NS.Print` (and routes debug through the debug sink) and emits `print("message")` — the shared printer prepends the tag and secret-stringifies every argument. Where AceConsole-3.0 is embedded, the shared `NS.Print` **MUST** be reclaimed after `NewAddon` so its `:Print` mixin cannot silently replace the secret-safe printer (architecture-§2, slash-commands-§4).
+
+**Scope of the pre-formatting rule.** *Pre-formatting is a MUST NOT at a call site whose arguments can
+reach a value read from one of the combat-protected APIs named below, and a SHOULD NOT everywhere
+else.*
+
+That sentence is the whole scoping rule. What follows is the list it names and why the remainder is a
+SHOULD.
+
+**The named APIs — the MUST's trigger set.** A call site is in scope if any argument it builds is, or
+derives from, a return value of:
+
+- `UnitGetTotalAbsorbs`, `UnitGetTotalHealAbsorbs`, `UnitGetIncomingHeals`
+- `UnitHealth`, `UnitHealthMax`
+- `UnitThreatSituation`, `UnitDetailedThreatSituation`
+- the amount / `points` fields of an aura payload — `C_UnitAuras.GetAuraDataByIndex`,
+  `GetAuraDataBySlot`, `GetAuraDataBySpellName`, `GetPlayerAuraBySpellID` — and the same fields as they
+  arrive on `UNIT_AURA`
+- **any other API a client build protects in combat**, and **anything derived from a protected value**:
+  secretness propagates silently through `..` and `tostring`, so a local computed from one is still in
+  scope, and so is a field stored on a table and read back later.
+
+This list is **the normative trigger set**. When a build protects a new API, extend the list here — that
+is an upstream edit, not a per-repo judgement call, because the whole value of naming the APIs is that
+every repo grades against the same set.
+
+**Outside the trigger set it is a SHOULD, and the reason is drift, not secrets.** A site that formats
+only values the addon owns — a setting name, a count it computed, a literal — cannot be handed a secret,
+so a MUST there is unenforceable in the sense that matters: nothing checks it (`.luacheckrc` sees none
+of these sites), no user can hit a failure, and a recurring finding across roughly fifty such sites
+collection-wide costs triage and changes no behavior. It stays a **SHOULD** because the risk is real but
+future-tense: a call site's argument list is not stable, and the day someone adds an absorb total to a
+line that used to format a setting name, the guard should already be in the seam rather than in the
+diff. Prefer `print("count", n)` over `print(("count %d"):format(n))` so that day costs nothing. A site
+that later moves into the trigger set converts as a MUST, and an audit files it as one.
+
+**Two things this scoping does not relax.**
+
+1. **No addon calls the global `print()` for user-facing output — at any site, in scope or out.** That
+   prohibition is independent of secrets: the global neither carries the `NS.PREFIX` tag every other
+   line carries (slash-commands-§4) nor secret-stringifies anything, so a bare `print()` is a
+   user-visible defect — an untagged chat line — whatever it is printing. It remains the unqualified
+   MUST NOT stated above.
+2. **The seam's own guarantee is unconditional.** The shared printer and the debug sink **MUST** route
+   every argument through the secret-safe stringifier regardless of what any call site does, and the
+   probe **MUST** still be `table.concat`-based. The scoping governs only what a *call site* may hand
+   the seam; it never weakens what the seam does with what it is handed.
+
+**Grading.** A pre-formatting site outside the trigger set is graded by impact like anything else
+(`AUDIT.md`): no user, no SavedVariables and no session can reach it, so it is **Low or Info** — and it
+still names the SHOULD it fails. Inside the trigger set it is a MUST, graded on what the value can do:
+an unguarded secret on a repeating ticker stops the callback rescheduling and freezes the feature until
+`/reload`.
 
 Reference implementation: `LibKa0s-Core-1.0` (`Core.lua`) owns the probe, the stringifier and the prefixed printer; a consuming addon's `core/CoreSetup.lua` publishes them and reclaims `NS.Print` after `NewAddon` where AceConsole is embedded (architecture-§2). An addon that still defines its own stringifier is carrying a pre-library copy — that is the deviation, not the absence of one.

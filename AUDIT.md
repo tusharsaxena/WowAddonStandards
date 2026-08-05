@@ -50,6 +50,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 1. **Resolve the standard.** Read the canonical rules from `standards/STANDARDS.md` in the
    `WowAddonStandards` repo (the addon's TOC `## X-Standard:` URL points here). Use the current
    version — note it (e.g. "audited against v1.0.0") in `01_CURRENT_STATE.md` so the run is reproducible.
+   - **Switch rule sets when the repo has no TOC.** A repo with no `.toc` is a **Ka0s-owned library
+     repo** (`standards/ADDONS.md` → *Ka0s-owned library repos*), not an addon. Audit it against
+     **library-stack-§7's applicability list** — what applies, what does not, and what substitutes —
+     and say in `01_CURRENT_STATE.md` which list you used. Measuring a library against the addon
+     sections manufactures findings the standard never meant (`documentation-§1`'s player README,
+     `documentation-§3`'s `docs/` trio, `toc-file`, `options-ui`, `slash-commands`, `preview-mode`,
+     `savedvariables`, `packaging`), and every one of them is noise.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, the root doc set
@@ -64,6 +71,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      search for a hand-built console.
 4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
    `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
+   - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
+     `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
+     `audit-review-history` binds this run twice, in opposite directions. A gap matching a register
+     row is recorded as **accepted, citing that row's rule and Decided date** — never re-filed as an
+     open MUST failure, or the same ratified decline returns every cycle. And any row whose **cited
+     rule the standard has since changed** is reported, so the register cannot quietly accumulate
+     entries for behavior the standard now mandates. A reasoning trail in a pending ledger or an
+     earlier bundle is not a substitute: a deviation with no register row is not ratified, and a
+     ledger decline with no row is itself a finding.
    - **Consuming the library is the compliant state; hand-rolling is the deviation.** An addon that
      builds `NS.DebugLog`, `NS.Helpers`, its dispatcher or its harness from a LibKa0s descriptor is
      **compliant** and **MUST NOT** be flagged for "not implementing" what those sections describe —
@@ -87,8 +103,49 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      members and no-ops the rest, and it is **correct** that it does not print an honest line per
      member the way the other stubs do; (b) a stub that deliberately omits a member, with the reason
      written down, is a decision, not a gap — read the comment before raising it.
-5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap: the ID, the section violated,
-   MUST/SHOULD severity, a one-line description, and the fix direction.
+5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap, carrying five things: the **ID**;
+   the **section violated**, written as `filename-§N` (documentation-§5/§6 — and by **bare filename**
+   for the eleven section files that carry no numbered subsections); the **impact grade**; a **one-line
+   description**; and the **fix direction**.
+
+   **Grade by impact, not rule strength.** The grade answers *what can go wrong, and to whom* — never
+   *was the word MUST or SHOULD*. A MUST is a statement about how firmly the standard holds a rule; it
+   is not a prediction about consequences, and grading the two as if they were the same thing is what
+   produces an audit whose High list is mostly documentation.
+
+   | Grade | What earns it |
+   |---|---|
+   | **High** | Something a **user**, their **SavedVariables**, or their **session** can hit **today**: a crash or Lua error on a reachable path, corrupted or silently dropped saved data, a feature that stops working until `/reload`, a user-visible wrong value, a taint or combat-lockdown failure. |
+   | **Medium** | Reachable, but degraded rather than broken — a fallback that is worse than it should be, a wrong or missing message on a path users do reach, a real defect gated behind an uncommon action. |
+   | **Low** | Not reachable by a user in the current code: a latent risk, a structural or convention gap, a doc or config file that is wrong. |
+   | **Info** | Observation, or a decision recorded elsewhere and confirmed here. |
+
+   A **doc-only or config-only failure is Low or Info even when the rule it fails is a MUST** — and the
+   entry **MUST still name that MUST**, so the grade never reads as the rule being optional. A missing
+   `## Documented deviations` heading is a MUST failure and it is Low: no user can reach a heading. Say
+   both.
+
+   Where a section states its own **applicability condition** or names a **terminal compliant state**
+   (architecture-§4, localization-§3, events-frames-taint-§8, performance-§12), check the condition
+   **before** grading — an addon outside a rule's scope is compliant, not deviant, and is not an entry
+   at all.
+
+   **One root, derived dependents listed under it.** Where several observations follow from a **single
+   unadopted subsystem or single upstream cause**, file **one root deviation** and list the rest as
+   dependents shaped `derived from <ID>`. Dependents are **excluded from the headline tally** and from
+   the MUST count. Without this rule one declined subsystem inflates into a dozen rows, the headline
+   number stops meaning anything, and the actual decision — adopt the subsystem or record why not — is
+   buried among its consequences.
+
+   A dependent **graduates** to a root of its own when **any** of these holds, and the graduation is
+   stated in the entry:
+   - the root is **closed or accepted** and the dependent survives it;
+   - the dependent is reachable by a user **independently** of the root — it would still be a defect if
+     the subsystem were adopted tomorrow;
+   - the dependent's own impact grade is **higher** than the root's. A High never hides under a Low.
+
+   Report both numbers, never one: the **headline tally** (roots only) and the **total including
+   dependents**. A tally whose basis is not stated is the failure this rule exists to prevent.
 6. **Back every finding with evidence** → `03_EVIDENCE.md`. `file:line` citations that prove each
    deviation (and each compliance claim). Don't assert without a citation.
    - **Mechanical checks belong here — run, not reasoned about.** Record the command and its real

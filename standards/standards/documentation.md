@@ -4,6 +4,21 @@
 
 Documentation is a **first-class compliance surface**, not an afterthought. Every Ka0s addon ships a fixed, predictable doc set so any human or agent lands in the same place in every repo. **Root of the repo** ships exactly three docs plus `LICENSE`, and never a fourth doc: a **full** `README.md` (documentation-§1), a **stub** `CLAUDE.md` (documentation-§2), and `DEPENDENCIES.md` (documentation-§7). Everything else lives under `docs/`.
 
+**`CHANGELOG.md` is named explicitly, because the count alone left it arguable.**
+
+- **In an addon repo, a root `CHANGELOG.md` is FORBIDDEN.** The player-facing history already has two
+  homes the standard mandates — `## What's new` and `## Version History` in the README
+  (documentation-§1, items 5 and 12) — and a second history is precisely the drift the never-a-fourth-doc
+  rule exists to prevent. `/wow-addon:bump-version` rolls those two README sections for an addon and
+  writes no `CHANGELOG.md`.
+- **In a Ka0s-owned library repo, a root `CHANGELOG.md` is REQUIRED** (library-stack-§7's applicability
+  list). testing-§10's versioning suite **MUST** assert that the changelog accounts for the version
+  every file is at, and it has nowhere else to look. A library has no player README to carry the history
+  instead.
+
+State the rule, not the count: an audit finding a root `CHANGELOG.md` cites this sentence, not "that is
+a fourth doc."
+
 ### 1. Root `README.md` — canonical structure
 
 The README is a **player-facing** document. It **MUST** be written for the person who installed the addon, not for a contributor: what the addon does, how to use it, and how to fix common problems. Developer- and contributor-facing material — the test harness, lint, build/packaging, and internal implementation detail — **MUST NOT** appear in the README; it lives under `docs/` (how to verify in `docs/testing.md`, the engineer brief in `docs/ARCHITECTURE.md`).
@@ -70,7 +85,7 @@ There is **no** `## Testing` section in the README (removed in the standard's v2
 
 1. **H1 title** — `# CLAUDE.md — Ka0s <Name>`.
 2. **Adherence line** — states the addon adheres to the **Ka0s WoW Addon Standard** with the repo URL <https://github.com/tusharsaxena/WowAddonStandards>.
-3. **`## Standards compliance (read first)` section** — **MUST** be present, verbatim in substance (documentation-§6). It states that all work here MUST conform to the standard; that a change which would deviate MUST **stop and be flagged** (never silently deviate, never silently "fix" to match); and that the user decides whether it is (a) an **accepted deviation** (recorded in the addon with a reason) or (b) a **change to the standard itself** (made upstream in this repo, after which the addon follows the new rule). Closes with "when in doubt, treat conformance as a hard requirement and ask."
+3. **`## Standards compliance (read first)` section** — **MUST** be present, verbatim in substance (documentation-§6). It states that all work here MUST conform to the standard; that a change which would deviate MUST **stop and be flagged** (never silently deviate, never silently "fix" to match); and that the user decides whether it is (a) an **accepted deviation** (recorded as a row in `docs/ARCHITECTURE.md` → `## Documented deviations`, with its `filename-§N` Rule, its reason and its re-check trigger — documentation-§3) or (b) a **change to the standard itself** (made upstream in this repo, after which the addon follows the new rule). Closes with "when in doubt, treat conformance as a hard requirement and ask."
 4. **A "read the docs" pointer list** — directs the reader into `docs/` for the full context: `docs/ARCHITECTURE.md` (module map — what this addon actually is), `docs/testing.md` (how to verify), then the topic-detail docs. **MUST NOT** point at a `docs/agent-context.md`; that file does not exist in a Ka0s addon (documentation-§3).
 5. **The green-gate line** — the commit gate (`lua tests/run.lua` + `luacheck .`), per testing.
 
@@ -80,15 +95,57 @@ Reference implementation (in the collection): the absorb-shield tracker's root `
 
 Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
 
-- **`docs/ARCHITECTURE.md`** — engineer context. Sections: Overview, Module Map, Settings Schema, Message Bus (named messages with sender/payload/consumers), Slash Commands (table from `NS.COMMANDS`), Event Subscriptions, Taint Notes, Known Limitations.
-- **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page.
+- **`docs/ARCHITECTURE.md`** — engineer context. **Nine** mandated sections, all nine named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema**, **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, and **`## Documented deviations`** — the register specified immediately below.
+- **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page. Where it tabulates the four out-of-game suites, the table **MUST** carry the **checkpoint** per suite — run/commit versus the tag — and **MUST NOT** leave a `Gates? no — recorded only` cell unqualified, since that is true of a commit and false of a release (testing-§6, automated-tests-§3/§4).
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
-Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **Five** topic-detail docs are **required**, not optional — `test-cases.md`, `performance.md`, `perf-runs/README.md`, `automated-tests/README.md` and `automated-tests/RESULTS.md`:
+**`docs/` is not where a forbidden root doc goes to live.** documentation-§1 forbids `CHANGELOG.md` at
+an **addon** root; moving it to `docs/CHANGELOG.md` does not satisfy that rule, it only hides the second
+history one directory down. An addon has one history, in the README's `## What's new` and
+`## Version History`. (A **library** repo's required `CHANGELOG.md` stays at **root**, where
+testing-§10's versioning suite reads it.)
+
+#### `## Documented deviations` — the single home for a ratified deviation (MUST)
+
+`documentation-§2` and `documentation-§6` both instruct an agent to *record it as a documented
+deviation* and, until now, named no file. The result was predictable: every repo invented its own home —
+a table in `ARCHITECTURE.md` here, `docs/scope.md` there, a paragraph in root `CLAUDE.md`, a
+`docs/pending/LEDGER.md` entry — and two failures followed from the same cause. An audit that cannot
+find a ratified decision **re-files it as an open MUST failure**, so the same argument is had every
+cycle; and a register nobody re-reads goes stale in the dangerous direction, accumulating entries for
+behavior the standard has since mandated or permitted, which reads as deviation and is not.
+
+- **MUST** carry `## Documented deviations` in `docs/ARCHITECTURE.md` — the ninth mandated section,
+  present even when empty (write "None." rather than omitting the heading; an absent section is
+  indistinguishable from an unwritten one).
+- **MUST** use this **exact row shape**:
+
+  ```markdown
+  | Rule | What differs | Why | Decided | Re-check trigger |
+  |---|---|---|---|---|
+  | `performance-§12` | No perf harness wired | No in-combat code path; sweep at <commit> | 2026-08-05 | The first OnUpdate, repeating ticker or in-combat event handler |
+  ```
+
+  **Rule** is a `filename-§N` reference into this standard — not a paraphrase, because a paraphrase
+  cannot be checked against the rule it claims to deviate from. **Decided** is a date. **Re-check
+  trigger** is the **condition that ends the deviation**, stated so a reader can tell whether it has
+  already fired; `performance-§12`'s exemption is the model. A row without a trigger is a permanent
+  opt-out wearing a table's clothes.
+- **This is the single home.** A decision **MAY** be *reasoned* at length in `docs/pending/LEDGER.md`,
+  an audit bundle or a review bundle, and the row **SHOULD** cite that id in **Why** — but **a deviation
+  not in the register is not ratified**. A ledger entry declining a rule with no corresponding register
+  row is itself the deviation, and an audit files it as one.
+- **MUST NOT** be a graveyard. An entry whose cited rule the standard has since changed — so the
+  behavior is now mandated or permitted outright — **MUST** be retired, and an audit that finds one
+  reports it (audit-review-history). A register that only ever grows stops being read, and a register
+  nobody reads is worse than none, because its existence is taken as evidence that the deviations are
+  known.
+
+Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **Five** topic-detail docs are **required**, not optional — `test-cases.md`, `performance.md`, `perf-runs/README.md`, `automated-tests/README.md` and `automated-tests/RESULTS.md` — of which **four are unconditional and one, `perf-runs/README.md`, is required only while the performance harness is wired** (performance-§12). The count is never written bare for exactly this reason: an addon holding a recorded no-combat-path exemption ships **four**, and naming them is what keeps that from reading as a missing doc.
 
 - **`docs/test-cases.md`** — the generated test-case inventory (testing-§5).
-- **`docs/performance.md`** — the addon's own performance page: which hot paths are bracketed and why, how to run a capture (`/<slash> perf`), how to read the report, and what the harness can and cannot resolve (performance). The shared protocol and record contract live with the library — this page points there rather than restating them.
-- **`docs/perf-runs/README.md`** — the standing **in-game** capture store's doc: the record naming convention, a schema summary, a pointer to the library's canonical field-by-field contract, and the note that offline runs live in `docs/automated-tests/` (performance-§8, automated-tests-§7). Cumulative rather than tied to one investigation, so in-game runs compare across addon versions.
+- **`docs/performance.md`** — **required unconditionally**, including under the performance-§12 exemption. When the harness is wired it is the addon's own performance page: which hot paths are bracketed and why, how to run a capture (`/<slash> perf`), how to read the report, and what the harness can and cannot resolve (performance). The shared protocol and record contract live with the library — this page points there rather than restating them. When the addon is **exempt** the page stays, and shrinks to **one screen**: that the addon brackets nothing, which of performance-§12's (b)/(c) applies, where the committed sweep lives, and what would re-arm the wiring. The question the page answers — *how much does this addon cost?* — does not go away with the harness; only the answer changes.
+- **`docs/perf-runs/README.md`** — **the one conditional member of the five**: required while the harness is wired, and **not shipped** by an addon holding a recorded performance-§12 exemption, which produces no in-game captures and therefore has no store to document. When present it is the standing **in-game** capture store's doc: the record naming convention, a schema summary, a pointer to the library's canonical field-by-field contract, and the note that offline runs live in `docs/automated-tests/` (performance-§8, automated-tests-§7). Cumulative rather than tied to one investigation, so in-game runs compare across addon versions.
 - **`docs/automated-tests/README.md`** — what the automated-test record is and how to produce it (automated-tests).
 - **`docs/automated-tests/RESULTS.md`** — one row per run across all four suites, **one file overwritten in place** so its git history is the trend line, plus the current complexity watch list (automated-tests-§4). It is **generated**, never hand-edited.
 
@@ -152,7 +209,7 @@ The reference **MUST** appear in **all three** of these places (a Ka0s addon mis
 
 1. **TOC `## X-Standard:`** — `## X-Standard: https://github.com/tusharsaxena/WowAddonStandards` (toc-file-§1). The machine-readable declaration.
 2. **README standard badge** — the badge/line linking the standard in the README badge row (documentation-§1 #2). The user-facing declaration.
-3. **`CLAUDE.md` → `## Standards compliance (read first)`** — the agent-facing directive at the first doc every agent reads (documentation-§2 #3). **MUST** instruct the agent to **stop and flag** any change that would deviate rather than silently deviate or silently conform, and to let the user classify it as an accepted deviation (recorded in the addon) or a change to the standard itself (made upstream here, then adopted).
+3. **`CLAUDE.md` → `## Standards compliance (read first)`** — the agent-facing directive at the first doc every agent reads (documentation-§2 #3). **MUST** instruct the agent to **stop and flag** any change that would deviate rather than silently deviate or silently conform, and to let the user classify it as an accepted deviation (recorded as a row in the addon's `## Documented deviations` register — documentation-§3) or a change to the standard itself (made upstream here, then adopted).
 
 Items 1–2 already existed (toc-file-§1, documentation-§1); item 3 is the **memory-and-context** requirement: the standard reference lives inside the document an agent loads as working context, not only in shipping metadata. The `/wow-addon:standards-audit` playbook checks all three.
 
@@ -174,8 +231,11 @@ doc structure.
 silently deviate and do not silently "fix" to match. Surface it and let the user decide which of
 two things it is:
 
-1. **An accepted deviation** — this addon intentionally differs; record it as a documented
-   deviation (e.g. in the TOC/README/`docs/` and in the audit bundle), with the reason.
+1. **An accepted deviation** — this addon intentionally differs; record it as a row in
+   `docs/ARCHITECTURE.md` → `## Documented deviations`, shaped
+   `| Rule | What differs | Why | Decided | Re-check trigger |`, where Rule is the `filename-§N`
+   reference. That register is the single home: the reasoning may live in `docs/pending/LEDGER.md`
+   or an audit bundle and the row cites it, but a deviation not in the register is not ratified.
 2. **A change to the standard itself** — the standard's definition should evolve; the update
    belongs upstream in the WowAddonStandards repo, after which this addon conforms to the new rule.
 
@@ -184,6 +244,72 @@ When in doubt, treat standard conformance as a hard requirement and ask.
 
 
 Reference implementation (in the collection): the absorb-shield tracker's root `CLAUDE.md` carries the `## Standards compliance (read first)` section verbatim in substance.
+
+**Citing the standard.** The three places above are *the reference to the standard*. This is the
+narrower question of how an individual **citation** is written when authored text points at a specific
+rule.
+
+A reference to the standard in any authored text the repo owns — code comments, `.luacheckrc` and
+`.pkgmeta` headers, `docs/` pages, commit-message bodies — **SHOULD** use the `filename-§N` form
+(documentation-§5): the section file's basename without `.md`, then `-§`, then the section's **local**
+number. `performance-§10` — not the retired dotted global form `§N.M`, not `STANDARDS.md` plus a
+dotted number, not an abbreviated filename (`perf-` for `performance`).
+
+*(This document deliberately never writes a literal dotted number. The sweep below is a plain regex
+over the whole repo, and a normative document that spells out the form it forbids reddens its own
+check.)*
+
+**A reference that cannot resolve is the defect**, and it comes in two grades:
+
+- **Retired global `§N.M` notation is a SHOULD.** The split standard replaced one document's global
+  numbering with per-file local numbering, so a dotted global number no longer names anything. It is a **SHOULD**
+  rather than a MUST because it is uniformly wrong in a way a reader decodes at a glance and a machine
+  sweeps mechanically — `/wow-addon:revendor-standards` does exactly that. Sweep it; do not hand-triage
+  it.
+- **A malformed or out-of-range reference is a MUST fix.** Malformed means it does not parse as
+  `filename-§N` at all (`slash-commands-§:`); out-of-range means the file exists but has no such
+  section — a citation numbered `§41` against `options-ui.md`, which carries §1–§11. Both are worse
+  than the retired form, because
+  the retired form tells the reader "this is old" while these send the reader to a section that does
+  not exist and looks current doing it. Range-check against the section file's own heading count.
+
+**Some section files have no numbered subsections, and are cited by BARE FILENAME.** These carry a
+single `## <Topic>` heading and prose beneath it, sometimes with unnumbered `###` headings. There is no
+`§N` to name, so **any** `filename-§N` citation against one of them is out-of-range by construction —
+the MUST grade above — no matter which number is used. Cite them as `lint`, `packaging`,
+`standalone-windows`; where a specific passage matters, name its heading in words
+(*`standalone-windows`, "The Ka0s window edge"*).
+
+The full set, as measured by `grep -c '^### [0-9]' standards/standards/<file>` returning 0 — **eleven**
+files, named rather than counted:
+
+`anti-patterns`, `audit-review-history`, `compat`, `lint`, `naming-cheatsheet`, `open-evolutions`,
+`packaging`, `preview-mode`, `public-api`, `standalone-windows`, `versioning-git`.
+
+An unnumbered `###` heading is **not** a section number. `standalone-windows` and
+`audit-review-history` each carry one, and counting it as "§2" is exactly the mistake this list exists
+to stop: the count shifts the moment a heading is added above it, so the citation silently comes to
+mean something else. If one of these files ever gains numbered subsections, it leaves this list in the
+same change.
+
+**Frozen bundles are exempt and MUST NOT be swept.** Anything under `docs/audits/`, `docs/reviews/` or
+`docs/automated-tests/` is a point-in-time record and its notation is part of what it recorded —
+the same carve-out `standards/_raw/_industry/` already has. Rewriting a citation inside a frozen bundle
+corrupts evidence to satisfy a cosmetic rule.
+
+**Reporting shape (MUST).** An audit records the notation sweep as **one** rolled-up finding carrying
+the **command that produces the current count**, e.g.
+
+```sh
+grep -rEn '§[0-9]+\.[0-9]' . \
+  --exclude-dir=libs --exclude-dir=_kit \
+  --exclude-dir=audits --exclude-dir=reviews --exclude-dir=automated-tests
+```
+
+— never a per-site enumeration. Hand-counted enumerations are what two separate audits of this
+collection got wrong, in both directions, on the same rule; the command is reproducible and the list is
+not. Out-of-range and malformed references, being the MUST half, are enumerated individually — there are
+few of them and each needs a decision.
 
 ### 7. Root `DEPENDENCIES.md` — the toolchain contract
 
