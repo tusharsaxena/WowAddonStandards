@@ -13,7 +13,7 @@ context pack for scaffolding new addons. Compliance auditing is **not** run from
 | [`STANDARDS.md`](STANDARDS.md) | **The standard** — canonical. Everything else supports this. Versioned via the changelog at its top. |
 | [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md) | The scaffolding context pack — **fetched to a temp directory and read**, never copied into an addon (documentation-§3, anti-pattern #49). |
 | [`INDUSTRY_RESEARCH.md`](INDUSTRY_RESEARCH.md) | The research foundation: synthesized patterns from 10 reference addons that justify the rules. |
-| [`ADDONS.md`](ADDONS.md) | **The roster** — the editable list of in-scope Ka0s addons; a standards-process input. |
+| [`ADDONS.md`](ADDONS.md) | **The roster** — the editable list of in-scope Ka0s addons, plus a second table of **Ka0s-owned library repos** (audited against library-stack-§7's applicability list, not the addon rule set); a standards-process input. |
 | [`_raw/_industry/`](_raw/_industry/) | Per-addon raw research reports — the evidence base behind `INDUSTRY_RESEARCH.md`. |
 
 The three **process playbooks** live at the repo root (predictable paths for the `wow-addon` plugin to

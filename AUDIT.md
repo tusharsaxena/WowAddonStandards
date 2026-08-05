@@ -50,6 +50,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 1. **Resolve the standard.** Read the canonical rules from `standards/STANDARDS.md` in the
    `WowAddonStandards` repo (the addon's TOC `## X-Standard:` URL points here). Use the current
    version — note it (e.g. "audited against v1.0.0") in `01_CURRENT_STATE.md` so the run is reproducible.
+   - **Switch rule sets when the repo has no TOC.** A repo with no `.toc` is a **Ka0s-owned library
+     repo** (`standards/ADDONS.md` → *Ka0s-owned library repos*), not an addon. Audit it against
+     **library-stack-§7's applicability list** — what applies, what does not, and what substitutes —
+     and say in `01_CURRENT_STATE.md` which list you used. Measuring a library against the addon
+     sections manufactures findings the standard never meant (`documentation-§1`'s player README,
+     `documentation-§3`'s `docs/` trio, `toc-file`, `options-ui`, `slash-commands`, `preview-mode`,
+     `savedvariables`, `packaging`), and every one of them is noise.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, the root doc set
