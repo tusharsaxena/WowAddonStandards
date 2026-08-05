@@ -211,8 +211,27 @@ all of them are under the green gate.
   derivation), that every derived path exists on disk, and that no `libs/` path leaked in. An ungated
   runner such as `tests/perf.lua` is pinned by **reading its source** for the derivation call, since
   the gate does not run it.
+- **MUST** pin the **suite list** — the third list, and the one this section used to be silent about.
+  The ordered list of `test_*.lua` paths handed to `Kit.run` is as hand-maintained as the other two and
+  is under exactly the same green gate that cannot see it go wrong. Pin it **in both directions**, with
+  distinct messages per direction:
+  - every `tests/test_*.lua` **on disk** appears in the declared list — otherwise a new suite is
+    written, committed, and never runs;
+  - every path **in the declared list** exists on disk — otherwise a renamed or deleted suite stops
+    contributing cases while the run stays green.
+  A runner that **auto-discovers** its suites from the directory satisfies this by construction and
+  carries no declared list to pin; the rule binds a runner that **declares** one. Two repos already
+  ship exactly this gate and are the **existing reference implementations** to copy rather than
+  reinvent — this is not a rule nobody has written yet:
+  **BankLedger** (`tests/test_harness.lua:22-32`), and
+  **PanelMaster** (`tests/test_harness.lua:19-32`).
+- The matching kit-side rule: **`loadSuites` MUST report a listed-but-absent suite as a skip carrying
+  its reason** (`Kit.skip`, §11) rather than silently omitting it. That keeps the affordance the
+  silence was protecting — a suite can be listed while it is still being written — while a renamed
+  suite stops disappearing without a trace. The write-in-progress case stays expressible as an explicit
+  `{ name = …, pending = … }` entry, which registers as a skip and says so.
 
-The rule exists because both failure modes are **silent, and both happened during the LibKa0s
+The rule exists because these failure modes are **silent, and the first two happened during the LibKa0s
 extraction**:
 
 - a suite named in the runner's list but missing from disk is **skipped, not failed** — deliberately,
@@ -220,10 +239,16 @@ extraction**:
   contributing cases while the run stays green and the count barely moves;
 - a **library file omitted** from the load list makes the dependent module refuse to register (its
   dependency guard returns before `LibStub:NewLibrary`, library-stack-§7), so the host's setup file
-  falls back to its stub and the suite happily measures **the stub** — green, and testing nothing.
+  falls back to its stub and the suite happily measures **the stub** — green, and testing nothing;
+- and the third, which is the first one's mirror image: a suite **on disk but absent from the declared
+  list** is never registered at all, so it contributes nothing while looking, in the repo, exactly like
+  a suite that runs. The count does not fall — it simply never rose — which is why nobody notices, and
+  why this direction needs its own case rather than being the other one read backwards.
 
-Neither shows up in the pass/fail line. Derivation is what makes them impossible rather than merely
-noticed.
+None of the three shows up in the pass/fail line. Derivation is what makes the first two impossible
+rather than merely noticed; for the third, where no derivation is possible because the list *is* the
+declaration, a two-directional case is the substitute — and `loadSuites` reporting a skip instead of
+silence is what stops the first from being invisible in the meantime.
 
 ### 10. The versioning suite (repos that publish per-file LibStub minors)
 
