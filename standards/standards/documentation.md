@@ -151,7 +151,7 @@ behavior the standard has since mandated or permitted, which reads as deviation 
   already fired; `performance-§12`'s exemption is the model. A row without a trigger is a permanent
   opt-out wearing a table's clothes.
 - **This is the single home.** A decision **MAY** be *reasoned* at length in the **GitHub issue** the
-  pending audit filed for it on the addon's own repo — titled `[deferred] …` or `[will-not-do] …`
+  pending audit filed for it on the addon's own repo — titled `[triaged] …` or `[will-not-do] …`
   (audit-review-history) — or in an audit or review bundle, and the row **SHOULD** cite that issue
   number or bundle id in **Why**; but **a deviation not in the register is not ratified**. An issue
   declining a rule with no corresponding register row is itself the deviation, and an audit files it

@@ -61,7 +61,7 @@ think, and the `[untriaged]` backlog between the two is itself a visible, counta
 than an unrecorded intention.
 
 A consequence worth stating, because it changes what a decision means: **triage records, it does not
-implement.** Accepting that something should be done produces a `[deferred]` issue carrying the
+implement.** Accepting that something should be done produces a `[triaged]` issue carrying the
 chosen approach, not a code change. The work happens in an ordinary session against that issue.
 
 - **MUST** carry the item's status as a **title prefix**, shaped exactly `[<Status>] <Title>`, drawn
@@ -71,7 +71,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   |---|---|---|
   | `[done]` | closed | Decided and implemented |
   | `[will-not-do]` | closed | Declined; terminal |
-  | `[deferred]` | open | Accepted as real, deliberately not now |
+  | `[triaged]` | open | Put to a human, accepted as real, deliberately not now |
   | `[untriaged]` | open | Swept up, not yet interviewed |
 
   The prefix is the status — **not** a label, and **not** a milestone. One field, visible in every
@@ -84,6 +84,6 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   issue work. Reaching for GraphQL first is a real, observed failure: it spends a round trip on a
   deprecated path before falling back to the subcommand that would have worked. Where a REST call is
   genuinely unavoidable, use `gh api repos/{owner}/{repo}/issues` — never the GraphQL endpoint.
-- **Migration is deferrals only.** `[deferred]` rows migrate out of a surviving ledger as **open**
-  `[deferred]` issues. `done` and `wont-do` rows are terminal and are **not** migrated; they survive
+- **Migration is deferrals only.** A surviving ledger's `deferred` rows migrate out as **open**
+  `[triaged]` issues. `done` and `wont-do` rows are terminal and are **not** migrated; they survive
   in git history via the commit that deletes the file, which is the whole reason deleting it is safe.

@@ -152,10 +152,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `[will-not-do]` issue with no row is itself a finding.
    - **`docs/pending/LEDGER.md` is retired and its presence is a finding.** The durable store of
      issue-audit decisions is **GitHub issues on this addon's own repo**, status carried as the
-     title prefix `[done]` / `[will-not-do]` (closed) and `[deferred]` / `[untriaged]` (open) —
+     title prefix `[done]` / `[will-not-do]` (closed) and `[triaged]` / `[untriaged]` (open) —
      `audit-review-history`. A surviving `LEDGER.md`, or a `docs/pending/` directory holding one, is
      reported with the deferrals it still holds, since those are the rows that owe an open
-     `[deferred]` issue; `done` and `wont-do` rows are terminal and migrate nowhere. Read issues with
+     `[triaged]` issue; `done` and `wont-do` rows are terminal and migrate nowhere. Read issues with
      the **`gh` CLI subcommands** (`gh issue list --json number,title,state` and a title filter) —
      **never** `gh api graphql`.
    - **Consuming the library is the compliant state; hand-rolling is the deviation.** An addon that
