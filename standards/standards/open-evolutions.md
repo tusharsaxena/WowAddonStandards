@@ -22,6 +22,37 @@ Items recorded for future versions of this standard:
   current the moment `db.global` is first read, so a version stamp cannot by itself distinguish a fresh
   install from a legacy account, and at least one addon runs its fold shape-driven and unconditionally
   for exactly that reason.
+- **What `performance-§12`'s re-check trigger should do with a window-bounded ticker.** §12 grants the
+  no-combat-path exemption on criterion **(a)** — no `OnUpdate`, no repeating ticker, no event handler
+  doing more than occasional work in combat — and its re-check trigger re-arms the **full** wiring MUST
+  on *"the first `OnUpdate` handler, repeating ticker, or in-combat event handler doing real work"*.
+  Note the asymmetry: *in-combat* qualifies only the event-handler arm. A repeating ticker re-arms the
+  wiring unconditionally, however it is gated.
+
+  WhatGroup hit this on 2026-08-06 and it is the first real test of the trigger. A teleport-cooldown
+  countdown in its popup needs a 1-second timer; the timer is a single handle, armed only while the
+  popup is **both** open and showing a live cooldown, replaced rather than stacked, and cancelled from
+  the frame's `OnHide`, from the top of the configure path, and by the tick that reaches zero. Per tick
+  it costs one `C_Spell.GetSpellCooldown` and one `SetText`. On the letter of the trigger that ends the
+  exemption, so the addon owes a `core/PerfSetup.lua`, a `perf` verb, a second SavedVariables global, a
+  suspend/resume contract, a `tests/perf.lua` and a `docs/perf-runs/` store — to account for a timer
+  the player starts by opening a window and stops by closing it. Criteria **(b)** and **(c)** did not
+  change: the buckets would still read `0.000`, which performance-§3 calls a lie in every report, and
+  `suspend` would still make a capture addon miss the capture. Only (a) broke.
+
+  It is recorded there as a **ratified deviation in its own right** rather than resolved locally, which
+  is the correct handling under documentation-§3 but is also the tell that the rule needs a ruling: an
+  addon meeting the *spirit* of (a) exactly — no hot path, no unbounded work — should not have to carry
+  a register row for it. The decision this needs is what the boundary actually is, and it is not
+  obvious. *"Gated on a visible frame"* is the intuitive line and is too loose (an addon can keep a
+  window open through a raid boss). *"Never runs in combat"* is too strict and unenforceable, since a
+  player can open a popup mid-pull. Candidate shape: a ticker at 1Hz or slower, bounded by a frame the
+  **player** opened, doing O(1) work per tick, stays inside (a) and is recorded as a one-line note on
+  the existing exemption row rather than a new deviation — with the wiring re-armed the moment any of
+  those three properties stops holding. Whatever is decided, the trigger should say which of its three
+  arms are qualified by combat and which are not, because the current asymmetry reads as an oversight
+  and the next reader will not know whether it was one.
+
 - **A collapsed-group key convention.** Two addons independently key a table's collapsed-group state as
   `mode .. "\001" .. rawValue`. It is load-bearing — changing the format silently resets every user's
   collapsed groups — and is currently written down nowhere. Too small to be a library (it is one
