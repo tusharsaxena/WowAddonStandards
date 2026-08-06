@@ -188,10 +188,12 @@ meant. The three lists below are the ones an audit of a Ka0s-owned library repo 
   `README.md` is a consumer-facing document and is structured for that audience.
 - **documentation-§2's addon `CLAUDE.md` stub as written.** The stub's shape assumes an addon; see the
   substitution below.
-- **documentation-§3's `docs/` trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md` — **and the
-  five required topic-detail docs** (`test-cases.md`, `performance.md`, `perf-runs/README.md`,
-  `automated-tests/README.md`, `automated-tests/RESULTS.md`). These describe an addon's runtime shape
-  and its in-game verification, and a library has neither.
+- **documentation-§3's `docs/` trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md` — **the
+  five verification-and-record docs** (`test-cases.md`, `performance.md`, `perf-runs/README.md`,
+  `automated-tests/README.md`, `automated-tests/RESULTS.md`) **and the whole topic-detail tier model**
+  (Tier 1's `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`,
+  `common-tasks.md`; Tier 2; `## Documentation map`). These describe an addon's runtime shape, its
+  settings canvas and its in-game verification, and a library has none of them.
 - **`toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`.** There
   is no TOC, no settings canvas, no slash surface, no on-screen display, no SavedVariables file and no
   CurseForge package. Each of these binds the *consumer* that wires the module, and is audited there.
@@ -204,6 +206,16 @@ meant. The three lists below are the ones an audit of a Ka0s-owned library repo 
 2. A root **`DEPENDENCIES.md`** (documentation-§7, above — listed in both lists deliberately: it is the
    substitute *and* it is simply required).
 3. A **`README.md` pointer to the standard**, naming the version the repo is written against.
+4. A **`## Documentation map` in that root `CLAUDE.md`**, listing every `.md` under `docs/` in one
+   table and naming the frozen directories once each. The **tier model** above does not bind a library
+   — four of Tier 1's six docs have no subject here, since there is no settings canvas, no
+   SavedVariables and no in-game pipeline — but the register's *purpose* survives the tiers that
+   inapplicability removes: a reader must be able to tell a doc that is missing from one that was
+   never meant to exist, and no page should be reachable only by listing the directory. It goes in
+   `CLAUDE.md` for the same reason the deviation register does: `documentation-§3`'s home for both is
+   `docs/ARCHITECTURE.md`, which a library repo does not have, and a register with no file is a
+   register nobody keeps. An audit checks it in both directions — every file has a row, every row
+   resolves — and checks nothing about tiers.
 
 A root **`CHANGELOG.md` is required** here and forbidden at an addon root — see documentation-§1, and
 testing-§10, whose versioning suite asserts that the changelog accounts for the version every file is

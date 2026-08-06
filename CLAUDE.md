@@ -116,12 +116,17 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
-  `testing.md`, `smoke-tests.md`, where `ARCHITECTURE.md` carries nine mandated sections ending in
-  `## Documented deviations`, the single home of a ratified deviation; and the **required
-  topic-detail docs** — `test-cases.md`, `performance.md`, `perf-runs/README.md`,
-  `automated-tests/README.md`, `automated-tests/RESULTS.md`, of which the first, second, fourth and
-  fifth are unconditional and `perf-runs/README.md` is required only while the performance harness
-  is wired, so an addon holding a recorded performance-§12 exemption ships four (documentation-§3).
+  `testing.md`, `smoke-tests.md`, where `ARCHITECTURE.md` carries ten mandated sections ending in
+  `## Documentation map` (the per-addon doc register) and `## Documented deviations` (the single home
+  of a ratified deviation); the **verification-and-record docs** — `test-cases.md`, `performance.md`,
+  `perf-runs/README.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md`, of which the
+  first, second, fourth and fifth are unconditional and `perf-runs/README.md` is required only while
+  the performance harness is wired, so an addon holding a recorded performance-§12 exemption ships
+  four; and **Tier 1** — `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`,
+  `data-flow.md`, `common-tasks.md`, all six unconditional and under exactly those names, with Tier 2
+  (`slash-dispatch.md`, `midnight-quirks.md`, `compat-layer.md`, `message-bus.md`, `profiles.md`,
+  `debug.md`) required per stated trigger and recorded as *Not applicable* in the map when the
+  trigger has not fired, and Tier 3 free-form (documentation-§3).
   `docs/automated-tests/RESULTS.md` is generated, one file overwritten in place — its single-path
   git history is the trend line — and a full run bundle is produced at **release**, never as a
   commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see

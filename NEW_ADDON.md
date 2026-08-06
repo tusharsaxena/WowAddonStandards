@@ -85,6 +85,19 @@ This playbook is the entry point; the substance lives in `standards/`:
    incl. the standard-link badge → logo → description → Screenshots → Usage → How it works → FAQ →
    Troubleshooting → Issues and feature requests → Version History — there is **no** `## Testing` section;
    verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
+6b. **Write the `docs/` set to documentation-§3's tier model.** The canonical trio
+   (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus **all six Tier 1 docs, under exactly
+   these names**: `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`,
+   `common-tasks.md`. They are unconditional — a v0.1.0 addon writes each one short rather than
+   omitting it, because the tier model's whole value is that the same question has the same filename
+   in every repo, and a slot left for later is a slot the next agent fills with a name of its own.
+   Then evaluate each **Tier 2** trigger against the code you just wrote and either ship the doc or
+   record it as a *Not applicable* row carrying the trigger. Finally write `ARCHITECTURE.md`'s
+   `## Documentation map` listing every `docs/` page in exactly one of its three tables — this is
+   the register `standards-audit` reads, and it is easiest to write now, while you still know why
+   each file exists. `ARCHITECTURE.md` is a **hub**: keep it under ~400 lines and spill any section
+   past ~60 lines into its canonical topic doc, leaving a summary and one link. Do **not** create
+   `file-index.md` or `conventions.md` — both retired in v2.23.0.
 7. **Write the root `DEPENDENCIES.md`.** The toolchain contract (documentation-§7): every piece of
    software needed to build, run, test or release this addon, split into **runtime (in-game)**,
    **development** and **release / assets**, with copy-pasteable WSL2 / Ubuntu install commands and a

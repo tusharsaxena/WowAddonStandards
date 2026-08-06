@@ -95,7 +95,7 @@ Reference implementation (in the collection): the absorb-shield tracker's root `
 
 Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
 
-- **`docs/ARCHITECTURE.md`** — engineer context. **Nine** mandated sections, all nine named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema**, **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, and **`## Documented deviations`** — the register specified immediately below.
+- **`docs/ARCHITECTURE.md`** — engineer context, and the **hub** of the doc set (documentation-§3's tier model). **Ten** mandated sections, all ten named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema**, **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, **`## Documentation map`** — the per-addon doc register specified below — and **`## Documented deviations`** — the register specified immediately below.
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page. Where it tabulates the four out-of-game suites, the table **MUST** carry the **checkpoint** per suite — run/commit versus the tag — and **MUST NOT** leave a `Gates? no — recorded only` cell unqualified, since that is true of a commit and false of a release (testing-§6, automated-tests-§3/§4).
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
@@ -141,7 +141,16 @@ behavior the standard has since mandated or permitted, which reads as deviation 
   nobody reads is worse than none, because its existence is taken as evidence that the deviations are
   known.
 
-Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, `module-map.md`, `data-flow.md`, `settings-panel.md`, `slash-dispatch.md`, `midnight-quirks.md`, `scope.md`, `file-index.md`, …) — these legitimately vary per addon and are **not** fixed by the standard. **Five** topic-detail docs are **required**, not optional — `test-cases.md`, `performance.md`, `perf-runs/README.md`, `automated-tests/README.md` and `automated-tests/RESULTS.md` — of which **four are unconditional and one, `perf-runs/README.md`, is required only while the performance harness is wired** (performance-§12). The count is never written bare for exactly this reason: an addon holding a recorded no-combat-path exemption ships **four**, and naming them is what keeps that from reading as a missing doc.
+Beyond the trio, an addon ships **topic-detail docs** in **three tiers** — a required set with fixed
+filenames, a conditional set with fixed filenames and stated triggers, and a free-form set the standard
+never names. The tiers and the rule that keeps `ARCHITECTURE.md` from swallowing them are specified in
+*The topic-detail tiers* below. **Five** of those docs are the **verification-and-record** members,
+required by the testing and automated-test rules rather than by this section's tier model —
+`test-cases.md`, `performance.md`, `perf-runs/README.md`, `automated-tests/README.md` and
+`automated-tests/RESULTS.md` — of which **four are unconditional and one, `perf-runs/README.md`, is
+required only while the performance harness is wired** (performance-§12). The count is never written
+bare for exactly this reason: an addon holding a recorded no-combat-path exemption ships **four**, and
+naming them is what keeps that from reading as a missing doc.
 
 - **`docs/test-cases.md`** — the generated test-case inventory (testing-§5).
 - **`docs/performance.md`** — **required unconditionally**, including under the performance-§12 exemption. When the harness is wired it is the addon's own performance page: which hot paths are bracketed and why, how to run a capture (`/<slash> perf`), how to read the report, and what the harness can and cannot resolve (performance). The shared protocol and record contract live with the library — this page points there rather than restating them. When the addon is **exempt** the page stays, and shrinks to **one screen**: that the addon brackets nothing, which of performance-§12's (b)/(c) applies, where the committed sweep lives, and what would re-arm the wiring. The question the page answers — *how much does this addon cost?* — does not go away with the harness; only the answer changes.
@@ -152,6 +161,143 @@ Beyond the trio, **MAY** ship any number of **topic-detail docs** (`schema.md`, 
   `docs/complexity.md` was a required doc through v2.18.0 and is **retired** as of v2.19.0: its raw output is `complexity.txt` in each run bundle and its trend-line role is `RESULTS.md`'s (automated-tests-§7).
 
 **MUST NOT** ship a `TODO.md` once released (documentation-§4).
+
+#### The topic-detail tiers — required, conditional, and addon-specific (MUST)
+
+Through v2.22.0 this section said topic-detail docs "legitimately vary per addon and are **not** fixed
+by the standard." That was true of *which subjects* an addon has to explain and false of *whether it
+has to explain them*, and leaving both to the addon produced two failures with one cause.
+
+- **The doc set collapsed into `ARCHITECTURE.md`, or it didn't, and nothing decided which.** Two
+  addons in the collection wrote every subject into the hub and reached **669 and 1071 lines**; six
+  split the same material across nine to twelve topic docs and hold their hub between **210 and 472**.
+  Same rule, opposite shapes, and the monolith is the one that loses: a reader looking for the settings
+  schema in a thousand-line file has no landmark, and an agent editing it rewrites sections it never
+  needed to open.
+- **The addons that *did* split gave the same content a different filename in almost every repo.**
+  SavedVariables shape was `schema.md`, `data-model.md` **and** `saved-variables.md`; the core pipeline
+  was `data-flow.md`, `pipeline.md`, `capture-pipeline.md`, `override-pipeline.md` and
+  `attribution.md`; the options panel was `settings-panel.md` and `settings-system.md`; client
+  workarounds were `midnight-quirks.md` and `wow-quirks.md`. The whole point of a fixed doc set is that
+  a reader who learns one repo has learned all of them, and per-repo vocabulary spends that for nothing.
+
+So the tier is fixed and the *content* stays per-addon. A doc belongs in **Tier 1** when the question it
+answers is guaranteed to exist in any addon built to this standard **and** the answer is genuinely
+per-addon. Both halves bind. The second is why the shared substrate is **not** here: every Ka0s addon
+has a `Compat` layer, a message bus and a debug console, but they come from `LibKa0s` and the library
+documents them once (library-stack-§7). A required per-addon page for those would be eight copies of
+someone else's documentation, which is the drift this section exists to prevent.
+
+##### Tier 1 — required, unconditional, canonical filename
+
+Every addon **MUST** ship all six, under **exactly** these names:
+
+| Doc | Answers | MUST cover |
+|---|---|---|
+| `docs/scope.md` | what is this addon for? | what it does, and — explicitly — what it deliberately does **not** do. The out-of-scope half is the load-bearing half; it is the answer to "why doesn't it just also…" |
+| `docs/module-map.md` | where does the code live? | every non-vendored file, its one-line responsibility, and **load order** (the TOC's file order and why it is that order) |
+| `docs/schema.md` | what is persisted? | the SavedVariables shape, every default, and the **migration** path for each schema version bump (savedvariables) |
+| `docs/settings-panel.md` | how is it configured? | the panel/subcategory tree, per-option behavior, and how each control maps to its schema key (options-ui-§5) |
+| `docs/data-flow.md` | how does it actually work? | the core mechanic as a pipeline — event or trigger in, processing, what the user ends up seeing. The engineer counterpart to the README's player-facing `## How <it> works` (documentation-§1 item 8); the two describe one pipeline at two levels and **MUST NOT** contradict each other |
+| `docs/common-tasks.md` | how do I change it? | recipes for the changes actually made most often in *this* addon — add a setting, add a slash command, add a tracked entity, add a locale string — each as concrete steps naming real files |
+
+Each is already the majority habit in the collection; this ratifies the shape the addons converged on
+rather than inventing one.
+
+##### Tier 2 — required when its trigger fires, canonical filename
+
+**MUST** ship under exactly these names **when** the stated trigger holds:
+
+| Doc | Required when |
+|---|---|
+| `docs/perf-runs/README.md` | the performance harness is wired (performance-§12) — specified above |
+| `docs/slash-dispatch.md` | `NS.COMMANDS` carries **eight or more** commands, or **any** subcommand tree |
+| `docs/midnight-quirks.md` | the addon carries **at least one** client-version workaround of its own |
+| `docs/compat-layer.md` | `core/Compat.lua` carries **addon-specific** shims beyond what `LibKa0s` supplies |
+| `docs/message-bus.md` | the addon defines **more than ten** distinct messages |
+| `docs/profiles.md` | AceDB profiles are **user-visible** (a profile control ships in the options UI) |
+| `docs/debug.md` | the addon ships debug surfaces **beyond** the `LibKa0s` default console |
+
+**Not applicable is a valid state, and it MUST be stated.** A Tier 2 doc whose trigger has not fired is
+recorded as a row in `## Documentation map` carrying the trigger — not silently absent. This is
+deliberately **not** a `## Documented deviations` row: the addon is complying, not deviating, and
+filing compliance in the deviation register is what turns that register into the graveyard
+documentation-§3 forbids. The cost of the row is one line; what it buys is that an audit can tell
+*not applicable* from *not written*, which by inspection of the directory alone it cannot.
+
+##### Tier 3 — addon-specific, free-form name
+
+Anything genuinely particular to one addon — its artwork spec, its macro manager, its browser window,
+its icon grid — **MAY** ship under **any** name, and the standard **MUST NOT** name it. This tier is
+the reason the tier model does not have to be conservative: a subject that belongs to one addon has a
+home that does not require an upstream change to create.
+
+Two obligations, and only two:
+
+- **MUST** appear in `## Documentation map` with a one-line description.
+- **MUST NOT** duplicate a Tier 1 or Tier 2 doc's content. Where a Tier 3 doc needs that material it
+  **links** to it. A second copy of the schema under a domain name is the drift the canonical filenames
+  were fixed to stop, wearing a Tier 3 badge.
+
+##### `ARCHITECTURE.md` is a hub, and the spill rule keeps it one (MUST)
+
+`ARCHITECTURE.md`'s mandated sections **summarize and link**; they are not the storage. Two rules,
+both stated as thresholds because "keep it short" demonstrably did not hold:
+
+- **A mandated section that exceeds roughly 60 lines MUST spill** into its canonical topic doc,
+  leaving behind a summary and exactly **one** link. *Module Map* spills to `module-map.md`, *Settings
+  Schema* to `schema.md`, *Slash Commands* to `slash-dispatch.md`, *Message Bus* to `message-bus.md`.
+- **The whole file SHOULD stay under roughly 400 lines.** A hub past that has stopped being an index.
+
+Both numbers are approximate on purpose — the failure they catch is 1071 lines, not 412 — and an audit
+reports the shape, not the arithmetic.
+
+##### `## Documentation map` — the tenth `ARCHITECTURE.md` section (MUST)
+
+The register that makes the tiers checkable **in both directions**. Every `.md` under `docs/` appears
+in **exactly one** of its three tables, and every table row points at a file that exists — so a missing
+required doc and an orphaned undocumented one are both findings, where previously neither was.
+
+Frozen and generated material is **out of scope** and **MUST NOT** be enumerated row by row:
+`docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-runs/<run>/`,
+`docs/pending/`, `docs/superpowers/` and `docs/investigations/` are named as directories, once each. A
+register that grows a row per audit is a register nobody re-reads.
+
+```markdown
+## Documentation map
+
+### Required (documentation-§3, Tier 1)
+
+| Doc | Covers |
+|---|---|
+| `scope.md` | What the ledger tracks, and what it deliberately leaves to other addons |
+| … | … |
+
+### Conditional (documentation-§3, Tier 2)
+
+| Doc | Status | Trigger |
+|---|---|---|
+| `slash-dispatch.md` | Present | 11 commands in `NS.COMMANDS` |
+| `profiles.md` | Not applicable | No profile control ships in the options UI |
+
+### Addon-specific (documentation-§3, Tier 3)
+
+| Doc | Covers |
+|---|---|
+| `artwork-spec.md` | Source dimensions and slice geometry for the panel frame art |
+```
+
+`wow-addon:sync-docs` keeps the map in lockstep with what is on disk;
+`wow-addon:standards-audit` checks the required set, the conditional set's stated status, orphans,
+non-canonical filenames, and the hub's shape.
+
+##### Retired topic-detail docs
+
+- **`file-index.md` is retired** as of v2.23.0 — folded into `module-map.md`, which four addons carried
+  alongside it as the same table twice. An addon shipping one **MUST** merge it in and delete it.
+- **`conventions.md` is retired** as of v2.23.0. It restated `naming-cheatsheet` and the standard's own
+  rules, which is exactly the per-addon copy of upstream text that goes stale without anyone noticing;
+  whatever is genuinely local moves to `common-tasks.md`.
 
 #### CRITICAL — the scaffolding pack is fetched, never stored
 

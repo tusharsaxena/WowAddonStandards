@@ -55,8 +55,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      **library-stack-§7's applicability list** — what applies, what does not, and what substitutes —
      and say in `01_CURRENT_STATE.md` which list you used. Measuring a library against the addon
      sections manufactures findings the standard never meant (`documentation-§1`'s player README,
-     `documentation-§3`'s `docs/` trio, `toc-file`, `options-ui`, `slash-commands`, `preview-mode`,
-     `savedvariables`, `packaging`), and every one of them is noise.
+     `documentation-§3`'s `docs/` trio **and its whole topic-detail tier model**, `toc-file`,
+     `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`), and every one of
+     them is noise. A library has no settings canvas and no in-game pipeline, so Tier 1's
+     `settings-panel.md` and `data-flow.md` are not missing docs there — they are inapplicable.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, the root doc set
@@ -71,6 +73,29 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      search for a hand-built console.
 4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
    `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
+   - **Check the documentation shape against documentation-§3's tier model — it is a directory
+     listing, so measure it rather than reading prose.** Six checks, and all six are mechanical:
+     (a) **Tier 1 present**, under exactly those names — `scope.md`, `module-map.md`, `schema.md`,
+     `settings-panel.md`, `data-flow.md`, `common-tasks.md`; a missing one is a MUST failure.
+     (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
+     `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-runs/README.md`, evaluate
+     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, read
+     `core/Compat.lua`) and require either the doc or a *Not applicable* row carrying that trigger.
+     An absent doc whose trigger **has** fired is a MUST failure; an absent doc with a fired trigger
+     *and* a "Not applicable" row is worse, because the row asserts something false — grade it above
+     the bare omission.
+     (c) **`## Documentation map` present in `docs/ARCHITECTURE.md`** and covering **every** `.md`
+     under `docs/` in exactly one table, with no row pointing at a file that does not exist. Orphans
+     and dangling rows are both findings, and this is the check that makes them findable at all.
+     (d) **Non-canonical filenames** — `data-model.md`, `saved-variables.md`, `pipeline.md`,
+     `capture-pipeline.md`, `override-pipeline.md`, `settings-system.md`, `wow-quirks.md`,
+     `slash-commands.md`, `debug-console.md` and the like are Tier 1/2 content under a per-repo name.
+     File as **one rolled-up finding** naming each file and its canonical target, not one finding per
+     file — the fix is a single `git mv` sweep and per-site enumeration only inflates the tally.
+     (e) **Retired docs** — a surviving `file-index.md` or `conventions.md` (retired v2.23.0).
+     (f) **Hub shape** — a mandated `ARCHITECTURE.md` section past ~60 lines that has not spilled to
+     its canonical topic doc, or a file past ~400 lines. Report the shape and the line count; do
+     **not** argue the arithmetic, and do not file a 412-line hub whose sections have all spilled.
    - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
      `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
      `audit-review-history` binds this run twice, in opposite directions. A gap matching a register
