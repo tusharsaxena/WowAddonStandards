@@ -5,13 +5,19 @@
 Until this section existed, the standard mandated the **exception** and never the **rule**.
 automated-tests-§2 required a repo to carve shell scripts out of *"a CRLF-pinned repo"* — a sentence
 that presumes a pin no section anywhere states, and that a repo satisfies by not pinning at all.
-`PanelMaster` is what that reads like in practice: a five-line `.gitattributes` containing the `*.sh`
-carve-out and nothing else, and **111 of its 185 tracked text files** sitting LF in the working tree
-against the collection's evident intent. Meanwhile eight repos — `LibKa0s`, `AbsorbTracker`,
-`BankLedger`, `ConsumableMaster`, `KickCD`, `LootHistory`, `WhatGroup`, `prettychat` — had each
-hand-written the same policy into files of **34, 36, 34, 35, 22, 31, 68 and 30 lines**, and the two
-repos that ship the standard and the tooling — `WowAddonStandards` and `wow-addon` — had **no
-`.gitattributes` at all**.
+The originating sweep measured what that produces. `PanelMaster` was what it reads like in practice:
+a five-line `.gitattributes` containing the `*.sh` carve-out and nothing else, and **111 of its 185
+tracked text files** sitting LF in the working tree against the collection's evident intent.
+Meanwhile eight repos — `LibKa0s`, `AbsorbTracker`, `BankLedger`, `ConsumableMaster`, `KickCD`,
+`LootHistory`, `WhatGroup`, `prettychat` — had each hand-written the same policy into files of
+**34, 36, 34, 35, 22, 31, 68 and 30 lines**, and the two repos that ship the standard and the
+tooling — `WowAddonStandards` and `wow-addon` — had **no `.gitattributes` at all**.
+
+**That census is the state this section was written against, and it has since been closed.** All
+eleven repos now carry an explicit root `.gitattributes` holding the §5 canonical body for their
+kind — the nine client-bound repos at 78 lines, `WowAddonStandards` and `wow-addon` at 81. The
+figures above are kept because they are why the rule reads the way it does, not because they
+describe the collection today.
 
 This section states the rule first and the exception second, fixes one canonical file body per repo
 kind so a repo can be **diffed** against the standard rather than read against it, and specifies the
@@ -91,7 +97,7 @@ which trains its readers to ignore the one gate that exists to catch a real drif
 - The reason is unconditional: `#!/usr/bin/env bash` followed by CRLF makes the kernel look for an
   interpreter literally named `bash\r`, and every `case`/`in` line becomes a syntax error. The file
   this protects in a client-bound repo is the vendored `tests/_kit/run-automated-tests.sh`
-  (automated-tests-§2); in `wow-addon` it is `scripts/normalize-crlf.sh`, the hook the plugin runs on
+  (automated-tests-§2); in `wow-addon` it is `scripts/normalize-eol.sh`, the hook the plugin runs on
   every `Write`/`Edit`.
 - The failure is uniform rather than intermittent — the script is broken on **every** checkout, not
   in one contributor's tree — which is why it reads as *"the script is wrong"* and sends the reader
