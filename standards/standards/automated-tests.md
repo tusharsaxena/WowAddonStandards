@@ -55,17 +55,25 @@ land, in what shape, and what may fail a run — that is what is specified here.
 - **MUST NOT** edit the vendored copy, and **MUST NOT** re-implement the runner locally "just for this
   addon". A runner that differs per addon produces bundles that cannot be compared across the
   collection, which is most of what the bundle is for.
-- **MUST** carve shell scripts out of a CRLF-pinned repo in `.gitattributes`:
+- **MUST** carry the `*.sh` carve-out that `line-endings-§3` already requires of this repo's
+  `.gitattributes`:
 
   ```gitattributes
-  *.sh   text eol=lf
+  *.sh text eol=lf
   ```
 
-  Every other file in the collection is CRLF. A `#!/usr/bin/env bash` line followed by CRLF makes the
-  kernel look for an interpreter literally named `bash\r`, and every `case`/`in` becomes a syntax
-  error. Without this line the vendored runner is broken on **every** checkout rather than in one
-  contributor's, and it fails identically for everyone — which reads as "the script is wrong" and
-  sends the reader to the wrong repo.
+  The requirement is **unconditional** and belongs to `line-endings`, not to this section: it binds
+  **both** repo kinds — the CRLF-pinned client-bound repos and the LF-pinned ones, where the line is
+  redundant and mandatory anyway. Through v2.23.0 this bullet read *"carve shell scripts out of a
+  CRLF-pinned repo"*, which presumed a pin no section stated and which a repo could satisfy by not
+  pinning at all — one repo did exactly that, arriving at the carve-out with no rule above it.
+  `line-endings-§1/§2` now state the rule, and this bullet restates the exception only as it bears on
+  the vendored runner. The rationale is written once, at `line-endings-§3`, and is not repeated in
+  normative voice here; the consequence for **this** section is that without the line the vendored
+  runner is broken on **every** checkout rather than in one contributor's, failing identically for
+  everyone — which reads as *"the script is wrong"* and sends the reader to the wrong repo.
+- **MUST** satisfy the rest of `line-endings` too, since a `.gitattributes` holding this carve-out and
+  no pin is explicitly **not** compliance (`line-endings-§1`).
 - **MUST** end re-vendoring by setting the executable bit **in the git index**, not in the working
   tree:
 

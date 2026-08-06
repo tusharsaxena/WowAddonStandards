@@ -14,9 +14,24 @@ This playbook is the entry point; the substance lives in `standards/`:
 
 ## Steps
 
+**Step 0 — before step 1, and before any other file exists: write `.gitattributes` (`line-endings`).**
+The repo's **first** commit carries a root `.gitattributes` holding the **client-bound** body verbatim
+from `line-endings-§5` — the `* text=auto eol=crlf` pin, the `*.sh text eol=lf` carve-out, and the
+`binary` markings. The text to copy is the context pack's `### .gitattributes` starter snippet; copy
+it rather than composing one, since eight hand-written 22-to-68-line variants of this policy exist
+today precisely because there was never one canonical text. **It goes first because it is the one file
+whose cost grows with everything already committed**: retrofitted later it needs
+`git add --renormalize .` plus a whole-tree re-checkout, producing a diff that touches every line of
+every straggler — which against a young repo is not reviewed, it is approved. Written first, it costs
+one file and every commit after it is correct by construction. Do **not** stop at the `*.sh` line: a
+`.gitattributes` carrying the carve-out with no pin above it is the near-miss `line-endings-§1` names
+explicitly, and it is how one repo in this collection reached 111 of 185 tracked text files
+disagreeing with the collection's intent while looking, in review, like it had been handled.
+
 1. **Scaffold the skeleton.** Lay down the Ace3 stack: AceAddon registration, AceDB saved variables,
-   the modular folder layout, MIT `LICENSE`, and an AceConsole slash command. This is the skeleton the
-   rest of the pack fills in.
+   the modular folder layout, MIT `LICENSE`, and an AceConsole slash command. The root
+   `.gitattributes` from step 0 is already in place; everything laid down here inherits its endings.
+   This is the skeleton the rest of the pack fills in.
 2. **Read the context pack — do NOT copy it in.** Fetch `standards/NEW_ADDON_CONTEXT.md` to a
    **temp directory**, work from it for this session, and discard it. It **MUST NOT** be written
    into the addon under any name (documentation-§3, anti-pattern #49): it is scaffolding, every

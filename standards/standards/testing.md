@@ -323,8 +323,9 @@ either absent or silently broken:
   diverged was a README, so a check restricted to `*.lua` would have caught nothing.
 - **MUST** compare **raw bytes**, read in binary mode, with **no line-ending normalization**. This MUST
   is scoped to a comparison where **both sides are the same representation** — here, two working-tree
-  directories in one checkout, both governed by the same `.gitattributes`, so a byte difference is a
-  real difference and nothing else. A repo that pins its line endings has already had a copy arrive
+  directories in one checkout, both governed by the same `.gitattributes` — which every repo carries
+  and which pins the whole tree one way (`line-endings-§1/§2`), so a byte difference is a real
+  difference and nothing else. A repo that pins its line endings has already had a copy arrive
   through a normalizing path; a check that normalizes cannot see it. *The consumer-side
   vendored-payload gate* below states the one carve-out, and it is a carve-out precisely because that
   comparison is **not** same-representation.
@@ -347,7 +348,10 @@ passing**. Both copies keep working when they drift, so both suites stayed green
 - **The comparison is blob-versus-worktree, and exactly one normalization is permitted and required.**
   The sibling side is read as a **`git show <ref>:<path>` blob**, which is LF **by construction** —
   git stores normalized content — while the local side is a **working tree** pinned to CRLF by
-  `.gitattributes` in almost every repo in this collection. Measured on a live pair:
+  `.gitattributes` in **every repo that ships Lua to the client** (`line-endings-§2`), which is
+  exactly the set of repos that vendor `libs/LibKa0s/`. *"Almost every repo"* was the honest phrasing
+  only while the pin was an unstated habit; it is now a rule, so this gate's precondition is
+  guaranteed rather than probable. Measured on a live pair:
   `git -C LibKa0s show HEAD:LibKa0s/Core.lua | tr -cd '\r' | wc -c` → **0**;
   `tr -cd '\r' < AbsorbTracker/libs/LibKa0s/Core.lua | wc -c` → **322**. The two sides are therefore
   **not** the same representation, and the library-side no-normalization MUST above does not reach here. The gate

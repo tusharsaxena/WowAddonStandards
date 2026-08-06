@@ -61,7 +61,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `settings-panel.md` and `data-flow.md` are not missing docs there — they are inapplicable.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
-   TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, the root doc set
+   TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, **`.gitattributes`**
+   (`line-endings` — record the pin verbatim, or record that the file is absent), the root doc set
    — `README.md`, the `CLAUDE.md` stub and `DEPENDENCIES.md` (documentation-§1/§2/§7) — and `docs/`)
    and record what it does now, citing files.
    - **Look in the right place for the shared subsystems.** The debug console, the options toolkit,
@@ -96,6 +97,42 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (f) **Hub shape** — a mandated `ARCHITECTURE.md` section past ~60 lines that has not spilled to
      its canonical topic doc, or a file past ~400 lines. Report the shape and the line count; do
      **not** argue the arithmetic, and do not file a 412-line hub whose sections have all spilled.
+   - **Check the line-ending policy by running the commands, not by reading the file
+     (`line-endings`).** Five checks, all mechanical, and the last one is the one that fails in
+     practice:
+
+     ```sh
+     # (a) present at the repo root
+     test -f .gitattributes || echo "MISSING — line-endings-§1"
+
+     # (b) the pin matches the repo's KIND. A repo with a .toc, or one shipping a client-bound
+     #     libs/ payload, is client-bound and pins CRLF; a repo with neither pins LF. Step 1 already
+     #     switches rule sets on the absence of a .toc, so the discriminator is in hand.
+     grep -n '^\* text=auto eol=\(crlf\|lf\)$' .gitattributes
+
+     # (c) the *.sh carve-out, mandatory in BOTH kinds (line-endings-§3)
+     grep -n '^\*\.sh text eol=lf$' .gitattributes
+
+     # (d) binaries marked (line-endings-§4)
+     grep -c ' binary$' .gitattributes
+
+     # (e) does the WORKING TREE actually agree with the declared pin? ONE number.
+     git ls-files -z | xargs -0 -I{} sh -c '
+       a=$(git check-attr eol -- "{}" | sed "s/.*: //")
+       case "$a" in crlf) file "{}" | grep -q CRLF || echo "{}";;
+                    lf)   file "{}" | grep -q CRLF && echo "{}";; esac' 2>/dev/null | wc -l
+     ```
+
+     A file carrying **only** the `*.sh` carve-out with no pin above it is **not** compliance — it is
+     the near-miss `line-endings-§1` names explicitly, and it reads in review as a repo that has been
+     handled. Compare the body against the canonical one for the repo's kind (`line-endings-§5`);
+     that check is a diff, not a reading. **Report (e) as ONE rolled-up finding** — *"N tracked files
+     disagree with the declared pin"* — carrying the command above so the number can be reproduced,
+     and **never** enumerate the files: the fix is a single `git add --renormalize .` plus a
+     re-checkout, and a per-file tally inflates the count for one action. A correct `.gitattributes`
+     over an unrenormalized tree is the **measured** failure in nine of nine repos, so (e) is the
+     check that earns its place. Grade by impact per step 5 — config-and-hygiene, so **Low** or
+     **Info** — while still naming the MUST it fails.
    - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
      `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
      `audit-review-history` binds this run twice, in opposite directions. A gap matching a register

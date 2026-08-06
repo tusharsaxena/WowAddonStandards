@@ -24,6 +24,10 @@ tests/_kit/run-automated-tests.sh --suite complexity           # a subset
 tests/_kit/run-automated-tests.sh --suite lint --suite tests --no-bundle   # the green gate, writes nothing
 ```
 
+If the runner fails with `bad interpreter` or a `\r`-shaped syntax error, it arrived CRLF: the repo's
+`.gitattributes` is missing `*.sh text eol=lf`, or has it and was never renormalized. The rule and the
+fix are one hop away at `line-endings-§3`/`§6` — do not edit the vendored script.
+
 The runner is **vendored** (`automated-tests-§2`). If it is missing, the addon has not adopted the
 section yet — say so and stop; do not hand-roll a substitute, and do not run the four tools
 individually and assemble a bundle by hand. A bundle whose provenance is "an agent ran some

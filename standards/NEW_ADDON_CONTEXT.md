@@ -145,7 +145,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
     reviews/<YYYY-MM-DD>/-- retained code-review history (audit-review-history)
   README.md (root, full)  CLAUDE.md (root, stub)  DEPENDENCIES.md (root)  LICENSE (root)
-  .luacheckrc  .pkgmeta
+  .luacheckrc  .pkgmeta  .gitattributes   -- written FIRST, before anything above it (line-endings)
 ```
 
 ---
@@ -735,6 +735,104 @@ NS.<Module>.__ev = NS.NewBusTarget()   -- AceEvent:Embed({}); or an AceAddon mod
 NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
 ```
 
+### `.gitattributes`
+
+**Write this file FIRST — before the TOC, before any Lua, before the first commit** (`line-endings`).
+This is the canonical **client-bound** body from `line-endings-§5`, verbatim. Copy it; do not compose
+your own. Eight repos in this collection hand-wrote this same policy into files of 22 to 68 lines,
+which is why the body is now fixed rather than described. A **non-client** repo — one that ships
+nothing into the WoW client — swaps the first pin line to `* text=auto eol=lf` and adjusts the two
+sentences that name the direction; nothing else changes. A new addon is always the client-bound one.
+
+Written first, it costs one file. Retrofitted later it costs `git add --renormalize .` plus a
+whole-tree re-checkout, and that diff touches every line of every straggler — the kind of diff that
+gets approved rather than reviewed. Do **not** ship a `.gitattributes` holding only the `*.sh` line:
+the carve-out without the pin above it is explicitly **not** compliance (`line-endings-§1`).
+
+```gitattributes
+# =============================================================================
+# Ka0s WoW Addon Standard — line-ending policy (line-endings-§2)
+#
+# Every repo in the Ka0s collection carries an explicit .gitattributes. There
+# are exactly two variants of this file and they differ in one decision only:
+# the pin below. Everything after it is byte-identical across the collection,
+# so diffing a client-bound repo against a non-client one shows one decision,
+# not two documents.
+#
+# Having no .gitattributes — or one that lists only exceptions to a rule that
+# was never stated — is itself the defect. It leaves what lands on disk at the
+# mercy of each contributor's `core.autocrlf` / `core.eol`.
+# =============================================================================
+
+# THIS REPO IS CLIENT-BOUND. It ships Lua into the WoW client, either directly
+# as an addon or vendored into an addon's libs/ folder. The client expects
+# CRLF in addon source, so the working tree is pinned CRLF on every platform.
+#
+# `text=auto` lets git classify text vs binary by content at add time. Text is
+# always stored LF in the repository, so diffs and blame stay clean; `eol=crlf`
+# pins what lands on disk at checkout and converts back on add. Because
+# .gitattributes overrides per-user config, a Linux contributor on
+# `core.autocrlf=input` and a Windows contributor on `true` end up with
+# identical bytes, and LF stragglers written by tools that bypass git's filters
+# (sed, WSL editors, generators) are corrected the moment they are staged.
+* text=auto eol=crlf
+
+# Shell scripts are LF, ALWAYS — even in a CRLF-pinned repo, where everything
+# else is CRLF. `#!/usr/bin/env bash` followed by CRLF makes the kernel look for
+# an interpreter literally named "bash\r", and every `case`/`in` line becomes a
+# syntax error. The vendored tests/_kit/run-automated-tests.sh is the file this
+# protects (automated-tests-§2); without this carve-out the runner is broken on
+# every checkout rather than in one contributor's working tree.
+*.sh text eol=lf
+
+# Binaries — never line-end converted, never diffed as text. `text=auto` would
+# usually detect these, but detection is content-based and a truncated or
+# odd-header asset can fool it; marking them is cheap and removes the class of
+# bug entirely. The list is the union of every binary type present anywhere in
+# the collection plus the WoW media types an addon may add at any time.
+#
+# Images and textures
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.bmp binary
+*.ico binary
+*.tga binary
+*.blp binary
+# Fonts
+*.ttf binary
+*.otf binary
+# Audio
+*.mp3 binary
+*.ogg binary
+*.wav binary
+# Archives and opaque data (model weights, tool payloads)
+*.zip binary
+*.tar binary
+*.gz binary
+*.7z binary
+*.pdf binary
+*.bin binary
+*.param binary
+
+# Renormalizing after this file is added or changed. The attributes only take
+# effect for content as it passes through git, so an existing checkout must be
+# rewritten once, in this order:
+#
+#   git add .gitattributes
+#   git add --renormalize .
+#   git status                 # review, then commit
+#
+# `--renormalize` rewrites the INDEX; it does not rewrite files already on
+# disk. To fix a straggler in the WORKING TREE, delete it and check it out
+# again (`rm <path> && git checkout -- <path>`), then confirm with
+# `file <path>` — "CRLF line terminators" is the expected answer here.
+```
+
+Then add `- .gitattributes` to `.pkgmeta`'s `ignore:` block below — it is dev-only, exactly as
+`.gitignore` and `.luacheckrc` are (`packaging`).
+
 ### `.luacheckrc`
 
 ```lua
@@ -765,6 +863,7 @@ package-as: <Addon>
 ignore:
   - .luacheckrc
   - .gitignore
+  - .gitattributes   # dev-only: the repo's line-ending policy (line-endings)
   - docs        # holds docs/audits/ and docs/reviews/ too — all dev-only
   - tests
   - _dev
@@ -946,7 +1045,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 19a. Test-case inventory & badge (testing-§5): ship a **generated** `docs/test-cases.md` (full per-suite case enumeration + totals, produced by a `--list` mode of the runner — `lua tests/run.lua --list > docs/test-cases.md`, never hand-authored; it is the authoritative pass count) and a **static** X/Y `[tests]` README badge. Regenerate the doc and update the badge **in the same change** whenever the suite changes (a case added/removed/renamed or the count moved). No CI.
 20. Docs: root ships **exactly three** docs plus `LICENSE`, and never a fourth — full `README.md`, **stub** `CLAUDE.md`, `DEPENDENCIES.md` (documentation-§7); everything else under `docs/`. Canonical `docs/` **trio** (all addons): `ARCHITECTURE.md`, `testing.md` (verify-how-to), `smoke-tests.md`. `ARCHITECTURE.md` carries **nine** mandated sections, named rather than counted: Overview, Module Map, Settings Schema, Message Bus, Slash Commands, Event Subscriptions, Taint Notes, Known Limitations, and **`## Documented deviations`** — the single home for a ratified deviation, rows shaped `| Rule | What differs | Why | Decided | Re-check trigger |` with Rule a `filename-§N` reference and Re-check trigger the condition that ends it. Present even when empty ("None."); a deviation not in the register is **not** ratified, and an audit reads it first rather than re-filing what it records (documentation-§3, audit-review-history). **Five** topic-detail docs are required, not optional: generated `test-cases.md` (testing-§5), `performance.md`, `perf-runs/README.md` (performance-§8, in-game captures), `automated-tests/README.md` and generated `automated-tests/RESULTS.md` (automated-tests); further topic-detail docs as needed. **MUST NOT** ship `docs/agent-context.md` — this pack is fetched at runtime, never stored (documentation-§3, anti-pattern #49). Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
 20d. **`DEPENDENCIES.md` at root** (documentation-§7): every piece of software needed to build, run, test or release the addon, each with the **evidence** for it (file:line, a script's import, a documented command — never a speculative entry), split **runtime / development / release-and-assets** because most readers need one group only, with copy-pasteable **WSL2 / Ubuntu** install commands that actually work and a one-line **verification** per tool. `lua5.1` is a hard version requirement (the harness uses `setfenv`); `luacheck`/`lizard` are "any recent". `pip install lizard` **fails** on Ubuntu 24.04 (PEP 668 `EXTERNALLY-MANAGED`) — use `pipx install lizard`. Refresh it in the change that adds the dependency, not at the next audit; an undocumented or drifted toolchain is anti-pattern #50.
-20e. **Automated test record** (automated-tests): run the **vendored** `tests/_kit/run-automated-tests.sh` — never an addon-side copy — and commit the frozen bundle it writes to `docs/automated-tests/<YYYYMMDD-HHMMSS>/` (one file per suite plus `manifest.json`), plus the row it prepends to `docs/automated-tests/RESULTS.md`. **`lint` and `tests` gate; `perf` and `complexity` are recorded and never fail a run** — a threshold that fails a run teaches the collection to reach for `--no-verify`, after which the gate protects nothing and the habit remains. A missing tool is a **skip recorded with its reason**, never a pass: a green run that silently measured nothing is worse than a red one, because it is believed. `RESULTS.md` is **one** file overwritten in place — never dated, never a directory — so its git history is the trend line, and it carries the current complexity watch list with a one-line disposition for everything the tool warned on and every file in the 1000–1500 LOC band ("None." when empty). The checkpoint is **release, not commit**: a full bundle with an `ANALYSIS.md` in the same change that bumps the version, **before** the tag. Never gate commits on the full bundle (the green gate is `--suite lint --suite tests --no-bundle`, which writes nothing), never hand-write a number into a bundle, and never edit a bundle once written. `.gitattributes` **MUST** carry `*.sh text eol=lf` or the vendored runner arrives CRLF and cannot execute (automated-tests-§2, anti-pattern #51).
+20e. **Automated test record** (automated-tests): run the **vendored** `tests/_kit/run-automated-tests.sh` — never an addon-side copy — and commit the frozen bundle it writes to `docs/automated-tests/<YYYYMMDD-HHMMSS>/` (one file per suite plus `manifest.json`), plus the row it prepends to `docs/automated-tests/RESULTS.md`. **`lint` and `tests` gate; `perf` and `complexity` are recorded and never fail a run** — a threshold that fails a run teaches the collection to reach for `--no-verify`, after which the gate protects nothing and the habit remains. A missing tool is a **skip recorded with its reason**, never a pass: a green run that silently measured nothing is worse than a red one, because it is believed. `RESULTS.md` is **one** file overwritten in place — never dated, never a directory — so its git history is the trend line, and it carries the current complexity watch list with a one-line disposition for everything the tool warned on and every file in the 1000–1500 LOC band ("None." when empty). The checkpoint is **release, not commit**: a full bundle with an `ANALYSIS.md` in the same change that bumps the version, **before** the tag. Never gate commits on the full bundle (the green gate is `--suite lint --suite tests --no-bundle`, which writes nothing), never hand-write a number into a bundle, and never edit a bundle once written. `.gitattributes` **MUST** exist at the root and carry the **whole** policy rather than the exception alone: the pin its repo kind requires (`* text=auto eol=crlf` for an addon), `*.sh text eol=lf` — without which the vendored runner arrives CRLF and the kernel looks for an interpreter named `bash\r` — and the `binary` markings, all verbatim from `line-endings-§5`. A file carrying only the `*.sh` line satisfies nothing (`line-endings-§1/§2/§3/§4`, automated-tests-§2, anti-pattern #57).
 20a. `README.md` is a **player-facing** document that renders on **CurseForge as well as GitHub** — so it **MUST NOT** use `<…>` angle-bracket placeholders anywhere (CurseForge strips them as HTML even inside backticks; write the argument bare, keep `[…]` for optional ones) nor percent-escapes for spaces in badge URLs. Deliberate HTML like `<br>` is fine. It is a document — written for the person who installed the addon (what it does, how to use it, how to fix common problems), in plain language, free of internal jargon and machine-generated tells; contributor material (test harness, lint, build, internals) stays out of it, under `docs/`. It follows the **canonical section order** (documentation-§1): title → badges (`[wow]` → version → license → standard → `[tests]`, that exact order and these exact templates: `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)`, `![License](https://img.shields.io/badge/License-MIT-orange)`, `[![Standard](https://img.shields.io/badge/Ka0s-WoW_Addon_Standard-yellow)](https://github.com/tusharsaxena/WowAddonStandards)`, `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`; the `[wow]` and `[tests]` badges MUST be updated in lockstep with the TOC `## Interface:` and the test inventory respectively) → logo → description → **What's new in `<X.Y.Z>`** (top user-facing highlights of the current release, mirroring the newest Version History row; rolled forward on every version bump) → Screenshots → Usage (Slash commands + Settings panel tables) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Version History (there is **no** `## Testing` section — verify-how-to lives in `docs/`; the README keeps only the `[tests]` badge). TOC follows the fixed field order + `#`-section file listing (toc-file-§1/toc-file-§5).
 20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (documentation-§4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
 20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **three** places — TOC `X-Standard`, README standard badge, and the root `CLAUDE.md` `## Standards compliance (read first)` section. There is no fourth place; the old one was a file the standard now forbids. STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
@@ -1035,7 +1134,8 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] Integration suite covers the addon-side wiring of **every** adopted module — descriptors well-formed, **every declared perf bucket actually reached** by a real bracket, suspend genuinely inert, and each lib-absent path exercised by loading the addon **without** the lib rather than by hand-stubbing (testing-§8). No duplicate of the library's own cases (they live in the `LibKa0s` repo), and every negative assertion proven falsifiable by mutation (testing-§12).
 - [ ] `tests/perf.lua` offline runner present, **outside** the green gate, asserting only deterministic quantities and shipping a zero-overhead scenario as evidence that instrumentation is free when capture is off (performance-§9). Its scenarios are **not** counted in `docs/test-cases.md` or the `[tests]` badge.
 - [ ] `docs/performance.md` and `docs/perf-runs/README.md` present (documentation-§3); `perf-runs/` scoped to **in-game** captures (automated-tests-§7).
-- [ ] `tests/_kit/run-automated-tests.sh` vendored and executable, `.gitattributes` carries `*.sh text eol=lf`, and `docs/automated-tests/{README.md,RESULTS.md}` exist (automated-tests-§2/§4).
+- [ ] **`.gitattributes` present at the repo root and byte-identical to the client-bound canonical body** (`line-endings-§5`) — `* text=auto eol=crlf`, `*.sh text eol=lf`, binaries marked `binary` — **and the working tree agrees with it**, proven by `git add --renormalize .` staging nothing and emitting no `LF will be replaced by CRLF` warning. It is the repo's **first** file (step 0), and it appears in `.pkgmeta`'s `ignore:` block (`line-endings-§1/§2/§3/§4/§6`, `packaging`).
+- [ ] `tests/_kit/run-automated-tests.sh` vendored and executable, and `docs/automated-tests/{README.md,RESULTS.md}` exist (automated-tests-§2/§4). The runner's `*.sh` carve-out is covered by the line-endings checkbox above; this one covers the runner.
 - [ ] **A full automated-test bundle produced by the vendored runner** — `tests/_kit/run-automated-tests.sh`, never an addon-side copy — committed under `docs/automated-tests/<YYYYMMDD-HHMMSS>/` with one file per suite plus `manifest.json`, and its row prepended to `docs/automated-tests/RESULTS.md`. `RESULTS.md` carries the current watch list with a disposition for everything `lizard` warned on and every file in the 1000–1500 LOC band ("None." if empty). Produced at every **release**, before the tag; commits are **not** gated on it, and `perf`/`complexity` never fail a run (automated-tests-§3/§4/§6, anti-pattern #51).
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).

@@ -178,6 +178,7 @@ meant. The three lists below are the ones an audit of a Ka0s-owned library repo 
 | `lint` | `luacheck .` is 0 warnings / 0 errors here as everywhere. |
 | `automated-tests` | The four out-of-game suites and the `docs/automated-tests/` record are repo-shaped, not addon-shaped. |
 | `versioning-git` | Semver tags, branch and commit discipline. The repo's tag axis stays separate from any file minor (above). |
+| `line-endings` | The library ships Lua into every consumer's client-bound `libs/` folder, so it is **client-bound** and takes the CRLF pin (`line-endings-§2`) and the canonical body of `line-endings-§5` unchanged — plus the `*.sh text eol=lf` carve-out for its own `testkit/run-automated-tests.sh`, which is the file the addons then vendor. It is named here rather than left to inference because a library repo has no `.toc`, and `line-endings-§2`'s discriminator would otherwise read it as non-client — which is the exact ambiguity that section exists to end. |
 | localization-§5 | US English in authored comments, docstrings and strings — a British spelling vendored into eight consumers is eight findings. |
 | documentation-§5 | The `filename-§N` citation scheme and documentation-§6's citation rules. |
 | documentation-§7 | A root `DEPENDENCIES.md`: a new machine needs the toolchain list as much for a library as for an addon. |

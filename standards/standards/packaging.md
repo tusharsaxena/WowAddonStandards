@@ -14,6 +14,7 @@ package-as: <Addon>
 ignore:
   - .luacheckrc
   - .gitignore
+  - .gitattributes   # dev-only: the repo's line-ending policy (line-endings)
   - docs        # holds docs/audits/ and docs/reviews/ too — all dev-only
   - tests
   - _dev
@@ -21,7 +22,7 @@ ignore:
 ```
 
 - **MUST** vendor and commit every library the addon uses (library-stack-§3). **MUST NOT** declare `externals:`; **MUST** commit `libs/` to git as part of the addon.
-- **MUST** ignore `docs/` (which now holds the audit and review histories under `docs/audits/` and `docs/reviews/`, audit-review-history), `_dev/`, `tests/`, and lockfiles in the package (dev-only; not shipped to players).
+- **MUST** ignore `docs/` (which now holds the audit and review histories under `docs/audits/` and `docs/reviews/`, audit-review-history), `_dev/`, `tests/`, lockfiles, and the root dev-only dotfiles `.luacheckrc`, `.gitignore` and `.gitattributes` in the package (dev-only; not shipped to players). `.gitattributes` is mandatory at every repo root (`line-endings-§1`) and governs the git checkout rather than the packaged addon, so it belongs on this list for exactly the reason `.gitignore` already does.
 - **MUST NOT** use `enable-toc-creation` flavor fan-out — the addon is Retail-only with a single TOC (toc-file-§3).
 - **MAY** use `move-folders:` only when the repo is a monorepo for multiple addons (out of scope today).
 

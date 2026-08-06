@@ -44,6 +44,7 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
   LICENSE
   .luacheckrc
   .pkgmeta
+  .gitattributes           -- MANDATORY: the CRLF pin + *.sh carve-out + binary markings (line-endings)
 ```
 
 - **MUST** use this folder layout — source lives under `core/`, `defaults/`, `settings/`, `locales/`, `modules/`; never loose at the root. A small addon simply has thin folders (a single `modules/` file, a one-row `settings/Schema.lua`), not a different structure.
