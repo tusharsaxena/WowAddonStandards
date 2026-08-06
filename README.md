@@ -107,6 +107,7 @@ WowAddonStandards/
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
   LICENSE
+  .gitattributes                          -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
   standards/                              -- THE STANDARD (living, canonical)
     README.md                             -- what's here + how to refresh the standard
     EXECUTIVE_SUMMARY.md               -- one-page TL;DR of the standard

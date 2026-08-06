@@ -10,7 +10,7 @@ The house standard for the Ka0s World of Warcraft addon collection — the canon
 
 **Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in three places** — the TOC `X-Standard` field, the README standard badge (a declaration, deliberately **not** a link), and the root `CLAUDE.md` "Standards compliance (read first)" section — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v2.28.0**, 2026-08-06).
 
-## The six patterns it makes canonical
+## The seven patterns it makes canonical
 
 These were validated against the Ka0s collection and the broader ecosystem (see [`INDUSTRY_RESEARCH.md`](INDUSTRY_RESEARCH.md)) and are now mandated by the standard:
 

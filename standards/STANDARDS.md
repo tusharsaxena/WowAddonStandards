@@ -89,7 +89,7 @@ Discovered by following the links here — not part of the normative standard, b
 - **[NEW_ADDON_CONTEXT.md](NEW_ADDON_CONTEXT.md)** — the scaffolding context pack (born compliant); fetched to a temp directory and read, **never** stored in the addon (documentation-§3).
 - **[INDUSTRY_RESEARCH.md](INDUSTRY_RESEARCH.md)** — the research foundation the rules are synthesized from (a process input).
 - **[ADDONS.md](ADDONS.md)** — the roster of in-scope addons, plus the separate table of Ka0s-owned library repos (audited against library-stack-§7's applicability list, not the addon sections).
-- Process playbooks (repo root): **[../AUDIT.md](../AUDIT.md)** (`/wow-addon:standards-audit`) and **[../NEW_ADDON.md](../NEW_ADDON.md)** (`/wow-addon:new-addon`).
+- Process playbooks (repo root): **[../AUDIT.md](../AUDIT.md)** (`/wow-addon:standards-audit`), **[../NEW_ADDON.md](../NEW_ADDON.md)** (`/wow-addon:new-addon`) and **[../AUTOMATED_TESTS.md](../AUTOMATED_TESTS.md)** (`/wow-addon:automated-tests`).
 
 ---
 

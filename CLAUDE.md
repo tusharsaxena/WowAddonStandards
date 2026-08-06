@@ -37,6 +37,7 @@ NEW_ADDON.md                      -- PLAYBOOK: /wow-addon:new-addon (scaffold, b
 README.md                         -- repo overview + the three things you can do here
 CLAUDE.md                         -- this file
 LICENSE
+.gitattributes                    -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
 standards/                        -- THE STANDARD (living, canonical). Everything supports STANDARDS.md.
   README.md                       -- what's in standards/ + how to rebuild the standard
   EXECUTIVE_SUMMARY.md            -- one-page TL;DR of the standard
