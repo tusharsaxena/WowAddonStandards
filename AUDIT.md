@@ -65,6 +65,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    (`line-endings` — record the pin verbatim, or record that the file is absent), the root doc set
    — `README.md`, the `CLAUDE.md` stub and `DEPENDENCIES.md` (documentation-§1/§2/§7) — and `docs/`)
    and record what it does now, citing files.
+   - **Three cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
+     and each is invisible to every suite: the standard badge is the **bare** `![Standard](…)` and
+     not wrapped in a link (documentation-§1 #2); the README carries **no bundled-library inventory**
+     — no `## Libraries` / `## Bundled libraries` / `## Libraries and credits` /
+     `## Credits and libraries` heading and no library roll-call in the intro prose, with any
+     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); and
+     the **LibKa0s provenance line is in root `CLAUDE.md`**, not `README.md` (documentation-§2 item 6,
+     anti-pattern #59 — see the step-6 `diff -r` evidence).
    - **Look in the right place for the shared subsystems.** The debug console, the options toolkit,
      the slash dispatcher, the performance harness and the test framework are **not** the addon's
      code — they are `LibKa0s` modules (library-stack-§7). What the addon owns is a **descriptor**
@@ -217,7 +225,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      **`diff -r <LibKa0sRepo>/LibKa0s <Addon>/libs/LibKa0s`** over the **whole folder** (every module,
      not just the ones the addon calls) plus
      **`diff -r <LibKa0sRepo>/testkit <Addon>/tests/_kit`** for the vendored test harness — which
-     lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty. This check
+     lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty. Diff
+     against the **tag the addon's root `CLAUDE.md` names** — the provenance line
+     `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6) — which is the same ref the repo's
+     own vendored-payload gate resolves. **The line missing from `CLAUDE.md`, or still sitting in
+     `README.md`, is itself a finding** (anti-pattern #59): since LibKa0s v1.8.1 / testkit revision 9
+     `tests/_kit/vendor_sync.lua` reads `CLAUDE.md` with no fallback, so that repo's gate is red. This check
      exists because drift is otherwise **invisible**: the library's suite passes against the library,
      the addon's suite passes against the stale copy, and **both repos stay green** while the two
      diverge (anti-pattern #45). A non-empty diff is the evidence for a #45 deviation; a *missing*

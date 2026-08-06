@@ -345,6 +345,16 @@ passing**. Both copies keep working when they drift, so both suites stayed green
   the library repo's ship folder in the sibling checkout. The library-side gate proves the library repo
   is self-consistent; it says nothing about whether **this** addon's copy is current, which is the
   divergence anti-patterns #45 is actually about.
+- **The `<ref>` it compares against comes from the repo's own root `CLAUDE.md`** — the provenance line
+  `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6, library-stack-§7), read with the Lua
+  pattern `[Bb]undles %[LibKa0s%]%b() (v[%d%.]+)` so a standalone sentence and a mid-sentence phrasing
+  both satisfy it. The kit has read `CLAUDE.md` rather than `README.md` since **LibKa0s v1.8.1 /
+  testkit revision 9**, and reads it through a named `provenanceFile` opt defaulting to `"CLAUDE.md"`.
+  **There is no fallback to `README.md`, deliberately**: a repo that has not moved its line reads as
+  carrying **no provenance line at all** and the case **fails**, naming `CLAUDE.md`. A fallback would
+  let a repo sit half-migrated with two lines that can disagree and a gate silently preferring one of
+  them, which is the same shape as the drift this gate exists to catch. A missing line is a **failure**,
+  not a skip — unlike an absent sibling checkout below, the repo had everything it needed to answer.
 - **The comparison is blob-versus-worktree, and exactly one normalization is permitted and required.**
   The sibling side is read as a **`git show <ref>:<path>` blob**, which is LF **by construction** —
   git stores normalized content — while the local side is a **working tree** pinned to CRLF by

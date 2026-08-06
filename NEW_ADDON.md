@@ -97,9 +97,20 @@ disagreeing with the collection's intent while looking, in review, like it had b
    to remove. `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
    (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
-   incl. the standard-link badge → logo → description → Screenshots → Usage → How it works → FAQ →
-   Troubleshooting → Issues and feature requests → Version History — there is **no** `## Testing` section;
-   verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
+   incl. the standard badge, which is **not** a link and MUST NOT be wrapped in one → logo → description →
+   What's new → Screenshots → Usage → How it works → FAQ →
+   Troubleshooting → Issues and feature requests → Version History → optional `## Credits`, last — there is
+   **no** `## Testing` section; verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
+   The README carries **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
+   `## Libraries and credits` section and no library list in the intro prose; that fact lives in
+   `DEPENDENCIES.md` and `docs/ARCHITECTURE.md`, and the LibKa0s provenance line lives in root
+   `CLAUDE.md` (step 6a). `## Credits` is optional and carries **only external** credit — artwork, a
+   font, a sound pack, another author's work.
+6a. **Put the LibKa0s provenance line in root `CLAUDE.md`.** `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).`
+   naming the **tag** `libs/LibKa0s/` and `tests/_kit/` were vendored from, moving in the same commit as
+   the bytes. `tests/_kit/vendor_sync.lua` reads it out of `CLAUDE.md` — since LibKa0s v1.8.1 / testkit
+   revision 9, with **no fallback** to `README.md` — so a line in the wrong file fails the gate
+   (documentation-§2 item 6, library-stack-§7, testing-§11).
 6b. **Write the `docs/` set to documentation-§3's tier model.** The canonical trio
    (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus **all six Tier 1 docs, under exactly
    these names**: `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`,
