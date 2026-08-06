@@ -42,13 +42,27 @@ the second stops it becoming a place to hide.
 
 *(This section carries no numbered subsections; cite it as `audit-review-history`.)*
 
-A pending audit (`/wow-addon:issue-audit`) sweeps the addon for everything still hanging, interviews
-the maintainer one item at a time, and records what was decided. That record used to be
-`docs/pending/LEDGER.md`, a tracked markdown table. It is **retired**: the durable store is now
-**GitHub issues on the addon's own repo**, and `docs/pending/LEDGER.md` **MUST** be deleted where it
-still exists. Nothing else about the sweep changes — the four discovery passes, the stable item IDs,
-the evidence hashes, the bucketization by type and severity, the one-item-at-a-time interview, the
-branch decision, the implementation step and the report are all unchanged. Only the store moved.
+Pending work is swept up, decided, and recorded as **GitHub issues on the addon's own repo**. That
+record used to be `docs/pending/LEDGER.md`, a tracked markdown table; it is **retired** and **MUST**
+be deleted where it still exists.
+
+**Discovery and triage are two commands, deliberately.** `/wow-addon:issue-audit` sweeps the addon —
+four discovery passes, stable item IDs, evidence hashes, severity — and files anything not already in
+the store as an open `[untriaged]` issue. It never interviews and never changes code.
+`/wow-addon:issue-triage` takes those `[untriaged]` issues, puts each to the maintainer one at a time
+with its evidence, and records the decision on the issue. It changes the store only.
+
+The split exists because the two halves have different costs. A sweep is mechanical, safe, and worth
+running often, including across every repo at once; a triage costs a human decision per item and can
+only be done attentively. Fused, the cheap half was gated behind the expensive one — you could not
+find out what was hanging without committing to an interview about all of it, which is a good way to
+train people not to look. Split, an addon can be swept in a minute and triaged when there is time to
+think, and the `[untriaged]` backlog between the two is itself a visible, countable quantity rather
+than an unrecorded intention.
+
+A consequence worth stating, because it changes what a decision means: **triage records, it does not
+implement.** Accepting that something should be done produces a `[deferred]` issue carrying the
+chosen approach, not a code change. The work happens in an ordinary session against that issue.
 
 - **MUST** carry the item's status as a **title prefix**, shaped exactly `[<Status>] <Title>`, drawn
   from a closed vocabulary of four:

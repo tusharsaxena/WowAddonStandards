@@ -8,7 +8,7 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in three places** — the TOC `X-Standard` field, the README standard badge (a declaration, deliberately **not** a link), and the root `CLAUDE.md` "Standards compliance (read first)" section — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v2.26.0**, 2026-08-06).
+**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in three places** — the TOC `X-Standard` field, the README standard badge (a declaration, deliberately **not** a link), and the root `CLAUDE.md` "Standards compliance (read first)" section — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned; see the changelog at the top of `STANDARDS.md` (current: **v2.27.0**, 2026-08-06).
 
 ## The six patterns it makes canonical
 
