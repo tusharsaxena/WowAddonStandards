@@ -27,7 +27,7 @@ the second stops it becoming a place to hide.
   reader of the bundle needs to know it exists; what it **MUST NOT** do is count it toward the MUST
   tally or ask for it to be fixed. A decision recorded exactly where this standard asks for it is
   **compliance**, and an audit reporting it as a defect is reporting on its own reading. Conversely, a
-  decision reasoned only in `docs/pending/LEDGER.md`, a root `CLAUDE.md` note or `docs/scope.md`, with
+  decision reasoned only in a issue-audit issue, a root `CLAUDE.md` note or `docs/scope.md`, with
   **no** register row, is **not** ratified — that missing row is itself the finding, and the audit
   files it.
 - **MUST report as a finding any register entry whose cited rule the standard has since changed** — so
@@ -37,3 +37,39 @@ the second stops it becoming a place to hide.
   what the row claims. Without it the register accumulates compliant behavior, and a reader who trusts
   it is misled by the one document whose whole purpose is to be trusted. Retiring such a row is a doc
   change, not a re-decision.
+
+### Pending-audit decisions live in GitHub issues, not a file in the repo
+
+*(This section carries no numbered subsections; cite it as `audit-review-history`.)*
+
+A pending audit (`/wow-addon:issue-audit`) sweeps the addon for everything still hanging, interviews
+the maintainer one item at a time, and records what was decided. That record used to be
+`docs/pending/LEDGER.md`, a tracked markdown table. It is **retired**: the durable store is now
+**GitHub issues on the addon's own repo**, and `docs/pending/LEDGER.md` **MUST** be deleted where it
+still exists. Nothing else about the sweep changes — the four discovery passes, the stable item IDs,
+the evidence hashes, the bucketization by type and severity, the one-item-at-a-time interview, the
+branch decision, the implementation step and the report are all unchanged. Only the store moved.
+
+- **MUST** carry the item's status as a **title prefix**, shaped exactly `[<Status>] <Title>`, drawn
+  from a closed vocabulary of four:
+
+  | Status prefix | Issue state | Means |
+  |---|---|---|
+  | `[done]` | closed | Decided and implemented |
+  | `[will-not-do]` | closed | Declined; terminal |
+  | `[deferred]` | open | Accepted as real, deliberately not now |
+  | `[untriaged]` | open | Swept up, not yet interviewed |
+
+  The prefix is the status — **not** a label, and **not** a milestone. One field, visible in every
+  listing, in the one place `gh issue list` returns without a second call.
+- **MUST** drive issue work through the **`gh` CLI subcommands** — `gh issue list`, `gh issue create`,
+  `gh issue edit`, `gh issue close`, `gh issue comment`, `gh issue view` — taking structured data with
+  `--json` on those same subcommands. Listing by status is therefore a **title filter** over
+  `gh issue list --json number,title,state`.
+- **MUST NOT** use `gh api graphql`, or hand-rolled GraphQL against `api.github.com/graphql`, for
+  issue work. Reaching for GraphQL first is a real, observed failure: it spends a round trip on a
+  deprecated path before falling back to the subcommand that would have worked. Where a REST call is
+  genuinely unavoidable, use `gh api repos/{owner}/{repo}/issues` — never the GraphQL endpoint.
+- **Migration is deferrals only.** `[deferred]` rows migrate out of a surviving ledger as **open**
+  `[deferred]` issues. `done` and `wont-do` rows are terminal and are **not** migrated; they survive
+  in git history via the commit that deletes the file, which is the whole reason deleting it is safe.

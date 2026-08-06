@@ -367,8 +367,8 @@ section during.
 `## Documented deviations` register in `docs/ARCHITECTURE.md` (documentation-§3), citing
 `performance-§12` as the Rule, the sweep commit as the Why, and the trigger above as the Re-check
 trigger. It **MUST NOT** be re-argued per audit: an audit reads the register first and records a
-ratified entry as accepted with its id (audit-review-history). A decline reasoned only in
-`docs/pending/LEDGER.md` is **not** an exemption — the ledger may hold the reasoning and the row may
+ratified entry as accepted with its id (audit-review-history). A decline reasoned only in a
+issue-audit GitHub issue is **not** an exemption — the issue may hold the reasoning and the row may
 cite it, but a deviation not in the register is not ratified.
 
 **Not exempt by default.** A new addon scaffolds **with** the wiring (NEW_ADDON_CONTEXT.md): it has no

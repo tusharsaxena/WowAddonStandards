@@ -147,9 +147,17 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      row is recorded as **accepted, citing that row's rule and Decided date** — never re-filed as an
      open MUST failure, or the same ratified decline returns every cycle. And any row whose **cited
      rule the standard has since changed** is reported, so the register cannot quietly accumulate
-     entries for behavior the standard now mandates. A reasoning trail in a pending ledger or an
+     entries for behavior the standard now mandates. A reasoning trail in a issue-audit issue or an
      earlier bundle is not a substitute: a deviation with no register row is not ratified, and a
-     ledger decline with no row is itself a finding.
+     `[will-not-do]` issue with no row is itself a finding.
+   - **`docs/pending/LEDGER.md` is retired and its presence is a finding.** The durable store of
+     issue-audit decisions is **GitHub issues on this addon's own repo**, status carried as the
+     title prefix `[done]` / `[will-not-do]` (closed) and `[deferred]` / `[untriaged]` (open) —
+     `audit-review-history`. A surviving `LEDGER.md`, or a `docs/pending/` directory holding one, is
+     reported with the deferrals it still holds, since those are the rows that owe an open
+     `[deferred]` issue; `done` and `wont-do` rows are terminal and migrate nowhere. Read issues with
+     the **`gh` CLI subcommands** (`gh issue list --json number,title,state` and a title filter) —
+     **never** `gh api graphql`.
    - **Consuming the library is the compliant state; hand-rolling is the deviation.** An addon that
      builds `NS.DebugLog`, `NS.Helpers`, its dispatcher or its harness from a LibKa0s descriptor is
      **compliant** and **MUST NOT** be flagged for "not implementing" what those sections describe —

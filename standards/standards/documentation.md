@@ -129,7 +129,7 @@ testing-§10's versioning suite reads it.)
 `documentation-§2` and `documentation-§6` both instruct an agent to *record it as a documented
 deviation* and, until now, named no file. The result was predictable: every repo invented its own home —
 a table in `ARCHITECTURE.md` here, `docs/scope.md` there, a paragraph in root `CLAUDE.md`, a
-`docs/pending/LEDGER.md` entry — and two failures followed from the same cause. An audit that cannot
+issue-audit issue on the repo — and two failures followed from the same cause. An audit that cannot
 find a ratified decision **re-files it as an open MUST failure**, so the same argument is had every
 cycle; and a register nobody re-reads goes stale in the dangerous direction, accumulating entries for
 behavior the standard has since mandated or permitted, which reads as deviation and is not.
@@ -150,10 +150,12 @@ behavior the standard has since mandated or permitted, which reads as deviation 
   trigger** is the **condition that ends the deviation**, stated so a reader can tell whether it has
   already fired; `performance-§12`'s exemption is the model. A row without a trigger is a permanent
   opt-out wearing a table's clothes.
-- **This is the single home.** A decision **MAY** be *reasoned* at length in `docs/pending/LEDGER.md`,
-  an audit bundle or a review bundle, and the row **SHOULD** cite that id in **Why** — but **a deviation
-  not in the register is not ratified**. A ledger entry declining a rule with no corresponding register
-  row is itself the deviation, and an audit files it as one.
+- **This is the single home.** A decision **MAY** be *reasoned* at length in the **GitHub issue** the
+  pending audit filed for it on the addon's own repo — titled `[deferred] …` or `[will-not-do] …`
+  (audit-review-history) — or in an audit or review bundle, and the row **SHOULD** cite that issue
+  number or bundle id in **Why**; but **a deviation not in the register is not ratified**. An issue
+  declining a rule with no corresponding register row is itself the deviation, and an audit files it
+  as one.
 - **MUST NOT** be a graveyard. An entry whose cited rule the standard has since changed — so the
   behavior is now mandated or permitted outright — **MUST** be retired, and an audit that finds one
   reports it (audit-review-history). A register that only ever grows stops being read, and a register
@@ -279,8 +281,8 @@ required doc and an orphaned undocumented one are both findings, where previousl
 
 Frozen and generated material is **out of scope** and **MUST NOT** be enumerated row by row:
 `docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-runs/<run>/`,
-`docs/pending/`, `docs/superpowers/` and `docs/investigations/` are named as directories, once each. A
-register that grows a row per audit is a register nobody re-reads.
+`docs/superpowers/` and `docs/investigations/` are named as directories, once each. A register that
+grows a row per audit is a register nobody re-reads.
 
 ```markdown
 ## Documentation map
@@ -399,8 +401,8 @@ two things it is:
 1. **An accepted deviation** — this addon intentionally differs; record it as a row in
    `docs/ARCHITECTURE.md` → `## Documented deviations`, shaped
    `| Rule | What differs | Why | Decided | Re-check trigger |`, where Rule is the `filename-§N`
-   reference. That register is the single home: the reasoning may live in `docs/pending/LEDGER.md`
-   or an audit bundle and the row cites it, but a deviation not in the register is not ratified.
+   reference. That register is the single home: the reasoning may live in the issue-audit GitHub
+   issue or an audit bundle and the row cites it, but a deviation not in the register is not ratified.
 2. **A change to the standard itself** — the standard's definition should evolve; the update
    belongs upstream in the WowAddonStandards repo, after which this addon conforms to the new rule.
 
