@@ -167,15 +167,15 @@ filenames, a conditional set with fixed filenames and stated triggers, and a fre
 never names. The tiers and the rule that keeps `ARCHITECTURE.md` from swallowing them are specified in
 *The topic-detail tiers* below. **Five** of those docs are the **verification-and-record** members,
 required by the testing and automated-test rules rather than by this section's tier model —
-`test-cases.md`, `performance.md`, `perf-runs/README.md`, `automated-tests/README.md` and
-`automated-tests/RESULTS.md` — of which **four are unconditional and one, `perf-runs/README.md`, is
+`test-cases.md`, `performance.md`, `perf-analysis/README.md`, `automated-tests/README.md` and
+`automated-tests/RESULTS.md` — of which **four are unconditional and one, `perf-analysis/README.md`, is
 required only while the performance harness is wired** (performance-§12). The count is never written
 bare for exactly this reason: an addon holding a recorded no-combat-path exemption ships **four**, and
 naming them is what keeps that from reading as a missing doc.
 
 - **`docs/test-cases.md`** — the generated test-case inventory (testing-§5).
 - **`docs/performance.md`** — **required unconditionally**, including under the performance-§12 exemption. When the harness is wired it is the addon's own performance page: which hot paths are bracketed and why, how to run a capture (`/<slash> perf`), how to read the report, and what the harness can and cannot resolve (performance). The shared protocol and record contract live with the library — this page points there rather than restating them. When the addon is **exempt** the page stays, and shrinks to **one screen**: that the addon brackets nothing, which of performance-§12's (b)/(c) applies, where the committed sweep lives, and what would re-arm the wiring. The question the page answers — *how much does this addon cost?* — does not go away with the harness; only the answer changes.
-- **`docs/perf-runs/README.md`** — **the one conditional member of the five**: required while the harness is wired, and **not shipped** by an addon holding a recorded performance-§12 exemption, which produces no in-game captures and therefore has no store to document. When present it is the standing **in-game** capture store's doc: the record naming convention, a schema summary, a pointer to the library's canonical field-by-field contract, and the note that offline runs live in `docs/automated-tests/` (performance-§8, automated-tests-§7). Cumulative rather than tied to one investigation, so in-game runs compare across addon versions.
+- **`docs/perf-analysis/README.md`** — **the one conditional member of the five**: required while the harness is wired, and **not shipped** by an addon holding a recorded performance-§12 exemption, which produces no in-game captures and therefore has no store to document. When present it is the standing **in-game** capture store's doc, and it covers: the bundle naming — one **frozen dated bundle per capture** at `docs/perf-analysis/<YYYYMMDD-HHMMSS>/`, stamped in local time from the record's own timestamp — and the three artifacts each bundle carries (`report.md`, the verbatim one-line `dump.json`, and `ANALYSIS.md`); a schema summary with a pointer to the library's canonical field-by-field contract rather than a second copy of it; how a capture is taken in **this addon's own** slash verb; the note that offline runs live in `docs/automated-tests/` (performance-§8, automated-tests-§7); and an **index of the captures taken so far**, one row per bundle, so a reader after the last capture on a given version does not have to open every directory. It is the one file in the store that is rewritten — the bundles are frozen. Cumulative rather than tied to one investigation, so in-game runs compare across addon versions.
 - **`docs/automated-tests/README.md`** — what the automated-test record is and how to produce it (automated-tests).
 - **`docs/automated-tests/RESULTS.md`** — one row per run across all four suites, **one file overwritten in place** so its git history is the trend line, plus the current complexity watch list (automated-tests-§4). It is **generated**, never hand-edited.
 
@@ -231,7 +231,7 @@ rather than inventing one.
 
 | Doc | Required when |
 |---|---|
-| `docs/perf-runs/README.md` | the performance harness is wired (performance-§12) — specified above |
+| `docs/perf-analysis/README.md` | the performance harness is wired (performance-§12) — specified above |
 | `docs/slash-dispatch.md` | `NS.COMMANDS` carries **eight or more** commands, or **any** subcommand tree |
 | `docs/midnight-quirks.md` | the addon carries **at least one** client-version workaround of its own |
 | `docs/compat-layer.md` | `core/Compat.lua` carries **addon-specific** shims beyond what `LibKa0s` supplies |
@@ -280,7 +280,7 @@ in **exactly one** of its three tables, and every table row points at a file tha
 required doc and an orphaned undocumented one are both findings, where previously neither was.
 
 Frozen and generated material is **out of scope** and **MUST NOT** be enumerated row by row:
-`docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-runs/<run>/`,
+`docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-analysis/<run>/`,
 `docs/superpowers/` and `docs/investigations/` are named as directories, once each. A register that
 grows a row per audit is a register nobody re-reads.
 

@@ -1,3 +1,5 @@
+> Part of the **[Ka0s WoW Addon Standard](../STANDARDS.md)** — the split standard. Cross-references use the `filename-§N` form (see the index's section map).
+
 ## Automated test records
 
 Four out-of-game suites answer four different questions about an addon — does it lint, does it pass,
@@ -275,7 +277,7 @@ is not a judgment call the release notes can absorb.
   trend-line role and its watch list are `RESULTS.md`'s (§4). An addon adopting this section deletes
   the file rather than leaving a second, staler copy of the same numbers — two reports of one
   measurement diverge, and the reader cannot tell which is current.
-- **`docs/perf-runs/` narrows to in-game captures only.** Offline scenario runs are produced by the
+- **`docs/perf-analysis/` narrows to in-game captures only.** Offline scenario runs are produced by the
   runner and belong in the bundle with the rest of the run. In-game captures **cannot** be produced by
   a script — a human runs `/<slash> perf` in a live client and exports the record — so they keep the
   standing cumulative store `performance-§8` defines, and its `README.md` says plainly that it is the

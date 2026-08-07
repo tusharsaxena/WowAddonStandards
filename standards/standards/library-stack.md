@@ -193,7 +193,7 @@ meant. The three lists below are the ones an audit of a Ka0s-owned library repo 
 - **documentation-§2's addon `CLAUDE.md` stub as written.** The stub's shape assumes an addon; see the
   substitution below.
 - **documentation-§3's `docs/` trio** — `ARCHITECTURE.md`, `testing.md`, `smoke-tests.md` — **the
-  five verification-and-record docs** (`test-cases.md`, `performance.md`, `perf-runs/README.md`,
+  five verification-and-record docs** (`test-cases.md`, `performance.md`, `perf-analysis/README.md`,
   `automated-tests/README.md`, `automated-tests/RESULTS.md`) **and the whole topic-detail tier model**
   (Tier 1's `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`,
   `common-tasks.md`; Tier 2; `## Documentation map`). These describe an addon's runtime shape, its

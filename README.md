@@ -1,17 +1,18 @@
 # WoW Addon Standards — Ka0s Collection
 
-This repo holds the house standard for the Ka0s World of Warcraft addon collection, plus the three
-**process playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md` and
-`NEW_ADDON.md`:
+This repo holds the house standard for the Ka0s World of Warcraft addon collection, plus the four
+**process playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md`,
+`NEW_ADDON.md` and `PERF_ANALYSIS.md`:
 
 1. **Define the standard.** A detailed house standard — built from industry research and the
    collection's own best patterns — covering not just technical design but **UX and user-behavior
    patterns**: slash-command handling, settings-panel look and feel, debug-mode conventions,
    standalone windows, packaging, localization, and more. → [`standards/`](standards/)
-2. **Ship the process playbooks.** Three thin orchestrator specs the plugin fetches and runs **inside
+2. **Ship the process playbooks.** Four thin orchestrator specs the plugin fetches and runs **inside
    each addon's own repo**: → [`AUDIT.md`](AUDIT.md) (`/wow-addon:standards-audit`),
-   [`NEW_ADDON.md`](NEW_ADDON.md) (`/wow-addon:new-addon`) and
-   [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`).
+   [`NEW_ADDON.md`](NEW_ADDON.md) (`/wow-addon:new-addon`),
+   [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`) and
+   [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) (`/wow-addon:perf-analysis`).
 
 The standard is the source of truth and evolves in place. **Auditing no longer happens here** — each
 addon audits *itself*, in its own repo, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle there. Which
@@ -22,15 +23,16 @@ source code lives here, and this work never modifies the addons themselves.
 
 > The plugin that invokes these playbooks lives in a **separate repo**,
 > <https://github.com/tusharsaxena/wow-addon>, and is updated there to consume `AUDIT.md` /
-> `AUTOMATED_TESTS.md` / `NEW_ADDON.md` and the `standards/` docs from here.
+> `AUTOMATED_TESTS.md` / `NEW_ADDON.md` / `PERF_ANALYSIS.md` and the `standards/` docs from here.
 
-## The three things you can do here
+## The four things you can do here
 
 | I want to… | Go to | Playbook |
 |---|---|---|
 | Refresh or revise the standard | [`standards/`](standards/) | [A, below](#a-refresh-the-standard) |
 | Audit an addon for compliance | [`AUDIT.md`](AUDIT.md) | [B, below](#b-audit-an-addon) |
 | Start a new addon, born compliant | [`NEW_ADDON.md`](NEW_ADDON.md) | [C, below](#c-start-a-new-addon) |
+| Turn an in-game perf capture into evidence | [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) | [D, below](#d-analyze-an-in-game-perf-capture) |
 | Add/remove an addon from the roster | [`standards/ADDONS.md`](standards/ADDONS.md) | edit one table row |
 
 ## Scope
@@ -95,6 +97,16 @@ In short: run `/wow-addon:new-addon` to scaffold the Ace3 skeleton, build agains
 working from the [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) pack — which is
 fetched to a temp directory and **never** written into the addon (documentation-§3), and add the addon's row to [`standards/ADDONS.md`](standards/ADDONS.md). A born-compliant addon ships three root docs plus `LICENSE` — a full `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§7) — over the canonical `docs/` trio (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`).
 
+## D. Analyze an in-game perf capture
+
+Turn a capture a player took in a live client into committed evidence — run **in that addon's own
+repo**. Full, authoritative steps: [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md). In short: run
+`/wow-addon:perf-analysis` with the paste of `/<slash> perf report` **and** `/<slash> perf dump`; it
+splits, validates and stamps them into a **frozen** `docs/perf-analysis/<YYYYMMDD-HHMMSS>/` bundle —
+`report.md`, a verbatim one-line `dump.json`, and an `ANALYSIS.md` written to the playbook's uniform
+prompt — and refreshes the store's `README.md` and its capture index. Nothing is ever recorded here,
+and a capture is never invented: no paste, no bundle.
+
 ---
 
 ## Layout
@@ -104,6 +116,7 @@ WowAddonStandards/
   AUDIT.md                                -- PLAYBOOK: /wow-addon:standards-audit (per-addon self-audit)
   AUTOMATED_TESTS.md                      -- PLAYBOOK: /wow-addon:automated-tests (per-addon test record)
   NEW_ADDON.md                            -- PLAYBOOK: /wow-addon:new-addon (scaffold, born compliant)
+  PERF_ANALYSIS.md                        -- PLAYBOOK: /wow-addon:perf-analysis (per-addon in-game capture bundle)
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
   LICENSE
@@ -123,9 +136,9 @@ Audit and review runs are **not** stored here — each lives under its own addon
 
 ## Status
 
-Standard is at **v2.28.1** and living. Compliance auditing has moved out of this repo into each addon's
-own repository, driven by the `AUDIT.md` / `AUTOMATED_TESTS.md` / `NEW_ADDON.md` playbooks that the
-`wow-addon` plugin consumes.
+Standard is at **v2.29.0** and living. Compliance auditing has moved out of this repo into each addon's
+own repository, driven by the `AUDIT.md` / `AUTOMATED_TESTS.md` / `NEW_ADDON.md` / `PERF_ANALYSIS.md`
+playbooks that the `wow-addon` plugin consumes.
 
 ## License
 

@@ -87,7 +87,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (a) **Tier 1 present**, under exactly those names — `scope.md`, `module-map.md`, `schema.md`,
      `settings-panel.md`, `data-flow.md`, `common-tasks.md`; a missing one is a MUST failure.
      (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
-     `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-runs/README.md`, evaluate
+     `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`, evaluate
      the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, read
      `core/Compat.lua`) and require either the doc or a *Not applicable* row carrying that trigger.
      An absent doc whose trigger **has** fired is a MUST failure; an absent doc with a fired trigger
@@ -101,7 +101,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `slash-commands.md`, `debug-console.md` and the like are Tier 1/2 content under a per-repo name.
      File as **one rolled-up finding** naming each file and its canonical target, not one finding per
      file — the fix is a single `git mv` sweep and per-site enumeration only inflates the tally.
-     (e) **Retired docs** — a surviving `file-index.md` or `conventions.md` (retired v2.23.0).
+     (e) **Retired docs** — a surviving `file-index.md` or `conventions.md` (retired v2.23.0), a
+     surviving `complexity.md` (retired v2.19.0), or a surviving **`docs/perf-runs/`** directory
+     (retired v2.29.0). The store is `docs/perf-analysis/`, one frozen `<YYYYMMDD-HHMMSS>/` bundle
+     per capture carrying `report.md`, `dump.json` and `ANALYSIS.md`; a directory still named
+     `docs/perf-runs/`, and any flat `<YYYY-MM-DD>-ingame-<label>.json` record in it, is a deviation
+     against **performance-§8**. File it **once** for the directory, naming the records it holds and
+     that each still owes an `ANALYSIS.md` — not one finding per record, since the fix is a single
+     migration.
      (f) **Hub shape** — a mandated `ARCHITECTURE.md` section past ~60 lines that has not spilled to
      its canonical topic doc, or a file past ~400 lines. Report the shape and the line count; do
      **not** argue the arithmetic, and do not file a 412-line hub whose sections have all spilled.

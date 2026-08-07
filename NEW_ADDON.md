@@ -144,8 +144,18 @@ disagreeing with the collection's intent while looking, in review, like it had b
    is the bundle's `complexity.txt` and the trend line is `RESULTS.md`. The **tag** is gated on all four
    suites passing plus zero functions above CCN 15 (automated-tests-§3); the **commit** gate stays
    lint + the harness only (testing-§4).
+   **The in-game capture store starts empty, and that is correct.** A scaffolded addon with the perf
+   harness wired ships `docs/perf-analysis/README.md` — the bundle naming, the three artifacts, the
+   schema summary and its pointer to the library's contract, how a capture is taken in this addon's
+   own slash verb, and an empty capture index stating plainly that no capture has been taken yet
+   (performance-§8, documentation-§3). It does **not** get a first bundle: nobody has played the
+   addon, there is no client paste, and `../PERF_ANALYSIS.md` forbids assembling one from the offline
+   scenarios or the source. The first real capture is a later, separate run of
+   `/wow-addon:perf-analysis`. An addon holding the performance-§12 no-combat-path exemption ships
+   **no** store at all — not an empty directory.
 9. **Check the Definition of Done.** Walk the DoD checklist at the bottom of the context pack before
-   tagging `v0.1.0`.
+   tagging `v0.1.0`. Its perf row expects `docs/performance.md` and `docs/perf-analysis/README.md`
+   with an empty, honestly-labeled capture index — not a bundle.
 10. **Register in the roster.** Add the addon's row to
     [`standards/ADDONS.md`](standards/ADDONS.md) in the `WowAddonStandards` repo. This is the one edit
     that brings the addon into the collection's scope for the next standards refresh.
@@ -165,4 +175,5 @@ disagreeing with the collection's intent while looking, in review, like it had b
 - **The context pack is the source of detail.** Don't restate its snippets here — read them from
   `standards/NEW_ADDON_CONTEXT.md`. When the two disagree, the standard/context-pack wins.
 - **Keep it maintainable afterward** with the `wow-addon:` skills (`review`, `sync-docs`,
-  `bump-version`, `bump-interface`, `standards-audit`).
+  `bump-version`, `bump-interface`, `standards-audit`, `automated-tests`, `run-tests`,
+  `perf-analysis`).

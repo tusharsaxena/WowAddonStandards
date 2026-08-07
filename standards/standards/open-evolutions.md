@@ -35,7 +35,7 @@ Items recorded for future versions of this standard:
   the frame's `OnHide`, from the top of the configure path, and by the tick that reaches zero. Per tick
   it costs one `C_Spell.GetSpellCooldown` and one `SetText`. On the letter of the trigger that ends the
   exemption, so the addon owes a `core/PerfSetup.lua`, a `perf` verb, a second SavedVariables global, a
-  suspend/resume contract, a `tests/perf.lua` and a `docs/perf-runs/` store — to account for a timer
+  suspend/resume contract, a `tests/perf.lua` and a `docs/perf-analysis/` store — to account for a timer
   the player starts by opening a window and stops by closing it. Criteria **(b)** and **(c)** did not
   change: the buckets would still read `0.000`, which performance-§3 calls a lie in every report, and
   `suspend` would still make a capture addon miss the capture. Only (a) broke.

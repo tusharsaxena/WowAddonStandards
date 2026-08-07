@@ -156,19 +156,31 @@ A capture is two **combat-gated windows** over comparable fights, differing only
 - **MUST** read the **bucket figures** as the addon's cost, and treat the frame-time delta as **unresolved** below the harness's measured run-to-run spread. A per-frame delta is a difference of two noisy aggregates; the buckets measure the addon's own code directly.
 - **SHOULD** capture and store the run's context — character, spec, level, zone, group size — with the record. A capture read back weeks later is uninterpretable without knowing whether it was a solo dummy or a 20-man.
 
-### 8. Record schema and `docs/perf-runs/` (MUST)
+### 8. Record schema, and the perf analysis bundle in `docs/perf-analysis/` (MUST)
 
-> **Scope, as of `automated-tests`:** this directory is now the **in-game** capture store. Offline
-> runs are produced by the vendored runner and land in that run's bundle under
+> **Scope, as of `automated-tests`:** this directory is the **in-game** capture store. Offline runs
+> are produced by the vendored runner and land in that run's bundle under
 > `docs/automated-tests/<run>/` with the rest of the suites. In-game captures cannot be produced by
 > a script — a human runs the `perf` verb in a live client and exports the record — so they keep the
 > standing cumulative store described here, and its `README.md` says so plainly.
 
+> **The store's shape changed in v2.29.0, and its name with it.** It was `docs/perf-runs/`, a flat
+> pile of `<YYYY-MM-DD>-ingame-<label>.json` records whose interpretation lived somewhere else — or,
+> far more often, nowhere. A record and its reading are one artifact: this section already says an
+> interpretation without its record is an assertion, and the converse turned out to matter as much —
+> a record nobody read is a number in a directory. The store is now **`docs/perf-analysis/`**, one
+> **frozen dated bundle per capture**, carrying the record *and* its reading together. The flat
+> naming is retired. **A directory still named `docs/perf-runs/` is a deviation.**
+
 - **MUST** emit records in the **library's versioned record schema**, whose field-by-field contract lives with the lib. The addon does not define the shape; one reader handles a record from any Ka0s addon, which is the point.
 - **MUST** stamp the emitting addon and its version into the record, so a record identifies itself outside the file it came from.
-- **MUST** commit **in-game** captures worth keeping under **`docs/perf-runs/`**, named `<YYYY-MM-DD>-ingame-<label>.json`, with a `README.md` in that directory documenting the naming, a schema summary, a pointer to the lib's canonical contract, and the fact that offline runs live in `docs/automated-tests/` (automated-tests-§7). The directory is **standing and cumulative** — not tied to one investigation — so in-game runs compare across addon versions.
+- **MUST** commit an **in-game** capture worth keeping as a bundle under **`docs/perf-analysis/<YYYYMMDD-HHMMSS>/`**, stamped in **local time from the record's own timestamp** — when the capture happened, not when it was written up, so a run analysed a week later still sorts against its neighbours. The bundle carries exactly three artifacts: **`report.md`** (what the client printed, including the run's lifecycle log), **`dump.json`** (the record) and **`ANALYSIS.md`** (the write-up). The directory is **standing and cumulative** — not tied to one investigation — so captures compare across addon versions.
+- **MUST** commit `dump.json` **byte for byte as the client emitted it** — one line, keys as sorted, figures as encoded. The library emits sorted keys so that two records diff cleanly; pretty-printing, re-keying or rounding destroys exactly that property, and a hand-touched record is worse than an absent one because it reads as measured.
+- **MUST** keep a `README.md` in that directory documenting the bundle naming and its three artifacts, a schema summary, a pointer to the lib's canonical contract, how a capture is taken in this addon's own slash verb, the fact that offline runs live in `docs/automated-tests/` (automated-tests-§7), and an **index of the captures taken so far**. It is the one file in the store that is rewritten; the bundles are frozen.
 - **MUST** treat committed records as **evidence**: the raw capture outlives the write-up that interprets it, and an interpretation without its record is an assertion.
-- **SHOULD** write the interpretation up under `docs/investigations/<YYYY-MM-DD>-<topic>/` when a capture is used to answer a question, and treat dated investigation bundles as frozen once written (audit-review-history).
+- **MUST** write `ANALYSIS.md` in the bundle, following the uniform prompt in the root **`PERF_ANALYSIS.md`** playbook, so every addon's write-up has the same shape and two addons' captures can be read against each other. It **MUST** be evidence-backed against the bundle it sits in — a claim about a number cites the file in the same directory that carries it — and it is frozen with that evidence; if the reading was wrong, the *next* capture's analysis says so.
+- **MUST NOT** report a frame-time delta inside the harness's resolution floor as a null result. `fps.deltaMsPerFrame` is a difference of two noisy aggregates, unresolved below roughly 0.5 ms/frame on a 60–80 s arm; "no measurable impact" written from an unresolved delta is a statement about the instrument dressed as a statement about the addon (§7). The **buckets** are the addon's cost.
+- **SHOULD** still open a `docs/investigations/<YYYY-MM-DD>-<topic>/` bundle when a capture is one input to a **wider question** — several captures, offline runs and profiler output argued together. The per-capture reading belongs in that capture's own `ANALYSIS.md`; an investigation cites it rather than restating it, and dated investigation bundles are frozen once written (audit-review-history).
 
 ### 9. The offline scenario runner (`tests/perf.lua`)
 
@@ -338,7 +350,7 @@ whichever of **(b)** or **(c)** applies:
   two — toc-file-§2, savedvariables-§4);
 - performance-§6's suspend/resume contract;
 - performance-§9's `tests/perf.lua` offline runner;
-- documentation-§3's `docs/perf-runs/README.md`, and with it the `docs/perf-runs/` store itself
+- documentation-§3's `docs/perf-analysis/README.md`, and with it the `docs/perf-analysis/` store itself
   (performance-§8) — there are no in-game captures to keep.
 
 **What it does NOT suspend.** All four of these survive the exemption, and three of them are the ones an

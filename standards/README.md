@@ -16,11 +16,12 @@ context pack for scaffolding new addons. Compliance auditing is **not** run from
 | [`ADDONS.md`](ADDONS.md) | **The roster** — the editable list of in-scope Ka0s addons, plus a second table of **Ka0s-owned library repos** (audited against library-stack-§7's applicability list, not the addon rule set); a standards-process input. |
 | [`_raw/_industry/`](_raw/_industry/) | Per-addon raw research reports — the evidence base behind `INDUSTRY_RESEARCH.md`. |
 
-The three **process playbooks** live at the repo root (predictable paths for the `wow-addon` plugin to
+The four **process playbooks** live at the repo root (predictable paths for the `wow-addon` plugin to
 fetch): [`../AUDIT.md`](../AUDIT.md) (`/wow-addon:standards-audit`),
-[`../NEW_ADDON.md`](../NEW_ADDON.md) (`/wow-addon:new-addon`) and
-[`../AUTOMATED_TESTS.md`](../AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`). Each is a thin orchestrator that draws
-its substance from the docs above.
+[`../NEW_ADDON.md`](../NEW_ADDON.md) (`/wow-addon:new-addon`),
+[`../AUTOMATED_TESTS.md`](../AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`) and
+[`../PERF_ANALYSIS.md`](../PERF_ANALYSIS.md) (`/wow-addon:perf-analysis`). Each is a thin
+orchestrator that draws its substance from the docs above.
 
 `STANDARDS.md` is the source of truth. When any document here disagrees with it, it wins.
 

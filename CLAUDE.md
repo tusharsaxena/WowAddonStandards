@@ -4,9 +4,9 @@ Guidance for AI agents working in this repository.
 
 ## What this repo is
 
-The **house standard** for the Ka0s World of Warcraft addon collection, plus the three **process
-playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md` and `NEW_ADDON.md`. It
-contains **documents only** — no addon source code lives here.
+The **house standard** for the Ka0s World of Warcraft addon collection, plus the four **process
+playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md` and
+`PERF_ANALYSIS.md`. It contains **documents only** — no addon source code lives here.
 
 This repo does **not** run audits. Compliance auditing and new-addon scaffolding happen **in each
 addon's own repo**, driven by a plugin skill that reads the playbook from here:
@@ -18,8 +18,11 @@ addon's own repo**, driven by a plugin skill that reads the playbook from here:
   **its own** repo.
 - **`NEW_ADDON.md`** (root) — the step-by-step spec for `/wow-addon:new-addon`. Scaffolds a new addon
   that is born compliant.
+- **`PERF_ANALYSIS.md`** (root) — the step-by-step spec for `/wow-addon:perf-analysis`. An addon
+  records **its own** in-game captures, writing a frozen `docs/perf-analysis/<YYYYMMDD-HHMMSS>/`
+  bundle inside **its own** repo.
 
-All three are **thin orchestrators**: they say *how* the process runs and defer all substance to the
+All four are **thin orchestrators**: they say *how* the process runs and defer all substance to the
 canonical docs under `standards/`. The plugin lives in a separate repo
 (<https://github.com/tusharsaxena/wow-addon>) and is updated there to consume these files.
 
@@ -34,7 +37,8 @@ than the addon rule set. **Do not modify those repos from here.**
 AUDIT.md                          -- PLAYBOOK: /wow-addon:standards-audit (per-addon self-audit)
 AUTOMATED_TESTS.md                -- PLAYBOOK: /wow-addon:automated-tests (per-addon test record)
 NEW_ADDON.md                      -- PLAYBOOK: /wow-addon:new-addon (scaffold, born compliant)
-README.md                         -- repo overview + the three things you can do here
+PERF_ANALYSIS.md                  -- PLAYBOOK: /wow-addon:perf-analysis (per-addon in-game capture bundle)
+README.md                         -- repo overview + the four things you can do here
 CLAUDE.md                         -- this file
 LICENSE
 .gitattributes                    -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
@@ -53,7 +57,7 @@ Audit and review runs are **not** in this repo — they live under each audited 
 `docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and audit-review-history of the standard).
 
 Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the playbooks (`AUDIT.md`,
-`NEW_ADDON.md`, `AUTOMATED_TESTS.md`) → the rest as needed.
+`NEW_ADDON.md`, `AUTOMATED_TESTS.md`, `PERF_ANALYSIS.md`) → the rest as needed.
 
 ## Conventions
 
@@ -81,9 +85,10 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   specific passage matters, name its heading in words (*standalone-windows, "The Ka0s window edge"*).
   This repo's own prose is held to the rule it publishes; if one of the eleven ever gains numbered
   subsections, it leaves the list in the same change.
-- **The playbooks are thin orchestrators.** `AUDIT.md`, `NEW_ADDON.md` and `AUTOMATED_TESTS.md` describe process and point
+- **The playbooks are thin orchestrators.** `AUDIT.md`, `NEW_ADDON.md`, `AUTOMATED_TESTS.md` and
+  `PERF_ANALYSIS.md` describe process and point
   into `standards/` (`STANDARDS.md` as the audit checklist; `NEW_ADDON_CONTEXT.md` as the scaffold
-  pack). Keep the *substance* in `standards/`; don't duplicate rules into the playbooks — they drift.
+  pack; the `performance` section as the record schema and capture protocol). Keep the *substance* in `standards/`; don't duplicate rules into the playbooks — they drift.
 - **Industry research is a standards-process input, not an audit step.** The reference-addon research
   (`standards/INDUSTRY_RESEARCH.md` + `standards/_raw/_industry/`) is a living foundation for
   `STANDARDS.md`; see `standards/README.md` for the rebuild process.
@@ -130,8 +135,8 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   `testing.md`, `smoke-tests.md`, where `ARCHITECTURE.md` carries ten mandated sections ending in
   `## Documentation map` (the per-addon doc register) and `## Documented deviations` (the single home
   of a ratified deviation); the **verification-and-record docs** — `test-cases.md`, `performance.md`,
-  `perf-runs/README.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md`, of which the
-  first, second, fourth and fifth are unconditional and `perf-runs/README.md` is required only while
+  `perf-analysis/README.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md`, of which the
+  first, second, fourth and fifth are unconditional and `perf-analysis/README.md` is required only while
   the performance harness is wired, so an addon holding a recorded performance-§12 exemption ships
   four; and **Tier 1** — `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`,
   `data-flow.md`, `common-tasks.md`, all six unconditional and under exactly those names, with Tier 2
