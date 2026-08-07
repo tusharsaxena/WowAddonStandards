@@ -108,7 +108,10 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   behavior: the hook reads `git check-attr eol` and follows whatever the repo declares, and what this
   repo declares is LF. The standard it publishes binds it — a standards repo that does not follow its
   own rule is the one thing that discredits the rule. If a file arrives CRLF anyway, that is a
-  straggler, not a local convention: `rm <path> && git checkout -- <path>`, then `file <path>`.
+  straggler, not a local convention: `rm <path> && git checkout -- <path>`, then count the bytes
+  with `tr -dc '\r' < <path> | wc -c` — it must be `0` here. Not `file <path>`: it reports nothing
+  about line terminators for JSON or for any binary, so it passes files it never examined
+  (`line-endings-§7`).
 - Keep documents internally consistent. A change to the standard usually ripples into
   `standards/EXECUTIVE_SUMMARY.md` and `standards/NEW_ADDON_CONTEXT.md`, and sometimes the root
   `README.md` / the playbooks. Update all affected docs together, and bump the standard's version +

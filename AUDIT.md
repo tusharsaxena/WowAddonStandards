@@ -126,9 +126,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 
      # (e) does the WORKING TREE actually agree with the declared pin? ONE number.
      git ls-files -z | xargs -0 -I{} sh -c '
-       a=$(git check-attr eol -- "{}" | sed "s/.*: //")
-       case "$a" in crlf) file "{}" | grep -q CRLF || echo "{}";;
-                    lf)   file "{}" | grep -q CRLF && echo "{}";; esac' 2>/dev/null | wc -l
+       set -- $(git check-attr text eol -- "{}" | sed "s/.*: //")
+       [ "$1" = unset ] && exit                      # binary: git converts nothing here
+       cr=$(tr -dc "\r" < "{}" | wc -c); lf=$(tr -dc "\n" < "{}" | wc -c)
+       case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && echo "{}";;
+                    lf)   [ "$cr" -gt 0 ] && echo "{}";; esac' 2>/dev/null | wc -l
      ```
 
      A file carrying **only** the `*.sh` carve-out with no pin above it is **not** compliance — it is
@@ -138,9 +140,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      disagree with the declared pin"* — carrying the command above so the number can be reproduced,
      and **never** enumerate the files: the fix is a single `git add --renormalize .` plus a
      re-checkout, and a per-file tally inflates the count for one action. A correct `.gitattributes`
-     over an unrenormalized tree is the **measured** failure in nine of nine repos, so (e) is the
-     check that earns its place. Grade by impact per step 5 — config-and-hygiene, so **Low** or
-     **Info** — while still naming the MUST it fails.
+     over an unrenormalized tree is the failure (e) exists to catch, and it was **measured in four of
+     the eleven repos** when the check was last corrected (`line-endings-§1`), so (e) earns its place.
+     Grade by impact per step 5 — config-and-hygiene, so **Low** or **Info** — while still naming the
+     MUST it fails. **Expect this count to be far lower than a pre-v2.28.1 audit bundle reported for
+     the same repo**: the old command counted every binary and every JSON file as a stray. A frozen
+     bundle is never edited, so say so in the finding rather than letting the two numbers sit
+     unexplained side by side.
    - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
      `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
      `audit-review-history` binds this run twice, in opposite directions. A gap matching a register

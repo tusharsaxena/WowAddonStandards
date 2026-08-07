@@ -15,9 +15,19 @@ tooling — `WowAddonStandards` and `wow-addon` — had **no `.gitattributes` at
 
 **That census is the state this section was written against, and it has since been closed.** All
 eleven repos now carry an explicit root `.gitattributes` holding the §5 canonical body for their
-kind — the nine client-bound repos at 78 lines, `WowAddonStandards` and `wow-addon` at 81. The
+kind — the nine client-bound repos at 81 lines, `WowAddonStandards` and `wow-addon` at 82. The
 figures above are kept because they are why the rule reads the way it does, not because they
 describe the collection today.
+
+**Treat the straggler counts in that census, and in the v2.24.0 changelog, as indicative rather than
+measured.** They were produced by the superseded §7 (e) check, which counted every binary and every
+JSON file as a stray on every run — so `111` is an upper bound on `PanelMaster`'s disagreement, not a
+count of it. Remeasured with the corrected command (v2.28.1), the collection stands at
+`AbsorbTracker` 7, `ConsumableMaster` 7, `BankLedger` 5, `LootHistory` 5, `PanelMaster` 1, and `0` in
+`KickCD`, `PrettyChat`, `WhatGroup`, `LibKa0s`, `WowAddonStandards` and `wow-addon`. The argument
+this section makes does not rest on the size of those numbers — an unpinned repo diverges per machine
+whether it has diverged yet or not — but a reader comparing an old audit against a new one **MUST**
+be told that the instrument changed, not the trees.
 
 This section states the rule first and the exception second, fixes one canonical file body per repo
 kind so a repo can be **diffed** against the standard rather than read against it, and specifies the
@@ -42,8 +52,9 @@ which trains its readers to ignore the one gate that exists to catch a real drif
   byte-different checkouts of the same commit and neither is doing anything wrong, so there is no
   conversation in which the disagreement surfaces.
 - A file carrying **only exceptions** — the `*.sh` carve-out with no pin above it — **MUST NOT** be
-  treated as satisfying this. It reads as a policy and is not one; it is the state that produced 111
-  disagreeing files in `PanelMaster` while looking, in review, like the repo had been handled.
+  treated as satisfying this. It reads as a policy and is not one; it is the state that left
+  `PanelMaster`'s working tree disagreeing with the collection's intent while looking, in review,
+  like the repo had been handled.
 - **`.gitattributes` is a development artifact and MUST NOT ship to players** — it is listed in the
   `.pkgmeta` `ignore:` block for the same reason `.gitignore` and `.luacheckrc` are (`packaging`).
 
@@ -210,8 +221,11 @@ sync.
 #
 # `--renormalize` rewrites the INDEX; it does not rewrite files already on
 # disk. To fix a straggler in the WORKING TREE, delete it and check it out
-# again (`rm <path> && git checkout -- <path>`), then confirm with
-# `file <path>` — "CRLF line terminators" is the expected answer here.
+# again (`rm <path> && git checkout -- <path>`), then count the bytes:
+#   tr -dc '\r' < <path> | wc -c     # must equal…
+#   tr -dc '\n' < <path> | wc -c     # …this, in a CRLF repo.
+# Not `file <path>`: it reports nothing about line terminators for JSON or
+# for any binary, so it passes files it never examined (line-endings-§7).
 ```
 
 **Non-client repos** — `WowAddonStandards` and `wow-addon`:
@@ -295,9 +309,10 @@ sync.
 #
 # `--renormalize` rewrites the INDEX; it does not rewrite files already on
 # disk. To fix a straggler in the WORKING TREE, delete it and check it out
-# again (`rm <path> && git checkout -- <path>`), then confirm with
-# `file <path>` — no "CRLF line terminators" in the output is the expected
-# answer here.
+# again (`rm <path> && git checkout -- <path>`), then count the bytes:
+#   tr -dc '\r' < <path> | wc -c     # must be 0 in an LF repo.
+# Not `file <path>`: it reports nothing about line terminators for JSON or
+# for any binary, so it passes files it never examined (line-endings-§7).
 ```
 
 ### 6. Adopting or changing the pin: the index is not the working tree (MUST)
@@ -331,7 +346,9 @@ warning: in the working copy of 'core/Namespace.lua', LF will be replaced by CRL
 
   ```sh
   rm <path> && git checkout -- <path>
-  file <path>                # "CRLF line terminators" in a CRLF repo; absent in an LF repo
+  printf '%s CR / %s LF\n' "$(tr -dc '\r' < <path> | wc -c)" "$(tr -dc '\n' < <path> | wc -c)"
+  # equal counts in a CRLF repo; CR must be 0 in an LF repo. Not `file <path>`:
+  # it prints nothing about line terminators for JSON or for any binary (§7).
   ```
 
 - The whole-tree form is `git rm --cached -r . && git reset --hard`. It **MUST NOT** be used with
@@ -355,11 +372,31 @@ test -f .gitattributes && grep -nE '^\* text=auto eol=(crlf|lf)$|^\*\.sh text eo
 
 # (e) does the WORKING TREE agree with the declared pin? — one number, not a list
 git ls-files -z | xargs -0 -I{} sh -c '
-  a=$(git check-attr eol -- "{}" | sed "s/.*: //")
-  case "$a" in crlf) file "{}" | grep -q CRLF || echo "{}";;
-               lf)   file "{}" | grep -q CRLF && echo "{}";; esac' 2>/dev/null | wc -l
+  set -- $(git check-attr text eol -- "{}" | sed "s/.*: //")
+  [ "$1" = unset ] && exit                      # binary: git converts nothing here
+  cr=$(tr -dc "\r" < "{}" | wc -c); lf=$(tr -dc "\n" < "{}" | wc -c)
+  case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && echo "{}";;
+               lf)   [ "$cr" -gt 0 ] && echo "{}";; esac' 2>/dev/null | wc -l
 ```
 
+- **(e) asks git for `text` as well as `eol`, and it counts bytes rather than asking `file(1)`.**
+  Both halves are corrections to a version of this check that over-reported by a factor of three.
+  `binary` expands to `-text`, and it says nothing about `eol` — so `git check-attr eol` on a marked
+  PNG returns `crlf`, inherited from the pin line, for a file git will never convert. Reading `text`
+  first is what makes §4's marking mean something to §7. And `file(1)` is a type sniffer, not a byte
+  test: it reports `JSON text data` for a fully-CRLF JSON file whatever its bytes, `no line
+  terminators` for a file that has none, and `with CRLF line terminators` for a file where only
+  **one** line ends CRLF — so it counts binaries and JSON as strays forever while passing the
+  half-converted file, which is exactly what an edit into a CRLF file produces. Counting CR against
+  LF answers the question that was actually asked. A file with no `\n` at all is not a straggler and
+  is skipped: there is nothing on disk to convert.
+- **The one accuracy the one-liner gives up is the lone `\r`.** Comparing totals treats every CR as
+  half of a CRLF pair, so a file carrying a bare `\r` **inside** a line reads wrong in both
+  directions — flagged when it is clean, and passed when a stray CR masks a real bare `\n`. No file
+  in the collection has one, and the trade buys a check that stays pasteable; a repo that acquires
+  old-Mac endings needs a scanner that counts `\r\n` pairs rather than this. **Do not "simplify" the
+  command back toward `file(1)`** — that shape is the defect this replaced, not a shorter spelling of
+  it.
 - A count of `0` is the compliant state. Anything else is **one** finding: *"N tracked files disagree
   with the declared pin"*, with the command above quoted so the next reader can reproduce the number
   rather than trust it.

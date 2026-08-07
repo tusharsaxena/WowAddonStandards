@@ -826,8 +826,11 @@ the carve-out without the pin above it is explicitly **not** compliance (`line-e
 #
 # `--renormalize` rewrites the INDEX; it does not rewrite files already on
 # disk. To fix a straggler in the WORKING TREE, delete it and check it out
-# again (`rm <path> && git checkout -- <path>`), then confirm with
-# `file <path>` — "CRLF line terminators" is the expected answer here.
+# again (`rm <path> && git checkout -- <path>`), then count the bytes:
+#   tr -dc '\r' < <path> | wc -c     # must equal…
+#   tr -dc '\n' < <path> | wc -c     # …this, in a CRLF repo.
+# Not `file <path>`: it reports nothing about line terminators for JSON or
+# for any binary, so it passes files it never examined (line-endings-§7).
 ```
 
 Then add `- .gitattributes` to `.pkgmeta`'s `ignore:` block below — it is dev-only, exactly as
