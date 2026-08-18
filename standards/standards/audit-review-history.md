@@ -48,42 +48,81 @@ be deleted where it still exists.
 
 **Discovery and triage are two commands, deliberately.** `/wow-addon:issue-audit` sweeps the addon —
 four discovery passes, stable item IDs, evidence hashes, severity — and files anything not already in
-the store as an open `[untriaged]` issue. It never interviews and never changes code.
-`/wow-addon:issue-triage` takes those `[untriaged]` issues, puts each to the maintainer one at a time
-with its evidence, and records the decision on the issue. It changes the store only.
+the store as an open issue labelled `state:untriaged`. It never interviews and never changes code.
+`/wow-addon:issue-triage` takes those `state:untriaged` issues, **most severe first**, puts each to the
+maintainer one at a time with its evidence, and records the decision by swapping the status label. It
+changes the store only.
 
 The split exists because the two halves have different costs. A sweep is mechanical, safe, and worth
 running often, including across every repo at once; a triage costs a human decision per item and can
 only be done attentively. Fused, the cheap half was gated behind the expensive one — you could not
 find out what was hanging without committing to an interview about all of it, which is a good way to
 train people not to look. Split, an addon can be swept in a minute and triaged when there is time to
-think, and the `[untriaged]` backlog between the two is itself a visible, countable quantity rather
+think, and the `state:untriaged` backlog between the two is itself a visible, countable quantity rather
 than an unrecorded intention.
 
 A consequence worth stating, because it changes what a decision means: **triage records, it does not
-implement.** Accepting that something should be done produces a `[triaged]` issue carrying the
+implement.** Accepting that something should be done produces a `state:triaged` issue carrying the
 chosen approach, not a code change. The work happens in an ordinary session against that issue.
 
-- **MUST** carry the item's status as a **title prefix**, shaped exactly `[<Status>] <Title>`, drawn
-  from a closed vocabulary of four:
+- **MUST** carry the item's status as a **GitHub label**, drawn from a closed vocabulary of four,
+  with the colours below so a status is legible at a glance in the web UI:
 
-  | Status prefix | Issue state | Means |
+  | Status label | Colour | Issue state | Means |
+  |---|---|---|---|
+  | `state:done` | green `00ff00` | closed | Decided and implemented |
+  | `state:will-not-do` | blue `0000ff` | closed | Declined; terminal |
+  | `state:triaged` | yellow `ffff00` | open | Put to a human, accepted as real, deliberately not now |
+  | `state:untriaged` | red `ff0000` | open | Swept up, not yet interviewed |
+
+  Exactly one per issue. **The label is the status — not a title prefix, and not a milestone.**
+
+  **The two families are deliberately opposed in brightness, and that is load-bearing.** Status
+  colours sit at full saturation (`ff` on the accent channel); severity colours sit near black (`11`
+  on the accent channel). Both families use the same *hue* ladder — green, yellow, orange, red — so a
+  hue alone cannot tell you which family a chip belongs to, and an issue always wears one of each.
+  When both were mid-tone, a row of chips read as an undifferentiated smear and the eye had to parse
+  the label text to find the status. Keep the two brightness bands apart when adding or recolouring;
+  matching them is what the split exists to prevent.
+- **MUST** carry the item's **severity** as a second GitHub label, one per issue, from a closed
+  vocabulary of four:
+
+  | Severity label | Colour | Means |
   |---|---|---|
-  | `[done]` | closed | Decided and implemented |
-  | `[will-not-do]` | closed | Declined; terminal |
-  | `[triaged]` | open | Put to a human, accepted as real, deliberately not now |
-  | `[untriaged]` | open | Swept up, not yet interviewed |
+  | `severity:critical` | red `110000` | Taint, combat-lockdown breakage, SavedVariables corruption or data loss, an error on a common path |
+  | `severity:high` | orange `110800` | A user-visible defect, or a standard deviation carried out of an audit or review bundle |
+  | `severity:medium` | yellow `111100` | Maintainability: a stub callers depend on, code/doc drift, a dead path |
+  | `severity:low` | green `001100` | Polish, naming, cosmetic, speculative-future notes |
 
-  The prefix is the status — **not** a label, and **not** a milestone. One field, visible in every
-  listing, in the one place `gh issue list` returns without a second call.
+  Severity is **not decoration**: it is the order `/wow-addon:issue-triage` interviews in, so a wrong
+  severity does not merely mislabel an item, it puts it in front of or behind the wrong things when a
+  human sits down to decide. `issue-audit` assigns one when it files, and the maintainer **MAY**
+  overrule it during triage, which re-orders the remaining queue. The **level** lives in the label
+  and nowhere else; the issue body carries the *rationale* for it, so the two cannot drift.
+- **MUST NOT** put either value in the **title**. A title is the plain statement of the work: no
+  `[<Status>] ` prefix, no emoji status marker, no severity word. Two conventions preceded the labels
+  and both are retired — the `marker + word` ledger-table affordance (`🟢 done`), and the
+  `[<Status>] <Title>` title prefix. Where a leftover prefix survives on an old issue, **the label is
+  the truth and the prefix is stale text**, stripped on sight by the commands that write the store.
+- **MUST** label the whole store, so there is no unlabelled state. An issue that arrives without a
+  `state:` label — filed from the GitHub web UI, or by someone not using these commands — is
+  **repaired on sight** to `state:untriaged` if open, or to the matching terminal label if closed,
+  and the repair is **announced**, including by the read-only commands: a listing command that
+  mutates silently is worse than one that does not repair at all. A missing `severity:` label is
+  repaired only by the commands that read issue bodies; a command that has not read the body
+  **MUST NOT** guess a severity from the title, because a fabricated grade lands in a report people
+  then reason from.
 - **MUST** drive issue work through the **`gh` CLI subcommands** — `gh issue list`, `gh issue create`,
-  `gh issue edit`, `gh issue close`, `gh issue comment`, `gh issue view` — taking structured data with
-  `--json` on those same subcommands. Listing by status is therefore a **title filter** over
-  `gh issue list --json number,title,state`.
+  `gh issue edit`, `gh issue close`, `gh issue comment`, `gh issue view`, `gh label list`,
+  `gh label create` — taking structured data with `--json` on those same subcommands. Listing by
+  status or severity is therefore a plain **`--label` query** over
+  `gh issue list --json number,title,state,labels`, not a title filter and not a search. The eight
+  labels are created idempotently with `gh label create --force`, which also repairs a drifted
+  colour.
 - **MUST NOT** use `gh api graphql`, or hand-rolled GraphQL against `api.github.com/graphql`, for
   issue work. Reaching for GraphQL first is a real, observed failure: it spends a round trip on a
   deprecated path before falling back to the subcommand that would have worked. Where a REST call is
   genuinely unavoidable, use `gh api repos/{owner}/{repo}/issues` — never the GraphQL endpoint.
 - **Migration is deferrals only.** A surviving ledger's `deferred` rows migrate out as **open**
-  `[triaged]` issues. `done` and `wont-do` rows are terminal and are **not** migrated; they survive
+  issues labelled `state:triaged`. `done` and `wont-do` rows are terminal and are **not** migrated; they survive
   in git history via the commit that deletes the file, which is the whole reason deleting it is safe.
