@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.30.0, 2026-08-18)
+# New Ka0s Addon — Context Pack (v2.31.0, 2026-08-23)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -57,7 +57,7 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
      inside it, so there is no `LibKa0s/testkit/` to copy from. It goes under `tests/`, **never**
      `libs/`, because it must not ship to the player (testing-§1).
 4. **Fill in the starters.** Work through the *Starter snippets* (TOC, entry, `Compat`, `Locale`,
-   `Database`, `Schema`, the five setup files, tests, message bus, `.luacheckrc`, `.pkgmeta`,
+   `Database`, `Schema`, the six setup files, tests, message bus, `.luacheckrc`, `.pkgmeta`,
    `DEPENDENCIES.md`) and the
    *Hard rules cheat sheet* below. **The shared subsystems are consumed, not written**: the chat
    printer, the debug console, the slash dispatcher, the options toolkit and the performance harness
@@ -107,6 +107,8 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     Constants.lua
     Namespace.lua        -- NS.PREFIX, the mandatory cyan chat tag (slash-commands-§4)
     State.lua            -- session-only state incl. NS.State.debug (never in SV)
+    MediaSetup.lua       -- NS.Icon / NS.MediaFont from LibKa0s-Media-1.0 + the one RegisterLSM
+                            call; loads BEFORE Constants, which resolves FONT_MONO from it
     CoreSetup.lua        -- NS.Print from LibKa0s-Core-1.0:New{prefix=...} (slash-commands-§4)
     PerfSetup.lua        -- NS.Perf = LibStub("LibKa0s-Perf-1.0"):New(descriptor) (performance-§1)
     DebugLogSetup.lua    -- NS.DebugLog = LibKa0s-DebugLog-1.0:New(descriptor); publishes NS.Debug
@@ -186,7 +188,8 @@ locales\enUS.lua
 
 # Core
 core\Compat.lua
-core\Constants.lua                       -- incl. FONT_MONO, the shipped console font path
+core\MediaSetup.lua                      -- BEFORE Constants: it publishes the seam FONT_MONO reads
+core\Constants.lua                       -- incl. FONT_MONO, resolved from NS.MediaFont
 core\Namespace.lua                       -- NS.PREFIX
 core\State.lua                           -- NS.State.debug
 core\CoreSetup.lua                       -- after NS.PREFIX, before anything that prints
@@ -512,12 +515,60 @@ widget created before a UI skin installs its `RegisterAsWidget` hook keeps Blizz
 for the session (options-ui-§5, anti-pattern #42). Panel-open **refuses** under combat lockdown with
 a gray notice — the gate is inside the open function, so a second un-gated open path is forbidden.
 
+### `core/MediaSetup.lua` — the shared art and type (`LibKa0s-Media-1.0`)
+
+The icon catalog, the monospace face and the bar textures ship **inside the vendored payload** at
+`libs/LibKa0s/media/`, so the addon already carries them (library-stack-§8). This file is the seam
+that reaches them, and it is three lines of real work:
+
+```lua
+local addonName, NS = ...
+
+local Media = LibStub and LibStub("LibKa0s-Media-1.0", true)
+
+--- The texture path for one shipped icon, or nil. NIL IS A REAL ANSWER -- the library may be
+--- absent, or the name may not be one it ships -- and both mean the same thing to a caller: draw
+--- something else. Far better than the alternative, which is a plausible path to a texture that
+--- does not load, draws nothing and raises nothing.
+function NS.Icon(name)
+    if not Media then return nil end
+    return Media.Icon(addonName, name)
+end
+
+--- The path of one shipped face, or nil when the library is absent.
+function NS.MediaFont(name)
+    if not Media then return nil end
+    return Media.Font(addonName, name)
+end
+
+-- At FILE LOAD, not PLAYER_LOGIN: LibSharedMedia is vendored under libs/ and has already run, and
+-- a shipped default naming a face LSM has not heard of yet resolves to nothing.
+if Media then Media.RegisterLSM(addonName) end
+```
+
+**Why every call passes `addonName`.** A texture path is absolute from `Interface\AddOns\` and the
+library is vendored — there is no one path to it, and a copy cannot know which folder it was copied
+into. This file has the folder name as its first vararg and nothing else does. Pass **that**, never a
+value that merely happens to equal it.
+
+**Why it loads before `core/Constants.lua`.** `Constants.FONT_MONO` is resolved from `NS.MediaFont`,
+and a Constants that loaded first would resolve it to the fallback on a perfectly healthy install.
+Make that fallback a **real client font** (`_G.STANDARD_TEXT_FONT`), never `nil` and never a path
+into a payload that may be absent — `SetFont` takes a bad path, fails to load it, and the text simply
+does not draw.
+
+Then draw with `NS.Icon("settings")` wherever the addon builds a control, keeping whatever fallback
+ladder it already has for art that fails to load. A mark the catalog lacks is added **upstream**
+(library-stack-§8), never drawn into this addon.
+
 ### `core/DebugLogSetup.lua` — the debug console (`LibKa0s-DebugLog-1.0`)
 
 The console window, the copy window, both formatters, the 500-line buffer, the scrollbar, the line
 counter and the enable seam are the library's — **none of it is the addon's code to write, and an
 audit MUST NOT ask for it in the addon's source**. This file supplies the frame-name prefix, the
-title, the monospace font path, where the flag lives, and what the `[Init]` line says. Sits after
+title, the monospace font path, **the addon folder name** (`addonName`, which is what makes the
+console's own close, copy and clear draw the shared marks — and is a different field from `name`,
+which seeds the frame globals), where the flag lives, and what the `[Init]` line says. Sits after
 `core/Constants.lua` (the font path), `core/State.lua` (the flag) and `core/CoreSetup.lua` (the
 printer), and before everything that calls the sink.
 
@@ -1128,7 +1179,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`.
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors**.
 - [ ] **`libs/LibKa0s/` vendored WHOLE** from the library repo's ship folder — every module, byte-identical (`diff -r` empty, library-stack-§7) — and TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block after Ace3.
-- [ ] **The five setup files present**, each a descriptor plus a degradation stub and nothing more: `core/CoreSetup.lua`, `core/PerfSetup.lua`, `core/DebugLogSetup.lua`, `settings/Slash.lua`, `settings/OptionsSetup.lua`. No hand-rolled console, options toolkit, dispatcher, printer or harness anywhere in the addon's own source (anti-pattern #47). Each stub answers **every** member the addon actually calls.
+- [ ] **The six setup files present**, each a descriptor plus a degradation stub and nothing more: `core/MediaSetup.lua`, `core/CoreSetup.lua`, `core/PerfSetup.lua`, `core/DebugLogSetup.lua`, `settings/Slash.lua`, `settings/OptionsSetup.lua`. No hand-rolled console, options toolkit, dispatcher, printer or harness anywhere in the addon's own source (anti-pattern #47). Each stub answers **every** member the addon actually calls.
 - [ ] `tests/_kit/` vendored from the LibKa0s repo's root-level `testkit/` (**not** under `libs/`, not edited); `tests/wow_mock.lua` is a thin extender over `mock_base.lua`; `tests/run.lua` derives the addon's file list from the TOC and lists the vendored library files explicitly in XML order (testing-§1, testing-§9).
 - [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing).
 - [ ] Generated `docs/test-cases.md` inventory present and in sync (`lua tests/run.lua --list`); README carries a static X/Y `[tests]` badge (testing-§5).
@@ -1143,7 +1194,8 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] The header **Defaults button** is created in the first `OnShow` (not at registration), via the library's `EnsureDefaultsButton` called at the **top of every `OnShow`**, with its callback parked on the panel (`panel.defaultsOnClick`) — options-ui-§5, anti-pattern #42.
 - [ ] The options setup file's fallback is **load-completing** (the documented exception, options-ui-§1) and its member set was determined by **measurement** — deleting one and re-running the library-absent load — with both the member set and the resulting schema row count pinned by cases.
 - [ ] Combat-lockdown: secure writes defer on `PLAYER_REGEN_ENABLED`; options-panel open **refuses** under lockdown (gray notice, no defer — options-ui-§2).
-- [ ] **Debug console wired (debug-logging)** — `core/DebugLogSetup.lua` builds `NS.DebugLog` from a descriptor (`name`, `title`, `font`, `isEnabled`/`setEnabled` over the addon's **own** flag, `initSummary`, call-time `print`/`safeToString` forwarders) and publishes `NS.Debug` bare; the monospace TTF + its `OFL.txt` ship under `media/fonts/` and are LSM-registered; enabled-state is **session-only** and never in SV, decoupled from window visibility; `/<slash> debug` toggles the window and `on|off` route through the single `SetEnabled` seam. **The window, the formatters, the buffer, the scrollbar and the counter are NOT in the addon's source** — an audit must not ask for them. (No-window addons MAY use chat.)
+- [ ] **Shared media wired (library-stack-§8)** — `core/MediaSetup.lua` publishes `NS.Icon` / `NS.MediaFont` from `LibKa0s-Media-1.0`, passing the addon's own **folder name**, and makes the one `Media.RegisterLSM(addonName)` call at file load. It loads **before** `core/Constants.lua`, whose `FONT_MONO` reads the seam and falls back to a **real client font** rather than `nil` or a dead path. The addon's own `media/` holds only what no other addon could use — the logo, the screenshots — and **no copy of any icon, face or bar texture the payload already ships** (layout-§3, anti-pattern #63). Every mark the addon draws comes from the catalog: window close controls through `MakeCloseButton(parent, onClick, addonName)`, title-bar strips, modals and their copy windows, and action buttons where the mark sits **beside** the label. A mark the catalog lacks is added **upstream**, never locally.
+- [ ] **Debug console wired (debug-logging)** — `core/DebugLogSetup.lua` builds `NS.DebugLog` from a descriptor (`name`, `title`, `font`, `isEnabled`/`setEnabled` over the addon's **own** flag, `initSummary`, call-time `print`/`safeToString` forwarders) and publishes `NS.Debug` bare; the monospace face comes from `libs/LibKa0s/media/fonts/` through `NS.MediaFont` and is LSM-registered by `Media.RegisterLSM` (**never** a second copy under the addon's own `media/fonts/`, anti-pattern #63); the descriptor passes **`addonName`**, so the console's close, copy and clear draw the shared marks; enabled-state is **session-only** and never in SV, decoupled from window visibility; `/<slash> debug` toggles the window and `on|off` route through the single `SetEnabled` seam. **The window, the formatters, the buffer, the scrollbar and the counter are NOT in the addon's source** — an audit must not ask for them. (No-window addons MAY use chat.)
 - [ ] Debug **coverage** (debug-logging-§8–§10): the main functional flows traced as one gated line each including the not-recorded decisions, repeating paths coalesced to one summary line per pass with the string-building behind the gate, and every settings change logged once at the write seam.
 - [ ] **Performance harness wired (performance)** — `core/PerfSetup.lua` builds `NS.Perf` from a descriptor and degrades to a working stub when the lib is absent; TOC lists `PerfSetup.lua` before its consumers; hot paths use the gated bracket idiom (performance-§2); declared buckets with `within` nesting (performance-§3); `perf` verb in `NS.COMMANDS` (performance-§4); `<Addon>PerfDB` declared in the TOC and `.luacheckrc`; `suspend`/`resume` make the addon inert without a reload, with visibility refused **at the source** (performance-§6).
 - [ ] Integration suite covers the addon-side wiring of **every** adopted module — descriptors well-formed, **every declared perf bucket actually reached** by a real bracket, suspend genuinely inert, and each lib-absent path exercised by loading the addon **without** the lib rather than by hand-stubbing (testing-§8). No duplicate of the library's own cases (they live in the `LibKa0s` repo), and every negative assertion proven falsifiable by mutation (testing-§12).

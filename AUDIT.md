@@ -187,6 +187,30 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (toc-file-§4/§5). A TOC listing individual `LibKa0s` `.lua` files, or a folder missing files the
      ship folder has, is a deviation even when the addon currently works — the majors it does not use
      today are not the ones that will break.
+   - **Check the shared media is used, not duplicated** (library-stack-§8, layout-§3). The payload is
+     whole-folder, so `libs/LibKa0s/media/` is present in **every** addon whether or not it wires
+     `LibKa0s-Media-1.0` — which makes both halves of this check mechanical:
+     - **A private copy is a deviation** (anti-pattern #63). List the addon's own `media/` tree: a
+       `fonts/`, `icons/` or `textures/` entry that also exists under `libs/LibKa0s/media/` is a
+       second copy, and the monospace face is the usual one because it predates the library payload.
+       What legitimately remains is the logo and the screenshots.
+     - **A one-off mark where the catalog has one is the commoner deviation.** Grep the addon's own
+       source for `SetText` on a control (`"X"`, `"\226\156\150"`, `"Copy"`, `"Clear"`), for
+       `SetAtlas`, and for texture paths under `Interface\` that are not the shared payload; cross
+       them against the module's `ICONS` catalog. Cite `file:line` and name the catalog entry that
+       should have been used.
+     - **Check the seam exists and is fed the folder name.** `core/MediaSetup.lua` (or wherever the
+       addon wires it) passes the addon's own first vararg, loads **before** any file resolving a
+       shipped path at load time, and makes one `RegisterLSM` call. A value that merely *happens* to
+       equal the folder name — a frame-name prefix, a hand-typed constant, the DebugLog descriptor's
+       `name` field — is a deviation even where it currently produces the right string.
+     - **Check the console was told.** The `LibKa0s-DebugLog-1.0` descriptor carries `addonName`
+       (debug-logging-§13). A console whose copy and clear draw marks while its close draws `×` is
+       anti-pattern #64 in the wrapper beneath it, not a host defect — check the vendored payload's
+       version before writing it up against the addon.
+     - **Not a deviation:** an addon on a LibKa0s tag older than v1.9.0 has no catalog to draw from.
+       Say which tag it carries (root `CLAUDE.md`'s provenance line) and file the adoption as a
+       re-vendor item rather than as a styling gap.
    - **Check the degradation stub covers every member the addon calls.** For each setup file, list
      the members the addon reaches on the library instance (grep the call sites) and confirm the
      library-absent branch answers **all** of them; a stub missing one is not a fallback, it is a

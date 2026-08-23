@@ -10,7 +10,7 @@ Items recorded for future versions of this standard:
 - ~~**Shared test scaffolding.**~~ **Shipped** as `testkit/` in the LibKa0s repo, vendored to each addon's `tests/_kit/` — the framework, the sandboxed loader and the universal WoW/Ace mock base (testing-§1).
 - **Multi-zone profile model adoption** for group-context addons.
 - **Object pool standard** packaged as a copyable micro-lib.
-- **Further `LibKa0s` modules.** `LibKa0s` is now the sanctioned path for shared Ka0s-owned code (library-stack-§7), and its per-module-major layout makes each addition independent and purely additive. Shipped so far: the secret-safe/printer seams (Core), the debug console, the slash dispatcher, the options toolkit and the perf harness — five majors across eight files. Candidates the collection still duplicates: the `Compat` shim, the message bus, the Schema runtime, and the object pool. Each is its own decision, adopted on its own schedule — deliberately **not** a lockstep migration, and deliberately not a `Ka0s-Core` addon (library-stack-§6 forbids requiring another addon).
+- **Further `LibKa0s` modules.** `LibKa0s` is now the sanctioned path for shared Ka0s-owned code (library-stack-§7), and its per-module-major layout makes each addition independent and purely additive. Shipped so far: the secret-safe/printer seams (Core), the shared media catalog, the debug console, the slash dispatcher, the options toolkit and the perf harness — six majors across nine files, plus the non-code `media/` payload. Candidates the collection still duplicates: the `Compat` shim, the message bus, the Schema runtime, and the object pool. Each is its own decision, adopted on its own schedule — deliberately **not** a lockstep migration, and deliberately not a `Ka0s-Core` addon (library-stack-§6 forbids requiring another addon).
 - **A per-addon adoption command.** Still open, and now broader than when it was written: adoption spans five majors rather than one, and the four newer ones **delete files the addon owns** rather than only adding a descriptor — which is harder to script safely and more valuable to keep identical across addons. `LibKa0s/docs/adoption-prompt.md` carries the per-addon survey and hazards in the meantime.
 - **Migration-stamp ownership.** The collection holds **five incompatible schema-migration variants**
   across eight repos, disagreeing on who writes `schemaVersion` (the runner, or each step), whether it
@@ -57,3 +57,15 @@ Items recorded for future versions of this standard:
   `mode .. "\001" .. rawValue`. It is load-bearing — changing the format silently resets every user's
   collapsed groups — and is currently written down nowhere. Too small to be a library (it is one
   concatenation); the right home is a naming/convention line, if a third addon grows grouped tables.
+
+- **The options surface and the shared icon catalog.** library-stack-§8 deliberately stops at the
+  addon's own user-facing windows and leaves the settings panel alone. The reason is ownership rather
+  than taste: those widgets are `LibKa0s-Options-1.0`'s, so a mark on a Defaults button or a page
+  header is a **library** change that lands in nine addons at once, and doing it per addon would mean
+  nine hosts reaching into the panel a library builds — exactly what options-ui exists to prevent.
+  What to settle before it moves: which controls genuinely benefit (a reset, a copy-from, a page
+  header's category mark) versus which are labels that should stay labels; whether the descriptor
+  gains a per-row `icon` field or the library picks marks by row type; and whether a host may override
+  one, given that the panel is the surface a user compares across addons least often and the strip of
+  a main window most. Do it as one library minor with a screenshot of every affected page, not as a
+  rolling adoption.

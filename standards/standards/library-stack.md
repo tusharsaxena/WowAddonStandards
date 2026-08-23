@@ -67,11 +67,12 @@ Some shared code is **authored inside the collection** rather than pulled from t
 
 Vendor from **that repo's** ship folder, not from a sibling addon's `libs/` — a sibling's copy may itself have drifted (anti-patterns #45).
 
-**The modules.** `LibKa0s` ships **five LibStub majors across eight files**, loaded by one aggregate `LibKa0s.xml`:
+**The modules.** `LibKa0s` ships **six LibStub majors across nine files**, loaded by one aggregate `LibKa0s.xml`, plus one non-code payload (`media/`, library-stack-§8):
 
 | Major | Files | What it owns |
 |---|---|---|
 | `LibKa0s-Core-1.0` | `Core.lua` | secret-safe stringification (`IsConcatSafe`, `SafeToString`), the shared window skin (`SKIN`, `ApplySkin`, `MakeCloseButton`), and a prefixed chat printer built from a descriptor |
+| `LibKa0s-Media-1.0` | `Media.lua` (+ `media/`) | the shared art and type every Ka0s addon draws with — the icon set, the monospace face and the bar textures, the paths that reach them, and the LibSharedMedia registration (library-stack-§8) |
 | `LibKa0s-DebugLog-1.0` | `DebugLog.lua` | the on-screen debug console and its copy window, both line formatters, the 500-line buffer, and the enable seam (debug-logging) |
 | `LibKa0s-Slash-1.0` | `Slash.lua` | the slash dispatcher, the help renderer, the `list`/`get`/`set`/`reset` schema CLI, and the type-aware value parser (slash-commands) |
 | `LibKa0s-Options-1.0` | `Options.lua`, `OptionsWidgets.lua`, `OptionsScroll.lua` | the Blizzard settings-canvas panel shell, the widget makers for the schema row types, the two-column flow engine, and the always-shown scrollbar patch (options-ui) |
@@ -85,12 +86,13 @@ Hand-rolling any of these inside an addon — a private debug console, a private
 - The TOC **MUST** list the single aggregate `libs\LibKa0s\LibKa0s.xml` (toc-file-§5), which is itself the file list. Naming module files individually in the TOC is the same partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file.
 - **Adoption is per module, on the addon's own schedule.** An addon wires only the modules it actually uses — one setup file per module, each resolving its major with `LibStub(major, true)` and degrading to a stub when it is absent (performance-§1 is the worked example). Carrying the source of a module the addon never wires costs a few kilobytes of never-executed file and buys the guarantee that no consumer ever has to reason about which half arrived.
 - **MUST NOT** list `LibKa0s` under `## Dependencies:` — a Ka0s addon works with no other addon installed (library-stack-§6).
+- **`media/` IS part of the ship payload**, and it is the first part of it that is not code. Every consumer therefore carries the icon set, the monospace face and the bar textures whether or not it wires `LibKa0s-Media-1.0` — the whole-folder rule already required this the day the folder appeared, and library-stack-§8 is about what follows from carrying it.
 - The library repo's `testkit/` is **not** part of the ship payload. It is the headless test harness, vendored into a consumer's `tests/_kit/`, and **MUST NOT** be placed under `libs/`: everything under `libs/` is TOC-loadable and ships to the player's install, and a test harness has no business there (testing).
 
 - **MUST** use **one LibStub major per module**, not one for the whole umbrella. LibStub picks the highest **minor of a major**: under a single major, an addon vendoring a copy that predates a module would be served a lib missing that module, and every host would need presence guards. Per-module majors keep version skew narrow and make adding a module purely additive — each addon adopts on its own schedule instead of in a lockstep migration.
 - **MUST** keep a **module's descriptor / API contract additive-only** within a major. A field may be added in a later minor, never removed or repurposed: once several addons have vendored copies, you cannot know who holds what.
 
-**Inter-module dependencies (MUST).** Four of the five majors need `LibKa0s-Core-1.0` — for secret-safe stringification, the window skin, or both. The dependency is declared and enforced in exactly one direction.
+**Inter-module dependencies (MUST).** Five of the six majors need `LibKa0s-Core-1.0` — for secret-safe stringification, the window skin, or both. The dependency is declared and enforced in exactly one direction.
 
 - A module that needs another **MUST** declare a **minimum minor floor** for it, and **MUST `return` before `LibStub:NewLibrary`** when that floor is unmet — dependency missing, or present at a lower minor. The major is then **never registered**, so `LibStub("LibKa0s-X-1.0", true)` yields nil and the module is **absent** rather than half-wired. The host's setup file sees the nil, says once that the library is missing, and falls back to its stub. That is the honest failure, and it is the only one a host can actually act on.
 - **MUST NOT** negotiate in the other direction. A module **MUST NOT** feature-detect a too-old dependency and run a reduced version of itself, and a dependent **MUST NOT** patch a member onto its dependency to satisfy the floor. Half a module is a defect that surfaces at some arbitrary later call site, in the hands of a user; an absent module surfaces at load, where the fallback already lives.
@@ -224,3 +226,89 @@ meant. The three lists below are the ones an audit of a Ka0s-owned library repo 
 A root **`CHANGELOG.md` is required** here and forbidden at an addon root — see documentation-§1, and
 testing-§10, whose versioning suite asserts that the changelog accounts for the version every file is
 at and has nowhere else to look.
+
+### 8. The shared media library (MUST)
+
+`LibKa0s-Media-1.0` ships the **art and type this collection draws with** — an icon set, a monospace
+face, and a family of statusbar textures — inside the vendored payload, at `libs/LibKa0s/media/`.
+Introduced in **LibKa0s v1.9.0**; the icon path spelling and the texture family settled at v1.9.1 and
+v1.9.2.
+
+**Every Ka0s addon ships it, and that is not a choice it makes.** The payload is whole-folder
+(library-stack-§7), so `media/` arrives with `Core.lua` in the same `cp -r`. The consequence is the
+rule: an addon that already carries the art has **no reason left** to ship its own, and every reason
+not to — two copies of a mark is two licenses to track, two provenance stories, and a collection
+whose addons stop reading as one author's work the first time one copy is regenerated and the other
+is not.
+
+**What the module answers.** Everything it returns is a **path**, and every path is **extensionless**
+(the client appends it; a path carrying `.tga` is one of the two spellings recorded as drawing
+nothing at all — and a texture that does not load draws nothing and raises nothing).
+
+| Member | Answers |
+|---|---|
+| `Icon(addonName, name)` | The icon path, or `nil` when `name` is not in `ICONS` |
+| `Font(addonName, name)` | The face path, or `nil` when `name` is not in `FONTS` |
+| `Texture(addonName, name)` | The statusbar path, or `nil` when `name` is not in `TEXTURES` |
+| `RegisterLSM(addonName)` | Registers every face and texture with LibSharedMedia under its catalog name; answers `fonts, bars`, and `0, 0` where LSM is absent |
+| `ICONS` / `FONTS` / `TEXTURES` | The catalogs — enumerate these, never hard-code a list |
+
+**Every call takes the host's own addon FOLDER name (MUST).** A texture path is absolute from
+`Interface\AddOns\`, and this library is vendored: there is no one path to it, there are as many as
+there are consumers, and a copy cannot know which folder it was copied into. The host has that string
+as the first vararg of every file its TOC loads and nothing else does. A host **MUST NOT** pass a
+value that merely *happens* to equal it — a frame-name prefix, an `## Title`, a constant typed by
+hand — because the failure is invisible: the wrong path draws nothing and raises nothing.
+
+- **MUST** wire it through one setup file (`core/MediaSetup.lua`), matching the one-file-per-module
+  pattern in library-stack-§7, publishing the addon's own `NS.Icon(name)` / `NS.MediaFont(name)`
+  wrappers and making the single `RegisterLSM` call.
+- That file **MUST** load **before** anything that resolves a shipped path at load time — a
+  `Constants.FONT_MONO` read from the seam is the common case, and a `core/Constants.lua` that loaded
+  first would resolve it to the fallback on a perfectly healthy install.
+- **MUST** register at **file load**, not at `PLAYER_LOGIN`. LibSharedMedia is vendored under `libs/`
+  and has already run by the time the TOC reaches the addon's own files, and a shipped default naming
+  a face LSM has not heard of yet resolves to nothing.
+
+**The catalog is the vocabulary (MUST).** Where the addon needs a mark, it **MUST** use the catalog's:
+
+- **MUST NOT** ship a private icon, face or bar texture that duplicates one the library already
+  carries, and **MUST NOT** copy one out of `libs/LibKa0s/media/` into the addon's own `media/`
+  (layout-§3, anti-patterns #63).
+- **A mark the catalog lacks is added UPSTREAM**, in the same style, by the generator that produced
+  the rest — never drawn one-off into an addon. The generators are the provenance record for the art:
+  which upstream glyph each name draws, every transformation applied, and for the synthesized
+  textures every value that decides a pixel. Art separated from them is a folder of binaries nobody
+  can regenerate, relicense or resize. Adding one is a library minor plus a re-vendor, which is the
+  same cost as any other library change and is not a reason to draw a local substitute.
+- **The art ships WHITE**, because WoW tints a texture by **multiplying**: white art becomes any color
+  a caller asks for and gray art mutes it. Art contributed upstream **MUST** be white with its shape
+  in the alpha channel, or one icon in the set silently stops obeying the color a host sets.
+- **MUST** treat `nil` as a real answer. Both an absent library and an unknown name answer `nil`, and
+  a caller **MUST** have somewhere to go — the fallback ladder a host already needs for a texture that
+  fails to load. A host **MUST NOT** build a path by string concatenation to work around a `nil`.
+
+**Where the marks belong.** The surfaces below are where a user meets an addon, and they are ranked by
+how visible an inconsistency is. This list is a floor, not a ceiling: an addon **SHOULD** sweep its own
+user-facing frames for the same shapes.
+
+| Surface | What draws from the catalog |
+|---|---|
+| The debug console and its copy window | close, copy, clear — the host passes `addonName` in the `LibKa0s-DebugLog-1.0` descriptor and the library does the rest (debug-logging-§7) |
+| Any window's close control | `Core.MakeCloseButton(parent, onClick, addonName)` (standalone-windows) |
+| A main window's title-bar strip | the controls it offers — lock, settings, reset, minimize, export, sort |
+| A modal and its copy window | the close control, and any action button (below) |
+| An action button with a label | the mark goes **beside** the label, never instead of it — a `spreadsheet` on *Export to CSV*, a `chat` on *Print to Chat*. The mark says where the action lands; the word says what it does |
+
+- **A label is not replaced by a mark without a reason (SHOULD NOT).** Dropping a word costs the one
+  thing the word was doing. It is right for a **title-bar control**, where the strip is a row of small
+  square targets, the vocabulary is short and every Ka0s window uses the same one; it is wrong for a
+  wide button that does something outward, where "which one posts to guild?" becomes a question
+  answered by hovering.
+- **A tooltip is not the fix for an unclear mark.** One shipped on the debug console's copy and clear
+  for a single release and was removed rather than repositioned: anchored under the control it covered
+  the first line of the log, which is the thing the window exists to show. If a mark needs a tooltip
+  to be understood on a crowded window, that is evidence the label should have stayed.
+- **The options surface is deliberately out of scope for now.** The settings panel's widgets are
+  `LibKa0s-Options-1.0`'s, so iconifying it is a library change with a collection-wide blast radius,
+  and it is tracked as an open evolution rather than done piecemeal per addon.

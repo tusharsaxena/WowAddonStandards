@@ -65,6 +65,8 @@ Shipped media **MUST** live in **typed subfolders** under `media/` — nothing l
 
 - `media/logos/` — the addon logo art (the runtime `.tga`/`.blp` plus the source `.jpg`/`.png`).
 - `media/screenshots/` — README/store screenshots and any demo GIFs.
-- `media/fonts/`, `media/sounds/`, `media/textures/` — as needed for shipped assets of that kind.
+- `media/fonts/`, `media/sounds/`, `media/textures/` — as needed for shipped assets of that kind, **and only for assets the shared media library does not already carry**.
+
+**`media/` is for what only THIS addon has.** The icon set, the monospace face and the bar textures every Ka0s addon draws with ship inside the vendored payload at `libs/LibKa0s/media/` (library-stack-§8) and arrive with `Core.lua` in the same copy — so an addon **MUST NOT** ship its own copy of one, and **MUST NOT** copy one out of `libs/` into `media/` to shorten a path. What legitimately remains here is the addon's own identity and its own subject matter: the logo, the screenshots, and any asset that would be meaningless in another addon. An addon whose `media/fonts/` or `media/textures/` holds a second copy of a library asset is anti-pattern #63, and the tell is a `media/` folder that two Ka0s addons could swap without either noticing.
 
 Reference implementation (in the collection): the standalone loot-history browser ships its logo under `media/logos/`. **MUST** keep the runtime texture in a WoW-loadable format (`.tga`/`.blp`) and the editable source (`.jpg`/`.png`) beside it (options-ui-§5).

@@ -70,6 +70,13 @@ disagreeing with the collection's intent while looking, in review, like it had b
    modules; a new addon is born with one **setup file** per module, each holding a **descriptor** and
    a **degradation stub** for when the library is absent, and nothing else. Hand-building any of them
    is anti-pattern #47. In TOC load order:
+   - `core/MediaSetup.lua` — `LibKa0s-Media-1.0` (library-stack-§8): `NS.Icon(name)` /
+     `NS.MediaFont(name)` over the shared catalog, and the one `Media.RegisterLSM(addonName)` call at
+     file load. **First of the setup files**, because `core/Constants.lua` resolves `FONT_MONO` from
+     the seam it publishes and a Constants that loaded first would take the fallback on a healthy
+     install. Every call passes the addon's own **folder name** — a texture path is absolute from
+     `Interface\AddOns\` and the library is vendored, so it cannot know which folder it was copied
+     into, and a wrong path draws nothing and raises nothing.
    - `core/CoreSetup.lua` — `LibKa0s-Core-1.0`: the secret-safe stringifier and the prefixed chat
      printer (`NS.Print` / `NS.Util.print`, one function object — architecture-§2). Placed after the
      file defining `NS.PREFIX` and before everything that prints; pass the prefix as a **function**
@@ -79,8 +86,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
      paths, and the reserved `perf` verb dispatched by the host. Placed before any module taking
      `local Perf = NS.Perf` as a load-time upvalue.
    - `core/DebugLogSetup.lua` — `LibKa0s-DebugLog-1.0` (debug-logging): the frame-name prefix, the
-     title, the monospace font, the `isEnabled`/`setEnabled` pair over the addon's **own** flag, and
-     the `[Init]` session summary. Publishes the gated sink `NS.Debug`.
+     title, the monospace font (from `NS.MediaFont`, not a copy the addon ships), **`addonName`** so
+     the console's close/copy/clear draw the shared marks, the `isEnabled`/`setEnabled` pair over the
+     addon's **own** flag, and the `[Init]` session summary. Publishes the gated sink `NS.Debug`.
+     `addonName` and `name` are different fields: the second seeds frame globals, and passing it for
+     the first hands the library a path into nowhere.
    - the **slash descriptor** in `settings/Slash.lua` — `LibKa0s-Slash-1.0` (slash-commands): the
      addon keeps its ordered `NS.COMMANDS` table and its host verbs and passes them in; the library
      supplies the dispatcher, help renderer, formatters and the type-aware value parser.
@@ -90,6 +100,15 @@ disagreeing with the collection's intent while looking, in review, like it had b
      every `settings/<page>.lua`.
    Each stub **MUST** answer every member the addon actually calls — a stub missing one is a crash
    moved to a rarer code path, not a fallback.
+
+   **Draw every mark from the shared catalog** (library-stack-§8). The payload just vendored carries
+   the icons, the monospace face and the bar textures, so a new addon starts with them and has no
+   reason to ship art of its own beyond its logo: window close controls come from
+   `MakeCloseButton(parent, onClick, addonName)`, a title-bar control strip and any modal draw catalog
+   marks, and a wide action button gains a mark **beside** its label rather than instead of it. A mark
+   the catalog lacks is added upstream in the `LibKa0s` repo, in the same style, by the generator that
+   produced the rest — never drawn one-off here. The settings panel is deliberately out of scope for
+   now.
 5. **Write tests first.** Stand up `tests/` on the vendored `tests/_kit/` harness and drive every
    behavior **test-first** (testing). Test what is **yours** — the descriptors, the degradation stubs,
    and the addon's own logic — and do not re-test the library's internals: they are covered in the
