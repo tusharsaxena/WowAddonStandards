@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.31.0, 2026-08-23)
+# New Ka0s Addon — Context Pack (v2.32.0, 2026-08-23)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -312,10 +312,47 @@ if not lib then
   -- Degrade, never error. Four settings files do `local print = NS.Print` at load, so a nil printer
   -- takes the whole settings UI with it and a no-op one makes /<slash> answer nothing. Keep short
   -- pre-library fallbacks, and say "not installed" ONCE — on the first line printed, not on every one.
+  --
+  -- The chrome degrades to NOTHING rather than to a hand-copied backdrop: Core.SKIN's values ARE the
+  -- contract (standalone-windows), and a host copy of them is the copy that goes stale one hex digit
+  -- at a time. SKIN is an empty TABLE rather than nil so a window may index it without a guard at
+  -- every field, and MakeCloseButton answers nil — exactly what Core's own does where CreateFrame is
+  -- unavailable, so the caller's existing nil check is the only one it needs. The degraded branch
+  -- owes the caller the SAME THREE NAMES the live seam publishes, or a module that reads them loads
+  -- against nil.
+  NS.SKIN            = {}
+  NS.ApplySkin       = function() end
+  NS.MakeCloseButton = function() return nil end
   return
 end
 
 NS.IsConcatSafe, NS.SafeToString = lib.IsConcatSafe, lib.SafeToString
+
+-- The shared window edge, published flat so a module reaches it by name rather than through a
+-- private lookalike. A re-skin then lands on the main window, the debug console and the perf panel
+-- at once (standalone-windows).
+NS.SKIN      = lib.SKIN
+NS.ApplySkin = lib.ApplySkin
+
+-- WRAPPED, TO SAY WHO IS ASKING -- and this wrapper is a MUST, not a convenience
+-- (standalone-windows). Core draws the catalog's `close` mark only when it is told which addon
+-- FOLDER to build a texture path from, and it cannot work that out: the library is vendored, so a
+-- copy cannot know which folder it was copied into. `addonName` is that answer and this file has it
+-- as its first vararg.
+--
+-- EVERY close control in the addon is built through here -- a modal, an export panel, a decoration
+-- hook handed to a shared module -- because a direct two-argument call to the factory silently gets
+-- the multiplication-sign fallback: no path is built, so nothing draws, nothing raises, lint stays
+-- clean and the suite stays green. It has shipped twice in this collection (anti-patterns #64, #65).
+-- One wrapper does not make the mistake impossible; it makes it greppable, which is all an
+-- out-of-game toolchain can offer:
+--
+--   grep -rn 'MakeCloseButton(' --include='*.lua' | grep -v '/libs/'
+--
+-- must return this definition and calls to NS.MakeCloseButton, and nothing else.
+NS.MakeCloseButton = function(parent, onClick)
+  return lib.MakeCloseButton(parent, onClick, addonName)
+end
 
 -- The prefix goes in as a FUNCTION, not as the value of NS.PREFIX: the printer is built once at
 -- load, and the function form keeps a later change to the constant from being frozen out.
@@ -1118,7 +1155,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (audit-review-history). Kept, not deleted.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
-24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px gray highlight just inside it, plus a gold title and a gray divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See standalone-windows, "The Ka0s window edge".
+24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. **Every close control the addon builds — on any window, and inside any decoration hook it hands a shared module — goes through the single `NS.MakeCloseButton` wrapper defined in `core/CoreSetup.lua`, which supplies the folder name (MUST).** A bare two-argument call to the factory silently draws the fallback glyph instead of the shared mark: no path is built, so nothing draws and nothing raises, and no gate can see it (anti-patterns #64, #65). The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px gray highlight just inside it, plus a gold title and a gray divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See standalone-windows, "The Ka0s window edge".
 
 ## Forbidden patterns
 
@@ -1194,7 +1231,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] The header **Defaults button** is created in the first `OnShow` (not at registration), via the library's `EnsureDefaultsButton` called at the **top of every `OnShow`**, with its callback parked on the panel (`panel.defaultsOnClick`) — options-ui-§5, anti-pattern #42.
 - [ ] The options setup file's fallback is **load-completing** (the documented exception, options-ui-§1) and its member set was determined by **measurement** — deleting one and re-running the library-absent load — with both the member set and the resulting schema row count pinned by cases.
 - [ ] Combat-lockdown: secure writes defer on `PLAYER_REGEN_ENABLED`; options-panel open **refuses** under lockdown (gray notice, no defer — options-ui-§2).
-- [ ] **Shared media wired (library-stack-§8)** — `core/MediaSetup.lua` publishes `NS.Icon` / `NS.MediaFont` from `LibKa0s-Media-1.0`, passing the addon's own **folder name**, and makes the one `Media.RegisterLSM(addonName)` call at file load. It loads **before** `core/Constants.lua`, whose `FONT_MONO` reads the seam and falls back to a **real client font** rather than `nil` or a dead path. The addon's own `media/` holds only what no other addon could use — the logo, the screenshots — and **no copy of any icon, face or bar texture the payload already ships** (layout-§3, anti-pattern #63). Every mark the addon draws comes from the catalog: window close controls through `MakeCloseButton(parent, onClick, addonName)`, title-bar strips, modals and their copy windows, and action buttons where the mark sits **beside** the label. A mark the catalog lacks is added **upstream**, never locally.
+- [ ] **Shared media wired (library-stack-§8)** — `core/MediaSetup.lua` publishes `NS.Icon` / `NS.MediaFont` from `LibKa0s-Media-1.0`, passing the addon's own **folder name**, and makes the one `Media.RegisterLSM(addonName)` call at file load. It loads **before** `core/Constants.lua`, whose `FONT_MONO` reads the seam and falls back to a **real client font** rather than `nil` or a dead path. The addon's own `media/` holds only what no other addon could use — the logo, the screenshots — and **no copy of any icon, face or bar texture the payload already ships** (layout-§3, anti-pattern #63). Every mark the addon draws comes from the catalog: window close controls through the **one** `NS.MakeCloseButton` wrapper in `core/CoreSetup.lua` (never a bare two-argument call anywhere, decoration hooks included — `grep -rn 'MakeCloseButton(' --include='*.lua' | grep -v '/libs/'` returns the wrapper and its callers and nothing else), title-bar strips, modals and their copy windows, and action buttons where the mark sits **beside** the label. A mark the catalog lacks is added **upstream**, never locally.
 - [ ] **Debug console wired (debug-logging)** — `core/DebugLogSetup.lua` builds `NS.DebugLog` from a descriptor (`name`, `title`, `font`, `isEnabled`/`setEnabled` over the addon's **own** flag, `initSummary`, call-time `print`/`safeToString` forwarders) and publishes `NS.Debug` bare; the monospace face comes from `libs/LibKa0s/media/fonts/` through `NS.MediaFont` and is LSM-registered by `Media.RegisterLSM` (**never** a second copy under the addon's own `media/fonts/`, anti-pattern #63); the descriptor passes **`addonName`**, so the console's close, copy and clear draw the shared marks; enabled-state is **session-only** and never in SV, decoupled from window visibility; `/<slash> debug` toggles the window and `on|off` route through the single `SetEnabled` seam. **The window, the formatters, the buffer, the scrollbar and the counter are NOT in the addon's source** — an audit must not ask for them. (No-window addons MAY use chat.)
 - [ ] Debug **coverage** (debug-logging-§8–§10): the main functional flows traced as one gated line each including the not-recorded decisions, repeating paths coalesced to one summary line per pass with the string-building behind the gate, and every settings change logged once at the write seam.
 - [ ] **Performance harness wired (performance)** — `core/PerfSetup.lua` builds `NS.Perf` from a descriptor and degrades to a working stub when the lib is absent; TOC lists `PerfSetup.lua` before its consumers; hot paths use the gated bracket idiom (performance-§2); declared buckets with `within` nesting (performance-§3); `perf` verb in `NS.COMMANDS` (performance-§4); `<Addon>PerfDB` declared in the TOC and `.luacheckrc`; `suspend`/`resume` make the addon inert without a reload, with visibility refused **at the source** (performance-§6).

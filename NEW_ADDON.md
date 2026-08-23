@@ -84,7 +84,13 @@ disagreeing with the collection's intent while looking, in review, like it had b
    - `core/PerfSetup.lua` — `LibKa0s-Perf-1.0` (performance): the descriptor's declared buckets with
      their `within` nesting, `<Addon>PerfDB` as `sv`, `suspend`/`resume`, gated brackets on the hot
      paths, and the reserved `perf` verb dispatched by the host. Placed before any module taking
-     `local Perf = NS.Perf` as a load-time upvalue.
+     `local Perf = NS.Perf` as a load-time upvalue. **Pass no `decorate` hook.** From `PerfPanel.lua`
+     minor 4 the library draws the step panel's close control from the addon's own name, so the panel
+     matches the debug console with nothing wired; a hook whose only job is a close button is a copy
+     of library behavior that can fall behind it, and the copy that shipped in this collection did
+     (performance-§4, anti-pattern #65). Add one only for chrome the library does not draw — and if
+     you do, build the close control through `NS.MakeCloseButton`, never with a bare two-argument
+     call to any factory.
    - `core/DebugLogSetup.lua` — `LibKa0s-DebugLog-1.0` (debug-logging): the frame-name prefix, the
      title, the monospace font (from `NS.MediaFont`, not a copy the addon ships), **`addonName`** so
      the console's close/copy/clear draw the shared marks, the `isEnabled`/`setEnabled` pair over the
@@ -104,7 +110,12 @@ disagreeing with the collection's intent while looking, in review, like it had b
    **Draw every mark from the shared catalog** (library-stack-§8). The payload just vendored carries
    the icons, the monospace face and the bar textures, so a new addon starts with them and has no
    reason to ship art of its own beyond its logo: window close controls come from
-   `MakeCloseButton(parent, onClick, addonName)`, a title-bar control strip and any modal draw catalog
+   `MakeCloseButton(parent, onClick, addonName)` — **wrapped once, in `core/CoreSetup.lua`, and never
+   called directly (MUST)**, because the third argument is the folder name, cannot be inferred by a
+   vendored library, and omitting it draws the fallback glyph with nothing raised and no gate able to
+   see it; the wrapper exists so the mistake is at least greppable (standalone-windows, anti-patterns
+   #64/#65). Build **every** close control the addon has through it, including inside any decoration
+   hook handed to a shared module. A title-bar control strip and any modal draw catalog
    marks, and a wide action button gains a mark **beside** its label rather than instead of it. A mark
    the catalog lacks is added upstream in the `LibKa0s` repo, in the same style, by the generator that
    produced the rest — never drawn one-off here. The settings panel is deliberately out of scope for

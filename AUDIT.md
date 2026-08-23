@@ -208,6 +208,31 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        (debug-logging-§13). A console whose copy and clear draw marks while its close draws `×` is
        anti-pattern #64 in the wrapper beneath it, not a host defect — check the vendored payload's
        version before writing it up against the addon.
+     - **Run the close-button grep. This is a MUST and it is mechanical:**
+
+       ```sh
+       grep -rn 'MakeCloseButton(' --include='*.lua' . | grep -v '/libs/' | grep -v '/tests/'
+       ```
+
+       Every line must be either the **one** wrapper definition in the addon's `LibKa0s-Core-1.0`
+       setup file (`NS.MakeCloseButton = function(parent, onClick) return lib.MakeCloseButton(parent,
+       onClick, addonName) end`), its degraded twin, or a **call to that wrapper**. Anything else is
+       a deviation: a direct `lib.MakeCloseButton(...)`, a `Core.MakeCloseButton(...)`, or — the
+       measured shape — `NS.DebugLog.MakeCloseButton(frame, api.Hide)` inside a perf-panel decoration
+       hook, which reaches the same three-argument function and supplies no name
+       (standalone-windows, debug-logging-§12, performance-§4, anti-pattern #65).
+
+       **File it on the grep, not on a screenshot.** The omission draws a perfectly good button and
+       raises nothing, so it is invisible to lint, to the suite and to a smoke test that only checks
+       the window opens. Severity is at least **medium**: it is a visible cross-window inconsistency
+       in the surface a user compares between addons. If the addon carries **no** wrapper at all but
+       builds close controls, the deviation is the missing wrapper, and every call site is evidence
+       for it rather than a separate row.
+     - **Check the perf panel's decoration hook earns its place.** From `PerfPanel.lua` minor 4
+       (LibKa0s v1.10.2) the library draws the panel's close control with the host's own name, so a
+       `decorate` hook whose entire body is a close button is a second copy of library behavior that
+       can fall behind it — and did. Report it as a **low**-severity simplification: delete the hook.
+       A hook drawing chrome the library does not draw is not a deviation.
      - **Not a deviation:** an addon on a LibKa0s tag older than v1.9.0 has no catalog to draw from.
        Say which tag it carries (root `CLAUDE.md`'s provenance line) and file the adoption as a
        re-vendor item rather than as a styling gap.
