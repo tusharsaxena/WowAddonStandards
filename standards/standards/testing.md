@@ -443,3 +443,85 @@ does what the new code does.
 - A collection-wide complexity sweep in 2026-08 found **16 of 86** warned functions with no coverage at
   all. Those are, by construction, the functions a refactor is least safe to attempt and most likely to
   be aimed at: complexity and untestedness have the same cause (performance-§11).
+
+### 14. The green gate MUST stay fast, and slowness MUST be measured before it is fixed (MUST)
+
+A commit gate is run dozens of times a day, and its cost is paid in the one currency the toolchain
+cannot mint: whether anyone actually runs it. A gate that takes two minutes gets run once at the end
+instead of after each change, then gets skipped, then gets `--no-verify`'d — the same failure mode
+`performance-§9` describes for a threshold that fails a build. Speed is therefore a property of the
+gate, not a nicety, and it is governed here.
+
+**The measurement comes first.**
+
+- **MUST** establish *where* the time goes before changing anything, and **MUST** state the figure —
+  wall clock, CPU, and the count of whatever turned out to dominate. A test suite is one of the
+  easiest things in this collection to profile and one of the easiest to guess wrong about: the
+  first instinct on Ka0s Multi Meters' 2m10s suite was "too many tests", and 1,246 cases were not
+  the problem at all.
+- **MUST** treat a low CPU-utilization figure as the diagnosis it is. That suite burned **32.7s of
+  CPU across 130.8s of wall clock — 25%**. Three quarters of the run was a process sitting still,
+  which is never fixed by making the code faster and is always fixed by doing fewer, or more
+  concurrent, waits.
+- **SHOULD** record the resulting figure in the repo's `docs/automated-tests/RESULTS.md` run, so a
+  regression is visible as a number rather than as a feeling.
+
+**Three costs dominate a headless WoW-addon suite, in this order.** Each is a MUST because each was
+found live, and each is fixed in the vendored kit rather than per repo.
+
+- **MUST NOT re-read and re-parse source the process has already read.** Suites build a fresh,
+  isolated instance per case, which is correct — isolation comes from re-*running* the chunks under
+  a new mock (§8) — but the bytes do not change between instances. `loadfile` re-opens and
+  re-*parses* on every one of them. Measured: **1,246 cases drove 60,112 `loadfile` calls, 28.5s of
+  31.4s of CPU.** On a WSL2 `/mnt` checkout each of those reads crosses a 9p mount at roughly 1.5ms,
+  which is where the wall clock went. Kit revision 12's `Loader.load` compiles each path once per
+  process and re-calls the cached chunk; a repo adopts it by re-vendoring and does nothing else.
+  **That change alone took the suite from 2m10.8s to 11.6s.**
+- **MUST NOT spawn one subprocess per item where one invocation answers the whole set.** Process
+  spawn is tens of milliseconds and the work inside is often microseconds, so a per-item loop is a
+  latency multiplier wearing a correctness disguise. The vendored-payload gate (§11) ran
+  `git show <tag>:<path>` **once per file**, which for a payload of 49 icons, a font and the Lua was
+  ~66 spawns and **7.5 seconds** — after the cache landed, the single longest thing in the suite.
+  Kit revision 12 reads every blob with one `git cat-file --batch`. The same rule binds a directory
+  walk, a `git check-attr` sweep, or any other shell-out written per file.
+- **SHOULD** slice a batched reply by the **length** the tool states, never by pattern-matching its
+  delimiters. `cat-file --batch` states each blob's byte count precisely so that a payload
+  containing newlines, NUL bytes or CRLF round-trips unharmed; a parser that splits on newlines
+  corrupts every binary in the payload and reports it as a line-ending problem in a file that has no
+  lines.
+
+**Parallelism is the last resort, not the first, and it is opt-in.**
+
+- **MUST** exhaust the two rules above before reaching for `--jobs`. Fanning out duplicated work
+  buys a fraction of what deleting the work buys, and it is strictly more complex. On Multi Meters
+  the cache and the batch together were **16x**; parallelism on top of them was a further **2.2x**.
+  Run in the other order, parallelism alone would have been a 1.4x improvement over a two-minute
+  suite and the real defect would still be there.
+- **SHOULD** switch `--jobs` on once a repo's serial gate exceeds roughly **10 seconds**, and
+  **MUST** verify the sharded run agrees with the serial one — same totals, same exit code — before
+  it becomes the gate. `Kit.run`'s default is `jobs = 1`; a repo opts in with
+  `Kit.run{ ..., jobs = "auto" }`.
+- **MUST** treat a suite that only passes because an earlier suite ran first as the **bug it always
+  was**, not as a reason to stay serial. Sharding splits the process-wide state suites share — the
+  `shared` instance, the SavedVariables globals — so it does not create that dependency, it
+  *reveals* it. This is §12's rule one level up: a suite whose result depends on what ran before it
+  is not measuring what its name says.
+- **MUST** keep a parallel run's transcript **identical to a serial one**. Shards take *contiguous*
+  slices of the declared suite list and their output is relayed in shard order. A gate whose output
+  reshuffles on every run is a gate nobody diffs, and diffing two runs is how a flaky case is found.
+- **MUST** fail the run when a shard dies without reporting. Its cases are then missing from the
+  totals, and a total that silently shrank is the same lie §9's load-list rules and
+  `assertSuiteInventory` exist to prevent — a gate that goes quiet when it cannot look is worse than
+  no gate.
+- **MUST NOT** let a shard spawn shards. `--shard` forces `jobs = 1` in the kit, so a runner
+  carrying `jobs = "auto"` cannot fork a process tree.
+- **MUST** fall back to a serial run, with a notice, where the platform has no POSIX shell to
+  background workers from. A missing shell is a missing capability, not a test failure (§1's
+  skip-is-not-a-pass rule, applied to the runner itself).
+
+**Reference implementation:** LibKa0s `testkit` revision 12 — `loader.lua`'s chunk cache,
+`vendor_sync.lua`'s batched blob reads, and `framework.lua`'s `--jobs` / `--shard` driver.
+`docs/api/testkit/version-12-docs.md` in that repo is the contract; `tests/test_loader.lua` pins the
+cache's isolation invariant and `tests/test_parallel.lua` pins the partition. End to end on Ka0s
+Multi Meters, 1,246 cases: **2m10.8s to 3.7s**.
+
