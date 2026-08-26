@@ -215,6 +215,14 @@ Every Ka0s addon offers **two** ways to say *"put this back the way it shipped"*
 - The buttons are the house pair, **Yes** / **No**, with `timeout = 0`, `whileDead = true`, `hideOnEscape = true`.
 - The control's own tooltip **SHOULD** name the equivalence rather than restate the popup: *"the same thing Profiles → Reset Profile does"*.
 
+**An addon with no profile-scoped storage (MUST).** A few addons keep everything account-wide — an `AceDB` with a `global` section and no `profile` section at all, because what they store is a ledger of things that happened to the account rather than a per-character preference. `db:ResetProfile()` is meaningless there, and the rule is not waived, it is *translated*: the global reset **MUST** empty the addon's account-wide store wholesale and merge its declared defaults back, so what comes back is indistinguishable from a fresh install. **MUST NOT** enumerate the keys to clear — the failure a row-by-row sweep has is exactly the failure a hand-written key list has, one release later, and both are silent. AceDB offers no `ResetGlobal`, so the host writes it: wipe the table **in place** (anything holding `db.global` keeps the live table), then re-copy the defaults.
+
+Such an addon takes the second canonical confirmation, verbatim, because the first one's closing clause is a promise it cannot keep:
+
+  > **Reset this addon to its defaults? Everything you have configured or recorded is discarded, for every character on this account — this cannot be undone.**
+
+Which of the two an addon uses follows from where it stores, not from taste: a `profile` section means the first, no `profile` section means the second. An addon with **both** uses the first and resets the profile — its account-wide store is not settings, and clearing it is a separate, separately-confirmed act (a *purge*, a *delete all*), never folded into *reset settings*.
+
 **A geometry hook is not needed for this and MUST NOT be re-added.** Positions live in the profile, so a profile reset restores them along with everything else. A `ResetPositions`-style seam wired into `afterRestoreAll` exists only to serve a row-by-row sweep; with the sweep gone it has no caller and **MUST** be removed rather than left as a dead export (`public-api`). The addon's targeted *reset positions* verb, where it has one, is unaffected and keeps going straight at whatever owns re-anchoring a live frame.
 
 **Testing (MUST).** The suite **MUST** prove the blast radius rather than the mechanism: after a global reset with **two or more** of whatever the addon lets a player create, exactly the shipped set survives; the profile *list* is unchanged and the active profile is still the one you were on; the session-only rows were swept; and the profile-changed message was published, because a reset that empties the profile without it leaves every live window drawing settings that are no longer there.
