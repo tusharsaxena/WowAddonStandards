@@ -489,7 +489,15 @@ local print = NS.Print
 
 -- Named ONCE and enforced twice — by the library through skipRestoreAll, and by the stub's own
 -- reset loop. Two literal copies of the rule is one added page away from a reset that eats profiles.
-local function vetoedFromResetAll(row) return row.page == "profiles" end
+--
+-- It vetoes the Profiles page AND every profile-backed row (options-ui-§12). The global reset IS a
+-- profile reset, so writing each row's default first would announce CONFIG_CHANGED once per row for
+-- values about to be discarded whole. What the walk keeps is what a profile reset cannot reach: the
+-- sessionOnly rows, whose storage is their own set().
+local function vetoedFromResetAll(row)
+  if row.page == "profiles" then return true end
+  return not row.sessionOnly
+end
 
 local lib = LibStub and LibStub("LibKa0s-Options-1.0", true)
 
@@ -504,7 +512,15 @@ local descriptor = {
   rowsForPage  = function(pageKey, filter) return NS.SchemaForPage(pageKey, filter) end,
 
   skipRestoreAll  = vetoedFromResetAll,
-  afterRestoreAll = function() NS.ResetPositions() end,   -- state no schema row owns
+  -- THE GLOBAL RESET IS A PROFILE RESET (options-ui-§12). One call: AceDB empties the ACTIVE
+  -- profile, the defaults merge back, and OnProfileReset reaches the host's profile-changed
+  -- handler — migrations, the re-seed, and the addon's own PROFILE_CHANGED message, off which every
+  -- window and every open panel rebuilds. Positions live in the profile, so they come back with it;
+  -- there is no ResetPositions hook here and there must not be one.
+  afterRestoreAll = function()
+    local db = NS.db
+    if db and db.ResetProfile then db:ResetProfile() end
+  end,
 
   colorDecode = function(c) c = type(c) == "table" and c or {}
                             return c.r or 1, c.g or 1, c.b or 1, c.a or 1 end,
