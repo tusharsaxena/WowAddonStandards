@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.32.0, 2026-08-23)
+# New Ka0s Addon — Context Pack (v2.34.0, 2026-08-26)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -102,15 +102,22 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
 ```
 <Addon>/
   <Addon>.toc            -- single Interface line (latest Retail)
-  core/
-    Compat.lua           -- LOAD FIRST
-    Constants.lua
+  core/                  -- dependency-correct order, NOT a fixed prefix (layout-§1); the
+                         -- LOAD-BEARING positions are marked, and the TOC repeats the marks
     Namespace.lua        -- NS.PREFIX, the mandatory cyan chat tag (slash-commands-§4)
+                            LOAD-BEARING: publishes the NS table every file below attaches to
+    Compat.lua           -- deprecated-API shims; conventional (reached at call time)
+    MediaSetup.lua       -- NS.Icon / NS.MediaFont from LibKa0s-Media-1.0 + the one RegisterLSM call
+                            LOAD-BEARING: Constants resolves FONT_MONO from it at file load
+    Constants.lua
     State.lua            -- session-only state incl. NS.State.debug (never in SV)
-    MediaSetup.lua       -- NS.Icon / NS.MediaFont from LibKa0s-Media-1.0 + the one RegisterLSM
-                            call; loads BEFORE Constants, which resolves FONT_MONO from it
+    EnvSetup.lua         -- NS.Env from LibKa0s-Env-1.0: TOC metadata, own version, map ID / zone
     CoreSetup.lua        -- NS.Print from LibKa0s-Core-1.0:New{prefix=...} (slash-commands-§4)
+                            LOAD-BEARING: after the file defining NS.PREFIX, before anything printing
+    PoolSetup.lua        -- NS.Pool from LibKa0s-Pool-1.0; only if the addon re-renders rows/bars
+    ItemSetup.lua        -- NS.Item from LibKa0s-Item-1.0; only if the addon handles items
     PerfSetup.lua        -- NS.Perf = LibStub("LibKa0s-Perf-1.0"):New(descriptor) (performance-§1)
+                            LOAD-BEARING: before any module taking NS.Perf as a load-time upvalue
     DebugLogSetup.lua    -- NS.DebugLog = LibKa0s-DebugLog-1.0:New(descriptor); publishes NS.Debug
     <Addon>.lua          -- AceAddon registration; promotes NS to AceAddon
     Database.lua         -- AceDB + migration
@@ -173,7 +180,9 @@ Fixed field order (toc-file-§1), then a blank line, then the file listing in co
 ## Category-enUS: <Combat|Group|Auction|Chat|UI|Misc>
 ## X-License: MIT
 ## X-Standard: https://github.com/tusharsaxena/WowAddonStandards
-## X-Curse-Project-ID: <id>
+# X-Curse-Project-ID: not published on CurseForge yet   -- a NEW addon is unpublished by definition:
+#                                                        -- comment the field out here, and NEVER put a
+#                                                        -- placeholder id in it (toc-file-§1)
 ## X-Wago-ID: <id>
 
 # Libraries (must load first) — vendored in libs/, .xml where the lib ships one, else .lua
@@ -186,15 +195,19 @@ libs\LibKa0s\LibKa0s.xml                 -- ONE line; the .xml is itself the fil
 # Locales
 locales\enUS.lua
 
-# Core
-core\Compat.lua
-core\MediaSetup.lua                      -- BEFORE Constants: it publishes the seam FONT_MONO reads
-core\Constants.lua                       -- incl. FONT_MONO, resolved from NS.MediaFont
-core\Namespace.lua                       -- NS.PREFIX
-core\State.lua                           -- NS.State.debug
-core\CoreSetup.lua                       -- after NS.PREFIX, before anything that prints
-core\PerfSetup.lua                       -- before anything taking NS.Perf as an upvalue
-core\DebugLogSetup.lua                   -- after Constants/State/CoreSetup, before any NS.Debug call
+# Core — dependency-correct order (layout-§1). Every LOAD-BEARING position says what resolves at
+#        load; the unmarked lines are conventional and free to move (toc-file-§5).
+core\Namespace.lua                       -- LOAD-BEARING: publishes NS and NS.PREFIX
+core\Compat.lua                          -- conventional
+core\MediaSetup.lua                      -- LOAD-BEARING: publishes the seam Constants reads FONT_MONO from
+core\Constants.lua                       -- incl. FONT_MONO, resolved from NS.MediaFont at file load
+core\State.lua                           -- NS.State.debug; conventional
+core\EnvSetup.lua                        -- conventional
+core\CoreSetup.lua                       -- LOAD-BEARING: after NS.PREFIX, before anything that prints
+core\PoolSetup.lua                       -- conventional; omit if nothing re-renders
+core\ItemSetup.lua                       -- conventional; omit if the addon handles no items
+core\PerfSetup.lua                       -- LOAD-BEARING: before anything taking NS.Perf as an upvalue
+core\DebugLogSetup.lua                   -- LOAD-BEARING: after Constants/State/CoreSetup, before any NS.Debug call
 core\<Addon>.lua
 core\Database.lua
 
@@ -924,7 +937,7 @@ the carve-out without the pin above it is explicitly **not** compliance (`line-e
 ```
 
 Then add `- .gitattributes` to `.pkgmeta`'s `ignore:` block below — it is dev-only, exactly as
-`.gitignore` and `.luacheckrc` are (`packaging`).
+`.gitignore`, `.luacheckrc`, `.claude/` and `.superpowers/` are (`packaging`).
 
 ### `.luacheckrc`
 
@@ -957,15 +970,24 @@ ignore:
   - .luacheckrc
   - .gitignore
   - .gitattributes   # dev-only: the repo's line-ending policy (line-endings)
+  - .claude          # dev-only: agent tooling; never loaded by the client
+  - .superpowers     # dev-only: agent tooling; never loaded by the client
   - docs        # holds docs/audits/ and docs/reviews/ too — all dev-only
   - tests
   - _dev
   - "*.bak"
 ```
 
+**The list above is a starting point, not the rule.** The rule is that **every** root dotfile and
+dot-directory in the repo is either on this list or justified in a comment beside it (`packaging`) —
+`.git` excepted, since the packager never sees it. Agent tooling is named here because leaving it to
+judgment failed: five addons in the collection were packaging a multi-file `.superpowers/` directory
+into the AddOn players install. When a new tool writes a new dot-directory, it goes on this list in
+the same change.
+
 Libraries are **vendored under `libs/` and committed** (`STANDARDS.md library-stack-§3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon's `libs/` so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
 
-`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because four of the five majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
+`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because nine of the ten majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
 
 ### Docs — the root three + the `docs/` trio
 
@@ -1127,7 +1149,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 2. SavedVariables: `<Addon>DB` with `schemaVersion`, plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
-5. TOC: single latest-Retail `## Interface:` (Retail only), plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
+5. TOC: single latest-Retail `## Interface:` (Retail only), plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge; **before that, omitted with a one-line comment in its position — never a placeholder id, which would publish this addon into somebody else's project**). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
 6. Slash: AceConsole `:RegisterChatCommand`. Never raw `SLASH_*`.
 7. Locale: metatable fallback `__index = function(_,k) return k end`. Never AceLocale strict.
 7a. **US English everywhere** (localization-§5): every English word you author — locale keys and their `enUS` values, chat/console output, options labels and tooltips, slash help, README and `docs/` prose, code comments, and identifiers — uses **US** spelling. `color` not `colour`, `gray` not `grey`, `behavior` not `behaviour`, `center`/`centered` not `centre`/`centred`, `canceled` not `cancelled`, `-ize`/`-ization` not `-ise`/`-isation`, `catalog`/`dialog`/`defense`/`license`/`analyze`. WoW's own API is US-spelled (`SetTextColor`, `GRAY_FONT_COLOR`), so a British-spelled identifier sits one letter from the Blizzard symbol beside it and greps miss. Locale **keys are the English string**, so fixing a spelling **changes the key** — update it in every `locales/*.lua` and at every call site in the same change, or the metatable silently renders the raw key on that client. Reproduce verbatim (never "correct"): Blizzard/library symbols, quoted external text, published proper nouns, and a deliberate `locales/enGB.lua` translation.
@@ -1213,7 +1235,8 @@ fetching it at build time — libraries are vendored and committed (documentatio
 
 ## Definition of done (new addon ready for v0.1.0 release)
 
-- [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
+- [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge; until then a commented placeholder-free line saying so).
+- [ ] Every **load-bearing** TOC position carries a comment naming what resolves at load; conventional positions are marked too (toc-file-§5). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`.
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors**.
 - [ ] **`libs/LibKa0s/` vendored WHOLE** from the library repo's ship folder — every module, byte-identical (`diff -r` empty, library-stack-§7) — and TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block after Ace3.

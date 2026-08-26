@@ -48,7 +48,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
    which this playbook does not scaffold (documentation-§1/§3, library-stack-§7).
 3. **Lay out files.** Use the single modular layout — `core/ modules/ defaults/ settings/ locales/` —
    for every addon regardless of size (a small addon just has thin folders). See *Layout* and the
-   starter tree in the context pack. Copy the vendored `libs/` set you actually
+   starter tree in the context pack. The folder load order is `libs/*` → `locales/*` → `core/*` →
+   `defaults/*` → `modules/*` → `settings/*` (layout-§1), which is the same order the TOC's `#`
+   section headers express (toc-file-§5). Inside `core/` there is **no fixed prefix**: order by what
+   the files actually resolve at load — which for a new addon is decided by the setup-file list in
+   step 4 — and annotate each load-bearing position at its TOC line (toc-file-§5). Copy the vendored `libs/` set you actually
    `LibStub()` from an existing Ka0s addon so versions stay consistent (library-stack-§3 — libraries are vendored
    and committed). Then vendor the two Ka0s-owned payloads (library-stack-§7) from the **`LibKa0s`
    repo's own ship folders**, byte-identical, rather than from a sibling addon's copy, which may
@@ -77,6 +81,18 @@ disagreeing with the collection's intent while looking, in review, like it had b
      install. Every call passes the addon's own **folder name** — a texture path is absolute from
      `Interface\AddOns\` and the library is vendored, so it cannot know which folder it was copied
      into, and a wrong path draws nothing and raises nothing.
+   - `core/EnvSetup.lua` — `LibKa0s-Env-1.0`: TOC metadata, the addon's own version (the fallback
+     stays visible at the call site, as an argument), and the player's map ID and zone. Wired by
+     every addon in the collection, because every addon reads at least its own version; a six-line
+     `GetAddOnMetadata` ladder in `core/Compat.lua` is the eleven-copy duplication this module ended.
+   - `core/PoolSetup.lua` — `LibKa0s-Pool-1.0`: the free/active widget pool, in the array shape or
+     the keyed shape — wired by any addon that re-renders rows, bars or chart elements. The two
+     shapes are not interchangeable; pick one per pool. Only skip this if the addon draws nothing
+     repeatedly, and remember that a hand-rolled pool whose `active` list is never drained looks
+     correct and leaks frames for the whole session.
+   - `core/ItemSetup.lua` — `LibKa0s-Item-1.0`: id and quality from a link, the quality label, and
+     the cache-then-callback load — wired only by an addon that handles items. It holds **no policy**
+     about what an uncached item means; that decision stays in the addon and gets written down.
    - `core/CoreSetup.lua` — `LibKa0s-Core-1.0`: the secret-safe stringifier and the prefixed chat
      printer (`NS.Print` / `NS.Util.print`, one function object — architecture-§2). Placed after the
      file defining `NS.PREFIX` and before everything that prints; pass the prefix as a **function**

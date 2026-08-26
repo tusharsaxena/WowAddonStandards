@@ -154,6 +154,45 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the same repo**: the old command counted every binary and every JSON file as a stray. A frozen
      bundle is never edited, so say so in the finding rather than letting the two numbers sit
      unexplained side by side.
+   - **Check the package ignore list by listing the repo's dot-entries, not by reading `.pkgmeta`
+     (`packaging`).** Two mechanical checks, and the second is the one that has been missed:
+
+     ```sh
+     # (a) the named dev-only entries are ignored
+     for e in .luacheckrc .gitignore .gitattributes .claude .superpowers docs tests _dev; do
+       grep -q "^  - $e\b" .pkgmeta || echo "NOT IGNORED — $e"
+     done
+
+     # (b) EVERY root dot-entry present in the repo is accounted for. The enumeration in (a) goes
+     #     stale the moment a new tool writes a new dot-directory; this one cannot.
+     for e in .[!.]*; do
+       [ -e "$e" ] || continue
+       grep -q "^  - $e\b" .pkgmeta || echo "UNACCOUNTED — $e"
+     done
+     ```
+
+     `.git` is the one entry the packager never sees and never needs a row; everything else that (b)
+     prints is either an ignore-list line the repo owes or a justification comment beside it. File
+     **one** finding carrying the full list rather than one per entry — the fix is a handful of
+     lines in a single file. The consequence is player-facing and concrete: a multi-file agent
+     tooling directory inside the packaged AddOn, which is what (b) was added for after five addons
+     shipped one and prose alone had already failed to stop it.
+   - **Check the TOC's position annotations (`toc-file-§5`).** In the `# Core` block, every line
+     whose position is **load-bearing** — a library major taken as an upvalue at file scope, a
+     constant resolved from an earlier seam at file load — **MUST** carry a comment at the line
+     naming what resolves. Read the seam files (`*Setup.lua`) and `core/Constants.lua` to establish
+     which positions actually are load-bearing rather than trusting the comments to be complete; an
+     unannotated load-bearing line is the MUST failure, and a load-bearing line annotated only as
+     *"order matters"* without naming what resolves is the same failure in weaker form. A TOC that
+     annotates its load-bearing lines but never marks a **conventional** position fails the SHOULD,
+     not the MUST — grade it accordingly. Do **not** file the within-`core/` sequence itself as a
+     deviation: dependency-correct order with its load-bearing positions declared is compliant,
+     whatever the sequence (`layout-§1`).
+   - **`X-Curse-Project-ID` on an unpublished addon is not a deviation (`toc-file-§1`).** If the
+     field is absent and the TOC carries a comment in its position saying the addon is not published
+     yet, that is **compliant** — record it as such and file nothing. A placeholder, invented, or
+     borrowed id **is** a finding, and a serious one: the packager uploads to whatever project the
+     id names. An absence with no comment is the SHOULD failure only.
    - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
      `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
      `audit-review-history` binds this run twice, in opposite directions. A gap matching a register

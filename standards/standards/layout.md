@@ -10,11 +10,13 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
 <AddonName>/
   <AddonName>.toc          -- single file, single Interface line (latest Retail), lists all .lua in dependency order
   core/
-    Compat.lua             -- deprecated-API shims; loaded FIRST
+    Compat.lua             -- deprecated-API shims
     Constants.lua          -- numeric constants, enum-like tables
     Namespace.lua          -- bootstrap: local addonName, NS = ...; sets up shared upvalues
     State.lua              -- mutable runtime state, message bus
     Util.lua               -- pure helpers
+    <Module>Setup.lua      -- one seam file per wired LibKa0s module (library-stack-§7);
+                           -- its position is often load-bearing and is declared in the TOC (toc-file-§5)
     <AddonName>.lua        -- AceAddon registration; promotes NS to AceAddon
     Database.lua           -- AceDB profile/global setup, migration runner
   defaults/
@@ -48,7 +50,8 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
 ```
 
 - **MUST** use this folder layout — source lives under `core/`, `defaults/`, `settings/`, `locales/`, `modules/`; never loose at the root. A small addon simply has thin folders (a single `modules/` file, a one-row `settings/Schema.lua`), not a different structure.
-- **MUST** load order: `core/Compat.lua` → `core/Constants.lua` → `core/Namespace.lua` → other `core/*` → `defaults/*` → `locales/*` → `settings/*` → `modules/*`.
+- **MUST** load in this **folder** order: `libs/*` → `locales/*` → `core/*` → `defaults/*` → `modules/*` → `settings/*`. Libraries first because everything resolves against them; settings **last**, because a settings panel depends on every module it configures already being initialized. This is the same order the TOC's `#` section headers express (toc-file-§5) — one order stated in two places, and if the two ever disagree that is a defect in this document rather than a choice an addon gets to make.
+- **MUST** load `core/*` in **dependency-correct order**, and **MUST** declare each load-bearing position at its own TOC line (toc-file-§5). There is no fixed `core/` prefix. The seam files `library-stack-§7` introduced — one `*Setup.lua` per wired module — resolve library members **at file scope**, so which file must precede which is a property of what the addon actually wires, and no list written here can anticipate it. `Compat.lua` → `Constants.lua` → `Namespace.lua` is the **illustrative** shape for an addon with no seam files and nothing resolving at load; an addon whose `Namespace.lua` publishes the `NS` table the other `core/` files attach to, or whose `Constants.lua` resolves a font from a media seam at file load, orders around that constraint and says so in the TOC comment. A dependency-correct order with its load-bearing positions declared is compliant; an order that matches the illustration but breaks a load-time resolution is not.
 - **MUST** cap any single `.lua` file at 1500 LOC. Files in the 1000–1500 band are on notice; a >1500 file is a bug — peel it.
 - **MAY** peel an oversized file into 2-3 sibling files in the same folder (e.g. `settings/Schema.lua` → `settings/Schema_Core.lua`, `settings/Schema_Display.lua`).
 

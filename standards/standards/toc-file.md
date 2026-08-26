@@ -19,7 +19,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 ## Category-enUS: <a category string the client accepts>   -- see the note below the block
 ## X-License: MIT
 ## X-Standard: https://github.com/tusharsaxena/WowAddonStandards
-## X-Curse-Project-ID: <id>              -- mandatory once published on CurseForge
+## X-Curse-Project-ID: <id>              -- mandatory once published on CurseForge; omitted (with a comment) before that
 ## X-Wago-ID: <id>                       -- optional; only if listed on Wago
 ## X-WoWI-ID: <id>                       -- optional; only if listed on WoW Interface
 ```
@@ -27,7 +27,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 - **MUST** follow the field order above so every Ka0s TOC reads identically. The file listing that follows the metadata block has its own required structure (toc-file-§5). Reference implementation (in the collection): the modular tracker's TOC.
 - **MUST** have `X-License: MIT`. **MUST NOT** ship "All Rights Reserved".
 - **MUST** have `X-Standard:` pointing at the standards repo, declaring the addon is built to this standard.
-- **MUST** have `X-Curse-Project-ID` once the addon is published on CurseForge (the collection's distribution platform). `X-Wago-ID` and `X-WoWI-ID` are **optional** (**MAY**) — include each only when the addon is actually listed on that platform (Wago / WoW Interface respectively); an addon that doesn't publish there simply omits the line. Keep the field **order** above regardless (Curse → Wago → WoWI).
+- **MUST** have `X-Curse-Project-ID` once the addon is published on CurseForge (the collection's distribution platform). **Before** it is published the field is **omitted**, and the omission is **compliant**: an unpublished addon **MUST NOT** carry a placeholder, invented, or borrowed id — the packager uploads to whatever project the id names, so a placeholder does not fail loudly, it publishes this addon into somebody else's project. An unpublished addon **SHOULD** carry a one-line comment where the field would go (`# X-Curse-Project-ID: not published on CurseForge yet`), in the field's own position, so the next reader sees a decision rather than an oversight. With that comment present the absence needs **no deviation-register row** — the same shape toc-file-§5 uses for a forced within-section order. Filing the absence as a deviation files a row no act of the addon can close. `X-Wago-ID` and `X-WoWI-ID` are **optional** (**MAY**) — include each only when the addon is actually listed on that platform (Wago / WoW Interface respectively); an addon that doesn't publish there simply omits the line. Keep the field **order** above regardless (Curse → Wago → WoWI).
 - **SHOULD NOT** declare hard `Dependencies`. Use `OptionalDeps` and shim missing libs with soft fallbacks. Reference implementation (in the collection): the absorb-shield tracker ships an AceDB-missing flat-table shim and LSM-missing Blizzard fallback constants, so it loads even with no libs present.
 
 **`Category-enUS` — the value MUST be a string the client accepts, and any list here is illustrative.**
@@ -84,12 +84,15 @@ libs\LibKa0s\LibKa0s.xml                 -- Ka0s-owned shared modules, after Ace
 locales\enUS.lua
 
 # Core
-core\Compat.lua
+core\Compat.lua                          -- conventional: reached through closures at call time
+core\MediaSetup.lua                      -- LOAD-BEARING: publishes NS.MediaFont, which Constants
+                                         -- resolves FONT_MONO from at file load
 core\Constants.lua
 core\State.lua
 core\Util.lua
-core\PerfSetup.lua                       -- before any module taking NS.Perf as an upvalue (performance-§1)
-core\Database.lua
+core\PerfSetup.lua                       -- LOAD-BEARING: before any module taking NS.Perf as an
+                                         -- upvalue (performance-§1)
+core\Database.lua                        -- conventional, as are the lines above it without a note
 core\<Addon>.lua
 
 # Defaults
@@ -103,7 +106,7 @@ settings\Panel.lua
 settings\...
 ```
 
-- **MUST** use `#` section headers, in the order **Libraries → Locales → Core → Defaults → Modules → Settings**, matching the load order (layout-§1). Libraries always load **first**; settings **last**.
+- **MUST** use `#` section headers, in the order **Libraries → Locales → Core → Defaults → Modules → Settings** — the same folder load order `layout-§1` states, expressed as the headers an author is actually looking at while writing a TOC. Libraries always load **first**; settings **last**, because a settings panel depends on every module it configures already being initialized.
 - **MUST** end the file with a single trailing newline.
 
 **The file sequence *within* a section is illustrative, not normative.** The block above is a reference
@@ -125,3 +128,25 @@ as a load-time upvalue (performance-§1, performance-§2) — and nothing more.
   next auditor both already are.
 - With that comment present the ordering is **compliant** and needs no deviation-register row: a
   register row records a departure from a rule, and there is no rule here to depart from.
+
+**Every position in the listing is one of two things, and the TOC says which.** A position is
+**load-bearing** when something resolves *at file scope* as the file loads — a library major taken
+as an upvalue, a constant computed from a seam that loaded earlier — so moving the line changes
+behavior. A position is **conventional** when everything the file needs is reached through a closure
+at call time, so the line is free to move and only reads oddly out of place.
+
+The distinction is worth a rule rather than a habit because of how the load-bearing kind fails:
+silently, and only in the client. A media seam that publishes `NS.MediaFont` sits above
+`core\Constants.lua` because `Constants` resolves its monospace font from it **at file load**; move
+the seam below and nothing errors, no test goes red, and every consumer quietly gets the client
+default font instead. The comment is the only guard there is.
+
+- A line whose position is **load-bearing MUST** carry a comment saying so, at the line, naming
+  **what resolves at load** — not merely that the order matters. `core\PerfSetup.lua` in the block
+  above is the form: the constraint and its reason on one line.
+- A position that is merely **conventional SHOULD** say that too, once per group rather than per
+  line, so the next author knows which lines are safe to move without re-deriving the whole
+  dependency graph. A TOC that annotates only its load-bearing lines leaves every other line
+  ambiguous between "free" and "not yet understood".
+- Moving an annotated line **MUST** be preceded by reading its comment. This is the one rule here
+  that is about the reader rather than the writer, and it is the one the annotation exists for.
