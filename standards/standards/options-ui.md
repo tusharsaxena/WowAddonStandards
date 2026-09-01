@@ -108,9 +108,11 @@ Schema-driven panels **MUST** default to a **two-column grid**: consecutive sche
 
 ### 7. Section headers
 
-Options **MUST** be grouped under **section headers** rendered as an AceGUI **`Heading`** (a centered label flanked by horizontal dividers), font bumped to `GameFontNormalLarge`, with a small spacer above (**except the first** — a leading gap reads as a broken top margin) and below. The flow engine emits one automatically whenever a row's `group` changes, so a section header is declared by a row, never drawn by a builder.
+Options on an **untabbed** page **MUST** be grouped under **section headers** rendered as an AceGUI **`Heading`** (a centered label flanked by horizontal dividers), font bumped to `GameFontNormalLarge`, with a small spacer above (**except the first** — a leading gap reads as a broken top margin) and below. The flow engine emits one automatically whenever a row's `group` changes, so a section header is declared by a row, never drawn by a builder.
 
 This is the same widget used for the landing page's "Slash Commands" divider, so headers read identically across the landing page and every subcategory.
+
+On a **tabbed** page (options-ui-§13) the tab label carries the section's name, so the heading is suppressed: drawing a `Heading` that repeats the tab the user just clicked is the same label twice. The `group` field still declares the section either way — what changes is where it is drawn, never who declares it.
 
 ### 8. Layout constants (exact values)
 
@@ -228,3 +230,21 @@ Which of the two an addon uses follows from where it stores, not from taste: a `
 **Testing (MUST).** The suite **MUST** prove the blast radius rather than the mechanism: after a global reset with **two or more** of whatever the addon lets a player create, exactly the shipped set survives; the profile *list* is unchanged and the active profile is still the one you were on; the session-only rows were swept; and the profile-changed message was published, because a reset that empties the profile without it leaves every live window drawing settings that are no longer there.
 
 > **Harness note.** A vendored AceDB fake may store a registered callback and *call* it, which breaks the `CallbackHandler` **string-method** form (`db.RegisterCallback(obj, "OnProfileChanged", "OnProfileChanged")`) that hosts use. Left unfixed, `db:ResetProfile()` raises in tests and the whole profile-changed path is untestable with nothing reporting it. Fix it in the addon's **own** mock extender, not in the vendored kit (testing).
+
+### 13. Tabbed pages
+
+A page whose rows exceed what one scroll can present **MAY** render its sections as a **tab strip** pinned above the scroll instead of as a sequence of section headings inside it.
+
+- **One tab per section, always.** A tab **MUST NOT** hold several sections and a section **MUST NOT** span several tabs. The tab label *is* the section name, so the two cannot drift and the flow engine's existing `group` field stays the single declaration of both. A second field naming a tab is a second selector to keep in step (options-ui-§1's reasoning against a separate `widget` field, arriving one layer up).
+- **The strip wraps.** When the labels exceed one row it **MUST** wrap to a second, never truncate, scroll horizontally, or shrink a label. A page **SHOULD** hold its section count low enough for one row at default UI scale; a wrapped second row is permitted and is not a defect.
+- **Switching tabs is a structural re-render**, and it is **not** combat-guarded. options-ui-§2's refusal covers *opening or switching a settings category*, which Blizzard protects; redrawing widgets inside a panel that is already open is not a protected action, so a tab click works in combat and a host **MUST NOT** add a guard that refuses one. What a tab switch inherits is the re-render path itself — the same one a change of subject takes — not a refusal.
+- **The active tab is session state, per page, and MUST NOT be persisted.** A stored tab is UI position masquerading as a setting: it makes one page look different to two characters on one account for a reason the player never asked for, and it turns a cosmetic default into a migration the day the sections are renamed.
+- **The per-page Defaults button stays page-wide.** Its label and its position do not change, so its blast radius **MUST NOT** narrow to the visible tab. A button whose meaning quietly shrank is the failure options-ui-§12 spends its whole length preventing at the global scale.
+
+### 14. The page banner
+
+A page that edits **one selected instance out of many** — a window, a unit, a profile — **MUST** say which one, in a **banner** pinned above the strip and the scroll. Six pages that silently retarget when a picker elsewhere moves is the panel lying about what a click will change.
+
+- **The banner carries the picker itself**, not a read-only label. A player who can see which instance they are editing and cannot change it from there has been told about the problem rather than given the fix.
+- **The banner is the ONLY picker.** Where a page already carried one for the same state, that picker **MUST** be deleted rather than kept in step: one writer, one control class, and no propagation code. The banner re-reads the pointer at render time, and the structural refresh the write already triggers re-renders every panel — so two banners cannot disagree, because there is only ever one value.
+- **The selection survives a tab switch and a page change.** Changing instance from a sub-page **MUST** leave the active tab alone: comparing one surface across two instances is the reason to switch from a sub-page at all, and resetting the tab defeats exactly that.
