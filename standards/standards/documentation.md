@@ -67,7 +67,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 6. **`## Screenshots`** — captioned images of the addon and its settings sub-panels. **SHOULD** (**MUST** once published).
 7. **`## Usage`** — **MUST**, with two subsections:
    - **`### Slash commands`** — one intro line (short + long slash form, and the `[XY]` chat prefix), then a **Command | What it does** table generated from `NS.COMMANDS` so it stays in lockstep with `/<slash> help` (slash-commands-§4).
-   - **`### Settings panel`** — a **Tab | Covers** table, one row per settings subcategory (options-ui-§5). **MAY** follow the table with per-panel prose (bolded panel/section names + option bullets) where a panel is rich enough to warrant it.
+   - **`### Settings panel`** — a **Tab | Covers** table, one row per settings subcategory (options-ui-§5). This is the player-facing summary and stays at page granularity; the per-tab breakdown that options-ui-§13's strip makes derivable belongs in `docs/settings-panel.md` (documentation-§3), not here. **MAY** follow the table with per-panel prose (bolded panel/section names + option bullets) where a panel is rich enough to warrant it.
 8. **`## How <it> works`** — **MUST**. A short, player-facing narrative — a numbered pipeline or prose — of how the addon produces what the user sees, titled for the domain (e.g. `## How picking & ranking works`, `## How the bar works`). Center it on the addon's core mechanic (ranking, attribution, scheduling, pick-selection, the value it tracks, …) and describe what happens, not the code behind it. Required even when the mechanic is simple — give the reader the one-paragraph "what's going on" rather than omit the section.
 9. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
 10. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table.
@@ -151,7 +151,7 @@ behavior the standard has since mandated or permitted, which reads as deviation 
   already fired; `performance-§12`'s exemption is the model. A row without a trigger is a permanent
   opt-out wearing a table's clothes.
 - **This is the single home.** A decision **MAY** be *reasoned* at length in the **GitHub issue** the
-  pending audit filed for it on the addon's own repo — labelled `state:triaged` or
+  pending audit filed for it on the addon's own repo — labeled `state:triaged` or
   `state:will-not-do` (audit-review-history) — or in an audit or review bundle, and the row **SHOULD** cite that issue
   number or bundle id in **Why**; but **a deviation not in the register is not ratified**. An issue
   declining a rule with no corresponding register row is itself the deviation, and an audit files it
@@ -218,7 +218,7 @@ Every addon **MUST** ship all six, under **exactly** these names:
 | `docs/scope.md` | what is this addon for? | what it does, and — explicitly — what it deliberately does **not** do. The out-of-scope half is the load-bearing half; it is the answer to "why doesn't it just also…" |
 | `docs/module-map.md` | where does the code live? | every non-vendored file, its one-line responsibility, and **load order** (the TOC's file order and why it is that order) |
 | `docs/schema.md` | what is persisted? | the SavedVariables shape, every default, and the **migration** path for each schema version bump (savedvariables) |
-| `docs/settings-panel.md` | how is it configured? | the panel/subcategory tree, per-option behavior, and how each control maps to its schema key (options-ui-§5) |
+| `docs/settings-panel.md` | how is it configured? | the panel/subcategory tree, per-option behavior, and how each control maps to its schema key (options-ui-§5). Since every page is a tab strip (options-ui-§13), the tree is **page → tab → row** and is written that way — one heading per page, the tabs in `group` declaration order, the rows under each. The table is **derived from the schema**, which is also where an audit reads it from, so a page → tab list here that the schema does not produce is the finding rather than the record |
 | `docs/data-flow.md` | how does it actually work? | the core mechanic as a pipeline — event or trigger in, processing, what the user ends up seeing. The engineer counterpart to the README's player-facing `## How <it> works` (documentation-§1 item 8); the two describe one pipeline at two levels and **MUST NOT** contradict each other |
 | `docs/common-tasks.md` | how do I change it? | recipes for the changes actually made most often in *this* addon — add a setting, add a slash command, add a tracked entity, add a locale string — each as concrete steps naming real files |
 
@@ -435,10 +435,14 @@ check.)*
   it.
 - **A malformed or out-of-range reference is a MUST fix.** Malformed means it does not parse as
   `filename-§N` at all (`slash-commands-§:`); out-of-range means the file exists but has no such
-  section — a citation numbered `§41` against `options-ui.md`, which carries §1–§11. Both are worse
-  than the retired form, because
+  section — a citation numbered `§41` against `options-ui.md`, which has never carried forty
+  sections. Both are worse than the retired form, because
   the retired form tells the reader "this is old" while these send the reader to a section that does
-  not exist and looks current doing it. Range-check against the section file's own heading count.
+  not exist and looks current doing it. **Range-check against the section file's own heading count,
+  which is the only authority** — `grep -c '^### [0-9]' standards/standards/<file>`. No live upper
+  bound is written into this sentence on purpose: a range pinned in prose goes stale the next time a
+  section is added, and a stale upper bound turns every legitimate citation above it into a MUST fix
+  for an agent applying the rule literally. That has already happened once here, to `options-ui`.
 
 **Some section files have no numbered subsections, and are cited by BARE FILENAME.** These carry a
 single `## <Topic>` heading and prose beneath it, sometimes with unnumbered `###` headings. There is no

@@ -134,7 +134,7 @@ derives from, a return value of:
   scope, and so is a field stored on a table and read back later.
 
 This list is **the normative trigger set**. When a build protects a new API, extend the list here — that
-is an upstream edit, not a per-repo judgement call, because the whole value of naming the APIs is that
+is an upstream edit, not a per-repo judgment call, because the whole value of naming the APIs is that
 every repo grades against the same set.
 
 **Outside the trigger set it is a SHOULD, and the reason is drift, not secrets.** A site that formats

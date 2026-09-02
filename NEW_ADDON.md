@@ -134,8 +134,44 @@ disagreeing with the collection's intent while looking, in review, like it had b
    hook handed to a shared module. A title-bar control strip and any modal draw catalog
    marks, and a wide action button gains a mark **beside** its label rather than instead of it. A mark
    the catalog lacks is added upstream in the `LibKa0s` repo, in the same style, by the generator that
-   produced the rest — never drawn one-off here. The settings panel is deliberately out of scope for
-   now.
+   produced the rest — never drawn one-off here.
+
+   **Scaffold the first settings page to the shape every Ka0s page has** (options-ui-§13/§14/§15/§16/§17/§18).
+   A new addon gets this for free by starting from it; retrofitting it later is a rename pass across
+   every page file, and one of the rules cannot be retrofitted at all without a migration.
+   - **Every settings page renders through the tabbed renderer**, starting with `General` and
+     including a page with a single section — a one-tab strip is the correct rendering of a
+     one-section page. The untabbed form is for the pages the host does not render through the flow
+     engine, and today that is **two**: the AceConfig-drawn Profiles sub-page, and the **landing
+     page**, whose body is your own `buildMain` (options-ui-§5) — logo, tagline, *Slash Commands*
+     heading, one Label per `COMMANDS` row. Do **not** put a tab strip on the landing page
+     (options-ui-§13). Give **every** schema row a `group`; a row without one belongs to no tab.
+   - **The General page's first tab is named exactly `Master controls`** and is built by the library's
+     master-controls composer from **one** declaration — `Enable <Addon>` | `General visibility` /
+     `Master scale` | `Master alpha` / `Lock frame` | `Debug console` / `Reset position` |
+     `Reset all settings` — including only the rows the addon has the state for. A frameless addon
+     omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
+     out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
+     shipping the *show only in combat* boolean instead buys a migration later for nothing.
+   - **Font, border and bar controls come from the composers**, never typed out — one call each emits
+     the canonical rows in the canonical order, and anything extra the surface needs is appended
+     after the block rather than interleaved into it (options-ui-§16). A tab mixing two of them gives
+     each a `subgroup` heading (options-ui-§7).
+   - **Every color row ships with its class-color companion** as the next row, defaulting **off**,
+     with `classColorSource` declared on both rows, and resolved through the library's one resolver —
+     which keeps the swatch's alpha, falls through to the stored swatch when the class cannot be
+     resolved, and reads the tracked unit's class where the surface describes a unit
+     (options-ui-§17). Never `disabledIf` on a color row. Write nothing private here: the four-copies
+     version is what this rule was written out of.
+   - **Anything a player orders is the shared drag-to-reorder list**, never arrow buttons; the handle
+     and the bounded row box are the library's and the row's contents are yours, and the controller is
+     canceled at the top of the render (options-ui-§18).
+   - **Page-wide controls sit in the chrome block above the strip**, not under one tab, and that block
+     is never boxed a second time (options-ui-§14).
+
+   Mirror every row into `defaults/Profile.lua` and give every new `label` **and** `desc` an `enUS`
+   key as you write it — the suite checks labels, and descs are checked by nothing, which is why they
+   are the ones that go missing.
 5. **Write tests first.** Stand up `tests/` on the vendored `tests/_kit/` harness and drive every
    behavior **test-first** (testing). Test what is **yours** — the descriptors, the degradation stubs,
    and the addon's own logic — and do not re-test the library's internals: they are covered in the
