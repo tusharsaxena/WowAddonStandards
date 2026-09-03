@@ -64,7 +64,7 @@ reason, is mis-specified — the decline is the answer, and it needs a place to 
 is that place, and the re-check trigger is what stops "English-only" from silently outliving the
 decision: the moment a `deDE.lua` lands, the row's trigger has fired and the routing work is owed.
 
-**A recorded decision is not a licence to leave the seam unused.** Strings the addon *does* route stay
+**A recorded decision is not a license to leave the seam unused.** Strings the addon *does* route stay
 routed, and `enUS.lua` **MUST NOT** accumulate keys nothing reads — a dead key is a claim about
 coverage that is not true (documentation-§5). Delete it or wire it.
 

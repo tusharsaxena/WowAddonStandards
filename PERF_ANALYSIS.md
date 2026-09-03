@@ -85,7 +85,7 @@ never corrected**.
 **Stamp the bundle from `dump.timestamp`** (epoch seconds) rendered as local-time
 `YYYYMMDD-HHMMSS` — the same local-time rule and rationale `automated-tests-§1` gives for its
 bundles. The directory names when the capture *happened*, not when it was pasted, so a run written up
-a week later still sorts against its neighbours. A reconstructed stamp is said to be one.
+a week later still sorts against its neighbors. A reconstructed stamp is said to be one.
 
 ## Step 3 — Write the bundle
 

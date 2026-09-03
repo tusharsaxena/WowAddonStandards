@@ -275,6 +275,119 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **Not a deviation:** an addon on a LibKa0s tag older than v1.9.0 has no catalog to draw from.
        Say which tag it carries (root `CLAUDE.md`'s provenance line) and file the adoption as a
        re-vendor item rather than as a styling gap.
+   - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
+     screen.** Nine checks. Each is a read of the schema array or a grep, none needs judgment, and
+     all nine are invisible to lint and to the headless suite — which is how every one of them
+     shipped. Do them in this order; the first changes what the rest are counting.
+     - **(a) Every page draws a tab strip (options-ui-§13).** List the addon's settings pages and,
+       per page, the distinct `group` values in declaration order. A page with **no** `group` values,
+       or whose builder calls the untabbed renderer, is a MUST failure — **including** a page with
+       exactly one section, which draws a one-tab strip. The exempt pages are those the host does
+       not render through the flow engine, and today that is **two** of them, both exempt: the
+       AceConfig-drawn **Profiles** sub-page, and the **landing page**, whose body is the host's own
+       `buildMain` (options-ui-§5) — a logo, a tagline and one Label per `COMMANDS` row, declaring no
+       `group` at all. Neither is a finding, and the landing page in particular is **mandated** in
+       that shape: do not file its missing strip. Read the renderer as well as the pages: a fallback
+       to the untabbed form below some
+       tab count is the finding even on a page that currently has enough tabs to dodge it, and so is
+       an early return that skips the strip for some state (an empty list, a mirrored or linked
+       unit). Report the **page → tab list**, before and after, as the evidence.
+     - **(b) The General page's first tab is exactly `Master controls` (options-ui-§15).** Compare
+       the first distinct `group` on the General page against that literal string. Then read the rows
+       filed under it, in declaration order, against the canonical set — enable, general visibility,
+       master scale, master alpha, lock frame, debug console, reset position, reset all settings.
+       They **MUST** be a subsequence of that list, and every canonical row the addon has the state
+       for **MUST** be present. A canonical row sitting under a different tab is a finding against
+       **§15**, not against the tab it is in. An addon that draws no positionable frame — proven by a
+       whole-repo `SetMovable` sweep, not assumed — legitimately omits exactly master scale, master
+       alpha, lock frame and reset position; record that as compliant and file nothing.
+       **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
+       that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
+       row whose type changed with **no** bumped `schemaVersion` and **no** migration step in
+       `Database.lua`'s runner (savedvariables) is a finding in its own right, graded at least
+       **medium**: the panel reads a stored `true` as an unrecognized dropdown value on every
+       existing install, so the addon silently loses a setting the player already made. The
+       migration is `true` → `inCombat`, `false` → `always`. Cite the runner's `file:line` and the
+       version it bumped to as the evidence that it exists; adopting the *name* `Master controls`
+       moved a `group` and needs no migration, and the two must not be confused for each other.
+     - **(c) Every color row has its class-color companion beside it (options-ui-§17).** Grep the
+       schema for color rows and, for each, require its companion — a `Use class color` bool or a
+       color-mode dropdown whose values include `class` — as the **next** row in declaration order,
+       so it lands in the right-hand column. Then check the declaration: both rows carry
+       `classColorSource`, and its value is checked against what the drawing code actually means
+       (cite the `file:line` where the render path decides whose class it reads — a control stored
+       under a per-unit path that draws the player's own spells is `player`). Finally read the
+       resolver: one function, the stored alpha used under both modes, and an unresolvable class
+       falling through to the stored swatch. A literal gray or white fallback is at least **medium**
+       — it is user-visible and reads exactly like the setting not working. Palette-definition
+       swatches (one color per statistic, per rarity, per category) are exempt and are the only
+       exemption.
+     - **(d) No `disabledIf` on a color row (options-ui-§17).** One grep over the schema files. Every
+       hit is a finding, because the row is still read for its alpha, so graying it tells the player
+       something untrue.
+     - **(e) Ordering is a drag (options-ui-§18).** One grep for the paired chat-scroll arrow art in
+       a settings file:
+
+       ```sh
+       grep -rn 'ScrollUp-Up\|ScrollDown-Up' --include='*.lua' settings/ | grep -v '/libs/'
+       ```
+
+       Any hit over a stored array is a finding, and so is a `MoveUp`/`MoveDown`-shaped handler or a
+       numeric position field. Where the shared reorder list **is** used, check the split instead: a
+       consumer drawing its own row fill, border or handle, a control placed left of the handle, a
+       list of unequal row heights, or a drag that can cross a fixed section boundary is the finding.
+     - **(f) No hand-written font, border or bar group (options-ui-§16).** Grep the settings files for
+       the shared-media dropdown controls (`LSM30_Font`, `LSM30_Border`, `LSM30_Statusbar`): on an
+       addon whose vendored library carries the composers, every hit **MUST** be a composer call
+       site. Then read each group's rows in declaration order against the canonical order. Two
+       shapes, graded differently: a **reordered** group is low (convention), a **missing** mandated
+       row — no border thickness, no bar opacity — is at least low and is reported with the
+       **literal it should have replaced**, cited at the render path's `file:line`, because that
+       number is the thing a player can see and cannot reach. While in the same files, check that a
+       tab mixing control types carries a `subgroup` heading per group, and that no hand-rolled
+       colored `Label` is standing in for the shared `Heading`.
+     - **(g) One chrome block above the strip, and it is not boxed twice (options-ui-§14).** Per
+       page, list what the builder draws into the chrome band and what it declares as schema rows.
+       Then the mechanical test: **a page-wide control declared inside a `group` is in the scroll,
+       and is the finding.** Page-wide means it applies to every tab — the page's picker for the
+       instance it edits, and the acts that apply to that instance whole: create, enable, unlock,
+       copy, reset, delete. Report it with the tab it currently hides under, because a control that
+       vanishes when the player clicks a different tab is what they actually see. Two findings share
+       this check: a page drawing **two** chrome blocks (a banner plus a separate control band — the
+       picker belongs *inside* the one block), and a **second box** around the band's contents. The
+       second is one grep over the same builder: an `InlineGroup`, a backdropped `SimpleGroup`, or a
+       hand-drawn border wrapping the band's controls is **anti-pattern #72** — the band is already
+       delimited by its divider and the content panel's top edge. Delete the box, keep the controls.
+     - **(h) A wrapped strip's geometry does not move with the selection (options-ui-§13).** Two
+       reads, no live client needed. First, in the vendored library, find the number the strip packs
+       its **wrapped rows** by and confirm it is taken from the **unselected** state and cached once
+       — a pitch read off "whichever tab was drawn first", or off the selected tab's art, font or
+       backdrop, is the finding whether or not this addon currently has a page that wraps, because
+       it becomes visible the day a label is added. Note that the row pitch and `TAB_H` are two
+       different quantities (options-ui-§8) and that reading the band off `TAB_H` alone is not the
+       same defect. Second, the suite: a case asserting the reserved band **and every row's y
+       offset** are identical for every value of the selection. Check what it runs against — a
+       harness that answers **one** height for every atlas cannot fail the case, so it is green
+       against nothing and is reported as a **missing** case, not a passing one (testing-§12). Name
+       the mutation the case dies under.
+     - **(i) A secondary strip lives in the scroll, and there is no third level (options-ui-§13).**
+       Where a page divides one primary tab's content with a second strip, confirm three things from
+       the builder: it is drawn as ordinary page content rather than pinned into the chrome band;
+       its selection is kept **per primary tab** so returning to a category returns to the subject
+       you were on; and that selection is session state, never written to the profile — a stored
+       secondary selection is a finding against the same rule that forbids storing the primary one.
+       Then check no third level exists, in either of its two shapes: a strip nested inside a
+       secondary tab, and a `subgroup` heading used to fake one, which is a finding against
+       options-ui-§7's rule that a subsection wanting its own tab should be given one.
+     - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
+       widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
+       `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a
+       panel deviation.
+     - **File the strip and the tab rules as one root with dependents** (step 5's rule). An addon
+       that has not adopted the tabbed page at all fails (a), (b), the heading half of (f), and
+       (g), (h) and (i) — which have nothing to attach to on a page with no strip — as consequences
+       of one decision; six roots would sextuple a single finding. The dependents are still listed
+       under the root, because the remediation order is theirs.
    - **Check the degradation stub covers every member the addon calls.** For each setup file, list
      the members the addon reaches on the library instance (grep the call sites) and confirm the
      library-absent branch answers **all** of them; a stub missing one is not a fallback, it is a

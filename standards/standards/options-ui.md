@@ -4,7 +4,7 @@
 
 Every Ka0s addon's settings surface is the **same** surface: a Blizzard canvas landing page, one canvas subcategory per topic, a two-column schema-driven body inside an always-scrollbarred `ScrollFrame`, a lazily built **Defaults** button top right, and a panel-open that refuses under combat. That sameness is the product, not a coincidence — a user who has configured one Ka0s addon has configured all of them — and it is now delivered by a **shared library** rather than by five copies of a toolkit drifting apart.
 
-**Adoption strength.** **MUST** for the **wiring** — vendor `LibKa0s-Options-1.0`, create one instance at load from a descriptor, stash it on the namespace, degrade when it is absent. **MUST** for the **behavior contract** below (options-ui-§5 through options-ui-§11): those rules describe what a Ka0s panel *is*, and they hold whether or not a given release of the library implements them for you. **SHOULD** for which pages an addon splits its settings into — that is genuinely addon-specific. Hand-rolling the panel shell, the widget makers or the flow engine when the library provides them is **anti-pattern #47**.
+**Adoption strength.** **MUST** for the **wiring** — vendor `LibKa0s-Options-1.0`, create one instance at load from a descriptor, stash it on the namespace, degrade when it is absent. **MUST** for the **behavior contract** below (options-ui-§5 onward): those rules describe what a Ka0s panel *is*, and they hold whether or not a given release of the library implements them for you. **SHOULD** for which pages an addon splits its settings into — that is genuinely addon-specific. Hand-rolling the panel shell, the widget makers or the flow engine when the library provides them is **anti-pattern #47**.
 
 ### 1. The options library
 
@@ -110,9 +110,13 @@ Schema-driven panels **MUST** default to a **two-column grid**: consecutive sche
 
 Options on an **untabbed** page **MUST** be grouped under **section headers** rendered as an AceGUI **`Heading`** (a centered label flanked by horizontal dividers), font bumped to `GameFontNormalLarge`, with a small spacer above (**except the first** — a leading gap reads as a broken top margin) and below. The flow engine emits one automatically whenever a row's `group` changes, so a section header is declared by a row, never drawn by a builder.
 
-This is the same widget used for the landing page's "Slash Commands" divider, so headers read identically across the landing page and every subcategory.
+This is the same widget used for the landing page's "Slash Commands" divider, so headers read identically across the landing page and every subcategory. The landing page is one of the **two** pages options-ui-§13 exempts from the tab strip (the other is the Profiles sub-page), so this untabbed form is that page's permanent rendering — not a stage on the way to a strip, and not a deviation to be filed against it.
 
-On a **tabbed** page (options-ui-§13) the tab label carries the section's name, so the heading is suppressed: drawing a `Heading` that repeats the tab the user just clicked is the same label twice. The `group` field still declares the section either way — what changes is where it is drawn, never who declares it.
+On a **tabbed** page (options-ui-§13) the tab label carries the section's name, so that heading is suppressed: drawing a `Heading` that repeats the tab the user just clicked is the same label twice. The `group` field still declares the section either way — what changes is where it is drawn, never who declares it.
+
+**A tab that mixes control types MUST break them up with subsection headings, and those are NOT suppressed.** A tab holding bar rows, background rows and border rows is three subjects under one label, and a player scanning it has no way to tell where one ends. The heading is declared by the row, exactly as the section heading is — a `subgroup` field, drawn whenever it changes within a group — so a subsection is still never drawn by a builder, and the tab list is still derivable from `group` alone. A `subgroup` **MUST NOT** repeat its tab's name, and it **MUST NOT** be used to fake a second tab level: if a subsection wants its own tab, give it one.
+
+**One heading widget in the collection.** Subsection headings use the same `Heading` every other header uses. A hand-rolled label — a colored full-width `Label`, a bolded string — **MUST** be replaced by it (**anti-pattern #71**); two heading looks on one canvas is the drift the shared library exists to end.
 
 ### 8. Layout constants (exact values)
 
@@ -152,6 +156,35 @@ Every Ka0s panel renders identically because every panel reads **one** set of co
 | `ROW_VSPACER` | **8** | spacer between rows |
 | scroll inset `TOPLEFT` | `(PADDING_X − 4, −8)` | AceGUI `ScrollFrame` vs body |
 | scroll inset `BOTTOMRIGHT` | `(−(PADDING_X + 12), 8)` | reserves the scrollbar gutter, which AceGUI parks 20px right of the scroll frame |
+
+**Tab strip** — every page (options-ui-§13):
+
+| Constant | Value | Meaning |
+|---|---|---|
+| `TAB_H` | **37** | the **button frame's** height — `SetHeight` on every tab button, selected or not. Deliberately **taller than the art it carries**, so the button's foot overlaps the content panel's top edge and the selected tab merges into the page instead of floating above it. This is a frame height, not an art height, and it is **not** the wrapped-row pitch |
+| `TAB_PAD_X` | **20** | label inset each side; a tab's width is the label plus twice this |
+| `TAB_GAP` | **4** | horizontal gap between two tabs in a row |
+| `TAB_MIN_W` | **60** | a tab is never narrower, whatever its label measures |
+| `CHROME_GAP` | **8** | between the chrome band's bottom and the scroll's top |
+| row pitch | *measured*, and **≤ `TAB_H`** | the **unselected tab art's** own height — the atlas texture *inside* the 37px frame, which is shorter than it. **This, not `TAB_H`, is the vertical distance between the tops of two wrapped rows**, so a second row sits flush under the first rather than being pushed down by each button's empty top strip. It is a measurement rather than a constant because an atlas has no height until the client resolves one — but it is **one** measurement, taken from the **unselected** state, which no click can change (options-ui-§13). Where nothing can be measured (a headless harness, a font not yet loaded) it falls back to `TAB_H`, which is the pre-measurement behavior and the only case in which the two numbers coincide |
+
+**Reorder rows** — every draggable list (options-ui-§18):
+
+| Constant | Value | Meaning |
+|---|---|---|
+| handle gutter | **30** | the drag handle's width at the row's far left; row contents start beyond it |
+| row fill | **1, 1, 1, 0.06** | the bounded box's background; **0.03** for a row drawn dimmed |
+| row edge | **1, 1, 1, 0.12** | the box's 1px border, all four sides; **0.06** dimmed |
+
+**The two are different quantities and both govern, in one formula.** The reserved chrome band is
+
+```
+band = bannerHeight + (rowCount − 1) × pitch + TAB_H
+```
+
+— the pitch stacks every row *above* the last one, and `TAB_H` is the last row's own height. A row's y offset is `−(bannerHeight + (rowIndex − 1) × pitch)`. Both inputs are a constant and a single cached measurement taken from a state no click can change, so the band and every row offset are the same numbers for every value of the selection — which is options-ui-§13's wrap-stability invariant, expressed arithmetically. An auditor checks the two inputs, not the rendered pixels: a strip that reads its pitch off the selected tab's art, its font or its backdrop is the finding, whatever the page currently measures.
+
+These live in the library and are read off the instance (`Helpers.TAB_H`, `Widgets.ROW_BOX`), never copied into a host constants file — the sentence at the top of this section applies to them exactly as it applies to the rest.
 
 **Landing page** (the host's `buildMain` body — these are the host's own constants, since the body is):
 
@@ -225,7 +258,7 @@ Such an addon takes the second canonical confirmation, verbatim, because the fir
 
 Which of the two an addon uses follows from where it stores, not from taste: a `profile` section means the first, no `profile` section means the second. An addon with **both** uses the first and resets the profile — its account-wide store is not settings, and clearing it is a separate, separately-confirmed act (a *purge*, a *delete all*), never folded into *reset settings*.
 
-**A geometry hook is not needed for this and MUST NOT be re-added.** Positions live in the profile, so a profile reset restores them along with everything else. A `ResetPositions`-style seam wired into `afterRestoreAll` exists only to serve a row-by-row sweep; with the sweep gone it has no caller and **MUST** be removed rather than left as a dead export (`public-api`). The addon's targeted *reset positions* verb, where it has one, is unaffected and keeps going straight at whatever owns re-anchoring a live frame.
+**A geometry hook is not needed for this and MUST NOT be re-added.** Positions live in the profile, so a profile reset restores them along with everything else. A `ResetPositions`-style seam wired into `afterRestoreAll` exists only to serve a row-by-row sweep; with the sweep gone it has no caller and **MUST** be removed rather than left as a dead export (`public-api`). The addon's targeted *reset positions* verb, where it has one, is unaffected and keeps going straight at whatever owns re-anchoring a live frame. **"Where it has one" is about the slash verb, not about the control**: options-ui-§15 makes a *Reset position* **row** mandatory on the Master controls tab of every addon that is not frameless, and this sentence **MUST NOT** be cited to excuse a missing one. What is optional here is whether the addon also exposes the act as a slash verb and what that verb reaches for; what is not optional is the row.
 
 **Testing (MUST).** The suite **MUST** prove the blast radius rather than the mechanism: after a global reset with **two or more** of whatever the addon lets a player create, exactly the shipped set survives; the profile *list* is unchanged and the active profile is still the one you were on; the session-only rows were swept; and the profile-changed message was published, because a reset that empties the profile without it leaves every live window drawing settings that are no longer there.
 
@@ -233,18 +266,115 @@ Which of the two an addon uses follows from where it stores, not from taste: a `
 
 ### 13. Tabbed pages
 
-A page whose rows exceed what one scroll can present **MAY** render its sections as a **tab strip** pinned above the scroll instead of as a sequence of section headings inside it.
+Every settings page **MUST** render its sections as a **tab strip** pinned above the scroll. This is not a size threshold and not a choice: a Ka0s page has a strip, so a player who has learned one page has learned all of them. A page with exactly **one** section draws a **one-tab strip** — the tab that cannot be clicked is that page's section label, which is what it always was.
+
+**The exemption is a page the host does not render through the flow engine**, and today that is **two** pages, both of them:
+
+- the **Profiles** sub-page (options-ui-§3), which AceConfigDialog draws whole; and
+- the **landing page** (options-ui-§5), whose body is the host's own `buildMain` — logo, tagline, a *Slash Commands* heading and one Label per `COMMANDS` row. It declares no `group` and names no sections, so there is nothing for a strip to be a strip of; its heading is the untabbed `Heading` form (options-ui-§7) and stays that way.
+
+The exemption is stated as a property of how the page is rendered rather than as the page's name, because a name-match is a rule that stops being true the first time a page is renamed and says nothing when it does. **Enumerate both, everywhere the exemption is enumerated.** An enumeration that names only the Profiles page reads as exclusive, and an audit agent holding it files a MUST failure against every addon's landing page — which is the mandated rendering of that page, not a deviation from it.
 
 - **One tab per section, always.** A tab **MUST NOT** hold several sections and a section **MUST NOT** span several tabs. The tab label *is* the section name, so the two cannot drift and the flow engine's existing `group` field stays the single declaration of both. A second field naming a tab is a second selector to keep in step (options-ui-§1's reasoning against a separate `widget` field, arriving one layer up).
+- **Every row carries a `group`.** A page whose rows declare none cannot draw a strip; the library reports it and renders the page untabbed rather than drawing an empty strip over a blank page, and the missing `group` is the defect to fix (**anti-pattern #69**).
 - **The strip wraps.** When the labels exceed one row it **MUST** wrap to a second, never truncate, scroll horizontally, or shrink a label. A page **SHOULD** hold its section count low enough for one row at default UI scale; a wrapped second row is permitted and is not a defect.
+- **A wrapped strip's geometry MUST NOT depend on which tab is selected.** The row pitch and the reserved chrome band are the same numbers for every value of the selection, and no layout number may be read off a **state-dependent** measurement — the selected tab's art, its font, its backdrop. A selected tab that is drawn differently is correct; a selected tab that MEASURES differently moves every row below it and the whole page with them (**anti-pattern #70**).
+- **A tab that mixes control types MUST carry subsection headings** — see options-ui-§7. The tab label names the section; a heading inside it names each kind of control the section mixes.
+- **A secondary strip is permitted inside one primary tab, and it lives in the scroll.** Where one tab's content is itself a list of like subjects — one per rewritten string, one per member of a set — it **MAY** be divided by a **secondary** strip drawn as ordinary page content. The primary strip is pinned; a secondary strip belongs to the content it divides and scrolls with it. Its selection is session state like the primary one, kept **per primary tab** so returning to a category returns to the subject you were on, and it **MUST NOT** be persisted. A page **MUST NOT** nest a third level.
 - **Switching tabs is a structural re-render**, and it is **not** combat-guarded. options-ui-§2's refusal covers *opening or switching a settings category*, which Blizzard protects; redrawing widgets inside a panel that is already open is not a protected action, so a tab click works in combat and a host **MUST NOT** add a guard that refuses one. What a tab switch inherits is the re-render path itself — the same one a change of subject takes — not a refusal.
 - **The active tab is session state, per page, and MUST NOT be persisted.** A stored tab is UI position masquerading as a setting: it makes one page look different to two characters on one account for a reason the player never asked for, and it turns a cosmetic default into a migration the day the sections are renamed.
 - **The per-page Defaults button stays page-wide.** Its label and its position do not change, so its blast radius **MUST NOT** narrow to the visible tab. A button whose meaning quietly shrank is the failure options-ui-§12 spends its whole length preventing at the global scale.
 
-### 14. The page banner
+**Testing (MUST).** The suite **MUST** pin the invariant rather than the mechanism: on a strip wide enough to **wrap**, the total reserved band and every row's y offset are **identical for every value of the selection**. A harness that answers one height for every atlas cannot fail this — the harness **MUST** answer a different height for the selected-state art, or the case is green against nothing (testing-§12). Name the mutation it dies under.
 
-A page that edits **one selected instance out of many** — a window, a unit, a profile — **MUST** say which one, in a **banner** pinned above the strip and the scroll. Six pages that silently retarget when a picker elsewhere moves is the panel lying about what a click will change.
+### 14. The page banner and the chrome block
+
+The band above the tab strip is where a page says what it is about. Two things belong there and nothing else does.
+
+A page that edits **one selected instance out of many** — a window, a unit, a panel, a profile — **MUST** say which one, in a **banner** pinned in that band. Six pages that silently retarget when a picker elsewhere moves is the panel lying about what a click will change.
 
 - **The banner carries the picker itself**, not a read-only label. A player who can see which instance they are editing and cannot change it from there has been told about the problem rather than given the fix.
 - **The banner is the ONLY picker.** Where a page already carried one for the same state, that picker **MUST** be deleted rather than kept in step: one writer, one control class, and no propagation code. The banner re-reads the pointer at render time, and the structural refresh the write already triggers re-renders every panel — so two banners cannot disagree, because there is only ever one value.
 - **The selection survives a tab switch and a page change.** Changing instance from a sub-page **MUST** leave the active tab alone: comparing one surface across two instances is the reason to switch from a sub-page at all, and resetting the tab defeats exactly that.
+
+**Controls that apply to every tab MUST sit in that band too, above the strip — never in the scroll below it.** A control that governs the whole page but is drawn under one tab reads as belonging to that tab, and it disappears the moment the player clicks a different one. Creating the thing the page edits, choosing which one is being edited, and the acts that apply to it whole — enable, unlock, copy, reset, delete — are page-wide and go above the strip. A page draws **at most one** such block; where it needs both a picker and other page-wide controls, the picker goes **inside** the block and the banner is not drawn separately, because two chrome blocks are two bands and the second one pushes the page down for nothing.
+
+**Once a control block is in the band, it MUST NOT also be boxed.** The band is already visually separated from the page by its own divider and by the content panel's top edge; a second bounded box drawn around the same controls is a border stating a boundary the band already states (**anti-pattern #72**). Delete the box, keep the controls.
+
+### 15. The Master controls tab
+
+Every addon's **General** page **MUST** exist and its **FIRST** tab **MUST** be named exactly **`Master controls`**. It carries the controls that govern the addon as a whole, so that the one thing every player looks for first — how do I turn this off, how do I make it smaller, how do I put it back — is in the same place, under the same words, in every Ka0s addon.
+
+The canonical set, in this order, laid out two per line:
+
+| | |
+|---|---|
+| Enable `<AddonName>` | General visibility |
+| Master scale | Master alpha |
+| Lock frame | Debug console |
+| Reset position | Reset all settings |
+
+- **The set is canonical, not a menu.** An addon includes every row that applies to it and **MUST NOT** reorder them, rename them, or split them across tabs.
+- **An addon with no movable frame omits exactly the frame-only rows** — master scale, master alpha, lock frame, reset position — and nothing else. A **frameless** addon (one that draws no positionable frame at all) is the only thing that omits them, and it **MUST NOT** invent a movable frame to fill the tab out. Where an addon's frames are per-instance (per window, per panel, per unit), the master rows are the addon-wide ones and the per-instance scale/alpha/lock stay on the instance's own page — the two are different settings and **MUST NOT** be conflated.
+- **General visibility is a dropdown**, not a boolean: `Always` / `Only in combat` / `Only out of combat` / `Never`. An addon that ships a *show only in combat* checkbox migrates it (`true` → `inCombat`, `false` → `always`), because a boolean can only ever answer two of the four. **This is a stored-value type change and takes the full savedvariables treatment** — a bumped `schemaVersion` and a step in the migration runner, in the **same** change that changes the row's type. Changing the type alone satisfies the letter of this rule and breaks every existing install: the panel meets a stored `true` where it expects one of four strings, and the player loses a setting they already made, silently. Contrast the tab **rename**: adopting the name `Master controls` moves a `group`, which is not a stored path and needs no migration. One of the two is a migration and the other is not, and the difference is whether a **stored value** changed shape.
+- **Debug console belongs here**, as a session-only row (debug-logging), not as a bespoke checkbox bolted onto some other section.
+- **The two resets are the tab's closing button pair** (`BUTTON_PAIR_REL`, options-ui-§8), and *Reset all settings* is options-ui-§12's global reset verbatim — the same one act, the same wording, the same blast radius. A frameless addon draws *Reset all settings* alone.
+- **The rows are composed, not hand-written** (options-ui-§16's rule applies here too): the library's `MasterControls` composer emits the canonical set from one declaration, so nine addons cannot drift into nine orders.
+
+A General page whose first tab is something else, or that has no tab strip at all, is **anti-pattern #68**.
+
+### 16. Control groups — font, border, bar
+
+Three kinds of control recur in every addon that paints anything, and a player who has set a font in one Ka0s addon **MUST** find the same rows in the same order in the next one. Each group is a fixed row-set with a fixed layout.
+
+**Font.** Font controls **MUST** appear together, as one contiguous block, in this order:
+
+| | |
+|---|---|
+| Font | Font size |
+| Font color | Use class color |
+| Font flags | Font shadow |
+
+**Border.** A border group **MUST** carry these four rows in this order, optionally preceded by the group's own *Show border* toggle where the addon has one:
+
+| | |
+|---|---|
+| Border style | Border thickness (px) |
+| Border color | Use class color |
+
+**Bar.** A bar group — a group over a **status bar**, a thing with a fill texture — **MUST** carry:
+
+| | |
+|---|---|
+| Bar texture | Bar opacity |
+| Bar color | Use class color |
+
+- **The mandated rows come first, contiguous, in that order.** An addon **MAY** append further rows of the same kind **after** the block, under the same subsection — a border offset, a fill direction, a bar spacing. It **MUST NOT** interleave them, and it **MUST NOT** drop a mandated row because its addon has no use for it: a control the addon cannot honor is a control it should not have needed a group for.
+- **A group over a background is not a bar group.** A container with a backdrop and no fill texture takes a background swatch and its class-color companion (options-ui-§17) and nothing else; inventing a texture picker for a surface that has no texture is a control wired to nothing.
+- **These groups are COMPOSED, not typed out.** The library emits each block from one declaration; a hand-written copy is **anti-pattern #73**. The composer is what makes the order, the labels, the ranges and the companion identical in nine addons without nine people agreeing to be careful.
+- **A tab holding more than one of these groups carries a subsection heading per group** (options-ui-§7). Merging a background group and a border group onto one tab is a legitimate choice and is not undone by this rule — what the rule requires is that the merged tab says where one stops and the next starts.
+
+### 17. The class-color companion
+
+**Every color-picker control in a Ka0s addon MUST be accompanied by a way to say *use the class color instead*, placed immediately to its right** in the two-column layout. A swatch on its own asks the player to hand-match a color the game already knows.
+
+- **The companion is a checkbox — `Use class color` — or a color-mode dropdown whose value set includes `class`.** The dropdown is the richer form and satisfies this rule wherever a surface genuinely has more than two answers (a per-statistic color, a skin color, none). An addon that already ships the dropdown **MUST NOT** be converted back to a checkbox: that trades a three-value control for a two-value one and loses the modes the third value names. An addon that ships neither adds the checkbox.
+- **Default OFF**, unless the addon already ships it on, in which case it stays on.
+- **Which class.** The color resolves to the class of the unit the surface **DESCRIBES**: a per-unit bar, cast bar or label takes the **tracked unit's** class; everything else — chrome, panels, the player's own cooldowns and glows, anything not about a particular unit — takes the **player's**. The path a setting is stored under does **NOT** decide this: a control living under `units.<unit>.` that draws the player's own spells is player-scoped. Because the path cannot be trusted, the intent **MUST** be declared on the row (`classColorSource = "player" | "unit"`), and that declaration is what an audit reads.
+- **An unresolvable class is not a color.** An NPC, an unknown unit, a class the client has not answered for — the control falls through to the **stored swatch**, never to white, never to gray, never to a substitute hue. A tenth color invented for the occasion is a color nobody chose.
+- **The stored alpha survives the mode.** No class-color source carries an alpha, so the swatch's opacity always applies, under either mode.
+- **The swatch is therefore NEVER disabled while the companion is on.** `disabledIf` on a color row is forbidden (**anti-pattern #74**): the row is still read — for its alpha — so graying it tells the player something untrue. Say it in words instead, in the swatch's tooltip: *not read while Use class color is on, except for its opacity, which always applies*.
+- **One resolver.** The lookup is the library's (`RAID_CLASS_COLORS`, which is what every other UI on the player's screen is already using), not a fifth private copy, and the player's own answer is cached only on success while no other unit's is cached at all.
+- **Palette-definition swatches are exempt**, and are the only exemption: a set of colors that *identifies* something other than a player — one color per statistic, per rarity, per category — has no class to take. A companion beside *Damage done color* is a control with no meaning.
+- **A background swatch resolves through the addon's own background palette where it has one**, and through the shared resolver where it does not. A darkened per-class background set is a different set of hues, not the class color times a constant, and the two **MUST NOT** be substituted for each other.
+
+### 18. Reorder lists
+
+Where the **order** of a list is the setting, the player **MUST** be able to drag it, through the shared reorder widget (`LibKa0s-Widgets-1.0`'s `ReorderList`). Paired up/down arrow buttons are **anti-pattern #75** wherever the widget can be used: two clicks per position, no feedback about where an item is going, and a different set of arrows drawn in every addon that has them.
+
+- **The library owns the chrome.** The drag handle — the hamburger mark from the shared icon catalog, in a fixed-width gutter at the row's **far left** — and the row's **bounded box** (background fill and a 1px border, values pinned in options-ui-§8) are the widget's, so every draggable list in the collection reads the same. So are the drag itself, the copy that follows the cursor, the insertion line and the index arithmetic.
+- **The row's CONTENTS are entirely the consumer's** and are expected to differ: icons, checks, labels, right-aligned text, buttons. A host **MUST NOT** draw its own row fill, border or handle — that is the double chrome the shared widget exists to prevent — and **MUST NOT** make the whole row draggable, which would swallow presses aimed at the controls inside it.
+- **Rows in one list are a uniform height.** The drop position is arithmetic on the row stride, not a hit test, so a list of unequal rows drops in the wrong place.
+- **A drag never crosses a boundary the data does not have.** Where a list is divided into sections whose membership is fixed — in combat / out of combat, collecting / not collecting — a drag reorders **within** a section only, and the rule is enforced by the widget's boundary rather than by hoping.
+- **The reorder controller MUST be canceled at the top of a render, before the first widget is created**, not merely before the list is rebuilt. Its handles and row boxes are pooled, and a controller released late leaves them attached to recycled widgets belonging to something else. This is a shipped-bug lesson, and it is the single most common way an adoption of this widget goes wrong.
+- **Without the library there is no handle and no box.** That is an accepted cosmetic degradation, stated here so nobody re-solves it host-side: a host-drawn box is the drift this rule exists to end.

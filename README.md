@@ -41,8 +41,9 @@ The repos the standard codifies rules for are listed in
 **[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster, in two tables. Edit
 that one file to change collection scope.
 
-- **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 8 Ka0s addons: Absorb
-  Tracker, Bank Ledger, Consumable Master, KickCD, Loot History, Panel Master, Pretty Chat, WhatGroup.
+- **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 9 Ka0s addons: Absorb
+  Tracker, Bank Ledger, Consumable Master, KickCD, Loot History, Multi Meters, Panel Master, Pretty
+  Chat, WhatGroup.
 - **Plus the Ka0s-owned library repos** those addons vendor — currently 1: LibKa0s. A library repo is
   in scope for the standards process and is audited, but against **library-stack-§7's applicability
   list** rather than the addon rule set: no TOC, no player-facing README, no settings panel, no
@@ -130,13 +131,15 @@ WowAddonStandards/
     INDUSTRY_RESEARCH.md               -- research foundation: 10 reference addons synthesized
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
     _raw/_industry/                       -- per-addon raw research reports (evidence)
+  harvests/                               -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass
+  media/logos/                            -- the Ka0s logo, used by the collection's READMEs
 ```
 
 Audit and review runs are **not** stored here — each lives under its own addon's `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` (audit-review-history).
 
 ## Status
 
-Standard is at **v2.37.0** and living. Compliance auditing has moved out of this repo into each addon's
+Standard is at **v2.38.0** and living. Compliance auditing has moved out of this repo into each addon's
 own repository, driven by the `AUDIT.md` / `AUTOMATED_TESTS.md` / `NEW_ADDON.md` / `PERF_ANALYSIS.md`
 playbooks that the `wow-addon` plugin consumes.
 

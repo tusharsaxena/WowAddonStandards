@@ -31,7 +31,7 @@ Items recorded for future versions of this standard:
 
   WhatGroup hit this on 2026-08-06 and it is the first real test of the trigger. A teleport-cooldown
   countdown in its popup needs a 1-second timer; the timer is a single handle, armed only while the
-  popup is **both** open and showing a live cooldown, replaced rather than stacked, and cancelled from
+  popup is **both** open and showing a live cooldown, replaced rather than stacked, and canceled from
   the frame's `OnHide`, from the top of the configure path, and by the tick that reaches zero. Per tick
   it costs one `C_Spell.GetSpellCooldown` and one `SetText`. On the letter of the trigger that ends the
   exemption, so the addon owes a `core/PerfSetup.lua`, a `perf` verb, a second SavedVariables global, a

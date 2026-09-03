@@ -48,7 +48,7 @@ be deleted where it still exists.
 
 **Discovery and triage are two commands, deliberately.** `/wow-addon:issue-audit` sweeps the addon —
 four discovery passes, stable item IDs, evidence hashes, severity — and files anything not already in
-the store as an open issue labelled `state:untriaged`. It never interviews and never changes code.
+the store as an open issue labeled `state:untriaged`. It never interviews and never changes code.
 `/wow-addon:issue-triage` takes those `state:untriaged` issues, **most severe first**, puts each to the
 maintainer one at a time with its evidence, and records the decision by swapping the status label. It
 changes the store only.
@@ -66,9 +66,9 @@ implement.** Accepting that something should be done produces a `state:triaged` 
 chosen approach, not a code change. The work happens in an ordinary session against that issue.
 
 - **MUST** carry the item's status as a **GitHub label**, drawn from a closed vocabulary of four,
-  with the colours below so a status is legible at a glance in the web UI:
+  with the colors below so a status is legible at a glance in the web UI:
 
-  | Status label | Colour | Issue state | Means |
+  | Status label | Color | Issue state | Means |
   |---|---|---|---|
   | `state:done` | green `00ff00` | closed | Decided and implemented |
   | `state:will-not-do` | blue `0000ff` | closed | Declined; terminal |
@@ -78,7 +78,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   Exactly one per issue. **The label is the status — not a title prefix, and not a milestone.**
 
   **The two families are deliberately opposed in brightness, and that is load-bearing.** Status
-  colours sit at full saturation (`ff` on the accent channel); severity colours sit near black (`11`
+  colors sit at full saturation (`ff` on the accent channel); severity colors sit near black (`11`
   on the accent channel). Both families use the same *hue* ladder — green, yellow, orange, red — so a
   hue alone cannot tell you which family a chip belongs to, and an issue always wears one of each.
   When both were mid-tone, a row of chips read as an undifferentiated smear and the eye had to parse
@@ -87,7 +87,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
 - **MUST** carry the item's **severity** as a second GitHub label, one per issue, from a closed
   vocabulary of four:
 
-  | Severity label | Colour | Means |
+  | Severity label | Color | Means |
   |---|---|---|
   | `severity:critical` | red `110000` | Taint, combat-lockdown breakage, SavedVariables corruption or data loss, an error on a common path |
   | `severity:high` | orange `110800` | A user-visible defect, or a standard deviation carried out of an audit or review bundle |
@@ -118,11 +118,11 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   status or severity is therefore a plain **`--label` query** over
   `gh issue list --json number,title,state,labels`, not a title filter and not a search. The eight
   labels are created idempotently with `gh label create --force`, which also repairs a drifted
-  colour.
+  color.
 - **MUST NOT** use `gh api graphql`, or hand-rolled GraphQL against `api.github.com/graphql`, for
   issue work. Reaching for GraphQL first is a real, observed failure: it spends a round trip on a
   deprecated path before falling back to the subcommand that would have worked. Where a REST call is
   genuinely unavoidable, use `gh api repos/{owner}/{repo}/issues` — never the GraphQL endpoint.
 - **Migration is deferrals only.** A surviving ledger's `deferred` rows migrate out as **open**
-  issues labelled `state:triaged`. `done` and `wont-do` rows are terminal and are **not** migrated; they survive
+  issues labeled `state:triaged`. `done` and `wont-do` rows are terminal and are **not** migrated; they survive
   in git history via the commit that deletes the file, which is the whole reason deleting it is safe.
