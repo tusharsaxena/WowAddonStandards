@@ -131,6 +131,8 @@ WowAddonStandards/
     INDUSTRY_RESEARCH.md               -- research foundation: 10 reference addons synthesized
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
     _raw/_industry/                       -- per-addon raw research reports (evidence)
+  harvests/                               -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass
+  media/logos/                            -- the Ka0s logo, used by the collection's READMEs
 ```
 
 Audit and review runs are **not** stored here — each lives under its own addon's `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` (audit-review-history).
