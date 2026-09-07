@@ -55,7 +55,7 @@ Ka0s addons **MUST ship every library vendored in `libs/` and committed to git**
 ### 5. Forking Ace libs is forbidden
 
 - **MUST NOT** privately fork an Ace3 lib. Private lib forks seen in some large UI suites (renamed copies of Ace3) block on every Ace3 update and are an anti-pattern.
-- **MUST** extend AceGUI via `AceGUI:RegisterWidgetType("Ka0s_X", ...)` if a custom widget is needed.
+- **MUST** extend AceGUI via `AceGUI:RegisterWidgetType("Ka0s_X", ...)` if a custom widget is needed. That sanction is about a **new** name the addon defines; **re-registering an existing** widget type writes into a process-global table and is `LibKa0s`'s to do, never an addon's (library-stack-§9).
 
 ### 6. No addon-suite dependencies (self-contained)
 
@@ -235,7 +235,7 @@ exactly the reason that nothing here said whether `layout` reached it (`LibKa0s/
 | Section | How it reads here |
 |---|---|
 | `layout` | The **cap and the band** (layout-§1) and the **casing** rules bind unchanged; a library's authored `.lua` is authored `.lua`. The `core/ defaults/ settings/ locales/ modules/` **skeleton** and the folder load order do not — a library has no TOC to order and no settings folder. Its shape is the payload folder plus `tests/`, `docs/` and `testkit/`, and `layout-§3`'s typed subfolder rule binds both `media/` folders it has — the payload's, which every consumer receives (library-stack-§8), and the repo's own. |
-| `library-stack` | This section binds itself. `§7` is where the repo's own rules live — the payload shape, the API-document-per-minor contract, the three promotion bars, and this applicability block — and `§8` governs the media payload it ships. `§1`–`§6` are written for the *consumer* and describe acts the library repo does not perform: it vendors nothing — there is no `libs/` here, because the headless suite runs on the kit's mocks — so the mandatory table, the optional list, the vendoring rules and the registry pattern have no instance. `§5`'s no-forking prohibition and `§6`'s self-containment survive as constraints on what the payload may **contain**, and are audited as such. |
+| `library-stack` | This section binds itself. `§7` is where the repo's own rules live — the payload shape, the API-document-per-minor contract, the three promotion bars, and this applicability block — and `§8` governs the media payload it ships. `§1`–`§6` are written for the *consumer* and describe acts the library repo does not perform: it vendors nothing — there is no `libs/` here, because the headless suite runs on the kit's mocks — so the mandatory table, the optional list, the vendoring rules and the registry pattern have no instance. `§5`'s no-forking prohibition and `§6`'s self-containment survive as constraints on what the payload may **contain**, and are audited as such. `§9` binds the library repo **directly** rather than by reading: the widget-type re-registration it forbids an addon to perform is one the library is required to publish, sentinel and all. |
 | `architecture` | The module pattern and the closed message bus bind **inside** the library where it uses them; the namespace bootstrap and AceAddon registration (architecture-§1, §2) do not — a library registers with LibStub, not with AceAddon, and has no addon namespace to bootstrap. |
 | `performance` | `performance-§10`'s `lizard` measurement and its release checkpoint bind, and the release gate in automated-tests counts a library's warnings like anyone's. The **wiring** MUST — a `PerfSetup.lua`, a `<Addon>PerfDB`, a `perf` verb — does not: there is no addon to wire it into and no slash surface to reach it from. The library **writes** the harness; it is measured by its consumers. |
 | `compat` | Binds. A deprecated or cross-patch API call inside the payload is exactly the thing a single `Compat` owner exists for, and a shim scattered through ten consumers' vendored copies is the worst version of the problem this section describes. |
@@ -357,3 +357,53 @@ user-facing frames for the same shapes.
 - **The options surface is deliberately out of scope for now.** The settings panel's widgets are
   `LibKa0s-Options-1.0`'s, so iconifying it is a library change with a collection-wide blast radius,
   and it is tracked as an open evolution rather than done piecemeal per addon.
+
+### 9. A widget-type re-registration is the library's (MUST)
+
+AceGUI's widget registry is **process-global**. `AceGUI:RegisterWidgetType(name, ctor, version)` writes
+into `AceGUI.WidgetRegistry` — one table, shared by every addon loaded in the client, Ka0s or not — and
+the highest version registered for a name wins for the rest of the session. library-stack-§5 and
+anti-patterns #8 sanction that call and continue to: extending a widget beats forking the library that
+ships it. What neither of them said is **where the call may live**, and the silence cost this collection
+five copies of one patch.
+
+**The case this is written against.** Five addons ship a private `core/LSMPatch.lua` that re-registers
+`LSM30_Border` at `AceGUI:GetWidgetVersion("LSM30_Border") + 1`, wrapping whatever constructor the
+registry held, to collapse a 42px border-preview tile that reads as misaligned on a canvas-layout
+settings page: `AbsorbTracker/core/LSMPatch.lua:20` (50 lines, exposed as a callable
+`NS.ApplyLSMBorderPatch()` and invoked from `core/AbsorbTracker.lua:52`),
+`ConsumableMaster/core/LSMPatch.lua:43` (65), `KickCD/core/LSMPatch.lua:46` (68),
+`MultiMeters/core/LSMPatch.lua:80` (101) and `PanelMaster/core/LSMPatch.lua:44` (66) — the last four
+installed from a `PLAYER_LOGIN` frame. Five files, five distinct md5s, one intent. Each is defensible
+read on its own, which is why two audit bundles graded the same code differently — `KICKCD-R-01` **High**
+and `PANELMASTER-R-01` **Medium** — and neither could name a rule it broke.
+
+Read together they are a different object. Every wrapper closes over whatever the registry held when it
+ran, so with all five loaded the last addon to reach `PLAYER_LOGIN` wraps the fourth, which wraps the
+third: the same work done five times, five constructors deep, with the outermost one belonging to
+**whichever addon the client happened to load last**. And the registration is the *session's*, not the
+addon's — the next Border dropdown anything opens, Ka0s or not, is drawn by a Ka0s wrapper it never asked
+for. The behavior is a function of load order, which is exactly why no addon's suite can see it: each one
+loads one copy, registers once, and passes.
+
+- **Re-registering a widget type the addon did not itself define** — a name already present in
+  `AceGUI.WidgetRegistry` when the addon loaded, whether AceGUI's own or a shared-media widget's —
+  **MUST** be done by `LibKa0s`, published as a member of the owning major, and **MUST NOT** be done from
+  an addon's `core/`, `modules/` or `settings/`. The addon **calls** the library's member; it does not
+  perform the registration.
+- The library's registration **MUST** be **idempotent behind a sentinel on the library table**, because
+  every consumer carries its own vendored copy and every copy will call it. N vendored copies loaded in
+  one session **MUST** produce exactly one registration, and the sentinel is what makes the count
+  independent of how many addons are installed and in what order.
+- **One consumer is enough to send it upstream.** §7's three promotion bars ask whether a shape is
+  *shared*; this rule does not ask that, and does not wait for a second caller. What makes the
+  registration the library's is the blast radius, not the number of callers — and a second Ka0s addon
+  reaching the same conclusion independently is not a duplicate, it is a collision.
+- **Registering a NEW widget type the addon itself defines is untouched.** A `Ka0s_X` name nothing else
+  in the process claims collides with nobody, and library-stack-§5's extend-don't-fork sanction applies
+  to it unchanged. This rule is about **where** a re-registration lives, never about **whether**
+  extension is legitimate.
+- Where the wanted change is **per-instance** — a hidden child, a re-anchored region, a restyled cap —
+  an addon **MAY** simply make it at **its own creation site**, on the widget it just acquired, and leave
+  the registry alone. That answer is always available, needs no library minor and affects nobody else;
+  what is forbidden is reaching the same end by editing the table every other addon in the client reads.

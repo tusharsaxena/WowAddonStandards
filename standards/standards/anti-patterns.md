@@ -11,7 +11,7 @@ For quick reference, the rules above as a do-not list:
 5. `SLASH_*` direct registration — use AceConsole.
 6. `if cmd == "x" then elseif ...` slash dispatcher — use schema + COMMANDS table.
 7. `.pkgmeta` `externals:` for libraries — vendor and commit all libs instead (library-stack-§3).
-8. Forking Ace libs — use `RegisterWidgetType` extension instead.
+8. Forking Ace libs — use `RegisterWidgetType` extension instead. That is a sanction for a **new** widget name the addon defines; re-registering a name it did not define writes into a process-global table and is the library's call to make, not an addon's (#76, library-stack-§9).
 9. `if WOW_PROJECT_ID == ...` game-flavor branching — Retail only; route any Retail-patch check through Compat (compat).
 10. Direct calls to deprecated APIs — route through Compat.
 11. `:Hide()` on Blizzard frames you replace — reparent to hidden parent.
@@ -101,3 +101,5 @@ For quick reference, the rules above as a do-not list:
 74. **`disabledIf` on a color row whose class-color companion is on** — graying the swatch to say *this is not being read*, when it is: its **alpha** still applies under class color, in every implementation in the collection. The control the player is told is inert is the one still deciding the opacity they are looking at. Say it in the tooltip; leave the swatch live (`options-ui-§17`).
 
 75. **Paired up/down arrow buttons where the list's order is the setting** — two 16px chat-scroll textures per row, a click per position, no indication of where an item will land, and a different pair of arrows in every addon that grew one. They also encode a **swap**, so a move of four positions is four writes and four re-renders instead of one splice. The shared reorder widget exists, is already vendored in every addon, and owns the handle, the ghost, the insertion line and the boundary clamp (`options-ui-§18`).
+
+76. **A widget-type re-registration living inside an addon** — a private `core/LSMPatch.lua` calling `AceGUI:RegisterWidgetType("LSM30_Border", wrapper, AceGUI:GetWidgetVersion("LSM30_Border") + 1)` off a `PLAYER_LOGIN` frame to win the version race. The tell is the **target**, not the call: `AceGUI.WidgetRegistry` is process-global, so the addon is not restyling its own dropdown, it is restyling every dropdown in the client — and with five addons doing it, each wrapper closes over the previous one and the outermost is whichever addon loaded last, five deep. **Nothing goes red**: every suite loads exactly one copy, registers once and passes, and load order is not a thing a headless harness has. Re-registration belongs to `LibKa0s`, idempotent behind a sentinel; a per-instance fix belongs at the addon's own creation site, leaving the registry alone (library-stack-§9). #8 still sanctions `RegisterWidgetType` for a **new** name the addon defines — this is about where the call lives, not whether extending beats forking.
