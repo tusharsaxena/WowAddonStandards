@@ -171,7 +171,11 @@ required by the testing and automated-test rules rather than by this section's t
 `automated-tests/RESULTS.md` — of which **four are unconditional and one, `perf-analysis/README.md`, is
 required only while the performance harness is wired** (performance-§12). The count is never written
 bare for exactly this reason: an addon holding a recorded no-combat-path exemption ships **four**, and
-naming them is what keeps that from reading as a missing doc.
+naming them is what keeps that from reading as a missing doc. These five, together with `testing.md`
+and `smoke-tests.md`, are the **seven documents that belong to no tier**, and `## Documentation map`'s
+fourth table — `### Verification and record`, specified below — is where they are registered; the one
+of the seven that also carries a Tier 2 trigger, `perf-analysis/README.md`, registers with its trigger
+instead, and the fourth table's own specification says why.
 
 - **`docs/test-cases.md`** — the generated test-case inventory (testing-§5).
 - **`docs/performance.md`** — **required unconditionally**, including under the performance-§12 exemption. When the harness is wired it is the addon's own performance page: which hot paths are bracketed and why, how to run a capture (`/<slash> perf`), how to read the report, and what the harness can and cannot resolve (performance). The shared protocol and record contract live with the library — this page points there rather than restating them. When the addon is **exempt** the page stays, and shrinks to **one screen**: that the addon brackets nothing, which of performance-§12's (b)/(c) applies, where the committed sweep lives, and what would re-arm the wiring. The question the page answers — *how much does this addon cost?* — does not go away with the harness; only the answer changes.
@@ -276,13 +280,69 @@ reports the shape, not the arithmetic.
 ##### `## Documentation map` — the tenth `ARCHITECTURE.md` section (MUST)
 
 The register that makes the tiers checkable **in both directions**. Every `.md` under `docs/` appears
-in **exactly one** of its three tables, and every table row points at a file that exists — so a missing
+in **exactly one** of its four tables, and every table row points at a file that exists — so a missing
 required doc and an orphaned undocumented one are both findings, where previously neither was.
 
 Frozen and generated material is **out of scope** and **MUST NOT** be enumerated row by row:
 `docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-analysis/<run>/`,
 `docs/superpowers/` and `docs/investigations/` are named as directories, once each. A register that
 grows a row per audit is a register nobody re-reads.
+
+###### `### Verification and record` — the fourth table (MUST)
+
+Through v2.38.0 this register named **three** tables, one per tier, and it was **unsatisfiable as
+written**. Seven documents belong to no tier and never did: `testing.md` and `smoke-tests.md` are
+canonical-trio members rather than topic detail, and the five verification-and-record docs —
+`test-cases.md`, `performance.md`, `perf-analysis/README.md`, `automated-tests/README.md` and
+`automated-tests/RESULTS.md` — are required by `testing` and `automated-tests` rather than by this
+section's tier model, which is what this section already says of them a page above. A MUST that every
+`.md` sit in exactly one of three **tier** tables, written over a doc set whose seven members the same
+section deliberately places outside the tiers, cannot be complied with; and filing them under a tier
+anyway would misstate where their requirement comes from, which is the one fact the register exists to
+carry.
+
+**Nine of nine addons wrote the missing table before the standard named it**, independently and under
+the same heading: AbsorbTracker `docs/ARCHITECTURE.md:332`, BankLedger `:199`, ConsumableMaster `:287`,
+KickCD `:204`, LootHistory `:360`, MultiMeters `:660`, PanelMaster `:148`, PrettyChat `:190`, WhatGroup
+`:320`. Two audits filed it — `PRETTYCHAT-A-09` and `WHATGROUP-A-15` — as a gap in the rule rather than
+a defect in the repo, and both were right. This amendment ratifies what the collection already ships.
+**No addon moves a table on account of it**, and any repo carrying a note that justifies the extra
+table against the old three-table MUST deletes that note: the table is now the rule.
+
+- **MUST** carry `### Verification and record` as the fourth table, in the shape `| Doc | Covers |`,
+  placed after `### Conditional` and before `### Addon-specific` — the order all nine converged on.
+- It holds **exactly** `testing.md`, `smoke-tests.md`, `test-cases.md`, `performance.md`,
+  `automated-tests/README.md` and `automated-tests/RESULTS.md`. Six rows, in every addon, in every
+  state — this table has no conditional member and therefore no *Not applicable* row. It is **not** a
+  spare tier for a doc whose tier is awkward.
+- **`perf-analysis/README.md` registers in `### Conditional`, not here**, in *both* of its states. It
+  is the one member of the five that is also a **Tier 2** doc with a stated trigger (the performance
+  harness is wired, performance-§12), and only the conditional table has the Status and Trigger columns
+  that answer it; a `| Doc | Covers |` row cannot express *not applicable*, which is the state five of
+  the nine addons are in. Registering it in both tables is the "exactly one" MUST broken by the
+  standard's own two-way classification, so this settles it: **the trigger decides the table**.
+
+###### Does `ARCHITECTURE.md` register itself? — **MAY**, and an audit files neither state (MUST NOT)
+
+The hub is itself a `.md` under `docs/`, so the scope sentence above reads as covering it, and the
+collection split five to four on whether to write the row. Five open their first table with a
+`| ARCHITECTURE.md | This file — the hub: … |` row — BankLedger `docs/ARCHITECTURE.md:179`,
+ConsumableMaster `:267`, KickCD `:185`, LootHistory `:340`, MultiMeters `:656` — and four do not:
+AbsorbTracker, PanelMaster, PrettyChat and WhatGroup. Left unsettled that is four findings or five,
+cycle after cycle, over a row that changes nothing.
+
+It is settled as a **MAY**, deliberately, because neither of the register's two failure modes exists
+for the file that carries the register. A missing required doc is caught by a table row with no file
+behind it; an orphaned undocumented one by a file with no row. `ARCHITECTURE.md` can be neither — it is
+the document being read, and its absence takes the map with it. A self-row is **orientation**, not a
+check: it tells a reader who landed on the map that the hub is part of the set it is looking at. That
+is worth something and it is not worth a rule, so:
+
+- An addon **MAY** register `ARCHITECTURE.md`, and when it does the row is the **first row of
+  `### Required`**, described as the hub — the form the five that do it already use.
+- An audit **MUST NOT** file the presence of that row, and **MUST NOT** file its absence. This is the
+  only exception to "every `.md` under `docs/` appears in exactly one table", and it is stated here so
+  that the exception lives with the rule rather than in nine repositories' heads.
 
 ```markdown
 ## Documentation map
@@ -299,7 +359,19 @@ grows a row per audit is a register nobody re-reads.
 | Doc | Status | Trigger |
 |---|---|---|
 | `slash-dispatch.md` | Present | 11 commands in `NS.COMMANDS` |
+| `perf-analysis/README.md` | Not applicable | The `performance-§12` exemption is held; no harness is wired |
 | `profiles.md` | Not applicable | No profile control ships in the options UI |
+
+### Verification and record (documentation-§3)
+
+| Doc | Covers |
+|---|---|
+| `testing.md` | How to run the harness and lint; the green commit gate |
+| `smoke-tests.md` | The in-game smoke-test suite |
+| `test-cases.md` | The generated case inventory (authoritative pass count) |
+| `performance.md` | The addon performance page |
+| `automated-tests/README.md` | What the automated-test record is and how to produce it |
+| `automated-tests/RESULTS.md` | One row per run; generated, never hand-edited |
 
 ### Addon-specific (documentation-§3, Tier 3)
 
@@ -309,8 +381,8 @@ grows a row per audit is a register nobody re-reads.
 ```
 
 `wow-addon:sync-docs` keeps the map in lockstep with what is on disk;
-`wow-addon:standards-audit` checks the required set, the conditional set's stated status, orphans,
-non-canonical filenames, and the hub's shape.
+`wow-addon:standards-audit` checks the required set, the conditional set's stated status, the
+verification-and-record set, orphans, non-canonical filenames, and the hub's shape.
 
 ##### Retired topic-detail docs
 
