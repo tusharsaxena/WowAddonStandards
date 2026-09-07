@@ -88,8 +88,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `settings-panel.md`, `data-flow.md`, `common-tasks.md`; a missing one is a MUST failure.
      (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
      `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`, evaluate
-     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, read
-     `core/Compat.lua`) and require either the doc or a *Not applicable* row carrying that trigger.
+     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the shims
+     `core/Compat.lua` publishes with documentation-§3's own grep — it is a count now, not a
+     judgment) and require either the doc or a *Not applicable* row carrying that trigger.
      An absent doc whose trigger **has** fired is a MUST failure; an absent doc with a fired trigger
      *and* a "Not applicable" row is worse, because the row asserts something false — grade it above
      the bare omission.

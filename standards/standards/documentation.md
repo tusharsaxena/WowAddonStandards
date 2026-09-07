@@ -238,10 +238,43 @@ rather than inventing one.
 | `docs/perf-analysis/README.md` | the performance harness is wired (performance-§12) — specified above |
 | `docs/slash-dispatch.md` | `NS.COMMANDS` carries **eight or more** commands, or **any** subcommand tree |
 | `docs/midnight-quirks.md` | the addon carries **at least one** client-version workaround of its own |
-| `docs/compat-layer.md` | `core/Compat.lua` carries **addon-specific** shims beyond what `LibKa0s` supplies |
+| `docs/compat-layer.md` | `core/Compat.lua` publishes **three or more** addon-specific shims beyond what `LibKa0s` supplies |
 | `docs/message-bus.md` | the addon defines **more than ten** distinct messages |
 | `docs/profiles.md` | AceDB profiles are **user-visible** (a profile control ships in the options UI) |
 | `docs/debug.md` | the addon ships debug surfaces **beyond** the `LibKa0s` default console |
+
+**The `compat-layer.md` trigger counts, and this is what it counts.** A shim is one entry point
+published on the addon's own `Compat` table — the wrapper a feature module calls in place of a
+version-variant or optional client API. It is counted mechanically, over the addon's own file and
+nothing else:
+
+```
+grep -cE '^\s*function\s+[A-Za-z_][A-Za-z0-9_]*\.' core/Compat.lua
+```
+
+Shims `LibKa0s` supplies are **not** counted and **MUST NOT** be re-documented here: the library
+documents its own substrate once, under library-stack-§7, and an addon page restating it is a copy of
+someone else's documentation going stale in eight places, which is the drift this whole section exists
+to stop.
+
+**Why the number, and why it is three.** Until this rule carried one, `compat-layer.md` was the only
+Tier 2 trigger written as pure judgment — "carries addon-specific shims" — sitting between
+`slash-dispatch.md`'s *eight or more* and `message-bus.md`'s *more than ten*. Read as judgment it was
+read four ways, and the readings do not track size. `MultiMeters/core/Compat.lua` is 761 lines
+publishing 28 shims and the repo ships no `docs/compat-layer.md`; `BankLedger/core/Compat.lua` (175
+lines, 13 shims), `KickCD/core/Compat.lua` (496, 13) and `LootHistory/core/Compat.lua` (416, 23) each
+ship one. The cleanest evidence that the old wording decided nothing is the pair four lines apart:
+`BankLedger/core/Compat.lua` at 175 lines has the doc and `PanelMaster/core/Compat.lua` at 173 lines
+(8 shims) does not. The two the auditor was actually being asked to decide were the small ones —
+`ConsumableMaster/core/Compat.lua` (83 lines, 6 shims) and `WhatGroup/core/Compat.lua` (130 lines, 7
+shims, at `:24`, `:40`, `:52`, `:62`, `:83`, `:105`, `:125`) — and they were decided differently from
+one cycle to the next, at the cost of the same argument every audit.
+
+Three sits deliberately below every `core/Compat.lua` the collection ships, because excluding somebody
+is not the number's job: **settling the small cases without an argument is.** It still leaves a real
+floor — an addon whose Compat file is one or two wrappers owes a *Not applicable* row in
+`## Documentation map` rather than a page that is more heading than content — and it moves no
+repository's answer away from what a careful reader would already have given it.
 
 **Not applicable is a valid state, and it MUST be stated.** A Tier 2 doc whose trigger has not fired is
 recorded as a row in `## Documentation map` carrying the trigger — not silently absent. This is
