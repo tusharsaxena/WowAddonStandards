@@ -961,7 +961,7 @@ Then add `- .gitattributes` to `.pkgmeta`'s `ignore:` block below — it is dev-
 std = "lua51"
 max_line_length = false
 codes = true
-exclude_files = { "libs/", "docs/audits/", "docs/reviews/", "_dev/", "tests/" }
+exclude_files = { "libs/", "docs/audits/", "docs/reviews/", "_dev/", "tests/_kit/" }
 ignore = { "212/self", "212/event" }
 read_globals = {
   "_G", "LibStub", "CreateFrame", "GetTime", "UnitName", "UnitGUID",
@@ -972,6 +972,12 @@ read_globals = {
 globals = {
   "<Addon>DB",      -- the SavedVariables write target
   "<Addon>PerfDB",  -- the diagnostics capture ring (performance-§5)
+}
+-- The test tree is linted; only `tests/_kit/` is out of scope, being a byte copy of a kit that is
+-- linted in its own repo. The harness global is declared here rather than in `read_globals` above,
+-- so the addon's own source cannot reach for it (lint).
+files["tests/"] = {
+  globals = { "<ADDON>_TEST" },
 }
 ```
 
@@ -1262,7 +1268,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge; until then a commented placeholder-free line saying so).
 - [ ] Every **load-bearing** TOC position carries a comment naming what resolves at load; conventional positions are marked too (toc-file-§5). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`.
-- [ ] `.luacheckrc` present; `luacheck .` reports **0 errors**.
+- [ ] `.luacheckrc` present; `luacheck .` reports **0 errors** **with `tests/` in scope** — only `tests/_kit/` is excluded, and the harness global is declared in the `files["tests/"]` stanza rather than in top-level `read_globals` (lint).
 - [ ] **`libs/LibKa0s/` vendored WHOLE** from the library repo's ship folder — every module, byte-identical (`diff -r` empty, library-stack-§7) — and TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block after Ace3.
 - [ ] **The six setup files present**, each a descriptor plus a degradation stub and nothing more: `core/MediaSetup.lua`, `core/CoreSetup.lua`, `core/PerfSetup.lua`, `core/DebugLogSetup.lua`, `settings/Slash.lua`, `settings/OptionsSetup.lua`. No hand-rolled console, options toolkit, dispatcher, printer or harness anywhere in the addon's own source (anti-pattern #47). Each stub answers **every** member the addon actually calls.
 - [ ] `tests/_kit/` vendored from the LibKa0s repo's root-level `testkit/` (**not** under `libs/`, not edited); `tests/wow_mock.lua` is a thin extender over `mock_base.lua`; `tests/run.lua` derives the addon's file list from the TOC and lists the vendored library files explicitly in XML order (testing-§1, testing-§9).
