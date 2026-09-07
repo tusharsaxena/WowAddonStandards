@@ -159,7 +159,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 
      ```sh
      # (a) the named dev-only entries are ignored
-     for e in .luacheckrc .gitignore .gitattributes .claude .superpowers docs tests _dev; do
+     for e in .luacheckrc .pkgmeta .gitignore .gitattributes .claude .superpowers docs tests _dev; do
        grep -q "^  - $e\b" .pkgmeta || echo "NOT IGNORED — $e"
      done
 

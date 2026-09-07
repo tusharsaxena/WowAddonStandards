@@ -984,6 +984,7 @@ package-as: <Addon>
 
 ignore:
   - .luacheckrc
+  - .pkgmeta         # dev-only: this file configures the packager; it is not part of the package
   - .gitignore
   - .gitattributes   # dev-only: the repo's line-ending policy (line-endings)
   - .claude          # dev-only: agent tooling; never loaded by the client
