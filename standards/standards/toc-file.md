@@ -186,7 +186,7 @@ core\Constants.lua
 silently do. `core\EnvSetup.lua` satisfies the **SHOULD**: it says the position is free, and why it
 is free despite being a seam. `core\Constants.lua` carries nothing and is **compliant** — its
 position is already pinned by the annotated line above it, and a rule that made every line restate
-its neighbour's comment would be noise the next reader learns to skip.
+its neighbor's comment would be noise the next reader learns to skip.
 
 **Grading, so two auditors reach the same row.**
 

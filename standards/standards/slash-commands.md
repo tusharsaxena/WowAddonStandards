@@ -148,7 +148,7 @@ function Sl:LandingRows() return cli:LandingRows() end  -- same rows, no indent,
   - a nil stored value → `nil`
 - The value formatter and the colored `key = value` helper are **one shared pair**, used by `list`, `get`, `set` and `reset` alike, so the coloring and the value shape can never drift between them. An addon **MUST NOT** wrap either in a private variant.
 - Unknown path → `Setting not found: <path>`; a missing or empty argument → a `Usage: …` line naming the addon's own slash.
-- **Annotations are the host's.** Where a rendered value needs a caveat the library cannot know — that a setting is currently overridden, mirrored, or inert — the addon **SHOULD** supply a row annotator rather than reformatting the line. The library decides only **where** an annotation may appear: after the colored pair, on `list` / `get` / `set`, and **never** on `reset` or `resetall`, where an explanation of what a value means is noise stapled to an acknowledgement that the value went away.
+- **Annotations are the host's.** Where a rendered value needs a caveat the library cannot know — that a setting is currently overridden, mirrored, or inert — the addon **SHOULD** supply a row annotator rather than reformatting the line. The library decides only **where** an annotation may appear: after the colored pair, on `list` / `get` / `set`, and **never** on `reset` or `resetall`, where an explanation of what a value means is noise stapled to an acknowledgment that the value went away.
 
 ### 6. Value parsing
 

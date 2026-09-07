@@ -82,7 +82,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   on the accent channel). Both families use the same *hue* ladder — green, yellow, orange, red — so a
   hue alone cannot tell you which family a chip belongs to, and an issue always wears one of each.
   When both were mid-tone, a row of chips read as an undifferentiated smear and the eye had to parse
-  the label text to find the status. Keep the two brightness bands apart when adding or recolouring;
+  the label text to find the status. Keep the two brightness bands apart when adding or recoloring;
   matching them is what the split exists to prevent.
 - **MUST** carry the item's **severity** as a second GitHub label, one per issue, from a closed
   vocabulary of four:
@@ -104,7 +104,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   and both are retired — the `marker + word` ledger-table affordance (`🟢 done`), and the
   `[<Status>] <Title>` title prefix. Where a leftover prefix survives on an old issue, **the label is
   the truth and the prefix is stale text**, stripped on sight by the commands that write the store.
-- **MUST** label the whole store, so there is no unlabelled state. An issue that arrives without a
+- **MUST** label the whole store, so there is no unlabeled state. An issue that arrives without a
   `state:` label — filed from the GitHub web UI, or by someone not using these commands — is
   **repaired on sight** to `state:untriaged` if open, or to the matching terminal label if closed,
   and the repair is **announced**, including by the read-only commands: a listing command that
