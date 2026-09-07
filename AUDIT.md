@@ -354,8 +354,17 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        list of unequal row heights, or a drag that can cross a fixed section boundary is the finding.
      - **(f) No hand-written font, border or bar group (options-ui-§16).** Grep the settings files for
        the shared-media dropdown controls (`LSM30_Font`, `LSM30_Border`, `LSM30_Statusbar`): on an
-       addon whose vendored library carries the composers, every hit **MUST** be a composer call
-       site. Then read each group's rows in declaration order against the canonical order. Two
+       addon whose vendored library carries the composers, the grep is a **finder, not the
+       finding**: a hit is a deviation when the rows around it **reproduce a mandated block**,
+       which is what its *companions* tell you — a font copy carries size, flags, shadow or the
+       color pair, a border copy carries thickness and color, a bar copy carries opacity and
+       color. A media row standing alone with **none** of its block's companions is not a
+       hand-written group, and the addon-wide **broadcast meta row** — one *All surfaces* control
+       whose `onChange` fans out over the composed groups — is the named exempt shape
+       (options-ui-§16). Audit it against §16's five bounds instead: one row per media kind, its
+       own scope-naming subgroup and label, a write through the single seam into paths that are
+       themselves composed, no companions of its own, and per-surface composed groups behind it.
+       Then read each real group's rows in declaration order against the canonical order. Two
        shapes, graded differently: a **reordered** group is low (convention), a **missing** mandated
        row — no border thickness, no bar opacity — is at least low and is reported with the
        **literal it should have replaced**, cited at the render path's `file:line`, because that
