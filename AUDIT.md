@@ -255,18 +255,34 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 
        Every line must be either the **one** wrapper definition in the addon's `LibKa0s-Core-1.0`
        setup file (`NS.MakeCloseButton = function(parent, onClick) return lib.MakeCloseButton(parent,
-       onClick, addonName) end`), its degraded twin, or a **call to that wrapper**. Anything else is
+       onClick, addonName) end`), its degraded twin, a **call to that wrapper**, or — under a decline
+       ratified in the register — the **one host factory** and calls to it. Anything else is
        a deviation: a direct `lib.MakeCloseButton(...)`, a `Core.MakeCloseButton(...)`, or — the
        measured shape — `NS.DebugLog.MakeCloseButton(frame, api.Hide)` inside a perf-panel decoration
        hook, which reaches the same three-argument function and supplies no name
        (standalone-windows, debug-logging-§12, performance-§4, anti-pattern #65).
+
+       **Check for a decline ratified in the register before you write the row.**
+       standalone-windows makes a reasoned decline of the wrapper a **terminal** compliant
+       state on four conditions: the host's own windows only (never the console, its copy
+       window or the perf panel), the same catalog `close` mark resolved through `NS.Icon`,
+       exactly one host factory with every title bar reaching it, and a row in
+       `docs/ARCHITECTURE.md` naming the section, the date and a re-check trigger. All four
+       hold — file nothing, and record in `01_CURRENT_STATE` that the decline was checked
+       against them. The first three hold and the row is missing — the deviation is the
+       **missing register row** (`audit-review-history`), **not** a MUST breach against each
+       title bar, and its cure is one row rather than a set of rewritten close controls a
+       player would watch change for nothing. The measured case is BankLedger: three host title bars
+       behind `modules/Browser.lua:98`, and a fourth close control on a copy window the library
+       draws, which is the library's under condition 1 and not part of the decline.
 
        **File it on the grep, not on a screenshot.** The omission draws a perfectly good button and
        raises nothing, so it is invisible to lint, to the suite and to a smoke test that only checks
        the window opens. Severity is at least **medium**: it is a visible cross-window inconsistency
        in the surface a user compares between addons. If the addon carries **no** wrapper at all but
        builds close controls, the deviation is the missing wrapper, and every call site is evidence
-       for it rather than a separate row.
+       for it rather than a separate row — unless the four conditions above are met, in which case the
+       decline is compliant and the only possible row is the register's.
      - **Check the perf panel's decoration hook earns its place.** From `PerfPanel.lua` minor 4
        (LibKa0s v1.10.2) the library draws the panel's close control with the host's own name, so a
        `decorate` hook whose entire body is a close button is a second copy of library behavior that
