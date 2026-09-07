@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.38.0, 2026-09-02)
+# New Ka0s Addon — Context Pack (v2.39.0, 2026-09-07)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -1191,7 +1191,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 12. Combat lockdown: gate `InCombatLockdown()` (secure writes — settings setters, secure-frame attributes) and defer those with `PLAYER_REGEN_ENABLED`. **Exception — options-panel open (options-ui-§2): refuse under lockdown, do not defer.** Print a gray `NS.PREFIX` notice ("cannot open settings during combat — Blizzard's category-switch is protected") and return; **never** `Settings.OpenToCategory` under lockdown, and **never** auto-open on `PLAYER_REGEN_ENABLED`. For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
 13. Per-frame loops: cache db values into module locals, refresh via `M:RefreshUpvalues()` on settings change.
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
-15. File LOC cap: ~1500. Peel when exceeded.
+15. File LOC cap: ~1500, over **every authored `.lua` the repo tracks** — `tests/` included; `libs/`, `tests/_kit/` and generated non-shipping data are the only carve-outs (layout-§1). Peel when exceeded, or carry the file as a tracked issue or a ratified register row: those are the three terminal states, and doing none of them is the deviation.
 16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries. **`libs/LibKa0s/` is copied WHOLE, every time** — every module, even unwired ones; a partial copy costs the addon majors it was not even touching (anti-pattern #48) — TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml`, and kept **byte-identical** to its source repo (`diff -r` empty), with a re-vendor commit here after every library change, because both repos stay green while the copies silently diverge (library-stack-§7, anti-pattern #45). Nothing under `libs/` is ever edited locally.
 16b. **Consume, never fork** (anti-pattern #47): the chat printer, the debug console, the slash dispatcher, the options toolkit, the performance harness and the test harness are `LibKa0s`. Adopting one is a **descriptor plus a degradation stub** in the addon's own setup file. Anything genuinely missing goes back into the library as an **additive** descriptor field so every consumer gets it — never a local patch, and never a private lookalike.
 16a. **Performance harness** (performance): vendor `LibKa0s-Perf-1.0`, build `NS.Perf` from a descriptor in `core/PerfSetup.lua` (degrading to a working stub if the lib is absent), bracket hot paths with the gated `local t0 = Perf.on and debugprofilestop()` form — **zero work when off**, evidenced by the offline zero-overhead scenario, never by a comment — declare buckets with their `within` nesting, expose the reserved **`perf`** verb through `NS.COMMANDS` (the lib returns lines; never let it register a slash), declare `<Addon>PerfDB`, and implement `suspend`/`resume` so the addon goes inert **without a `/reload`** with visibility refused at the **source** of the show decision. Never hand-roll a probe, and never let a shared harness own a frame on your behalf (anti-patterns #43/#44). The **static** half of the same question — where the addon is getting hard to change — is the `lizard` run recorded in every automated-test bundle (rule 20e, automated-tests).
@@ -1234,7 +1234,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - Hard `## Dependencies:` (use OptionalDeps + soft fallback).
 - Hard-depending on an addon suite or standalone addon (ElvUI/EllesmereUI/DBM/WeakAuras/…), or reading its media/API/frames/SavedVariables — the addon is fully self-contained and works identically standalone; suite integration is optional, presence-guarded (`C_AddOns.IsAddOnLoaded`), `OptionalDeps`-listed, and degrades gracefully (library-stack-§6). Vendored **libraries** are unaffected — a library is not a suite.
 - `X-License: All Rights Reserved`.
-- Files >1500 LOC.
+- Files >1500 LOC — authored `.lua` anywhere in the repo, test files included.
 - Multiple senders per bus message.
 - Debug output to the chat frame when the addon has a main window (use the on-screen console).
 - Deferring settings-**category** registration until first `/config`/panel-open (register eagerly at load).
@@ -1276,7 +1276,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] Generated `docs/test-cases.md` inventory present and in sync (`lua tests/run.lua --list`); README carries a static X/Y `[tests]` badge (testing-§5).
 - [ ] `Compat.lua` exists (even if scaffold); no `WOW_PROJECT_ID` flavor branching.
 - [ ] `Locale.lua` exists with metatable fallback.
-- [ ] **US English spelling** throughout (localization-§5) — locale keys/`enUS` values, all player-visible strings, comments, identifiers, README and `docs/`; no `colour`/`grey`/`behaviour`/`centre`/`cancelled`/`-ise` in authored text (Blizzard/library symbols, quoted external text, and any `enGB.lua` translation excepted).
+- [ ] **US English spelling** throughout (localization-§5) — locale keys/`enUS` values, all player-visible strings, comments, identifiers, README and `docs/`; no `colour`/`grey`/`behaviour`/`centre`/`cancelled`/`-ise` in authored text (Blizzard/library symbols, quoted external text, and any `enGB.lua` translation excepted). **A mechanical prose gate copies `localization-§5`'s published `BRITISH` and `ALLOWED` lists whole** — every entry, no additions — and a spelling the lists miss is amended upstream in the standard before it is added locally. A private subset is a coverage claim nobody outside this repo can check, and the first one written stayed green for months while `CANCELLED` shipped in chat text a player reads.
 - [ ] `Database.lua` exists with `RunMigrations()` (even if no migrations yet).
 - [ ] Schema has at least one row and one write seam; the slash and options descriptors both route `set`/`applyDefault` through it, so the CLI and the panel cannot drift onto different code paths.
 - [ ] Slash dispatcher built from `LibKa0s-Slash-1.0` with the addon's own ordered `NS.COMMANDS` (positional triples) passed **in**; the reserved verbs answer identically, `reset` takes a **path**, and `perf` is registered by the addon, not the library.

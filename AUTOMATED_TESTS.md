@@ -204,8 +204,14 @@ addon's record:
 | Band | File | LOC | Disposition |
 |---|---|---|---|
 | 1000–1500 (on notice) | `tests/test_x.lua` | 1256 | accepted — case count, not tangle |
-| > 1500 (over cap) | `data/Generated.lua` | 2893 | already tracked as `<id>` |
+| > 1500 (over cap) | `settings/Schema.lua` | 2893 | already tracked as `<id>` |
 ```
+
+The band table counts what `layout-§1`'s cap **binds**: every authored `.lua` the repo tracks,
+`tests/` included — which is why the example's first row is a suite file and is not a mistake.
+`libs/`, `tests/_kit/` and **generated non-shipping data** are the carve-outs, so a committed
+generated table is not a row here however long it is; if one appears, the runner is counting
+something the cap does not reach.
 
 Anything that **newly** crossed since the previous run arrives with an **empty** Disposition, which is
 the file saying it is owed one. `None.` where a table would be empty — an empty watch list is a

@@ -97,6 +97,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (c) **`## Documentation map` present in `docs/ARCHITECTURE.md`** and covering **every** `.md`
      under `docs/` in exactly one table, with no row pointing at a file that does not exist. Orphans
      and dangling rows are both findings, and this is the check that makes them findable at all.
+     The register has **four tables**, in order: Required, Conditional, **Verification and record**,
+     Addon-specific (documentation-§3). The fourth is not optional and not a spare tier — it holds
+     exactly `testing.md`, `smoke-tests.md`, `test-cases.md`, `performance.md`,
+     `automated-tests/README.md` and `automated-tests/RESULTS.md`, six rows in every addon in every
+     state, and `perf-analysis/README.md` is **not** among them: it carries a Tier 2 trigger, so it
+     registers in `### Conditional` in both of its states. A hub with three tables is the finding;
+     a hub whose extra table is this one, under this heading, is compliant, and a note justifying it
+     against the old three-table MUST is what gets deleted. **One exception, and it runs both ways:
+     `ARCHITECTURE.md`'s own row.** Registering the hub in its own map is a **MAY**, and an audit
+     **MUST NOT** file its presence *or* its absence — the two failure modes the register exists to
+     catch cannot exist for the file that carries the register, and the collection is split five to
+     four over a row that changes nothing.
      (d) **Non-canonical filenames** — `data-model.md`, `saved-variables.md`, `pipeline.md`,
      `capture-pipeline.md`, `override-pipeline.md`, `settings-system.md`, `wow-quirks.md`,
      `slash-commands.md`, `debug-console.md` and the like are Tier 1/2 content under a per-repo name.
@@ -144,7 +156,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      A file carrying **only** the `*.sh` carve-out with no pin above it is **not** compliance — it is
      the near-miss `line-endings-§1` names explicitly, and it reads in review as a repo that has been
      handled. Compare the body against the canonical one for the repo's kind (`line-endings-§5`);
-     that check is a diff, not a reading. **Report (e) as ONE rolled-up finding** — *"N tracked files
+     that check is a diff, not a reading — and it is a diff over the **body**, because since v2.39.0
+     a repo vendoring a binary no extension rule can reach **MAY** carry a `line-endings-§5 appendix`
+     below it. Run the three lines §5 specifies: `diff` the first *n* lines against the canonical
+     file (81 client-bound, 82 non-client), then read what is left. Nothing, or a block whose first
+     non-blank line is exactly `# --- line-endings-§5 appendix ---`, is **compliant** and files
+     nothing — neither a §5 finding nor a register row, and a row written for one before the rule
+     existed is retired by bringing the block into that shape. Anything else in the tail, or an entry
+     spliced into the body where it reads best, is the finding: the second moves every line after it
+     and turns a one-hunk diff into a file nobody can compare. **Report (e) as ONE rolled-up finding** — *"N tracked files
      disagree with the declared pin"* — carrying the command above so the number can be reproduced,
      and **never** enumerate the files: the fix is a single `git add --renormalize .` plus a
      re-checkout, and a per-file tally inflates the count for one action. A correct `.gitattributes`
@@ -201,11 +221,19 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      id names. An absence with no comment is the SHOULD failure only.
    - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
      `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
-     `audit-review-history` binds this run twice, in opposite directions. A gap matching a register
-     row is recorded as **accepted, citing that row's rule and Decided date** — never re-filed as an
-     open MUST failure, or the same ratified decline returns every cycle. And any row whose **cited
-     rule the standard has since changed** is reported, so the register cannot quietly accumulate
-     entries for behavior the standard now mandates. A reasoning trail in a issue-audit issue or an
+     `audit-review-history` binds this run **three** times, and the first two point in opposite
+     directions on purpose. A gap matching a register row is recorded as **accepted, citing that
+     row's rule and Decided date** — never re-filed as an open MUST failure, or the same ratified
+     decline returns every cycle. Any row whose **cited rule the standard has since changed** is
+     reported, so the register cannot quietly accumulate entries for behavior the standard now
+     mandates. And **every row's re-check trigger is evaluated against the tree in front of you, and
+     every evidence id the row cites is resolved** — the audit deviation id to a bundle under
+     `docs/audits/`, the review finding id to one under `docs/reviews/`, the issue number to this
+     repo's own issue store. A trigger that has **already fired** ended the deviation on the day it
+     came true and the row is now asserting a live deviation that is not one; an id that resolves to
+     nothing reads as evidence and leads to none. Both are as mechanical as the rule check above, and
+     they catch the case it cannot: a row whose rule still exists, still says what the row claims,
+     and stopped being true months ago. A reasoning trail in a issue-audit issue or an
      earlier bundle is not a substitute: a deviation with no register row is not ratified, and a
      `state:will-not-do` issue with no row is itself a finding.
    - **`docs/pending/LEDGER.md` is retired and its presence is a finding.** The durable store of
@@ -493,6 +521,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      file on the addon side is the evidence for **#48**. If the sibling library repo is not present on
      the machine, mark the check **not run** and say so — never infer it from the code looking
      reasonable, and never quietly skip it.
+   - **Read the `.luacheckrc` before you quote the `0/0`: since v2.39.0 the test tree is in scope
+     (`lint`).** A `0 warnings / 0 errors` line says nothing until you know what it was run
+     over. `exclude_files` **MUST** narrow to `tests/_kit/` — the vendored kit, linted in its own
+     repo — and nothing wider; a config still excluding bare `tests/` is the finding, and it is the
+     finding even where the run is green, since across the collection that exclusion was hiding 308
+     test files against 329 source files. The harness global belongs in a `files["tests/"]` stanza
+     and **MUST NOT** sit in top-level `read_globals`, where it is a permission the addon's own
+     shipped source can reach for. And a tree turned on behind a blanket `ignore` is worse than the
+     exclusion it replaced: report the ignore list with the count it suppresses.
    - **The complexity report is measured, not read.** Run the standard's exact invocation from the
      repo root — **`lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`** — and compare the result
      against the **latest run bundle's `complexity.txt`** and the watch list in
