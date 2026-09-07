@@ -19,7 +19,7 @@ For quick reference, the rules above as a do-not list:
 13. Hard `## Dependencies:` (use OptionalDeps + soft fallback).
 14. `## X-License: All Rights Reserved` — must be MIT.
 15. Multi-flavor / Classic support (comma Interface lists, per-flavor TOCs, `_Classic` data splits, `enable-toc-creation` fan-out) — Retail only, single Interface line (toc-file-§3).
-16. Files >1500 LOC — peel.
+16. Files >1500 LOC — peel. The cap reaches every authored `.lua` in the repo, `tests/` included; `libs/`, `tests/_kit/` and generated non-shipping data are the carve-outs, and an over-cap file that is neither peeled, issue-tracked nor register-recorded is what this entry is actually pointing at (layout-§1).
 17. Multiple senders for the same bus message.
 18. Debug output to the chat frame when the addon has a main window — use the on-screen debug console (debug-logging).
 19. Cross-module direct table access — use the bus.

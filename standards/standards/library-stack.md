@@ -185,8 +185,18 @@ And the rule that catches the most tempting mistake:
 vendors and consumes a Ka0s-owned lib. The **library's own repository** — `LibKa0s` today — is also in
 scope for this standard, but it is not an addon: it has no TOC, no player-facing README, no settings
 panel and no install. Auditing it against the addon rule set manufactures findings the standard never
-meant. The three lists below are the ones an audit of a Ka0s-owned library repo uses instead
-(`ADDONS.md` lists which repos those are).
+meant. The **three applicability lists** below are the ones an audit of a Ka0s-owned library repo uses
+instead (`ADDONS.md` lists which repos those are); the *Substitutes* list that follows them answers a
+different question — not whether a section binds, but what the library carries in place of the addon
+artifacts the *Does not apply* list removes — and is not one of the three.
+
+**The three lists are exhaustive, and the default is that a section applies.** Between them they
+classify **every** section in `STANDARDS.md`'s Sections list, and an audit of a library repo may check
+that mechanically. A section this standard gains later, and which nobody has thought about in a
+library's terms, **applies unchanged** until it is placed in one of the lists — the default runs
+toward the rule binding, because the failure mode of the other default is a section that governs
+nothing anywhere and nobody notices. *Does not apply* is the only list that is an exception to that
+default; the other two record how a section that binds is read here.
 
 **Applies, unchanged:**
 
@@ -216,6 +226,28 @@ meant. The three lists below are the ones an audit of a Ka0s-owned library repo 
 - **`toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`.** There
   is no TOC, no settings canvas, no slash surface, no on-screen display, no SavedVariables file and no
   CurseForge package. Each of these binds the *consumer* that wires the module, and is audited there.
+
+**Applies, read for a library repo:** these bind, and the only thing that changes is what the words
+point at. They were absent from both lists above until this was written, and the cost of that silence
+was not theoretical — the library repo's own two `layout-§1` cap breaches sat graded **Low** for
+exactly the reason that nothing here said whether `layout` reached it (`LibKa0s/docs/audits/2026-09-07/02_DEVIATIONS.md:29`).
+
+| Section | How it reads here |
+|---|---|
+| `layout` | The **cap and the band** (layout-§1) and the **casing** rules bind unchanged; a library's authored `.lua` is authored `.lua`. The `core/ defaults/ settings/ locales/ modules/` **skeleton** and the folder load order do not — a library has no TOC to order and no settings folder. Its shape is the payload folder plus `tests/`, `docs/` and `testkit/`, and `layout-§3`'s typed subfolder rule binds both `media/` folders it has — the payload's, which every consumer receives (library-stack-§8), and the repo's own. |
+| `library-stack` | This section binds itself. `§7` is where the repo's own rules live — the payload shape, the API-document-per-minor contract, the three promotion bars, and this applicability block — and `§8` governs the media payload it ships. `§1`–`§6` are written for the *consumer* and describe acts the library repo does not perform: it vendors nothing — there is no `libs/` here, because the headless suite runs on the kit's mocks — so the mandatory table, the optional list, the vendoring rules and the registry pattern have no instance. `§5`'s no-forking prohibition and `§6`'s self-containment survive as constraints on what the payload may **contain**, and are audited as such. |
+| `architecture` | The module pattern and the closed message bus bind **inside** the library where it uses them; the namespace bootstrap and AceAddon registration (architecture-§1, §2) do not — a library registers with LibStub, not with AceAddon, and has no addon namespace to bootstrap. |
+| `performance` | `performance-§10`'s `lizard` measurement and its release checkpoint bind, and the release gate in automated-tests counts a library's warnings like anyone's. The **wiring** MUST — a `PerfSetup.lua`, a `<Addon>PerfDB`, a `perf` verb — does not: there is no addon to wire it into and no slash surface to reach it from. The library **writes** the harness; it is measured by its consumers. |
+| `compat` | Binds. A deprecated or cross-patch API call inside the payload is exactly the thing a single `Compat` owner exists for, and a shim scattered through ten consumers' vendored copies is the worst version of the problem this section describes. |
+| `anti-patterns` | Binds, whole and unchanged. The entries keyed to an addon artifact (a TOC line, a SavedVariables key) simply have no instance here; nothing is exempted. |
+| `public-api` | Binds, and is closer to load-bearing here than in any addon: a library major **is** a public API. Its surface is versioned by the file's own `MINOR` and its API document under `docs/api/` (above), which is the library's form of the `NS.API.v1` contract. |
+| `debug-logging` | Binds where the library **draws** a console; the addon-side rule that log output goes to the console rather than the chat frame is inherited by every consumer through the module. |
+| `events-frames-taint` | Binds. Combat lockdown, taint and frame pooling are properties of the client, not of the repo kind, and a library frame that taints taints every consumer at once. |
+| `standalone-windows` | Binds to the window **chrome the library owns** — the normative Ka0s edge, the title-bar controls drawn from the shared catalog, the one close-button wrapper. A library repo has no window of its own to audit, so in practice this is checked at the consumer; the rule still governs what the payload draws. |
+| `naming-cheatsheet` | Binds. The conventions table is about identifiers, and identifiers vendored into ten trees are ten copies of whatever was decided once. |
+| `audit-review-history` | Binds: the frozen dated `docs/audits/` and `docs/reviews/` bundles, the two opposed MUSTs on the deviation register, and the GitHub-issue decision store. The register's **home** moves — `documentation-§3` puts it in `docs/ARCHITECTURE.md`, which a library repo does not have, so it lives in the root `CLAUDE.md` alongside the documentation map (see *Substitutes*, below). |
+| `documentation-§4` | Binds unchanged: **no root `TODO.md`**. `§3`'s trio and tier model do not apply here (above), but the reason `§4` exists does — a backlog belongs in the issue store (audit-review-history), where it can be triaged and closed, not in a file that rots at the root. So do `§4`'s siblings that the first list already names: `§5` keeping the docs in sync, `§6`'s citation rules, `§7`'s `DEPENDENCIES.md`. The `documentation` sections that do **not** bind are `§1`, `§2` and `§3`, and they are listed above. |
+| `open-evolutions` | Binds in the only sense it binds anywhere: it is a record of recorded directions, not a rule an audit files against. A library-repo entry goes in it like any other. |
 
 **Substitutes — the library repo MUST carry these instead:**
 
