@@ -153,7 +153,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      MUST it fails. **Expect this count to be far lower than a pre-v2.28.1 audit bundle reported for
      the same repo**: the old command counted every binary and every JSON file as a stray. A frozen
      bundle is never edited, so say so in the finding rather than letting the two numbers sit
-     unexplained side by side.
+     unexplained side by side. **And check that (e) has an owner in the repo**: `line-endings-§7`
+     MUSTs the vendored gate `tests/_kit/test_eol.lua` (LibKa0s test-kit revision 15), which asks
+     this same question over the whole tracked set on every run of the suite. A repo whose kit
+     predates 15 has no gate and (e) is the audit's alone; a repo that has the gate, reports green
+     and still fails (e) here is a **gate** finding, not a file finding, and it outranks the strays
+     it missed.
    - **Check the package ignore list by listing the repo's dot-entries, not by reading `.pkgmeta`
      (`packaging`).** Two mechanical checks, and the second is the one that has been missed:
 

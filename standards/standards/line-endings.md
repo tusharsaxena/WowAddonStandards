@@ -422,6 +422,38 @@ An audit **MUST** check all four properties mechanically and **MUST** report wor
 enumeration, which inflates the tally for what is a single `--renormalize` sweep (documentation-§6
 applies the same rolled-up rule to citation sweeps).
 
+**Property (e) is a test before it is a finding.** Every repo **MUST** carry the vendored EOL gate —
+`tests/_kit/test_eol.lua`, LibKa0s test-kit revision 15 — loaded by `tests/run.lua` with the rest of
+the suite, and that suite **MUST** be green. The one-liner below asks the same question by hand, and
+the reason this section spent so long asking it by hand is the record: on 2026-09-07 this was the
+collection's only **100%-failed** MUST, ten of ten repositories, two of the strays inside LibKa0s's own
+shipped payload. That is not laziness and it is not disagreement. A rule with an auditor and no seam is
+a rule that gets re-swept every cycle — the repair is a two-second re-checkout per file, nobody has
+ever disputed it, and it comes back because between one audit and the next nothing in the repo ever
+mentions it again. A red test mentions it on every green gate.
+
+The gate asks `git check-attr` what each path's terminator is **declared** to be and then counts the
+bytes on disk, over the whole `git ls-files` set. It asserts the invariant rather than any writer's
+implementation, so it also catches a file no tool in the repo produces — an `ANALYSIS.md` an agent
+dropped into a bundle after the runner exited, a document written with a shell redirect, a payload file
+a re-vendor copied with `cp`. Scope is the whole tracked set for a reason: through kit revision 14 the
+gate existed and read only `docs/automated-tests/`, which is how `LibKa0s/DebugLog.lua` and
+`LibKa0s/Pool.lua` — two files in the **shipped** payload, vendored into nine addons — sat LF on disk
+under an `eol=crlf` pin for nine kit revisions with a green suite above them.
+
+- The gate **MUST** fail rather than pass when it cannot look: no git, no `ls`, no answer from
+  `check-attr` is a failure and not a skip. A gate that goes quiet when it is blind reports success,
+  which is worse than not existing.
+- A red **MUST** be cleared by §6's per-file re-checkout, never by `git add --renormalize .`. The index
+  is already correct in every repository measured — which is exactly why nothing ever reported these —
+  so renormalising rewrites what was never wrong and leaves the bytes on disk as it found them.
+- A green suite **MUST NOT** be read as covering (a) through (d). The gate compares bytes against
+  declared attributes; it cannot tell you the `.gitattributes` body is byte-for-byte one of the two
+  canonical ones (§5), or that a newly vendored binary type reached §4's union list. Those stay the
+  audit's work, every cycle.
+- A repo whose vendored kit predates revision 15 still owes `(e)` by hand, and that is the only reason
+  the one-liner below stays in this section.
+
 ```sh
 # (a) present at root, and (b)/(c)/(d) the pin, the carve-out and the binaries
 test -f .gitattributes && grep -nE '^\* text=auto eol=(crlf|lf)$|^\*\.sh text eol=lf$|binary$' .gitattributes
@@ -459,3 +491,7 @@ git ls-files -z | xargs -0 -I{} sh -c '
 - Grade by **impact**, per `AUDIT.md` step 5: this is a config-and-repo-hygiene failure, so it is
   **Low** or **Info** even though every rule in this section is a MUST — and the entry **MUST** still
   name the MUST it fails.
+- In a repo carrying the gate, that count is the suite's own and a stray is a **red test** rather than
+  a discovered defect. An audit that finds strays where `tests/_kit/test_eol.lua` reports green
+  **MUST** file the gate as the finding, not the files: the working tree is one commit from clean
+  either way, and a check that passes over what it was written to catch is the more expensive defect.
