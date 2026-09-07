@@ -4,18 +4,22 @@
 
 ### 1. Mandatory libs (every Ace3 addon)
 
-| Lib | Purpose | Embedded as |
-|---|---|---|
-| LibStub | lib registry | vendored |
-| CallbackHandler-1.0 | Ace3 dependency | vendored |
-| AceAddon-3.0 | addon + module lifecycle | vendored |
-| AceDB-3.0 | profile / char / global SV | vendored |
-| AceEvent-3.0 | event subscription | vendored |
-| AceTimer-3.0 | timers | vendored |
-| AceConsole-3.0 | slash registration | vendored |
-| AceGUI-3.0 | options panel widgets | vendored |
+**"Mandatory" means mandatory *when used*, and library-stack-§3's prune rule governs this table.** What follows is the set a Ka0s addon vendors *once it reaches the lib* — the canonical Ace3 substrate for this collection, not a floor every addon carries whether it touches it or not. Read as a floor it contradicts §3's "vendor what you use, nothing more" outright, and an addon caught between the two halves cannot comply with either; the note below the table is the instance that proved it.
 
-All libraries are **vendored in `libs/` and committed** (library-stack-§3).
+| Lib | Purpose | Vendored |
+|---|---|---|
+| LibStub | lib registry | always |
+| CallbackHandler-1.0 | Ace3 dependency | always — reached by Ace3's own files, never by yours |
+| AceAddon-3.0 | addon + module lifecycle | always |
+| AceDB-3.0 | profile / char / global SV | always |
+| AceEvent-3.0 | event subscription | when used |
+| AceTimer-3.0 | timers | when used |
+| AceConsole-3.0 | slash registration | when used |
+| AceGUI-3.0 | options panel widgets | when used — including where a lib you vendor is what reaches it |
+
+Every lib the addon does vendor is **vendored in `libs/` and committed** (library-stack-§3). Nothing in this table obliges an addon to vendor a lib nothing in its install reaches, and "when used" is decided by library-stack-§3's reachability test, not by eye.
+
+**The case this wording was written for.** PrettyChat reaches neither AceEvent-3.0 nor AceTimer-3.0: it starts no timers, and the two combat-boundary events its visibility watcher needs go on a plain frame it creates lazily and drops again (`PrettyChat/modules/Override.lua:67-80`, argued in place). Under the old table it had to vendor both; under §3 it had to vendor neither; it could not do both, so it filed the collision against **itself** — audit `PC-52` of 2026-08-04, carried since as a deviation row at `PrettyChat/docs/ARCHITECTURE.md:230` whose re-check trigger is, in as many words, "the next `library-stack` edit". This is that edit. An addon holding a ratified-deviation row for a contradiction that lives upstream is exactly the graveyard the register exists to prevent, manufactured here rather than there; the row is retired, not re-argued, and PrettyChat vendoring six of the eight rows above is compliant.
 
 ### 2. Common optional libs
 
@@ -36,7 +40,12 @@ Ka0s addons **MUST ship every library vendored in `libs/` and committed to git**
 - **MUST** vendor all Ace3 and third-party libs under `libs/` and commit them. **MUST NOT** use `.pkgmeta` `externals:` to fetch libraries.
 - **MUST** use the standard folder-per-lib layout (`libs/AceAddon-3.0/AceAddon-3.0.xml`, `libs/LibStub/LibStub.lua`, …) and load libs **first** in the TOC — the lib's `.xml` where it ships one (it pulls the lib's `.lua` + any sub-files), the `.lua` otherwise.
 - **SHOULD** copy the folder-per-lib set from an existing Ka0s addon's `libs/` so lib versions stay consistent across the suite. Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
-- **MUST** vendor only libs the addon actually `LibStub("X")` — vendor what you use, nothing more. Prune dead weight (**except a Ka0s-owned umbrella such as `LibKa0s`, whose ship payload is the whole folder even where the addon wires up only some of its modules — library-stack-§7, anti-patterns #48**) (e.g. AceConfig where only Profiles needs it; AceLocale/AceBucket/AceComm/AceHook/AceSerializer/AceTab where unloaded).
+- **MUST** vendor every lib the addon **reaches at runtime**, and only those — vendor what you use, nothing more. Prune dead weight (**except a Ka0s-owned umbrella such as `LibKa0s`, whose ship payload is the whole folder even where the addon wires up only some of its modules — library-stack-§7, anti-patterns #48**) (e.g. AceConfig where only Profiles needs it; AceLocale/AceBucket/AceComm/AceHook/AceSerializer/AceTab where unloaded). This rule is what qualifies library-stack-§1's table: a lib in it that nothing reaches is not vendored, and a lib outside it that something reaches is.
+- **"Reaches" is not "writes `LibStub("X")`" (MUST).** This rule's test used to be the addon's own `LibStub` call, and taken at its word it prunes libs every addon in the collection needs — which is how it ended up contradicting §1's table instead of governing it. There are **three** ways a vendored lib gets reached, and only the first is a `LibStub` call in the addon's own source. Clear all three before calling a lib dead:
+  1. **The addon `LibStub`s it directly** — `LibStub("AceGUI-3.0")`, `LibStub("LibSharedMedia-3.0")`. The only case the old wording covered.
+  2. **An Ace3 mixin name string**, which AceAddon resolves through `LibStub` on the addon's behalf and which greps as a bare quoted string, not as a call: `AceAddon:NewAddon(NS, addonName, "AceEvent-3.0", "AceTimer-3.0", "AceConsole-3.0")` (`BankLedger/core/BankLedger.lua:4`, `WhatGroup/core/WhatGroup.lua:31-33`) and `addon:NewModule("Castbar", "AceEvent-3.0")` (`KickCD/modules/Castbar.lua:68`). Neither BankLedger nor WhatGroup writes `LibStub("AceTimer-3.0")` anywhere, and both would break without AceTimer-3.0 vendored.
+  3. **A lib you vendor reaching another lib you vendor.** `libs/LibKa0s/Options.lua:306` takes `LibStub("AceGUI-3.0", true)`, so an addon whose only options surface is `LibKa0s-Options-1.0` still vendors AceGUI-3.0 without ever naming it. CallbackHandler-1.0 is the same case at its limit: **no** addon in this collection `LibStub`s it — the count is nine of nine — and all nine load Ace3 files that do.
+  The sweep is therefore two greps, not one: `grep -rn '"X"' --include='*.lua' . | grep -v '/libs/'` for cases 1 and 2, then the same pattern **inside** `libs/` for case 3. A single `grep -rn 'LibStub("X")'` outside `libs/` answers only case 1 and will tell you to delete a lib the addon cannot load without.
 - **MAY** vendor an addon-private micro-lib (e.g. an 80-line object-pool mixin) the same way.
 
 ### 4. Lib registry pattern
