@@ -19,8 +19,9 @@ Audit and code-review runs are **frozen, dated snapshots** kept in the addon's *
 `documentation-§3` gives a ratified deviation exactly one home: `## Documented deviations` in
 `docs/ARCHITECTURE.md`. An audit that does not read it re-derives decisions already made and files them
 as open failures — which is how one ratified decline becomes the same High row in every bundle forever.
-Two MUSTs, pointing in opposite directions on purpose: the first stops the register being re-litigated,
-the second stops it becoming a place to hide.
+Three MUSTs. The first two point in opposite directions on purpose — the first stops the register
+being re-litigated, the second stops it becoming a place to hide — and the third stops it going
+stale while both of the others pass.
 
 - **MUST read the register first**, before filing anything, and record a matching entry as **accepted,
   with its id** — never as an open MUST failure. The audit still *names* the deviation, because a
@@ -37,6 +38,19 @@ the second stops it becoming a place to hide.
   what the row claims. Without it the register accumulates compliant behavior, and a reader who trusts
   it is misled by the one document whose whole purpose is to be trusted. Retiring such a row is a doc
   change, not a re-decision.
+- **MUST evaluate every row's re-check trigger, and resolve every evidence id the row cites.**
+  `documentation-§3` defines the Re-check trigger as *the condition that ends the deviation, stated so
+  a reader can tell whether it has already fired* — written to be evaluated, and until now by nobody in
+  particular. An audit **MUST** evaluate each trigger against the tree in front of it and report any row
+  whose trigger has **already fired**: that deviation ended on the day the condition came true, and
+  every day the row stays in the register the document asserts a live deviation that is not one.
+  Likewise the ids a row cites in **Why** — an audit deviation id, a review finding id, a bundle date,
+  an issue number — **MUST** resolve, the deviation id to a bundle under `docs/audits/`, the finding id
+  to one under `docs/reviews/`, the issue to the addon's own repo. An id that resolves to nothing is
+  worse than no citation at all, because it reads as evidence and leads to none, and it survives every
+  re-read by a maintainer who knows the shape of an id and never goes looking for what it names. Both
+  are as mechanical as the rule citation above, and they catch the case it cannot: a row whose rule
+  still exists, still says what the row claims, and stopped being true months ago.
 
 ### Pending-audit decisions live in GitHub issues, not a file in the repo
 

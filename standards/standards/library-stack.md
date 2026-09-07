@@ -76,7 +76,7 @@ Some shared code is **authored inside the collection** rather than pulled from t
 
 Vendor from **that repo's** ship folder, not from a sibling addon's `libs/` — a sibling's copy may itself have drifted (anti-patterns #45).
 
-**The modules.** `LibKa0s` ships **ten LibStub majors across thirteen files** — `Core`, `Env`, `Item`, `Pool`, `Media`, `Widgets`, `DebugLog`, `Slash`, `Options`, `Perf` — loaded by one aggregate `LibKa0s.xml`, plus one non-code payload (`media/`, library-stack-§8):
+**The modules.** `LibKa0s` ships **ten LibStub majors across fourteen files** — `Core`, `Env`, `Item`, `Pool`, `Media`, `Widgets`, `DebugLog`, `Slash`, `Options`, `Perf` — loaded by one aggregate `LibKa0s.xml`, plus one non-code payload (`media/`, library-stack-§8). The file count is not the major count and never was: `Options` spans four files and `Perf` two. Count it against `LibKa0s/LibKa0s.xml`'s `Script` entries, which is the one list that cannot be a release behind:
 
 | Major | Files | What it owns |
 |---|---|---|
@@ -88,7 +88,7 @@ Vendor from **that repo's** ship folder, not from a sibling addon's `libs/` — 
 | `LibKa0s-Widgets-1.0` | `Widgets.lua` | the collection's flat dropdown and the single popup menu every instance of it drops, the shared copy window, and **`ReorderList`** — the drag-to-reorder list every ordered setting in the collection is required to use (options-ui-§18), which owns the hamburger handle, the bounded row box (`Widgets.ROW_BOX`, options-ui-§8), the drag ghost, the insertion line, the index arithmetic and the section-boundary clamp while the row's contents stay the consumer's; every piece of art arrives as a parameter, so it needs no media module |
 | `LibKa0s-DebugLog-1.0` | `DebugLog.lua` | the on-screen debug console and its copy window, both line formatters, the 500-line buffer, and the enable seam (debug-logging) |
 | `LibKa0s-Slash-1.0` | `Slash.lua` | the slash dispatcher, the help renderer, the `list`/`get`/`set`/`reset` schema CLI, and the type-aware value parser (slash-commands) |
-| `LibKa0s-Options-1.0` | `Options.lua`, `OptionsWidgets.lua`, `OptionsScroll.lua` | the Blizzard settings-canvas panel shell, the widget makers for the schema row types, the two-column flow engine, and the always-shown scrollbar patch (options-ui) |
+| `LibKa0s-Options-1.0` | `Options.lua`, `OptionsWidgets.lua`, `OptionsCompose.lua`, `OptionsScroll.lua` | the Blizzard settings-canvas panel shell, the widget makers for the schema row types, **the composers that emit the canonical font, border, bar, color-pair and master-controls row sets** rather than leaving nine addons to hand-write them (options-ui-§15–§16), the two-column flow engine, and the always-shown scrollbar patch (options-ui) |
 | `LibKa0s-Perf-1.0` | `Perf.lua`, `PerfPanel.lua` | the A/B performance capture harness and its guided step panel (performance) |
 
 Hand-rolling any of these inside an addon — a private debug console, a private options toolkit, a private slash dispatcher, a private test harness — is forking the toolkit, and is exactly the duplication the umbrella exists to end (anti-patterns #47).
