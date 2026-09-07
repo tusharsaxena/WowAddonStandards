@@ -129,12 +129,17 @@ which trains its readers to ignore the one gate that exists to catch a real drif
   `.mp3`, `.wav`, `.otf`) and the archive types (`.zip`, `.tar`, `.gz`, `.7z`, `.pdf`). A stale entry
   costs nothing; a missing one costs a corrupted asset, so the list is deliberately ahead of the
   census and **MUST NOT** be trimmed to what a given repo happens to hold today.
+- **The list is keyed by extension, so a binary that has none is unreachable by it.** Those are
+  marked by **path**, in the §5 appendix, and this union list **MUST NOT** grow a path entry to
+  carry one: a path is a fact about a single repo, and everything above it is a fact about the
+  collection. Marking is still mandatory — §5 says where the mark goes, not whether it is owed.
 
 ### 5. The canonical file bodies (MUST)
 
-A repo's `.gitattributes` **MUST** be one of these two files, byte-for-byte. They differ in **one
-decision**: the pin, the paragraph above it declaring which kind of repo this is, and the two
-word-level consequences of that inside the same paragraph and the closing verification line.
+A repo's `.gitattributes` **MUST** be one of these two files, byte-for-byte — optionally followed by
+the appendix specified below it, which is the only thing that may sit outside the body. They differ
+in **one decision**: the pin, the paragraph above it declaring which kind of repo this is, and the
+two word-level consequences of that inside the same paragraph and the closing verification line.
 Everything else — the `*.sh` block, the binary block, the renormalization recipe — is identical, so
 diffing a client-bound repo against a non-client one shows one decision rather than two documents.
 
@@ -314,6 +319,57 @@ sync.
 # Not `file <path>`: it reports nothing about line terminators for JSON or
 # for any binary, so it passes files it never examined (line-endings-§7).
 ```
+
+**The appendix: binaries no extension rule can reach.** The canonical list in §4 is keyed by
+**extension**, and §4 MUSTs that every binary be marked. A repo that vendors a binary with **no
+extension** — an ELF tool payload, a compiled helper, a downloaded model runner — therefore sits
+between two MUSTs and can satisfy exactly one of them: mark it, and the file is no longer
+byte-identical to the body above; leave it unmarked, and it is a §4 failure that §7's (e) check
+re-reports every cycle for as long as the repo vendors it. `PanelMaster` has been in that position
+since v2.24.0 and wrote it down rather than picking a side — its
+`tools/artwork/bin/realesrgan-ncnn-vulkan` is the Real-ESRGAN upscaler behind `tools/artwork/`, an
+extension-less executable no `*.ext` line can ever match.
+
+A repo holding such a file **MAY** carry an **appendix** below the canonical body. The appendix is a
+**compliant** state under this section, not a deviation from it:
+
+- It **MUST** begin after the **last line** of the canonical body, which stays intact through its
+  final byte, so a `diff` against the canonical file produces at most **one** hunk and that hunk is
+  appended at the end. An entry placed beside the binary block — where it reads best, and where the
+  first repo to need one put it — is what this rule forbids: it moves every line after it, and the
+  diff that was supposed to show one decision starts showing two.
+- Its first non-blank line **MUST** be exactly `# --- line-endings-§5 appendix ---`, and nothing may
+  follow the appendix. That is what lets an auditor tell an appendix from an edited body without
+  reading either.
+- It **MUST** hold only marks an extension rule cannot express — a `binary` mark keyed by **path**.
+  Anything reachable by extension belongs in §4's union list, upstream, where all eleven repos get
+  it; a private extension list in one repo's appendix is the eight-hand-written-files problem this
+  section closed, restarted one repo at a time.
+- Each entry **MUST** name a **single path** rather than a glob. `tools/**` swallows the text file
+  somebody adds under it next year, silently, and a binary-marked text file is not diffed and not
+  converted — the exact failure §4 exists to prevent, self-inflicted by the fix for it.
+- Each entry **MUST** carry a one-line comment saying what the file is and why no extension reaches
+  it, because the next reader's first question is whether the entry could have been an extension.
+- The appendix is for **binary marks only**. It is not a place to pin, to re-pin, or to write a
+  per-path `-text` exemption; §2 forbids those and this **MUST NOT** be read as reopening them.
+- An auditor **MUST NOT** file a §5 finding against a file whose body diffs clean and whose extra
+  lines are a conforming appendix, and a repo **MUST NOT** carry an `audit-review-history` register
+  row for one. A row that predates this rule is retired by bringing the block into the shape above —
+  that, and not the block's existence, was the thing worth recording.
+
+An audit runs this beside §7's (a)–(e), and it is the check that keeps "byte-for-byte" checkable now
+that a file may legitimately be longer than the body:
+
+```sh
+# is the body intact, and is anything extra a conforming appendix?
+n=$(wc -l < <canonical>)                                  # 81 client-bound, 82 non-client
+diff <(head -n "$n" .gitattributes) <canonical>           # MUST be empty
+tail -n +"$((n + 1))" .gitattributes | tr -d '\r' | grep -m1 .   # nothing, or the delimiter
+```
+
+The `tr -d '\r'` is not decoration: in a CRLF-pinned repo a blank line is a lone `\r`, which
+`grep .` matches, so without it the check reads the separator as the delimiter and passes an
+appendix that has none.
 
 ### 6. Adopting or changing the pin: the index is not the working tree (MUST)
 
