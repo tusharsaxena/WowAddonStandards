@@ -408,10 +408,21 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **(g) One chrome block above the strip, and it is not boxed twice (options-ui-§14).** Per
        page, list what the builder draws into the chrome band and what it declares as schema rows.
        Then the mechanical test: **a page-wide control declared inside a `group` is in the scroll,
-       and is the finding.** Page-wide means it applies to every tab — the page's picker for the
-       instance it edits, and the acts that apply to that instance whole: create, enable, unlock,
-       copy, reset, delete. Report it with the tab it currently hides under, because a control that
-       vanishes when the player clicks a different tab is what they actually see. Two findings share
+       and is the finding — unless that group is the page's FIRST tab and is named `General`.**
+       Page-wide means it applies to every tab — the page's picker for the instance it edits, and
+       the acts that apply to that instance whole: create, enable, unlock, copy, reset, delete.
+       Report it with the tab it currently hides under, because a control that vanishes when the
+       player clicks a different tab is what they actually see.
+
+       **The `General` first tab is compliant, and has three conditions to check rather than one**
+       (options-ui-§14, v2.40.0). A page whose acts would not fit beside the picker on one band row
+       MAY draw them there instead, so verify: the band still carries the **picker** (and the create
+       control, where the page has one); the `General` tab is **first**, because the escape rests
+       entirely on the page opening there; and **no page-wide control is drawn on any other tab**,
+       since acts split across the band and a tab are worse than either shape alone. A `General` tab
+       that is not first, or a band left as a bare divider because the picker moved into it, is the
+       finding. Do not file the tab itself — that was the rule until v2.40.0 and it was wrong about
+       a page carrying six acts. Two findings share
        this check: a page drawing **two** chrome blocks (a banner plus a separate control band — the
        picker belongs *inside* the one block), and a **second box** around the band's contents. The
        second is one grep over the same builder: an `InlineGroup`, a backdropped `SimpleGroup`, or a

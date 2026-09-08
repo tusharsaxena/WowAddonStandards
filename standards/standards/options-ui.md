@@ -308,6 +308,18 @@ A page that edits **one selected instance out of many** — a window, a unit, a 
 
 **Controls that apply to every tab MUST sit in that band too, above the strip — never in the scroll below it.** A control that governs the whole page but is drawn under one tab reads as belonging to that tab, and it disappears the moment the player clicks a different one. Creating the thing the page edits, choosing which one is being edited, and the acts that apply to it whole — enable, unlock, copy, reset, delete — are page-wide and go above the strip. A page draws **at most one** such block; where it needs both a picker and other page-wide controls, the picker goes **inside** the block and the banner is not drawn separately, because two chrome blocks are two bands and the second one pushes the page down for nothing.
 
+**The band is ONE ROW, and where the acts do not fit in it they move to a `General` first tab.** The paragraph above was written against a page carrying a picker and an act or two, and it does not survive a page carrying six. Stacked three rows deep the band stops being chrome and becomes a second page above the page, pushing the strip and everything under it down for controls a player touches once a session — the same cost this section already refuses to pay for a second chrome block, arriving by a different route.
+
+So the band **MUST** carry the identity controls — the picker, and the create control where the page has one — and those alone are what page-wide is worth a permanent row for. Where the remaining acts (rename, copy-from, enable, unlock, reset, delete) do not fit **beside them on one row**, they **MAY** instead be drawn on the page's **first tab, which MUST be named `General`**. Three conditions, all of them:
+
+- **The band keeps the picker.** A page that edits one instance out of many still says which one, permanently, above the strip. That is this section's first MUST and the escape does not touch it.
+- **`General` is FIRST, so the page opens on it.** The objection to a page-wide control under a tab is that it vanishes the moment the player clicks elsewhere; a tab the page lands on has not vanished, it is where the player already is. A `General` tab anywhere but first re-earns that objection in full.
+- **No page-wide control is drawn on any other tab.** The acts live in the band or on `General` and nowhere else. Splitting them across both is worse than either shape alone, because the player now has to learn which is where.
+
+A page taking this escape has **one** band row and **one** `General` tab, not a partial move of both. And it is an escape for the acts, never for the picker: a page whose band is a bare divider because the picker moved into a tab is precisely the shape the first MUST exists to forbid.
+
+The General **page**'s first tab is `Master controls` by §15 and is not this tab. The two cannot collide, because a page carrying a picker and six acts on one instance is not the General page.
+
 **Once a control block is in the band, it MUST NOT also be boxed.** The band is already visually separated from the page by its own divider and by the content panel's top edge; a second bounded box drawn around the same controls is a border stating a boundary the band already states (**anti-pattern #72**). Delete the box, keep the controls.
 
 ### 15. The Master controls tab
