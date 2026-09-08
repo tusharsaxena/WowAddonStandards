@@ -33,8 +33,10 @@ section yet — say so and stop; do not hand-roll a substitute, and do not run t
 individually and assemble a bundle by hand. A bundle whose provenance is "an agent ran some
 commands" is not the artifact the standard defines.
 
-The runner writes the bundle and updates `RESULTS.md`'s table row. It does **not** write `ANALYSIS.md`
-or the `RESULTS.md` watch list — those are Steps 2 and 3, and they are the parts that need a reader.
+The runner writes the bundle and the whole of `RESULTS.md` — the table row, both watch-list tables and
+the four standing sections (`automated-tests-§4`, *the one boundary*). Two things are still yours:
+`ANALYSIS.md`, which is Step 2, and the watch list's **Disposition** column, which is Step 3 and is the
+one authored cell in the record.
 
 ## Step 2 — Write `<bundle>/ANALYSIS.md`
 
@@ -119,18 +121,25 @@ today's two render uniformly. "None." rather than dropping a heading.>
 the addon's own tracking — a deviation ID or a review finding — says that it is new here.>
 ```
 
-## Step 3 — Refresh the `RESULTS.md` standing sections
+## Step 3 — Rule on the watch list
 
-The runner prepends the table row. Everything **below** the table is written by the reader
-(`automated-tests-§4`) and describes the **current** state, not this run's diff.
+The runner writes everything below the table as well as the table itself: both watch-list tables from
+its own `lizard` output, and a standing section per suite from the manifest. **Exactly one cell in the
+file is yours** — the watch list's **Disposition** (`automated-tests-§4`, *the one boundary*). The
+runner carries a disposition forward while its entry is unchanged and leaves it **blank** when the
+entry is new, so this step is: read the blanks, and rule on each one.
 
-Four sections, one per suite. The complexity watch list came first and it is easy to leave it the
-only prose — but a record whose only narrative is about complexity teaches the reader that the other
-three suites are pass/fail lights, and they are not.
+Do not re-write a generated sentence. If one is wrong the fix is in the kit — `LibKa0s`, reaching this
+repo on its next re-vendor — and a local correction is reverted silently by that re-vendor
+(`testing-§1`). Through the standard's v2.38.0 this step said the prose below the table was the
+reader's; it was, in ten of ten repositories, prose nobody could keep current, which is what the
+boundary ended.
+
+What the four generated sections carry, so you can tell a wrong one from an unfamiliar one:
 
 ### `## Test suite`
 
-Case count and what it covers. Worth a sentence when: the count has **not moved** across several
+Case count and what it covers. The section says so when: the count has **not moved** across several
 runs (a suite that stopped growing while the addon did is a coverage gap, and the table cannot show
 it); a whole area is covered only by in-game smoke tests; or the count jumped and it is worth saying
 why. Name the generated inventory (`test-cases.md`) as the authority.
@@ -195,14 +204,21 @@ addon's record:
 | Band | File | LOC | Disposition |
 |---|---|---|---|
 | 1000–1500 (on notice) | `tests/test_x.lua` | 1256 | accepted — case count, not tangle |
-| > 1500 (over cap) | `data/Generated.lua` | 2893 | already tracked as `<id>` |
+| > 1500 (over cap) | `settings/Schema.lua` | 2893 | already tracked as `<id>` |
 ```
 
-Anything that **newly** crossed since the previous run is marked as such in its disposition. `None.`
-where a table would be empty — an empty watch list is a **result**, not a reason to drop the heading.
+The band table counts what `layout-§1`'s cap **binds**: every authored `.lua` the repo tracks,
+`tests/` included — which is why the example's first row is a suite file and is not a mistake.
+`libs/`, `tests/_kit/` and **generated non-shipping data** are the carve-outs, so a committed
+generated table is not a row here however long it is; if one appears, the runner is counting
+something the cap does not reach.
 
-Carry forward a disposition that is still true rather than re-arguing it; a watch list that reads
-differently every release teaches the reader that none of it is settled.
+Anything that **newly** crossed since the previous run arrives with an **empty** Disposition, which is
+the file saying it is owed one. `None.` where a table would be empty — an empty watch list is a
+**result**, not a reason to drop the heading.
+
+The runner carries a still-true disposition forward rather than making you re-argue it, so a watch
+list that reads differently every release means somebody has been editing the generated half.
 
 ## Step 4 — Release runs
 

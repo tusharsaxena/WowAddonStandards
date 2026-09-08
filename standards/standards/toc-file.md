@@ -150,3 +150,49 @@ default font instead. The comment is the only guard there is.
   ambiguous between "free" and "not yet understood".
 - Moving an annotated line **MUST** be preceded by reading its comment. This is the one rule here
   that is about the reader rather than the writer, and it is the one the annotation exists for.
+
+**The denominator this MUST is measured against.** The MUST above binds **load-bearing positions**,
+and its denominator is the set of positions that actually are load-bearing — established by reading
+the seam files (`*Setup.lua`) and `core\Constants.lua`, not by counting lines in the TOC. An 81-line
+listing with two load-bearing positions has a denominator of **two**: annotate both and the file
+passes the MUST outright, and the seventy-nine other lines are not seventy-nine unmet MUSTs. An
+unannotated **conventional** line is never a MUST failure. At most it is the SHOULD above, which is
+graded separately, once per group, and files a SHOULD row.
+
+**This is stated because an audit got it wrong.** The 2026-09-07 collection audit read the MUST
+against every line of nine TOC files — 23 to 81 lines each — and on that arithmetic concluded the
+rule was unsatisfiable and had to be rewritten. Measured against its own denominator the same nine
+files were **eight** unannotated load-bearing positions in three of them: `KickCD.toc:55` and `:73`,
+`PrettyChat.toc:40` and `:57`, and four in `WhatGroup.toc` at `:44`, `:47` and `:53-56`. No per-repo
+audit filed a per-line MUST row against the remaining six. The rule did not change; the denominator
+did, and a rule counted against the wrong denominator looks unworkable long before it is.
+
+**Worked example — both kinds, one file.** `AbsorbTracker.toc:35-42` carries one of each and is the
+form to copy:
+
+```
+# Core (the LibKa0s-Env seam loads first)
+# The LibKa0s-Env seam: this addon reads its own TOC manifest through it. Nothing here is resolved
+# at load, so this position is conventional rather than load-bearing.
+core\EnvSetup.lua
+# Before Constants, deliberately: Constants.FONT_MONO is resolved from the NS.MediaFont seam
+# this file publishes, so a Constants that loaded first would resolve it to the fallback.
+core\MediaSetup.lua
+core\Constants.lua
+```
+
+`core\MediaSetup.lua` satisfies the **MUST**: the comment names the symbol that resolves
+(`Constants.FONT_MONO`), the seam it resolves from (`NS.MediaFont`) and what moving the line would
+silently do. `core\EnvSetup.lua` satisfies the **SHOULD**: it says the position is free, and why it
+is free despite being a seam. `core\Constants.lua` carries nothing and is **compliant** — its
+position is already pinned by the annotated line above it, and a rule that made every line restate
+its neighbor's comment would be noise the next reader learns to skip.
+
+**Grading, so two auditors reach the same row.**
+
+- A load-bearing position with no comment, or with a comment saying only *"order matters"* without
+  naming what resolves: one **MUST** row, one row per position.
+- A file whose load-bearing positions are all annotated and whose conventional groups are not: one
+  **SHOULD** row for the file — never one per line, and never a MUST row.
+- A file whose within-section sequence is unusual but dependency-correct and annotated: **no row**,
+  per the ordering rules above.

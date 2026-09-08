@@ -19,8 +19,9 @@ Audit and code-review runs are **frozen, dated snapshots** kept in the addon's *
 `documentation-§3` gives a ratified deviation exactly one home: `## Documented deviations` in
 `docs/ARCHITECTURE.md`. An audit that does not read it re-derives decisions already made and files them
 as open failures — which is how one ratified decline becomes the same High row in every bundle forever.
-Two MUSTs, pointing in opposite directions on purpose: the first stops the register being re-litigated,
-the second stops it becoming a place to hide.
+Three MUSTs. The first two point in opposite directions on purpose — the first stops the register
+being re-litigated, the second stops it becoming a place to hide — and the third stops it going
+stale while both of the others pass.
 
 - **MUST read the register first**, before filing anything, and record a matching entry as **accepted,
   with its id** — never as an open MUST failure. The audit still *names* the deviation, because a
@@ -37,6 +38,19 @@ the second stops it becoming a place to hide.
   what the row claims. Without it the register accumulates compliant behavior, and a reader who trusts
   it is misled by the one document whose whole purpose is to be trusted. Retiring such a row is a doc
   change, not a re-decision.
+- **MUST evaluate every row's re-check trigger, and resolve every evidence id the row cites.**
+  `documentation-§3` defines the Re-check trigger as *the condition that ends the deviation, stated so
+  a reader can tell whether it has already fired* — written to be evaluated, and until now by nobody in
+  particular. An audit **MUST** evaluate each trigger against the tree in front of it and report any row
+  whose trigger has **already fired**: that deviation ended on the day the condition came true, and
+  every day the row stays in the register the document asserts a live deviation that is not one.
+  Likewise the ids a row cites in **Why** — an audit deviation id, a review finding id, a bundle date,
+  an issue number — **MUST** resolve, the deviation id to a bundle under `docs/audits/`, the finding id
+  to one under `docs/reviews/`, the issue to the addon's own repo. An id that resolves to nothing is
+  worse than no citation at all, because it reads as evidence and leads to none, and it survives every
+  re-read by a maintainer who knows the shape of an id and never goes looking for what it names. Both
+  are as mechanical as the rule citation above, and they catch the case it cannot: a row whose rule
+  still exists, still says what the row claims, and stopped being true months ago.
 
 ### Pending-audit decisions live in GitHub issues, not a file in the repo
 
@@ -82,7 +96,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   on the accent channel). Both families use the same *hue* ladder — green, yellow, orange, red — so a
   hue alone cannot tell you which family a chip belongs to, and an issue always wears one of each.
   When both were mid-tone, a row of chips read as an undifferentiated smear and the eye had to parse
-  the label text to find the status. Keep the two brightness bands apart when adding or recolouring;
+  the label text to find the status. Keep the two brightness bands apart when adding or recoloring;
   matching them is what the split exists to prevent.
 - **MUST** carry the item's **severity** as a second GitHub label, one per issue, from a closed
   vocabulary of four:
@@ -104,7 +118,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   and both are retired — the `marker + word` ledger-table affordance (`🟢 done`), and the
   `[<Status>] <Title>` title prefix. Where a leftover prefix survives on an old issue, **the label is
   the truth and the prefix is stale text**, stripped on sight by the commands that write the store.
-- **MUST** label the whole store, so there is no unlabelled state. An issue that arrives without a
+- **MUST** label the whole store, so there is no unlabeled state. An issue that arrives without a
   `state:` label — filed from the GitHub web UI, or by someone not using these commands — is
   **repaired on sight** to `state:untriaged` if open, or to the matching terminal label if closed,
   and the repair is **announced**, including by the read-only commands: a listing command that

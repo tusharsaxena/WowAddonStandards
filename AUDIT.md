@@ -88,14 +88,27 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `settings-panel.md`, `data-flow.md`, `common-tasks.md`; a missing one is a MUST failure.
      (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
      `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`, evaluate
-     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, read
-     `core/Compat.lua`) and require either the doc or a *Not applicable* row carrying that trigger.
+     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the shims
+     `core/Compat.lua` publishes with documentation-§3's own grep — it is a count now, not a
+     judgment) and require either the doc or a *Not applicable* row carrying that trigger.
      An absent doc whose trigger **has** fired is a MUST failure; an absent doc with a fired trigger
      *and* a "Not applicable" row is worse, because the row asserts something false — grade it above
      the bare omission.
      (c) **`## Documentation map` present in `docs/ARCHITECTURE.md`** and covering **every** `.md`
      under `docs/` in exactly one table, with no row pointing at a file that does not exist. Orphans
      and dangling rows are both findings, and this is the check that makes them findable at all.
+     The register has **four tables**, in order: Required, Conditional, **Verification and record**,
+     Addon-specific (documentation-§3). The fourth is not optional and not a spare tier — it holds
+     exactly `testing.md`, `smoke-tests.md`, `test-cases.md`, `performance.md`,
+     `automated-tests/README.md` and `automated-tests/RESULTS.md`, six rows in every addon in every
+     state, and `perf-analysis/README.md` is **not** among them: it carries a Tier 2 trigger, so it
+     registers in `### Conditional` in both of its states. A hub with three tables is the finding;
+     a hub whose extra table is this one, under this heading, is compliant, and a note justifying it
+     against the old three-table MUST is what gets deleted. **One exception, and it runs both ways:
+     `ARCHITECTURE.md`'s own row.** Registering the hub in its own map is a **MAY**, and an audit
+     **MUST NOT** file its presence *or* its absence — the two failure modes the register exists to
+     catch cannot exist for the file that carries the register, and the collection is split five to
+     four over a row that changes nothing.
      (d) **Non-canonical filenames** — `data-model.md`, `saved-variables.md`, `pipeline.md`,
      `capture-pipeline.md`, `override-pipeline.md`, `settings-system.md`, `wow-quirks.md`,
      `slash-commands.md`, `debug-console.md` and the like are Tier 1/2 content under a per-repo name.
@@ -143,7 +156,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      A file carrying **only** the `*.sh` carve-out with no pin above it is **not** compliance — it is
      the near-miss `line-endings-§1` names explicitly, and it reads in review as a repo that has been
      handled. Compare the body against the canonical one for the repo's kind (`line-endings-§5`);
-     that check is a diff, not a reading. **Report (e) as ONE rolled-up finding** — *"N tracked files
+     that check is a diff, not a reading — and it is a diff over the **body**, because since v2.39.0
+     a repo vendoring a binary no extension rule can reach **MAY** carry a `line-endings-§5 appendix`
+     below it. Run the three lines §5 specifies: `diff` the first *n* lines against the canonical
+     file (81 client-bound, 82 non-client), then read what is left. Nothing, or a block whose first
+     non-blank line is exactly `# --- line-endings-§5 appendix ---`, is **compliant** and files
+     nothing — neither a §5 finding nor a register row, and a row written for one before the rule
+     existed is retired by bringing the block into that shape. Anything else in the tail, or an entry
+     spliced into the body where it reads best, is the finding: the second moves every line after it
+     and turns a one-hunk diff into a file nobody can compare. **Report (e) as ONE rolled-up finding** — *"N tracked files
      disagree with the declared pin"* — carrying the command above so the number can be reproduced,
      and **never** enumerate the files: the fix is a single `git add --renormalize .` plus a
      re-checkout, and a per-file tally inflates the count for one action. A correct `.gitattributes`
@@ -153,13 +174,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      MUST it fails. **Expect this count to be far lower than a pre-v2.28.1 audit bundle reported for
      the same repo**: the old command counted every binary and every JSON file as a stray. A frozen
      bundle is never edited, so say so in the finding rather than letting the two numbers sit
-     unexplained side by side.
+     unexplained side by side. **And check that (e) has an owner in the repo**: `line-endings-§7`
+     MUSTs the vendored gate `tests/_kit/test_eol.lua` (LibKa0s test-kit revision 15), which asks
+     this same question over the whole tracked set on every run of the suite. A repo whose kit
+     predates 15 has no gate and (e) is the audit's alone; a repo that has the gate, reports green
+     and still fails (e) here is a **gate** finding, not a file finding, and it outranks the strays
+     it missed.
    - **Check the package ignore list by listing the repo's dot-entries, not by reading `.pkgmeta`
      (`packaging`).** Two mechanical checks, and the second is the one that has been missed:
 
      ```sh
      # (a) the named dev-only entries are ignored
-     for e in .luacheckrc .gitignore .gitattributes .claude .superpowers docs tests _dev; do
+     for e in .luacheckrc .pkgmeta .gitignore .gitattributes .claude .superpowers docs tests _dev; do
        grep -q "^  - $e\b" .pkgmeta || echo "NOT IGNORED — $e"
      done
 
@@ -195,11 +221,19 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      id names. An absence with no comment is the SHOULD failure only.
    - **Read the deviation register before filing anything.** `docs/ARCHITECTURE.md`'s
      `## Documented deviations` is the **single** home of a ratified decision (documentation-§3), and
-     `audit-review-history` binds this run twice, in opposite directions. A gap matching a register
-     row is recorded as **accepted, citing that row's rule and Decided date** — never re-filed as an
-     open MUST failure, or the same ratified decline returns every cycle. And any row whose **cited
-     rule the standard has since changed** is reported, so the register cannot quietly accumulate
-     entries for behavior the standard now mandates. A reasoning trail in a issue-audit issue or an
+     `audit-review-history` binds this run **three** times, and the first two point in opposite
+     directions on purpose. A gap matching a register row is recorded as **accepted, citing that
+     row's rule and Decided date** — never re-filed as an open MUST failure, or the same ratified
+     decline returns every cycle. Any row whose **cited rule the standard has since changed** is
+     reported, so the register cannot quietly accumulate entries for behavior the standard now
+     mandates. And **every row's re-check trigger is evaluated against the tree in front of you, and
+     every evidence id the row cites is resolved** — the audit deviation id to a bundle under
+     `docs/audits/`, the review finding id to one under `docs/reviews/`, the issue number to this
+     repo's own issue store. A trigger that has **already fired** ended the deviation on the day it
+     came true and the row is now asserting a live deviation that is not one; an id that resolves to
+     nothing reads as evidence and leads to none. Both are as mechanical as the rule check above, and
+     they catch the case it cannot: a row whose rule still exists, still says what the row claims,
+     and stopped being true months ago. A reasoning trail in a issue-audit issue or an
      earlier bundle is not a substitute: a deviation with no register row is not ratified, and a
      `state:will-not-do` issue with no row is itself a finding.
    - **`docs/pending/LEDGER.md` is retired and its presence is a finding.** The durable store of
@@ -255,18 +289,34 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 
        Every line must be either the **one** wrapper definition in the addon's `LibKa0s-Core-1.0`
        setup file (`NS.MakeCloseButton = function(parent, onClick) return lib.MakeCloseButton(parent,
-       onClick, addonName) end`), its degraded twin, or a **call to that wrapper**. Anything else is
+       onClick, addonName) end`), its degraded twin, a **call to that wrapper**, or — under a decline
+       ratified in the register — the **one host factory** and calls to it. Anything else is
        a deviation: a direct `lib.MakeCloseButton(...)`, a `Core.MakeCloseButton(...)`, or — the
        measured shape — `NS.DebugLog.MakeCloseButton(frame, api.Hide)` inside a perf-panel decoration
        hook, which reaches the same three-argument function and supplies no name
        (standalone-windows, debug-logging-§12, performance-§4, anti-pattern #65).
+
+       **Check for a decline ratified in the register before you write the row.**
+       standalone-windows makes a reasoned decline of the wrapper a **terminal** compliant
+       state on four conditions: the host's own windows only (never the console, its copy
+       window or the perf panel), the same catalog `close` mark resolved through `NS.Icon`,
+       exactly one host factory with every title bar reaching it, and a row in
+       `docs/ARCHITECTURE.md` naming the section, the date and a re-check trigger. All four
+       hold — file nothing, and record in `01_CURRENT_STATE` that the decline was checked
+       against them. The first three hold and the row is missing — the deviation is the
+       **missing register row** (`audit-review-history`), **not** a MUST breach against each
+       title bar, and its cure is one row rather than a set of rewritten close controls a
+       player would watch change for nothing. The measured case is BankLedger: three host title bars
+       behind `modules/Browser.lua:98`, and a fourth close control on a copy window the library
+       draws, which is the library's under condition 1 and not part of the decline.
 
        **File it on the grep, not on a screenshot.** The omission draws a perfectly good button and
        raises nothing, so it is invisible to lint, to the suite and to a smoke test that only checks
        the window opens. Severity is at least **medium**: it is a visible cross-window inconsistency
        in the surface a user compares between addons. If the addon carries **no** wrapper at all but
        builds close controls, the deviation is the missing wrapper, and every call site is evidence
-       for it rather than a separate row.
+       for it rather than a separate row — unless the four conditions above are met, in which case the
+       decline is compliant and the only possible row is the register's.
      - **Check the perf panel's decoration hook earns its place.** From `PerfPanel.lua` minor 4
        (LibKa0s v1.10.2) the library draws the panel's close control with the host's own name, so a
        `decorate` hook whose entire body is a close button is a second copy of library behavior that
@@ -338,8 +388,17 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        list of unequal row heights, or a drag that can cross a fixed section boundary is the finding.
      - **(f) No hand-written font, border or bar group (options-ui-§16).** Grep the settings files for
        the shared-media dropdown controls (`LSM30_Font`, `LSM30_Border`, `LSM30_Statusbar`): on an
-       addon whose vendored library carries the composers, every hit **MUST** be a composer call
-       site. Then read each group's rows in declaration order against the canonical order. Two
+       addon whose vendored library carries the composers, the grep is a **finder, not the
+       finding**: a hit is a deviation when the rows around it **reproduce a mandated block**,
+       which is what its *companions* tell you — a font copy carries size, flags, shadow or the
+       color pair, a border copy carries thickness and color, a bar copy carries opacity and
+       color. A media row standing alone with **none** of its block's companions is not a
+       hand-written group, and the addon-wide **broadcast meta row** — one *All surfaces* control
+       whose `onChange` fans out over the composed groups — is the named exempt shape
+       (options-ui-§16). Audit it against §16's five bounds instead: one row per media kind, its
+       own scope-naming subgroup and label, a write through the single seam into paths that are
+       themselves composed, no companions of its own, and per-surface composed groups behind it.
+       Then read each real group's rows in declaration order against the canonical order. Two
        shapes, graded differently: a **reordered** group is low (convention), a **missing** mandated
        row — no border thickness, no bar opacity — is at least low and is reported with the
        **literal it should have replaced**, cited at the render path's `file:line`, because that
@@ -462,6 +521,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      file on the addon side is the evidence for **#48**. If the sibling library repo is not present on
      the machine, mark the check **not run** and say so — never infer it from the code looking
      reasonable, and never quietly skip it.
+   - **Read the `.luacheckrc` before you quote the `0/0`: since v2.39.0 the test tree is in scope
+     (`lint`).** A `0 warnings / 0 errors` line says nothing until you know what it was run
+     over. `exclude_files` **MUST** narrow to `tests/_kit/` — the vendored kit, linted in its own
+     repo — and nothing wider; a config still excluding bare `tests/` is the finding, and it is the
+     finding even where the run is green, since across the collection that exclusion was hiding 308
+     test files against 329 source files. The harness global belongs in a `files["tests/"]` stanza
+     and **MUST NOT** sit in top-level `read_globals`, where it is a permission the addon's own
+     shipped source can reach for. And a tree turned on behind a blanket `ignore` is worse than the
+     exclusion it replaced: report the ignore list with the count it suppresses.
    - **The complexity report is measured, not read.** Run the standard's exact invocation from the
      repo root — **`lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`** — and compare the result
      against the **latest run bundle's `complexity.txt`** and the watch list in

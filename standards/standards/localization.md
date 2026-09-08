@@ -166,5 +166,101 @@ Three reasons this is a MUST rather than taste:
 - **Proper nouns already published** — an addon name, repo name, or CurseForge slug keeps its spelling;
   renaming a published identifier is a breaking change, not a spelling fix.
 
-Lint cannot catch this (`luacheck` does not read English), so it is enforced by review and by
-`/wow-addon:standards-audit`, which flags a British spelling in authored text as a deviation.
+#### The canonical list
+
+The table above is prose. People read it; nothing runs it. Every attempt in this collection to run it
+anyway has produced a **private** list — LibKa0s's six substrings in `tests/test_prose.lua`,
+AbsorbTracker's whole-word map in `tests/test_docs.lua` — and a private list is a coverage claim that
+nobody outside that repo can check. Two of LibKa0s's six entries are not in the table above at all,
+and its gate has stayed green for months while `CANCELLED` shipped in chat text a player reads. That
+is `testing-§12`'s failure mode — a check that reads as coverage and provides none — sitting inside
+the gate for this very section. So the list is published here, once, and every mechanical gate
+**MUST** use it **whole**.
+
+There are two lists because one cannot do the job. `BRITISH` holds lowercase **substrings**, matched
+case-insensitively, so a single entry covers a word's whole family: `colour` catches *coloured*,
+*colourise* and *colours*; `normalis` catches *normalise*, *normalised* and *normalisation*. That
+economy is also the trap, because a few correct US words contain one of those substrings — *analysis*
+contains `analys`, *organism* contains `organis`, *specialist* contains `specialis`, *programmer*
+contains `programme`. `ALLOWED` names them.
+
+```lua
+-- localization-§5 · US English is the source dialect. Copy BOTH lists whole.
+-- BRITISH: lowercase substrings, matched case-insensitively.
+-- ALLOWED: correct US words that contain a BRITISH substring; removed as WHOLE WORDS first.
+
+local BRITISH = {
+  -- -our → -or
+  "colour", "behaviour", "favour", "honour", "neighbour", "armour", "flavour",
+  "labour", "rumour", "humour", "endeavour", "rigour", "vigour", "saviour",
+  -- -re → -er
+  "centre", "centring", "metre", "fibre", "calibre", "theatre", "manoeuvre",
+  -- -ce → -se
+  "defence", "licence", "offence", "pretence", "practis",
+  -- -ise / -isation → -ize / -ization, and the -yse verbs
+  "initialis", "normalis", "generalis", "specialis", "optimis", "customis",
+  "serialis", "summaris", "utilis", "organis", "authoris", "prioritis",
+  "alphabetis", "categoris", "sanitis", "visualis", "minimis", "maximis",
+  "itemis", "randomis", "tokenis", "capitalis", "localis", "modularis",
+  "standardis", "memois", "recognis", "analys", "paralys", "synthesis",
+  "emphasis",
+  -- a doubled consonant before a suffix, where US English keeps one
+  "cancelled", "cancelling", "cancellable", "labelled", "labelling",
+  "travelled", "travelling", "modelled", "modelling", "signalled",
+  "signalling", "levelled", "levelling", "fuelled", "fuelling", "totalled",
+  "totalling", "fulfil",
+  -- -ogue → -og
+  "catalogue", "dialogue", "analogue",
+  -- no family, just British
+  "grey", "artefact", "whilst", "amongst", "learnt", "ageing", "enquir",
+  "acknowledgement", "judgement", "sceptic", "mould", "sulphur", "programme",
+}
+
+local ALLOWED = {
+  "analysis", "analyses", "analyst", "analysts",
+  "organism", "organisms", "organist",
+  "specialist", "specialists", "generalist", "generalists",
+  "optimism", "optimist", "optimists", "optimistic", "optimistically",
+  "paralysis", "paralyses", "synthesis", "syntheses", "emphasis", "emphases",
+  "fulfill", "fulfills", "fulfilled", "fulfilling", "fulfillment",
+  "programmer", "programmers", "programmed",
+}
+```
+
+**How a gate MUST read them.**
+
+- **Whole, both of them.** A gate **MUST** carry every `BRITISH` entry and every `ALLOWED` entry, and
+  **MUST NOT** carry an entry that is not published here. A subset is not a smaller gate; it is a gate
+  whose green means nothing, because no reader of the suite can tell which spellings it covers.
+- **A new entry lands here first.** A sweep or a review that finds a British form the list misses
+  amends this section, and the gates take it on their next sync. A private addition **MUST NOT**
+  outlive the change that discovered it.
+- **`ALLOWED` is removed as whole words, before the scan.** Delimit on non-letters, drop the matched
+  tokens, then run the `BRITISH` substrings over what remains. Matching `ALLOWED` as a *substring*
+  instead would swallow *analysed* inside the allowance for *analyses* and hide the defect the gate
+  exists to find.
+- **A `BRITISH` entry MUST NOT be a substring of a correct US word** unless that word is on `ALLOWED`.
+  This is the admissibility test for any future entry, and it is why the list is shaped the way it is:
+  `cancelled` and `cancelling` are listed separately rather than as `cancell`, because *cancellation*
+  is US-correct; `synthesis` and `emphasis` are entries whose own noun forms sit on `ALLOWED`; and
+  `fulfil` is admissible **only** because *fulfill* and its inflections are allowed beside it.
+- **Some words are deliberately absent, and stay absent.** *towards*, *afterwards*, *forwards* and
+  *learned* are acceptable US English, not British-only, and a gate that reddens on a correct word
+  gets deleted rather than obeyed. The British verb *analyses* escapes by construction, because
+  *analyses* is also the US plural of *analysis*; review catches that one, and the list does not
+  pretend otherwise.
+
+**What a gate scans, and what it MUST skip.** The scope is authored text as this section defines it
+above — source, locale files, prose in `README.md` and `docs/`. Four exclusions, and each one **MUST**
+be named file by file or directory by directory in the gate itself rather than inferred from a
+pattern, so the exclusion list cannot quietly grow: vendored code (`libs/`, `tests/_kit/`), which the
+consuming repo MUST NOT edit; frozen dated bundles and released changelog entries, which are the
+record and are not rewritten; `locales/enGB.lua`, which is what a locale file is for; and a document
+whose subject is this rule and which therefore quotes a forbidden spelling **in order to forbid it** —
+this section, `anti-patterns` #46, any downstream restatement of either, and the gate's own copy of
+the lists.
+
+Lint cannot catch any of this (`luacheck` does not read English), so enforcement is three-layered:
+the gate above for the mechanical part, `/wow-addon:standards-audit`, which flags a British spelling
+in authored text as a deviation, and review for the rest — the locale-key ripple, the four exceptions,
+and the forms no substring can decide.

@@ -201,9 +201,12 @@ disagreeing with the collection's intent while looking, in review, like it had b
    in every repo, and a slot left for later is a slot the next agent fills with a name of its own.
    Then evaluate each **Tier 2** trigger against the code you just wrote and either ship the doc or
    record it as a *Not applicable* row carrying the trigger. Finally write `ARCHITECTURE.md`'s
-   `## Documentation map` listing every `docs/` page in exactly one of its three tables — this is
-   the register `standards-audit` reads, and it is easiest to write now, while you still know why
-   each file exists. `ARCHITECTURE.md` is a **hub**: keep it under ~400 lines and spill any section
+   `## Documentation map` listing every `docs/` page in exactly one of its four tables — Required,
+   Conditional, **Verification and record** and Addon-specific, in that order. The fourth holds
+   `testing.md`, `smoke-tests.md` and the record docs, which sit outside the tier model; a v0.1.0
+   addon writes all six of its rows. This is the register `standards-audit` reads, and it is easiest
+   to write now, while you still know why each file exists. `ARCHITECTURE.md` is a **hub**: keep it
+   under ~400 lines and spill any section
    past ~60 lines into its canonical topic doc, leaving a summary and one link. Do **not** create
    `file-index.md` or `conventions.md` — both retired in v2.23.0.
 7. **Write the root `DEPENDENCIES.md`.** The toolchain contract (documentation-§7): every piece of

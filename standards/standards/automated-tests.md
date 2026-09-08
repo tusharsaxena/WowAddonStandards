@@ -218,12 +218,48 @@ is not a judgment call the release notes can absorb.
 - **MUST NOT** silently recreate the file when its column set has changed. Rewriting the header
   drops every previous row — the one thing a trend line must never do. A runner that cannot append
   says so and leaves the file alone.
+
+**What is generated and what is authored — the one boundary.** Everything in `RESULTS.md` is the
+runner's output: the header, the lead-in, every table row and every figure in it, both watch-list
+tables' entries, and the standing section for each suite. **The watch list's `Disposition` column is
+the one authored cell in the file**, and nothing else in it is ever hand-edited (documentation-§3).
+
+- The runner **MUST** carry a disposition forward verbatim while its entry is unchanged — the same
+  function at the same location in the functions table, the same file in the same band in the band
+  table — and **MUST** leave the cell **blank** where the entry is new. A blank disposition is the
+  file telling its owner that something crossed and nobody has ruled on it yet. A runner that invents
+  a disposition, or drops one that still applies, destroys the only judgment the file carries.
+- The standing sections are **generated from the run's own `manifest.json`** and the rows already in
+  the table, not written as an essay. Everything this section asks them to say is a fact the record
+  already holds — a case count that has not moved across the last several runs, what the lint config
+  excludes and over how many files, whether the addon ships a `tests/perf.lua` at all — and that is
+  precisely what makes the requirement producible instead of decorative.
+- An owner who disagrees with a generated sentence fixes the **runner**, never the file. testing-§1
+  forbids editing the vendored kit, so the fix lands in `LibKa0s` and arrives on the next re-vendor;
+  a local correction is silently reverted by that re-vendor and the record is stale again.
+
+**The case this boundary was written for.** documentation-§3 called `RESULTS.md` "generated, never
+hand-edited" while this section **MUST**'d a per-entry disposition and a standing section per suite —
+narrative the vendored runner has never emitted. The result was not a compromise but a stall: nobody
+could produce the file correctly, and the record went stale in **ten of ten** repositories.
+`MultiMeters/docs/automated-tests/RESULTS.md:30` carries a hand-written watch list headed *"Current as
+of `20260809-195454`"* reporting **"None. `lizard` reports 0 warnings"** at `:34`, while the newest
+row of the table directly above it (`:23`, run `20260825-103437`) records **19**;
+`LibKa0s/docs/automated-tests/RESULTS.md:50` opens its test-suite section with **"499 cases"** against
+a suite that runs 764. Both are honest attempts at a rule that could not be satisfied. A rule that
+mandates prose no tool produces, in a file no one is allowed to write, is not a rule — it is a stall,
+and what it costs is the trend line the whole section exists to keep.
+
 - **MUST** carry the current complexity **watch list** below the table, as **two tables with header
   rows**: warned functions (Function / CCN / Location / Disposition), and files by `layout-§1` band
-  (**Band** / File / LOC / Disposition). Each carries a one-line disposition — *accepted and why*,
-  *peel next*, or *already tracked as `<deviation-id>`* — and anything that **newly** crossed since
-  the previous run says so. A regeneration that yields no disposition for what newly crossed has
-  performed the ritual and skipped the point.
+  (**Band** / File / LOC / Disposition). **The rows are generated** from the run's own `lizard`
+  output — an entry is there because a threshold was crossed on this run, never because somebody
+  remembered it — and each carries a one-line disposition: *accepted and why*, *peel next*, or
+  *already tracked as `<deviation-id>`*. The disposition is the authored half, on the boundary stated
+  above: the runner carries it forward while its entry is unchanged and leaves it blank when the
+  entry is new, so anything that **newly** crossed since the previous run arrives as an empty cell
+  that names itself as owed. A watch list whose newly-crossed entries are still blank at the next
+  release has performed the ritual and skipped the point.
 - **MUST NOT** carry an entry as *accepted* indefinitely. A disposition is a decision with a shelf
   life (performance-§10): an entry accepted across **three consecutive release runs** is either fixed
   or converted into a tracked deviation with an ID and an owner, and the watch list then points at the
@@ -234,9 +270,10 @@ is not a judgment call the release notes can absorb.
   every addon's record need restructuring when it changes. It also keeps a file that moved between
   bands on one line in the diff rather than two.
 - **MUST** carry a short standing section for each of the **other three** suites as well — test
-  suite, lint, perf. The complexity watch list existed first and it is easy to leave it the only
-  prose, but a record whose only narrative is about complexity teaches the reader that the other
-  three suites are just pass/fail lights. They are not: a suite count that has not moved in six
+  suite, lint, perf — **generated from the same manifest** as the table, on the boundary stated
+  above, so that the requirement has a producer rather than an aspiration. The complexity watch list
+  existed first and it is easy to leave it the only prose, but a record whose only narrative is about
+  complexity teaches the reader that the other three suites are just pass/fail lights. They are not: a suite count that has not moved in six
   releases, a lint config with a broad exclusion, and an addon with no perf scenarios at all are
   each worth a sentence that the table cannot carry.
 
@@ -244,6 +281,12 @@ is not a judgment call the release notes can absorb.
 
 - **MUST** write **`<bundle>/ANALYSIS.md`** for every **release** run, and **SHOULD** write one for any
   run whose verdict is not `green` or whose numbers moved.
+- **MUST NOT** be backfilled into a bundle that was frozen without one. A bundle is evidence (§1),
+  and writing today's reading into a directory stamped weeks ago fabricates a record that nobody can
+  detect as fabricated a year later. The gap is closed **forward**: the next run in that repository
+  writes its analysis and notes, once, how many earlier bundles carry none. Across the collection on
+  2026-09-07 that was **35 of 93** bundles — most of them runs for which this section only ever asked
+  the SHOULD, which is why the number is a note and not a backlog.
 - **MUST** follow the uniform prompt in the root **`AUTOMATED_TESTS.md`** playbook, so every addon's
   write-up has the same shape and two addons' analyses can be read against each other.
 - **MUST** link each suite's artifact from the row that reports it, so a reader gets from a figure to
