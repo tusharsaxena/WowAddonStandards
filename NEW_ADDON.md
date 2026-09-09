@@ -43,7 +43,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
    step 7). The root ships exactly those three docs plus `LICENSE` — `README.md`, the `CLAUDE.md`
    stub, `DEPENDENCIES.md` — and never a fourth. In particular, **never scaffold a `CHANGELOG.md`**:
    at an addon root it is forbidden, because the player-facing history is already mandated twice in
-   the README's `## What's new` and `## Version History`, and moving it to `docs/CHANGELOG.md` is the
+   the README's `## Version History`, and moving it to `docs/CHANGELOG.md` is the
    same second history one directory down. It is required only at a **Ka0s-owned library** root,
    which this playbook does not scaffold (documentation-§1/§3, library-stack-§7).
 3. **Lay out files.** Use the single modular layout — `core/ modules/ defaults/ settings/ locales/` —
@@ -180,7 +180,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
    (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
    incl. the standard badge, which is **not** a link and MUST NOT be wrapped in one → logo → description →
-   What's new → Screenshots → Usage → How it works → FAQ →
+   Screenshots → Usage (prose, no tables) → How it works → FAQ →
    Troubleshooting → Issues and feature requests → Version History → optional `## Credits`, last — there is
    **no** `## Testing` section; verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
    The README carries **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /

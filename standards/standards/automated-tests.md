@@ -139,7 +139,7 @@ without saying so.
 Everything above is about **the run**, and about **commits**. A **release** is a different checkpoint
 with a different failure mode, and there all four suites gate.
 
-- **MUST NOT** cut a release — bump the version, roll `## What's new`, tag — unless the release run's
+- **MUST NOT** cut a release — bump the version, roll `## Version History`, tag — unless the release run's
   `manifest.json` shows **all four** suites at `pass`, and `suites.complexity.warnings` at **0**.
   Concretely: `lint` pass (which already means **zero warnings and zero errors**, since `luacheck`
   exits non-zero on either), `tests` pass with zero failures, `perf` pass, and `complexity` pass with
