@@ -138,13 +138,14 @@ reactors — modules handling the settings-changed message — **MUST NOT** re-e
 second `[Cfg] …` line restating a value the `[Set]` line already showed is redundant spam. A
 reactor logs **only** a *material effect* the reader cannot infer from the `[Set]` line (e.g.
 "capture disabled", "test data swapped in"), never a restatement of the new value. **Named
-non-setting state** (architecture-§5) — geometry only a drag writes, a remembered view, learned or
-recorded data, a vendored library's own writes — is written outside the `Set` seam and is **not** a
-setting for this rule: it **SHOULD NOT** be logged per change (a per-drag position write, or one line
-per id a scan learns, is noise), and its owner's reset or *forget* verb is a functional flow, traced
-once under debug-logging-§8. A structural registry's
-membership change (architecture-§5) is not a schema-row write either and produces no `[Set]` line; a
-create or delete is a functional flow, traced once by the registry writer under debug-logging-§8.
+non-setting state** (architecture-§5) — geometry only a drag or a resize determines, a remembered
+view, learned or recorded data, a vendored library's own writes — is written outside the `Set` seam
+and is **not** a setting for this rule: it **SHOULD NOT** be logged per change (a per-drag position
+write, or one line per id a scan learns, is noise). A purge, *forget* or delete of learned or
+recorded data is a data mutation debug-logging-§8 already traces; a reset of geometry or of a view
+**MAY** be traced once and is not required to be. A structural registry's membership change
+(architecture-§5) is not a schema-row write either and produces no `[Set]` line; a create or delete
+is a functional flow, traced once by the registry writer under debug-logging-§8.
 
 ### 11. Scrollbar + line counter — a guarantee, and a hazard for anyone extending it
 

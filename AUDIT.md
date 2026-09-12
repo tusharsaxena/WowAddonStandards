@@ -347,18 +347,24 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      own reset verb calling a seed routine the load pass shares is not;
      (d) **wholesale replacement** by the options-ui-§12 global reset or AceDB's profile swap / copy is
      compliant and files nothing;
-     (e) **named non-setting state** (architecture-§5) — geometry only a drag writes, which no control
-     sets and no row addresses (a position on a registry member included; a drag's write to a row
-     path is (a)), a remembered view, learned or recorded data the addon builds itself, and a vendored
-     library's own writes into a table the addon hands it — is **compliant when named** and files
-     nothing: `docs/ARCHITECTURE.md` → Settings Schema gives its storage key, its one owner module and
-     every function that writes it. **Unnamed, it is a doc-only MUST failure, Low**, and so is a
-     writer the naming leaves out; the remedy is the naming sentence, never a register row. Apply the
-     guards before filing (e): a control that chooses the value (a slider, an X/Y field, a slash verb
-     taking the value) makes it a preference, which is (f), while a reset to the shipped default or a
-     capture of what is on screen does not; an entry the player authors is not learned data; the
-     addon's own write into a library's table (a seed, a backfill) is the addon's, and a whole-table
-     write over a row path is (a); a reset that clears learned data is the owner's operation and
+     (e) **named non-setting state** (architecture-§5) — geometry only a drag or a resize determines,
+     saved on drag-stop, on hide or at logout, which no control sets and no row addresses (a position
+     on a registry member included; a drag's write to a row path is (a)), a remembered view, learned
+     or recorded data the addon builds itself, and a vendored library's own writes into a table the
+     addon hands it — is **compliant when named** and files nothing: `docs/ARCHITECTURE.md` →
+     Settings Schema gives its storage key, its one owner module and every function that writes it,
+     wherever each lives. A named writer outside the owner module is compliant and is **not** a
+     finding. **Unnamed, it is a doc-only MUST failure, Low**, and so is a writer the naming leaves
+     out; the remedy is the naming sentence, never a register row. The load pass, and an accessor
+     that lazily creates an empty container, are not writers. Apply the guards before filing (e): a
+     control that chooses the value (a slider, an X/Y field, a slash verb taking the value) makes it
+     a preference, which is (f), while a reset to the shipped default, a capture of what is on screen
+     and a value the addon derives (a duplicate's offset, a template backfill, a copy keeping the
+     target's own value) do not; an entry the player authors is not learned data, and a set the
+     player adds ids to is (b) or a value, never (e); the addon's own write into a library's table
+     outside the load pass (a seed, a backfill) is the addon's; a whole-table write over a row path
+     is (a) **and** is listed as a writer of any (e) state it covers until it is fixed; a reset that
+     clears learned data, and a prune driven by a retention row, is the owner's operation and
      belongs in the naming;
      (f) anything else — a preference the player sets that no row addresses, on a member or not (a
      position a control also sets included), a list over a fixed member set with no row — needs its
