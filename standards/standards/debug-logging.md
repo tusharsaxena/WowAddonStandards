@@ -139,7 +139,9 @@ second `[Cfg] …` line restating a value the `[Set]` line already showed is red
 reactor logs **only** a *material effect* the reader cannot infer from the `[Set]` line (e.g.
 "capture disabled", "test data swapped in"), never a restatement of the new value. Window geometry
 and other non-schema view state written outside the `Set` seam are **not** settings for this rule
-and **SHOULD NOT** be logged per-change (a per-drag position write is noise).
+and **SHOULD NOT** be logged per-change (a per-drag position write is noise). A structural registry's
+membership change (architecture-§5) is not a schema-row write either and produces no `[Set]` line; a
+create or delete is a functional flow, traced once by the registry writer under debug-logging-§8.
 
 ### 11. Scrollbar + line counter — a guarantee, and a hazard for anyone extending it
 
