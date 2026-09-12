@@ -364,8 +364,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      player adds ids to is (b) or a value, never (e); the addon's own write into a library's table
      outside the load pass (a seed, a backfill) is the addon's; a whole-table write over a row path
      is (a) **and** is listed as a writer of any (e) state it covers until it is fixed; a reset that
-     clears learned data, and a prune driven by a retention row, is the owner's operation and
-     belongs in the naming;
+     clears learned data, a per-entry delete and a prune driven by a retention row are the owner's
+     operation and belong in the naming;
      (f) anything else — a preference the player sets that no row addresses, on a member or not (a
      position a control also sets included), a list over a fixed member set with no row — needs its
      `Documented deviations` row; a preference with neither a row nor a register row is a missing row.

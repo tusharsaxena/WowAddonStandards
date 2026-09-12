@@ -105,7 +105,9 @@ what the addon did — not just that it loaded. At minimum:
   a cast resolved, a bar shown), including the **not-recorded / no-op decisions** that explain a
   *missing* entry (why a loot line was skipped, why a value was ignored). A log that shows only
   successes can't explain the bug the user is reporting.
-- **All data mutations** — user-initiated purge/delete and any bulk rewrite of stored data.
+- **All data mutations** — user-initiated purge/delete and any bulk rewrite of stored data. For
+  architecture-§5's named non-setting state §10 decides: a purge, *forget* or delete of learned or
+  recorded data is traced here, and a reset of geometry or of a remembered view is a **MAY**.
 - **View open / recompute** — the main window opening, tab switches, and each table/analytics
   **recompute**, as a single summary line (see §9).
 - **Every settings change** — see §10.
