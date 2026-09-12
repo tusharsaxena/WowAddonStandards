@@ -144,13 +144,15 @@ reactor logs **only** a *material effect* the reader cannot infer from the `[Set
 **A batch through the helper logs per row, unless the act is a bulk copy or reset.** When one act
 writes many rows through the helper, the act decides the shape of the log, never the row count:
 
-- **A bulk copy or reset is one line.** An act whose purpose is to rewrite a set of rows wholesale
-  — copying one member's or one unit's settings onto another, resetting a page or a section to its
-  defaults — **MUST** be logged as **one** debug-logging-§8 flow line that names the act, the source
-  and target (or the scope) and the row count, e.g. `[Set] copy target→focus: 110 rows`, and
-  **MUST NOT** emit a per-row `[Set]` line for any row it writes. Only the log collapses:
-  validation and each row's `onChange` still run per row, and one change notification for the
-  whole batch is fine.
+- **A bulk copy or reset is one `[Set]` line.** An act whose purpose is to rewrite a set of rows
+  wholesale — copying one member's or one unit's settings onto another, resetting a page or a
+  section to its defaults — **MUST** be logged as **one** debug-logging-§8 flow line, and that line
+  **MUST** be a `[Set]` line of the shape `[Set] <act> <scope>: N rows`, such as
+  `[Set] copy target→focus: 110 rows` or `[Set] reset Appearance page: 59 rows`. The act **MUST
+  NOT** emit a per-row `[Set]` line for any row it writes. **N is the number of rows the act
+  actually wrote**, not the number in its scope: a row already at its default, or a session-only
+  row the act skips, is not counted. Only the log collapses: validation and each row's `onChange`
+  still run per row, and one change notification for the whole batch is fine.
 - **Every other batch logs per row.** A batched write that is not a bulk copy or reset logs one
   `[Set] <path> = <value>` per row it writes, even when the batch sends a single change
   notification: a header click that writes the sort column, mode and direction is three `[Set]`
@@ -159,6 +161,16 @@ writes many rows through the helper, the act decides the shape of the log, never
 *Bulk* is the purpose of the act, not its size: a reset of a two-row section is one line, and a
 three-row sort change is three. Where this section's once-per-write line and debug-logging-§8/§9's
 one-line bulk rewrite would both apply, this is the rule that decides.
+
+**A profile-wide reset, copy or switch is not a batch through the helper.** When AceDB replaces the
+whole profile — `db:ResetProfile()`, a profile copy, a profile switch — that is wholesale
+replacement (options-ui-§12, architecture-§5), not a write through the helper, and the per-row
+`onChange` clause above does not apply to it. It is logged **once**, by the addon's profile-event
+handler, in words chosen by the event: `[Set] reset profile 'Default' to defaults (N rows)`,
+`[Set] copied profile 'A' → 'B'`, `switched to profile 'X'`. No bulk bracket adds a second line.
+The reset and copy lines carry the `[Set]` tag; a switch rewrites no rows and keeps whatever tag the
+addon's profile tracing already uses. The row count is included where it is cheap to know and
+**MAY** be omitted otherwise.
 
 **Named non-setting state** (architecture-§5) — geometry only a drag or a resize determines, a
 remembered view, learned or recorded data, a vendored library's own writes — is written outside the

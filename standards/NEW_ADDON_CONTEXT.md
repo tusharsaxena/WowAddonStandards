@@ -708,12 +708,14 @@ descriptor expresses rather than code to write.
   reactor logs only a material effect the `[Set]` line cannot imply (debug-logging-§10). A batch
   through the seam logs one `[Set]` line per row, even under one change notification, unless the
   act is a **bulk copy or reset** (a copy-from, a page or section back to defaults). That act is
-  one line naming the act, the source and target or the scope, and the row count
+  one `[Set] <act> <scope>: N rows` line, N counting only the rows it actually wrote
   (`[Set] copy target→focus: 110 rows`), with the per-row lines suppressed while validation and
-  `onChange` still run per row. The purpose of the act decides, not its row count. A structural
-  registry's create/delete is not a `[Set]` line; the registry writer traces it once as a functional
-  flow (debug-logging-§8). Neither is a drag's position write or an id a scan learns: named
-  non-setting state is not logged per change (debug-logging-§10).
+  `onChange` still run per row. The purpose of the act decides, not its row count. A profile-wide
+  reset, copy or switch is AceDB's wholesale replacement, not a batch: the profile-event handler
+  logs it once (`[Set] reset profile 'Default' to defaults (N rows)`); no bulk line repeats it.
+  A structural registry's create/delete is not a `[Set]` line; the registry writer traces it once
+  as a functional flow (debug-logging-§8). Neither is a drag's position write or an id a scan
+  learns: named non-setting state is not logged per change (debug-logging-§10).
 - **Secret-safe by construction** (events-frames-taint-§8). In combat, retail returns absorb/health/
   threat totals as opaque *secret* values that survive `tostring()` **and `..`** but raise in
   `table.concat`/`string.format`; on a repeating ticker one unguarded secret freezes the feature
