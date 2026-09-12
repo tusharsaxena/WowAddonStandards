@@ -25,6 +25,7 @@ function NS:RunMigrations()
 end
 ```
 
+- The runner, and any profile-preparation step called with it at initialization and from AceDB's profile callbacks, is the **load pass**: it writes stored data directly, before any reader has seen it, and its entry points are reachable from nothing else (a seed routine it shares with a registry writer's reset verb belongs to that writer — architecture-§5). Where it seeds or repairs a **structural registry**, architecture-§5 makes it part of that registry's writer surface and requires it named in `docs/ARCHITECTURE.md` beside the writer.
 - **SHOULD** allow the user to opt out via a soft-fallback path (an AceDB-missing shim, as the absorb-shield tracker ships). Not mandatory.
 
 ### 2. Defaults

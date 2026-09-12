@@ -325,6 +325,39 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **Not a deviation:** an addon on a LibKa0s tag older than v1.9.0 has no catalog to draw from.
        Say which tag it carries (root `CLAUDE.md`'s provenance line) and file the adoption as a
        re-vendor item rather than as a styling gap.
+   - **Check the write paths against `architecture-§5` by grep, then classify every hit.** Grep the
+     addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
+     `db.profile`, `db.global`, `db.char` and the local aliases the files bind them to — and for
+     `table.insert`, `table.remove` and `wipe` on stored tables. Every hit outside the write helper is
+     exactly one of five things, and the class decides the finding:
+     (a) a **schema-row write** — a fixed or instance-relative path a row addresses, whole-section
+     writes included, and a field that is also a key included — is a MUST failure wherever it sits,
+     **inside a registry writer included**;
+     (b) a **structural registry write** — the collection passes all three of architecture-§5's tests,
+     and the write is membership or an item on its closed identity-and-bookkeeping list (order, id
+     counter, storage key, stamped id, frame name, a lookup-key name no row addresses, the seeding
+     sentinel) — is compliant only inside the one writer `docs/ARCHITECTURE.md` names for that
+     registry; a hit in a panel file or a slash handler is filed against the writer (anti-pattern #78),
+     never as a demand that membership route through the helper. A collection the helper already takes
+     whole at one normalized path fails test (3); it is a value, its writes are helper writes, and it
+     files nothing;
+     (c) the **load pass** is compliant when its entry points (the runner, the profile-prepare function)
+     are reachable only from initialization and the AceDB profile callbacks and are named beside the
+     writer; a slash verb or panel control that calls an entry point is a finding, while the writer's
+     own reset verb calling a seed routine the load pass shares is not;
+     (d) **wholesale replacement** by the options-ui-§12 global reset or AceDB's profile swap / copy is
+     compliant and files nothing;
+     (e) anything else — window geometry only a drag writes, which no control sets and no row
+     addresses (a position on a registry member included; a drag's write to a row path is (a)), a
+     remembered view, a preference the player sets on a member that no row addresses — needs its
+     `Documented deviations` row, as it did before v2.43.0; a member preference with neither a row
+     nor a register row is a missing row.
+     Apply architecture-§5's three tests before filing (b): a list over a fixed member set the player
+     only reorders is a **value**, and belongs to (a) or (e). A registry with **no named writer** is a
+     doc-only MUST failure, Low. A register row whose only content is a named registry bypassing the
+     helper is **stale** since v2.43.0 — file its retirement as compliant under the register's second
+     MUST (audit-review-history), because the cited rule has changed, and under the third as well where
+     the row's own trigger names WowAddonStandards#7; not the registry.
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
      screen.** Nine checks. Each is a read of the schema array or a grep, none needs judgment, and
      all nine are invisible to lint and to the headless suite — which is how every one of them
