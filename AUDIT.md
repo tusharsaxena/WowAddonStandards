@@ -347,9 +347,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      own reset verb calling a seed routine the load pass shares is not;
      (d) **wholesale replacement** by the options-ui-§12 global reset or AceDB's profile swap / copy is
      compliant and files nothing;
-     (e) anything else — window geometry (a drag-written position on a registry member included), a
-     remembered view, a preference the player sets on a member that no row addresses — needs its `Documented deviations` row, as it did before v2.43.0; a member
-     preference with neither a row nor a register row is a missing row.
+     (e) anything else — window geometry only a drag writes, which no control sets and no row
+     addresses (a position on a registry member included; a drag's write to a row path is (a)), a
+     remembered view, a preference the player sets on a member that no row addresses — needs its
+     `Documented deviations` row, as it did before v2.43.0; a member preference with neither a row
+     nor a register row is a missing row.
      Apply architecture-§5's three tests before filing (b): a list over a fixed member set the player
      only reorders is a **value**, and belongs to (a) or (e). A registry with **no named writer** is a
      doc-only MUST failure, Low. A register row whose only content is a named registry bypassing the
