@@ -105,7 +105,9 @@ what the addon did — not just that it loaded. At minimum:
   a cast resolved, a bar shown), including the **not-recorded / no-op decisions** that explain a
   *missing* entry (why a loot line was skipped, why a value was ignored). A log that shows only
   successes can't explain the bug the user is reporting.
-- **All data mutations** — user-initiated purge/delete and any bulk rewrite of stored data.
+- **All data mutations** — user-initiated purge/delete and any bulk rewrite of stored data. For
+  architecture-§5's named non-setting state §10 decides: a purge, *forget* or delete of learned or
+  recorded data is traced here, and a reset of geometry or of a remembered view is a **MAY**.
 - **View open / recompute** — the main window opening, tab switches, and each table/analytics
   **recompute**, as a single summary line (see §9).
 - **Every settings change** — see §10.
@@ -137,11 +139,47 @@ Every settings mutation **MUST** be logged **once**, at the schema's single writ
 reactors — modules handling the settings-changed message — **MUST NOT** re-echo the same change: a
 second `[Cfg] …` line restating a value the `[Set]` line already showed is redundant spam. A
 reactor logs **only** a *material effect* the reader cannot infer from the `[Set]` line (e.g.
-"capture disabled", "test data swapped in"), never a restatement of the new value. Window geometry
-and other non-schema view state written outside the `Set` seam are **not** settings for this rule
-and **SHOULD NOT** be logged per-change (a per-drag position write is noise). A structural registry's
-membership change (architecture-§5) is not a schema-row write either and produces no `[Set]` line; a
-create or delete is a functional flow, traced once by the registry writer under debug-logging-§8.
+"capture disabled", "test data swapped in"), never a restatement of the new value.
+
+**A batch through the helper logs per row, unless the act is a bulk copy or reset.** When one act
+writes many rows through the helper, the act decides the shape of the log, never the row count:
+
+- **A bulk copy or reset is one `[Set]` line.** An act whose purpose is to rewrite a set of rows
+  wholesale — copying one member's or one unit's settings onto another, resetting a page or a
+  section to its defaults — **MUST** be logged as **one** debug-logging-§8 flow line, and that line
+  **MUST** be a `[Set]` line of the shape `[Set] <act> <scope>: N rows`, such as
+  `[Set] copy target→focus: 110 rows` or `[Set] reset Appearance page: 59 rows`. The act **MUST
+  NOT** emit a per-row `[Set]` line for any row it writes. **N is the number of rows the act
+  actually wrote**, not the number in its scope: a row already at its default, or a session-only
+  row the act skips, is not counted. Only the log collapses: validation and each row's `onChange`
+  still run per row, and one change notification for the whole batch is fine.
+- **Every other batch logs per row.** A batched write that is not a bulk copy or reset logs one
+  `[Set] <path> = <value>` per row it writes, even when the batch sends a single change
+  notification: a header click that writes the sort column, mode and direction is three `[Set]`
+  lines.
+
+*Bulk* is the purpose of the act, not its size: a reset of a two-row section is one line, and a
+three-row sort change is three. Where this section's once-per-write line and debug-logging-§8/§9's
+one-line bulk rewrite would both apply, this is the rule that decides.
+
+**A profile-wide reset, copy or switch is not a batch through the helper.** When AceDB replaces the
+whole profile — `db:ResetProfile()`, a profile copy, a profile switch — that is wholesale
+replacement (options-ui-§12, architecture-§5), not a write through the helper, and the per-row
+`onChange` clause above does not apply to it. It is logged **once**, by the addon's profile-event
+handler, in words chosen by the event: `[Set] reset profile 'Default' to defaults (N rows)`,
+`[Set] copied profile 'A' → 'B'`, `switched to profile 'X'`. No bulk bracket adds a second line.
+The reset and copy lines carry the `[Set]` tag; a switch rewrites no rows and keeps whatever tag the
+addon's profile tracing already uses. The row count is included where it is cheap to know and
+**MAY** be omitted otherwise.
+
+**Named non-setting state** (architecture-§5) — geometry only a drag or a resize determines, a
+remembered view, learned or recorded data, a vendored library's own writes — is written outside the
+`Set` seam and is **not** a setting for this rule: it **SHOULD NOT** be logged per change (a
+per-drag position write, or one line per id a scan learns, is noise). A purge, *forget* or delete of
+learned or recorded data is a data mutation debug-logging-§8 already traces; a reset of geometry or
+of a view **MAY** be traced once and is not required to be. A structural registry's membership
+change (architecture-§5) is not a schema-row write either and produces no `[Set]` line; a create or
+delete is a functional flow, traced once by the registry writer under debug-logging-§8.
 
 ### 11. Scrollbar + line counter — a guarantee, and a hazard for anyone extending it
 

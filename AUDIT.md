@@ -329,7 +329,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
      `db.profile`, `db.global`, `db.char` and the local aliases the files bind them to — and for
      `table.insert`, `table.remove` and `wipe` on stored tables. Every hit outside the write helper is
-     exactly one of five things, and the class decides the finding:
+     exactly one of six things, and the class decides the finding:
      (a) a **schema-row write** — a fixed or instance-relative path a row addresses, whole-section
      writes included, and a field that is also a key included — is a MUST failure wherever it sits,
      **inside a registry writer included**;
@@ -347,17 +347,36 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      own reset verb calling a seed routine the load pass shares is not;
      (d) **wholesale replacement** by the options-ui-§12 global reset or AceDB's profile swap / copy is
      compliant and files nothing;
-     (e) anything else — window geometry only a drag writes, which no control sets and no row
-     addresses (a position on a registry member included; a drag's write to a row path is (a)), a
-     remembered view, a preference the player sets on a member that no row addresses — needs its
-     `Documented deviations` row, as it did before v2.43.0; a member preference with neither a row
-     nor a register row is a missing row.
+     (e) **named non-setting state** (architecture-§5) — geometry only a drag or a resize determines,
+     saved on drag-stop, on hide or at logout, which no control sets and no row addresses (a position
+     on a registry member included; a drag's write to a row path is (a)), a remembered view, learned
+     or recorded data the addon builds itself, and a vendored library's own writes into a table the
+     addon hands it — is **compliant when named** and files nothing: `docs/ARCHITECTURE.md` →
+     Settings Schema gives its storage key, its one owner module and every function that writes it,
+     wherever each lives. A named writer outside the owner module is compliant and is **not** a
+     finding. **Unnamed, it is a doc-only MUST failure, Low**, and so is a writer the naming leaves
+     out; the remedy is the naming sentence, never a register row. The load pass, and an accessor
+     that lazily creates an empty container, are not writers. Apply the guards before filing (e): a
+     control that chooses the value (a slider, an X/Y field, a slash verb taking the value) makes it
+     a preference, which is (f), while a reset to the shipped default, a capture of what is on screen
+     and a value the addon derives (a duplicate's offset, a template backfill, a copy keeping the
+     target's own value) do not; an entry the player authors is not learned data, and a set the
+     player adds ids to is (b) or a value, never (e); the addon's own write into a library's table
+     outside the load pass (a seed, a backfill) is the addon's; a whole-table write over a row path
+     is (a) **and** is listed as a writer of any (e) state it covers until it is fixed; a reset that
+     clears learned data, a per-entry delete and a prune driven by a retention row are the owner's
+     operation and belong in the naming;
+     (f) anything else — a preference the player sets that no row addresses, on a member or not (a
+     position a control also sets included), a list over a fixed member set with no row — needs its
+     `Documented deviations` row; a preference with neither a row nor a register row is a missing row.
      Apply architecture-§5's three tests before filing (b): a list over a fixed member set the player
-     only reorders is a **value**, and belongs to (a) or (e). A registry with **no named writer** is a
+     only reorders is a **value**, and belongs to (a) or (f). A registry with **no named writer** is a
      doc-only MUST failure, Low. A register row whose only content is a named registry bypassing the
      helper is **stale** since v2.43.0 — file its retirement as compliant under the register's second
      MUST (audit-review-history), because the cited rule has changed, and under the third as well where
-     the row's own trigger names WowAddonStandards#7; not the registry.
+     the row's own trigger names WowAddonStandards#7; not the registry. A row whose only content is (e)
+     state is **stale since v2.44.0** on the same footing: file the naming sentence as the fix and the
+     row's retirement with it. A row that mixes (e) state with (f) state narrows to its (f) part.
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
      screen.** Nine checks. Each is a read of the schema array or a grep, none needs judgment, and
      all nine are invisible to lint and to the headless suite — which is how every one of them
