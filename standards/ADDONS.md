@@ -24,6 +24,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory |
 | Ka0s Multi Meters | [`../../MultiMeters/`](../../MultiMeters/) | https://github.com/tusharsaxena/MultiMeters |
 | Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster |
+| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced |
 | Ka0s Pretty Chat | [`../../PrettyChat/`](../../PrettyChat/) | https://github.com/tusharsaxena/PrettyChat |
 | Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup |
 
