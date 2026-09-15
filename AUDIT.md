@@ -399,12 +399,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **(b) The General page's first tab is exactly `Master controls` (options-ui-§15).** Compare
        the first distinct `group` on the General page against that literal string. Then read the rows
        filed under it, in declaration order, against the canonical set — enable, general visibility,
-       master scale, master alpha, lock frame, debug console, reset position, reset all settings.
+       master scale, master alpha, lock frame, debug console, test mode, reset position, reset all settings.
        They **MUST** be a subsequence of that list, and every canonical row the addon has the state
        for **MUST** be present. A canonical row sitting under a different tab is a finding against
        **§15**, not against the tab it is in. An addon that draws no positionable frame — proven by a
        whole-repo `SetMovable` sweep, not assumed — legitimately omits exactly master scale, master
        alpha, lock frame and reset position; record that as compliant and file nothing.
+       **Test mode is required exactly when the addon has a test mode that stays on until turned
+       off** — read what the `test` / `preview` verb does, not its name. Its absence, or that switch
+       drawn as a button, is anti-pattern #80. A one-shot test action (a sample printed, a flow run
+       once, a value held for a few seconds) is not a test mode: no row is compliant.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
        row whose type changed with **no** bumped `schemaVersion` and **no** migration step in
