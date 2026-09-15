@@ -149,9 +149,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
    - **The General page's first tab is named exactly `Master controls`** and is built by the library's
      master-controls composer from **one** declaration — `Enable <Addon>` | `General visibility` /
      `Master scale` | `Master alpha` / `Lock frame` | `Debug console` / `Test mode` / `Reset position` |
-     `Reset all settings` — including only the rows the addon has the state for. `Test mode` is there
-     only when the addon has a test mode that stays on until turned off: a session-only checkbox the
-     composer emits from `testModePath`, never a button (anti-pattern #80). A frameless addon
+     `Reset all settings` — including only the rows the addon has the state for. `Test mode` is there in
+     every addon with a positionable display: its test mode (placeholder content, on until turned off,
+     ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
+     (anti-pattern #80). A frameless addon
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.
