@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.49.0, 2026-09-16)
+# Ka0s WoW Addon Standard (v2.50.0, 2026-09-16)
 
 **Status:** Source of truth. All audit deviation reports and `NEW_ADDON_CONTEXT.md` template content derive from this standard. When the standard changes, bump the date and version at the top of this file.
 
@@ -94,6 +94,8 @@ Discovered by following the links here — not part of the normative standard, b
 ---
 
 ## Changelog
+
+- **v2.50.0 (2026-09-16):** **Bare `/<slash>` opens the settings panel; `/<slash> help` prints the command list.** `slash-commands-§4` had bare `/<slash>` print the help index, with a documented-deviation escape for browser-first addons that opened their main window instead. The collection owner changed it for every addon: an empty command now runs the reserved `config` verb, so the panel opens on its landing page (which renders the same `COMMANDS` table), and the list is `/<slash> help`. The dispatcher does this, not each addon: LibKa0s v1.38.0 (Slash minor 11) runs the host's `config` verb for an empty command and falls back to the help index only for a host with none. In combat the panel's own refusal is what bare `/<slash>` prints. The browser-first exception is dropped; `standalone-windows` now says so. **What it obliges:** every addon re-vendors LibKa0s v1.38.0, mirrors the new bare behavior in its library-absent Slash stub, and updates the tests, README and docs that described bare `/<slash>` as the help index. An addon that had mapped bare `/<slash>` to a window keeps that window on its `show` / `toggle` verbs.
 
 - **v2.49.0 (2026-09-16):** **An addon whose unlocked view already is its preview omits Test mode; Lock frame is its switch.** After adoption the collection owner found the Test mode checkbox and Lock frame doing the same thing in Ka0s Aura Master, Ka0s Consumable Master, Ka0s KickCD and Ka0s Panel Master, where unticking Lock frame already shows the display with its placeholder content: two switches for one state. `options-ui-§15` now exempts such an addon from the Test mode row and from a `/<slash> test` verb (its `lock` / `unlock` verbs are the switch); `preview-mode`, anti-pattern #80 (which now names the duplicate as the finding), the audit check, the scaffold playbook, the context pack and the summary follow. **What it obliges:** those four remove the row, their `test` verb and the test-mode machinery; Ka0s Panel Master's sample panels and Ka0s Consumable Master's hidden-bar override go with them, the owner's call. Ka0s Absorb Tracker, Ka0s Bank Ledger, Ka0s Loot History, Ka0s Multi Meters and Ka0s WhatGroup keep their test mode (unlocking there does not show the placeholders), as does Ka0s Party Frame Enhanced, whose test mode adds a stand-in party frame out of a party.
 
