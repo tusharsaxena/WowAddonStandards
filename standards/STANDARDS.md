@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.47.0, 2026-09-16)
+# Ka0s WoW Addon Standard (v2.48.0, 2026-09-16)
 
 **Status:** Source of truth. All audit deviation reports and `NEW_ADDON_CONTEXT.md` template content derive from this standard. When the standard changes, bump the date and version at the top of this file.
 
@@ -94,6 +94,8 @@ Discovered by following the links here — not part of the normative standard, b
 ---
 
 ## Changelog
+
+- **v2.48.0 (2026-09-16):** **A test mode cannot be started during combat.** v2.47.0 ended the mode when combat starts; adoption across the collection showed half the hosts still let a start through mid-fight, which puts placeholders over real data for the rest of the pull. `options-ui-§15` now requires a start during combat to be refused with one line, the checkbox left unticked; `preview-mode`, anti-pattern #80 and the audit check say the same. **What it obliges:** Ka0s Panel Master, Ka0s Aura Master and Ka0s Multi Meters add the refusal; every other adopter already refuses.
 
 - **v2.47.0 (2026-09-16):** **Every addon with a positionable display ships a test mode, and its switch is the Test mode checkbox.** v2.46.0 made the `options-ui-§15` row canonical only for an addon that already had an on/off test mode, and exempted a preview reached only by unlocking and a one-shot test verb. The collection owner widened it the same day: `preview-mode`'s lead **SHOULD** becomes **MUST** for any positionable display (a window or popup the player places included), and that preview **MUST** be a test mode — placeholder content, on until turned off, independent of the lock, session-only and reset by *Reset all settings* — switched by the composed *Test mode* checkbox. **It ends when combat starts** (the owner's call), at `PLAYER_REGEN_DISABLED` while secure writes are still allowed. A one-shot test verb or the unlocked view MAY stay beside it but no longer substitutes for it, and only a frameless addon omits the row. Anti-pattern #80 and the audit's Master controls check are rewritten to match. **What it obliges:** Ka0s Absorb Tracker and Ka0s KickCD build a test mode (theirs were the unlocked view and, for Absorb Tracker, a timed `/at test` hold); Ka0s WhatGroup builds one for its popup and Ka0s Consumable Master for its Macro Bar; Ka0s Bank Ledger binds its sample ledger (`/bl test`) and Ka0s Loot History its `/lh test`; Ka0s Multi Meters and Ka0s Panel Master move their hand-written *Test mode* rows into the composed one; Ka0s Aura Master and Ka0s Party Frame Enhanced, the v2.46.0 adopters, end theirs at combat. Ka0s Pretty Chat is frameless and owes nothing. No library change: LibKa0s v1.37.0's `testModePath` already composes the row.
 

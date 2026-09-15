@@ -408,7 +408,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        **Test mode is required in every addon with a positionable display** — proven by the same
        whole-repo `SetMovable` sweep that proves a frameless addon. Its absence, a test mode that is
        only the unlocked view or a one-shot verb, its switch drawn as a button or hand-written, or a
-       test mode that survives the start of combat, is anti-pattern #80. A frameless addon omits the
+       test mode that survives the start of combat or can be started during it, is anti-pattern #80. A frameless addon omits the
        row and is compliant.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
