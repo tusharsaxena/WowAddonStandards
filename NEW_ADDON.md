@@ -152,7 +152,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      `Reset all settings` — including only the rows the addon has the state for. `Test mode` is there in
      every addon with a positionable display: its test mode (placeholder content, on until turned off,
      ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
-     (anti-pattern #80). A frameless addon
+     (anti-pattern #80). An addon whose unlocked view already shows those placeholders omits it:
+     *Lock frame* is its switch. A frameless addon
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.

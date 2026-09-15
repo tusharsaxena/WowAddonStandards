@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.48.0, 2026-09-16)
+# Ka0s WoW Addon Standard (v2.49.0, 2026-09-16)
 
 **Status:** Source of truth. All audit deviation reports and `NEW_ADDON_CONTEXT.md` template content derive from this standard. When the standard changes, bump the date and version at the top of this file.
 
@@ -94,6 +94,8 @@ Discovered by following the links here — not part of the normative standard, b
 ---
 
 ## Changelog
+
+- **v2.49.0 (2026-09-16):** **An addon whose unlocked view already is its preview omits Test mode; Lock frame is its switch.** After adoption the collection owner found the Test mode checkbox and Lock frame doing the same thing in Ka0s Aura Master, Ka0s Consumable Master, Ka0s KickCD and Ka0s Panel Master, where unticking Lock frame already shows the display with its placeholder content: two switches for one state. `options-ui-§15` now exempts such an addon from the Test mode row and from a `/<slash> test` verb (its `lock` / `unlock` verbs are the switch); `preview-mode`, anti-pattern #80 (which now names the duplicate as the finding), the audit check, the scaffold playbook, the context pack and the summary follow. **What it obliges:** those four remove the row, their `test` verb and the test-mode machinery; Ka0s Panel Master's sample panels and Ka0s Consumable Master's hidden-bar override go with them, the owner's call. Ka0s Absorb Tracker, Ka0s Bank Ledger, Ka0s Loot History, Ka0s Multi Meters and Ka0s WhatGroup keep their test mode (unlocking there does not show the placeholders), as does Ka0s Party Frame Enhanced, whose test mode adds a stand-in party frame out of a party.
 
 - **v2.48.0 (2026-09-16):** **A test mode cannot be started during combat.** v2.47.0 ended the mode when combat starts; adoption across the collection showed half the hosts still let a start through mid-fight, which puts placeholders over real data for the rest of the pull. `options-ui-§15` now requires a start during combat to be refused with one line, the checkbox left unticked; `preview-mode`, anti-pattern #80 and the audit check say the same. **What it obliges:** Ka0s Panel Master, Ka0s Aura Master and Ka0s Multi Meters add the refusal; every other adopter already refuses.
 
