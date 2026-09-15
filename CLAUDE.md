@@ -52,7 +52,7 @@ standards/                        -- THE STANDARD (living, canonical). Everythin
   ADDONS.md                       -- THE ROSTER: editable list of in-scope addons (standards-process input)
   _raw/_industry/                 -- per-addon raw research reports (evidence for INDUSTRY_RESEARCH.md)
 harvests/                         -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass; never edited after the fact
-media/logos/                      -- the Ka0s logo, used by the collection's READMEs
+media/logos/                      -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
 ```
 
 Audit and review runs are **not** in this repo — they live under each audited addon's own

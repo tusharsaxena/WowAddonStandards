@@ -179,11 +179,12 @@ disagreeing with the collection's intent while looking, in review, like it had b
    to remove. `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
    (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
-   incl. the standard badge, which is **not** a link and MUST NOT be wrapped in one → logo → description →
+   incl. the standard badge, which is **not** a link and MUST NOT be wrapped in one → description →
    Screenshots → Usage (prose, no tables) → How it works → FAQ →
    Troubleshooting → Issues and feature requests → Version History → optional `## Credits`, last — there is
    **no** `## Testing` section; verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
-   The README carries **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
+   The README carries **no logo image** (the logo is the in-game landing page's, options-ui-§5;
+   anti-pattern #79) and **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
    `## Libraries and credits` section and no library list in the intro prose; that fact lives in
    `DEPENDENCIES.md` and `docs/ARCHITECTURE.md`, and the LibKa0s provenance line lives in root
    `CLAUDE.md` (step 6a). `## Credits` is optional and carries **only external** credit — artwork, a

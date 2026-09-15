@@ -65,9 +65,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    (`line-endings` — record the pin verbatim, or record that the file is absent), the root doc set
    — `README.md`, the `CLAUDE.md` stub and `DEPENDENCIES.md` (documentation-§1/§2/§7) — and `docs/`)
    and record what it does now, citing files.
-   - **Three cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
+   - **Four cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
      and each is invisible to every suite: the standard badge is the **bare** `![Standard](…)` and
-     not wrapped in a link (documentation-§1 #2); the README carries **no bundled-library inventory**
+     not wrapped in a link (documentation-§1 #2); the README shows **no logo image** under its title or
+     badge row — no `![…](media/logos/…)` line and no `<img>` (documentation-§1, anti-pattern #79); the
+     README carries **no bundled-library inventory**
      — no `## Libraries` / `## Bundled libraries` / `## Libraries and credits` /
      `## Credits and libraries` heading and no library roll-call in the intro prose, with any
      surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); and

@@ -132,14 +132,14 @@ WowAddonStandards/
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
     _raw/_industry/                       -- per-addon raw research reports (evidence)
   harvests/                               -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass
-  media/logos/                            -- the Ka0s logo, used by the collection's READMEs
+  media/logos/                            -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
 ```
 
 Audit and review runs are **not** stored here — each lives under its own addon's `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` (audit-review-history).
 
 ## Status
 
-Standard is at **v2.44.0** and living. Compliance auditing has moved out of this repo into each addon's
+Standard is at **v2.45.0** and living. Compliance auditing has moved out of this repo into each addon's
 own repository, driven by the `AUDIT.md` / `AUTOMATED_TESTS.md` / `NEW_ADDON.md` / `PERF_ANALYSIS.md`
 playbooks that the `wow-addon` plugin consumes.
 
