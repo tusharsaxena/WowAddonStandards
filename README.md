@@ -41,9 +41,9 @@ The repos the standard codifies rules for are listed in
 **[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster, in two tables. Edit
 that one file to change collection scope.
 
-- **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 9 Ka0s addons: Absorb
-  Tracker, Bank Ledger, Consumable Master, KickCD, Loot History, Multi Meters, Panel Master, Pretty
-  Chat, WhatGroup.
+- **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 11 Ka0s addons: Absorb
+  Tracker, Aura Master, Bank Ledger, Consumable Master, KickCD, Loot History, Multi Meters, Panel
+  Master, Party Frame Enhanced, Pretty Chat, WhatGroup.
 - **Plus the Ka0s-owned library repos** those addons vendor — currently 1: LibKa0s. A library repo is
   in scope for the standards process and is audited, but against **library-stack-§7's applicability
   list** rather than the addon rule set: no TOC, no player-facing README, no settings panel, no
