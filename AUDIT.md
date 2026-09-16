@@ -50,15 +50,32 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 1. **Resolve the standard.** Read the canonical rules from `standards/STANDARDS.md` in the
    `WowAddonStandards` repo (the addon's TOC `## X-Standard:` URL points here). Use the current
    version — note it (e.g. "audited against v1.0.0") in `01_CURRENT_STATE.md` so the run is reproducible.
-   - **Switch rule sets when the repo has no TOC.** A repo with no `.toc` is a **Ka0s-owned library
-     repo** (`standards/ADDONS.md` → *Ka0s-owned library repos*), not an addon. Audit it against
-     **library-stack-§7's applicability list** — what applies, what does not, and what substitutes —
-     and say in `01_CURRENT_STATE.md` which list you used. Measuring a library against the addon
-     sections manufactures findings the standard never meant (`documentation-§1`'s player README,
+   - **Switch rule sets on the repo's KIND, and there are THREE.** Resolve the kind first; it decides
+     which rule set the whole run is graded against, and getting it wrong manufactures findings the
+     standard never meant. Say in `01_CURRENT_STATE.md` which kind you resolved and which list you
+     used. The kinds and their discriminator (`documentation-§8`):
+
+     | Kind | Discriminator | Audit against |
+     |---|---|---|
+     | **Addon** | has a `.toc` | the addon rule set — every section |
+     | **Ka0s-owned library repo** | no `.toc`, but ships a client-bound Lua payload addons vendor into `libs/` | **library-stack-§7's** applicability lists |
+     | **Documentation-and-tooling repo** | no `.toc` **and** no vendored payload | **documentation-§8's** applicability lists |
+
+     `standards/ADDONS.md` names which repos are which, in its three tables; it is the authority when
+     the discriminator is ambiguous. **This used to say that a repo with no `.toc` IS a library repo,
+     which was false** for `WowAddonStandards` and `wow-addon` — both have no `.toc` and vendor
+     nothing, and both were consequently graded against a rule set written for a Lua payload.
+
+     Measuring a **library** against the addon sections is noise (`documentation-§1`'s player README,
      `documentation-§3`'s `docs/` trio **and its whole topic-detail tier model**, `toc-file`,
-     `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`), and every one of
-     them is noise. A library has no settings canvas and no in-game pipeline, so Tier 1's
-     `settings-panel.md` and `data-flow.md` are not missing docs there — they are inapplicable.
+     `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`). A library has no
+     settings canvas and no in-game pipeline, so Tier 1's `settings-panel.md` and `data-flow.md` are
+     not missing docs there — they are inapplicable. Measuring a **documentation-and-tooling repo**
+     against either of the other two is worse: it has no Lua at all, so `lint`, `testing`,
+     `performance` and `automated-tests` have no instance, and `documentation-§8` reduces
+     `ARCHITECTURE.md` to five sections rather than ten. **Do not file a finding for an absent
+     `docs/testing.md`, an absent test suite or a near-empty `DEPENDENCIES.md` in such a repo** —
+     §8 grants each one, and re-filing it is the duplication that section exists to end.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, **`.gitattributes`**
@@ -136,8 +153,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      test -f .gitattributes || echo "MISSING — line-endings-§1"
 
      # (b) the pin matches the repo's KIND. A repo with a .toc, or one shipping a client-bound
-     #     libs/ payload, is client-bound and pins CRLF; a repo with neither pins LF. Step 1 already
-     #     switches rule sets on the absence of a .toc, so the discriminator is in hand.
+     #     libs/ payload, is client-bound and pins CRLF; a repo with neither pins LF. Step 1 resolved
+     #     the repo's kind against those same two questions, so the discriminator is in hand --
+     #     and a documentation-and-tooling repo is exactly the 'neither' case, pinning LF.
      grep -n '^\* text=auto eol=\(crlf\|lf\)$' .gitattributes
 
      # (c) the *.sh carve-out, mandatory in BOTH kinds (line-endings-§3)

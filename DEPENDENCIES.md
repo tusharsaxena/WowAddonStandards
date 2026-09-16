@@ -2,13 +2,17 @@
 
 The toolchain contract for **this** repository (documentation-§7).
 
-> **Read this first.** documentation-§7 is written for an **addon** — a repo that builds, lints,
-> tests and releases a client-bound payload. This repo does none of those things: it ships
-> **documents only**, 54 Markdown files plus `LICENSE`, `.gitattributes` and two logo images, and no
-> line of it ever reaches the WoW client. So the honest answer to *"what must I install to work on
-> this repo?"* is **almost nothing**, and this file says that plainly rather than inventing entries
-> to fill the shape. Where a tool genuinely is not needed, the row says **not used here** and why —
-> an absent row and a "not needed" row read identically to a human and differently to an auditor.
+> **Read this first.** This is a **documentation-and-tooling repo** (`documentation-§8`), so
+> `documentation-§7` binds but is read for that repo kind: a short **required** list and an explicit
+> **not used here** list with reasons. §8 says outright that a repo needing almost nothing records
+> that fact and **MUST NOT** invent entries to fill the addon-shaped shape — §7's evidence-based MUST
+> already forbids it, and a padded list here would be the first thing to go stale. An absent row and
+> a "not used here" row read identically to a human and differently to an auditor, which is why the
+> second list exists. §7's *Runtime (in-game)* group has no instance and is omitted rather than
+> answered.
+>
+> The repo is 60 tracked files: 56 Markdown plus `LICENSE`, `.gitattributes` and two logo images. No
+> line of it reaches the WoW client.
 
 ## The short version
 
@@ -75,5 +79,5 @@ the `.gitattributes`.
 
 - **`CLAUDE.md`** — what this repo is, its layout, and how to change the standard.
 - **`standards/STANDARDS.md`** — the standard's index and its section files.
-- **`docs/ARCHITECTURE.md`** — how this repo is put together, and which addon-shaped rules do not
-  bind it.
+- **`docs/ARCHITECTURE.md`** — how this repo is put together, in the five sections `documentation-§8`
+  mandates for a repo of this kind.

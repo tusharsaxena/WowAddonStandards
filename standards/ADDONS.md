@@ -39,6 +39,23 @@ player-facing README, no settings panel and no install, so the addon-shaped sect
 |---|---|---|
 | LibKa0s | [`../../LibKa0s/`](../../LibKa0s/) | https://github.com/tusharsaxena/LibKa0s |
 
+## Documentation-and-tooling repos
+
+The **third repo kind** (`documentation-§8`). These ship **no Lua to the WoW client** and vendor no
+payload into any addon's `libs/`, so they are neither addons nor Ka0s-owned libraries. They are in
+scope for the standards process and are audited — against **`documentation-§8`'s applicability
+lists**, not the addon rule set and not `library-stack-§7`'s.
+
+| Repo | Folder | Repository |
+|---|---|---|
+| WowAddonStandards | [`../`](../) | https://github.com/tusharsaxena/WowAddonStandards |
+| wow-addon | [`../../wow-addon/`](../../wow-addon/) | https://github.com/tusharsaxena/wow-addon |
+
+`WowAddonStandards` is this repo — listed because a roster that omits the repo it lives in is the
+one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind from this file.
+
+**Not in the rotation:** `Ka0sAddonsCommonTasks` is deliberately outside it and is not audited.
+
 ## Adding an addon
 
 1. Add one row above (display name, folder, repository URL). Keep the table alphabetical by folder.

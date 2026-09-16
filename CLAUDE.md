@@ -27,9 +27,10 @@ canonical docs under `standards/`. The plugin lives in a separate repo
 (<https://github.com/tusharsaxena/wow-addon>) and is updated there to consume these files.
 
 The in-scope repos are listed in **`standards/ADDONS.md`** (the roster) and live in their own sibling
-repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`: the addon table, and a second table of
-**Ka0s-owned library repos**, which are audited against library-stack-§7's applicability list rather
-than the addon rule set. **Do not modify those repos from here.**
+repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`, in **three** tables, one per repo
+kind: the addons; the **Ka0s-owned library repos**, audited against library-stack-§7's applicability
+lists; and the **documentation-and-tooling repos**, audited against documentation-§8's. **This repo is
+in that third table.** **Do not modify those repos from here.**
 
 ## Layout
 
@@ -60,8 +61,12 @@ media/logos/                      -- the Ka0s collection logo art (an addon READ
 Audit and review runs are **not** in this repo — they live under each audited addon's own
 `docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and audit-review-history of the standard).
 
-Ratified exemptions from the addon-shaped rules live in `docs/ARCHITECTURE.md` → `## Documented
-deviations`. That register is the single home: a deviation not in it is not ratified.
+The addon-shaped rules that do **not** bind this repo are granted by the standard itself, in
+**`documentation-§8`** — this is a **documentation-and-tooling repo**, and §8 carries its three
+applicability lists. Do **not** restate those exemptions as local deviation rows; §8 **SHOULD NOT**s
+exactly that, and the three rows this repo used to carry are what prompted the section. Anything that
+is genuinely a deviation still goes in `docs/ARCHITECTURE.md` → `## Documented deviations`, which
+remains the single home: a deviation not in it is not ratified.
 
 Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the playbooks (`AUDIT.md`,
 `NEW_ADDON.md`, `AUTOMATED_TESTS.md`, `PERF_ANALYSIS.md`) → the rest as needed.

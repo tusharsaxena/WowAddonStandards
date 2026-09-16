@@ -1,15 +1,16 @@
 # ARCHITECTURE.md — Ka0s WoW Addon Standard
 
-Engineer context for **this** repository, and the hub of its doc set (documentation-§3).
+Engineer context for **this** repository, and the hub of its doc set (documentation-§8).
 
-> **Why several sections below say "not applicable".** documentation-§3 mandates ten sections in a
-> `docs/ARCHITECTURE.md`, and every one of them is written for an **addon**: a Lua payload with
-> modules, a settings schema, a message bus, slash commands, event subscriptions and a taint surface.
-> This repo has none of those — it ships **documents only**, and nothing in it loads into the WoW
-> client. The sections are all present, in the mandated order, because an omitted heading is
-> indistinguishable from an unwritten one; where the subject does not exist, the section says so and
-> says why, which is a checkable claim rather than a gap. See `## Documented deviations` for the
-> ratified decision behind that.
+> **This repo is a documentation-and-tooling repo** (`documentation-§8`) — the collection's third repo
+> kind, alongside addons and Ka0s-owned library repos. It ships no Lua to the WoW client and vendors
+> no payload into any addon's `libs/`, so §8's applicability lists govern it rather than the addon
+> rule set. That section reduces this file's mandated sections from ten to **five**: Overview, Module
+> Map read as the file-and-path map, Known Limitations, the documentation map and the deviation
+> register. The five that describe an addon's runtime — Settings Schema, Message Bus, Slash Commands,
+> Event Subscriptions and Taint Notes — are **not** written here as "not applicable" rows, because §8
+> **SHOULD NOT**s exactly that: the exemption is granted once, in the standard, and restating it per
+> repo is the duplication that section exists to end.
 
 ## Overview
 
@@ -27,8 +28,9 @@ plugin can change without a standards release, and an addon picks up both on its
 
 ## Module Map
 
-**Not applicable** — there is no code, so there are no modules. The structural equivalent is the file
-layout, which is load-bearing because the plugin addresses these paths by URL:
+Read as the **file-and-path map** (`documentation-§8`): there is no Lua and there are no modules, so
+what this section carries is which paths exist, what reads each one, and which are **addressed by**
+**URL** and therefore breaking to rename.
 
 | Path | What it is | Read by |
 |---|---|---|
@@ -46,36 +48,6 @@ layout, which is load-bearing because the plugin addresses these paths by URL:
 
 **Renaming any path in the first block is a breaking change** for every addon in the collection,
 because the plugin resolves it by URL at runtime and a 404 is the failure mode.
-
-## Settings Schema
-
-**Not applicable** — no SavedVariables, no settings, no registries, and no named non-setting state
-(architecture-§5). This repo stores nothing at runtime because it has no runtime.
-
-## Message Bus
-
-**Not applicable** — architecture-§4's MUST binds an addon with two or more feature modules or any
-module registering game events. There are no modules and no events here, so the rule is out of scope
-rather than unmet.
-
-## Slash Commands
-
-**Not applicable as an addon surface** — there is no `NS.COMMANDS` table and this repo registers no
-slash command. It is, however, the *definition* consumed by commands that run elsewhere; those are
-listed in `## Module Map` above against the playbook each one reads.
-
-## Event Subscriptions
-
-**Not applicable** — nothing here registers a WoW event. There is no event surface at all.
-
-## Taint Notes
-
-**Not applicable** — taint is a property of code executing in the WoW client. Nothing in this repo
-executes anywhere, so it cannot taint the secure environment.
-
-The *rules about* taint that addons are held to live in
-[`standards/standards/events-frames-taint.md`](../standards/standards/events-frames-taint.md); this
-section is about **this repo's own** taint surface, which is empty.
 
 ## Known Limitations
 
@@ -100,7 +72,7 @@ Every `.md` in this repo appears in exactly one row below.
 |---|---|
 | `README.md` | Repo overview and what you can do here |
 | `CLAUDE.md` | Agent guidance: what this repo is, its layout, how to change the standard |
-| `DEPENDENCIES.md` | The toolchain contract (documentation-§7) — near-empty here, and why |
+| `DEPENDENCIES.md` | The toolchain contract (documentation-§7, read per §8) — git only, and why the rest is absent |
 | `docs/ARCHITECTURE.md` | This file — the hub |
 | `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` | The four process playbooks |
 | `standards/STANDARDS.md` | The standard's index |
@@ -111,13 +83,26 @@ Every `.md` in this repo appears in exactly one row below.
 | `harvests/<date>/` | Frozen harvest bundles, named once here rather than per file |
 
 `docs/testing.md` and `docs/smoke-tests.md` — the other two thirds of documentation-§3's canonical
-trio — are **deliberately absent**: there is nothing to verify out of game and nothing to walk in
-game. That is covered by the deviation row below rather than left to be discovered.
+trio — are absent, and that is **compliance rather than deviation**: `documentation-§8` places both
+in its *does not apply* list, because each describes how to verify a Lua addon out of game and in
+the client, and this repo has neither. No register row is owed for them.
 
 ## Documented deviations
 
-| Rule | What differs | Why | Decided | Re-check trigger |
-|---|---|---|---|---|
-| documentation-§3 | `docs/` holds `ARCHITECTURE.md` only. `docs/testing.md` and `docs/smoke-tests.md` are absent, and six of ARCHITECTURE.md's ten mandated sections are recorded **not applicable** rather than filled. | The trio and those six sections presuppose a Lua payload that loads into the WoW client. This repo ships documents only — no code, no suite, no client surface — so the docs would have to be invented to exist, and an invented verification doc is worse than an absent one because it reads as measured. | 2026-09-16 | Any executable content landing in this repo — a script, a linter config, a test harness — at which point `docs/testing.md` becomes real and is owed. |
-| documentation-§7 | Root `DEPENDENCIES.md` exists but names exactly one required tool (git) and lists the rest as **not used here**. | Same cause. The file is present because the rule's value is that a reader always finds it in the same place; its content is honest about a repo with no toolchain instead of padded to look like an addon's. | 2026-09-16 | The first tool this repo genuinely requires to work on. |
-| library-stack-§7 | This repo has no Applicability block of its own, the way LibKa0s does. | §7's list was written for a Ka0s-owned **library** repo. A documentation-and-tooling repo is a third shape the standard does not yet name, so the two rows above carry the exemption locally instead. | 2026-09-16 | A third documentation-and-tooling repo entering the rotation — at which point the exemption should move upstream into the standard as a named applicability list rather than being restated per repo. |
+**None.**
+
+This repo carried three rows until 2026-09-16 — the absent `docs/testing.md` and `smoke-tests.md`, a
+near-empty `DEPENDENCIES.md`, and six `ARCHITECTURE.md` sections recorded *not applicable*. All three
+are **retired, and not by editing this repo**: each was individually reasonable and collectively a
+sign that the standard was missing a **scope** rather than that this repo was non-compliant. The
+third row said so outright and named the fix — a named applicability list for this repo kind, the way
+`library-stack-§7` has one for `LibKa0s`.
+
+That is now **`documentation-§8`**, added in standard **v2.51.0**. It grants all three exemptions once,
+to both documentation-and-tooling repos, so nothing is restated here. Its own re-check trigger lives
+in the section rather than in this table: **the first `.lua` this repo tracks outside a frozen
+bundle**, at which point `lint`, `testing` and `automated-tests` are re-read against what the tree
+actually has.
+
+The heading stays, empty, because `documentation-§3` requires it present even when there is nothing in
+it — an absent section is indistinguishable from an unwritten one.

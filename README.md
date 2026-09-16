@@ -38,7 +38,8 @@ source code lives here, and this work never modifies the addons themselves.
 ## Scope
 
 The repos the standard codifies rules for are listed in
-**[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster, in two tables. Edit
+**[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster, in three tables, one
+per repo kind: addons, Ka0s-owned library repos and documentation-and-tooling repos. Edit
 that one file to change collection scope.
 
 - **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 11 Ka0s addons: Absorb

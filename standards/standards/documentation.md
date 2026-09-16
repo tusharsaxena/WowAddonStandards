@@ -613,3 +613,56 @@ Why root, and why its own file. Before this rule the answer to *"what do I need 
 - **SHOULD** end with the exact **commands this repo is verified with** — lint, the headless suite, the complexity report — so the document doubles as the "am I set up correctly?" check. These point at `docs/testing.md` (documentation-§3) rather than restating its content; `DEPENDENCIES.md` answers *what to install*, `docs/testing.md` answers *how to verify*, and neither repeats the other.
 - **MUST NOT** drift. It is **checked at release** alongside the rest of the doc set (documentation-§5): a new script, a new import, or a dropped tool changes this file in the same change. A dependency list that is wrong is the specific failure mode that makes a new contributor's first hour their last.
 - **MUST NOT** be a substitute for vendoring. Libraries are vendored and committed (library-stack, packaging); listing a library here does **not** license fetching it at build time.
+
+### 8. What binds a documentation-and-tooling repo
+
+Everything above is written for an **addon**. `library-stack-§7` already carves out the second repo kind — a **Ka0s-owned library repo**, which has no TOC and is audited against its own applicability lists. This section carves out the **third**: a **documentation-and-tooling repo**, which ships no Lua to the WoW client and is not a library either.
+
+There are two today, both named in `ADDONS.md` → *Documentation-and-tooling repos*: **`WowAddonStandards`** (this repo — the standard and its four process playbooks) and **`wow-addon`** (the Claude Code plugin that consumes them). `line-endings-§2` has recognised this kind since it was written — it is the *"ships nothing to the client"* half of the two-pin rule, and it names *"the standards and plugin repos"* in as many words — but nothing said which of the **other** twenty-five sections reach such a repo. The cost of that silence was the predictable one: this repo carried three locally-argued deviation rows restating the same exemption the standard should have granted once, and `AUDIT.md` step 1 asserted that *a repo with no `.toc` is a Ka0s-owned library repo*, which is false for both repos named above.
+
+**How to tell the three kinds apart.** A repo with a `.toc` is an **addon**. A repo with no `.toc` that ships a **client-bound Lua payload** vendored into addons' `libs/` is a **Ka0s-owned library repo** (library-stack-§7). A repo with **neither** — no `.toc`, no payload any addon vendors into `libs/` — is a **documentation-and-tooling repo**, and takes the lists below. The discriminator is the same one `line-endings-§2` already uses to choose the pin, so an audit that has resolved the pin has resolved the kind.
+
+**The three lists are exhaustive, and the default is that a section applies.** Between them they classify **every** section in `STANDARDS.md`'s Sections list, and an audit of such a repo may check that mechanically. A section this standard gains later, which nobody has thought about in these terms, **applies unchanged** until it is placed in one of the lists. *Does not apply* is the only list that is an exception to that default.
+
+**Applies, unchanged:**
+
+| Section | Why it binds a documentation-and-tooling repo |
+|---|---|
+| `line-endings` | The **LF** pin (`line-endings-§2`), the `*.sh text eol=lf` carve-out mandatory in both kinds, the binary marks and the `§5` canonical body. This section already named this repo kind before this one existed. |
+| `versioning-git` | Semver and trunk-based git discipline. The standard's own version is the clearest case in the collection: every rule change bumps it, and consumers cite the version they were written against. |
+| `documentation-§4` | **No root `TODO.md`.** A backlog belongs in the issue store, not in a file that rots at the root — and a repo whose entire product is documents has the least excuse. |
+| `documentation-§5` | Keeping the docs in sync. Here this is nearly the whole job rather than a chore beside the code. |
+| `documentation-§6` | The `filename-§N` citation scheme and the citation rules. **Load-bearing here beyond any addon:** this is where the cited text lives, so a malformed or out-of-range reference in this repo is wrong at the source rather than in one copy of it. |
+| `localization-§5` | US English in authored text. A British spelling in a section file is copied into every addon that quotes the rule. |
+| `audit-review-history` | The frozen dated bundles, all three MUSTs on the deviation register, and the GitHub-issue decision store. |
+| `open-evolutions` | In the only sense it binds anywhere: a record of recorded directions, not a rule an audit files against. |
+
+**Does not apply:**
+
+- **`toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `standalone-windows`, `debug-logging`, `events-frames-taint`, `compat`, `public-api`, `packaging`.** There is no TOC, no settings canvas, no slash surface, no on-screen display, no SavedVariables file, no combat surface, no client API to shim, no exported Lua surface and no CurseForge package. Each binds an addon, and each is audited there.
+- **`architecture`.** Namespace bootstrap, AceAddon registration, the module pattern and the message bus all describe a Lua addon's runtime. There is none.
+- **`library-stack`.** The repo vendors nothing into a `libs/` and publishes no LibStub major. Its own consumers reach it over HTTPS at runtime, which is not vendoring and is governed by nothing in that section.
+- **`lint`, `testing`, `performance`, `automated-tests`.** All four presuppose Lua source to lint, load, measure and record. A repo with no `.lua` has no `.luacheckrc`, no `tests/` harness, no buckets and no four-suite battery, and a bundle recording four skips is a record of nothing. **This is a statement about Lua, not about verification**: if such a repo grows executable content, see *Read here*, below.
+- **`documentation-§1`'s player-facing README structure and badge row.** There are no players. The `README.md` is written for contributors and agents.
+- **`documentation-§2`'s addon `CLAUDE.md` stub as written.** The stub's shape assumes an addon; see the substitution below.
+- **`documentation-§3`'s `docs/` trio as written, its three-tier topic-detail model, and the seven verification-and-record documents.** `testing.md` and `smoke-tests.md` describe how to verify a Lua addon out of game and in the client, and both are inapplicable where neither exists. Tier 1's `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md` and `common-tasks.md` describe an addon's runtime shape and settings canvas. **`ARCHITECTURE.md` itself still binds, in a reduced shape** — see *Read here*.
+
+**Applies, read for a documentation-and-tooling repo:**
+
+| Section | How it reads here |
+|---|---|
+| `documentation-§3`'s `ARCHITECTURE.md` | **Binds, with a reduced section set.** Six of the ten mandated sections — Settings Schema, Message Bus, Slash Commands, Event Subscriptions, Taint Notes, and Module Map *as a Lua module map* — describe a runtime this repo kind does not have, and a file recording six "not applicable" headings is worse than one that never claimed them. The mandated set here is **five**: **Overview**, **Module Map** *read as the file-and-path map* (which paths exist, what reads each one, and which are addressed by URL and therefore breaking to rename), **Known Limitations**, **`## Documentation map`**, and **`## Documented deviations`**. The last two bind unchanged and for the same reasons they bind anywhere. Writing the other five as "not applicable" rows is **not** required and **SHOULD NOT** be done: this section is the exemption, and restating it per repo is the duplication it exists to end. |
+| `documentation-§7` | **Binds.** A new machine needs the toolchain list whatever the repo ships, and the reader must not have to infer "nothing" from an absent file. Where a repo genuinely requires almost nothing, the honest content is **a short required list and an explicit *not used here* list with reasons** — `git` alone is a complete answer. **MUST NOT** invent entries to fill the addon-shaped shape: §7's evidence-based MUST already forbids it, and a padded list here would be the first thing to go stale. §7's *Runtime (in-game)* group has no instance and is omitted rather than answered. |
+| `layout` | The **folder casing** rules bind. The `core/ defaults/ settings/ locales/ modules/` skeleton and the folder load order do not — there is no TOC to order. The **1500-line cap** (`layout-§1`) binds *authored `.lua`*, so it has no instance while the repo has none; it is not re-read onto Markdown, whose length is governed by nothing here. |
+| `naming-cheatsheet` | Binds to whatever identifiers the repo authors — a shell script's functions, a JSON config's keys. With no Lua the surface is small, not absent. |
+| `anti-patterns` | Binds, whole and unchanged. Entries keyed to an addon artifact simply have no instance; nothing is exempted. |
+| `lint`, `testing`, `automated-tests` (**if executable content appears**) | Listed in *Does not apply* above **because there is no Lua today**, and that is a statement about the tree rather than a permanent grant. A repo of this kind that grows a Lua file, a test harness or a script complex enough to have a failure mode **MUST** re-read these three against what it actually has, and record the outcome. The trigger is stated so it cannot be missed: **the first `.lua` file this repo tracks outside a frozen bundle.** A shell script alone does not fire it — the standard mandates no shell linter — but it does oblige the script's own documentation under `documentation-§5`. |
+
+**Substitutes — a documentation-and-tooling repo MUST carry these instead:**
+
+1. A root **`CLAUDE.md`** carrying `## Standards compliance (read first)` or an equivalent *what this repo is* opening. Of `documentation-§6`'s three places a standards reference lives, this is the only one that exists in a repo with no TOC `## X-Standard:` line and no player README badge row.
+2. A root **`DEPENDENCIES.md`**, in the honest shape described above.
+3. A **`docs/ARCHITECTURE.md`** carrying the five sections named above, including the deviation register.
+4. A **`README.md` written for contributors and agents**, naming what the repo is and how it is consumed.
+
+**A note on this repo.** `WowAddonStandards` publishes the standard it is audited against, and the temptation is to treat that as either an exemption or an embarrassment. It is neither. A rule this repo cannot satisfy is evidence about the **rule's scope**, not about the repo — which is precisely how this section came to exist, out of three deviation rows that were each individually reasonable and collectively a sign the standard was missing a repo kind.
