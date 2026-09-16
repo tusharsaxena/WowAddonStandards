@@ -417,7 +417,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          harness's suspend takes a hold on, so the addon carries two mechanisms for *inert*
          (`performance-§6`, anti-pattern #85). A resume or an enable that stands the addon up
          without re-evaluating the other hold is the same finding.
-       - **The slash surface.** Exactly **`enable`** and **`help`** answer normally while disabled.
+       - **The slash surface.** **Every** verb answers while disabled — `config` and the bare
+         `/<slash>` open the panel, the schema CLI reads and repairs, `debug` and `perf` run.
+         v2.56.0 narrowed this to `enable` and `help`; **v2.57.0 reversed that**, so an audit
+         that finds a full command surface on a disabled addon has found CONFORMANCE, not a
+         finding. The only refusal is slash-commands-§2's feature-verb **SHOULD**, and an addon
+         that declines a SHOULD owes no deviation row. **Do not confuse this with the
+         stand-down**: the surface tells you nothing about whether the addon is inert, which is
+         what the checks above measure.
          **Every** other verb — feature verbs, and also `config`, `version`, `debug`, `perf`, `get`,
          `set`, `list`, `reset`, `resetall`, the bare command and an unknown verb — answers with the
          **one** `slash-commands-§7` refusal line naming `/<slash> enable`, and nothing else. `disable`

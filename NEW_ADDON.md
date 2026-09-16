@@ -191,7 +191,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
      game event. Route it through the **same stand-down latch the perf harness suspends on**, as one of
      two named holds, never through a second teardown path. The chat command, the `COMMANDS` table, the
      dispatcher, the settings-category registration and AceDB's profile callbacks are **setup** and stay
-     up in either state; **`enable` and `help` are the only verbs that answer** while the addon is off,
+     up in either state; **every verb keeps answering** while the addon is off — `config` and the bare `/<slash>` open the panel, and the schema CLI reads and repairs settings, which is exactly when it is most needed — while a **feature** verb SHOULD answer one tagged line naming `/<slash> enable`,
      and every other verb — `config`, `version`, `debug`, `perf`, the schema CLI, the bare command and
      an unknown verb alike — prints the one refusal line naming `/<slash> enable`. The launcher's
      left-click is refused and writes nothing; its right-click still opens the panel. Ship
