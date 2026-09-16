@@ -148,8 +148,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
      (options-ui-§13). Give **every** schema row a `group`; a row without one belongs to no tab.
    - **The General page's first tab is named exactly `Master controls`** and is built by the library's
      master-controls composer from **one** declaration — `Enable <Addon>` | `General visibility` /
-     `Master scale` | `Master alpha` / `Lock frame` | `Debug console` / `Test mode` / `Reset position` |
-     `Reset all settings` — including only the rows the addon has the state for. `Test mode` is there in
+     `Master scale` | `Master alpha` / `Lock frame` | `Debug console` / `Minimap button` | `Test mode` /
+     `Reset position` | `Reset all settings` — including only the rows the addon has the state for.
+     `Minimap button` is **unconditional** (every addon ships a launcher) and takes the **first** column
+     precisely because only some addons have a `Test mode` to pair beside it; it stores at LibDBIcon's own
+     `minimap.hide` and never at a second key (launcher-§3). `Test mode` is there in
      every addon with a positionable display: its test mode (placeholder content, on until turned off,
      ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
      (anti-pattern #80). An addon whose unlocked view already shows those placeholders omits it:
@@ -157,6 +160,23 @@ disagreeing with the collection's intent while looking, in review, like it had b
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.
+   - **Scaffold the launcher — one object, registered twice** (launcher). Vendor LibDataBroker-1.1 and
+     LibDBIcon-1.0, create **one** LDB `type = "launcher"` object named for the addon folder, give it the
+     128×128 logo as its `icon`, and register that same object with LibDBIcon. Its single `OnClick` is
+     **right-click → settings panel, always**, and left-click by launcher-§2's three rungs, first match
+     wins: the addon's **primary window** if it has one, else its **preview switch** (test mode, or
+     lock/unlock where unlocking is the preview), else the settings panel. Hand `db.profile.minimap`
+     straight to `:Register` so the *Minimap button* row and the library share one `hide` boolean. Give
+     the broker object **no** enable setting, deliberately. Then record the addon's rung in
+     `standards/ADDONS.md`'s Launcher column in the same pass.
+   - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
+     128×128, **uncompressed 32-bit**, from the 2000×2000 `.png` source:
+     `Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")`. Point
+     `## IconTexture` at it and give the LDB object the same path — never a Blizzard icon or a file id
+     (anti-pattern #82). The landing page's logo is a **separate, larger** file in the same folder.
+   - **`/<slash> enable` and `/<slash> disable` are in `COMMANDS` from day one** (slash-commands-§2), as
+     aliases writing the *Enable `<Addon>`* row's stored path through the single write seam — no second
+     key, no module flag, no local.
    - **Font, border and bar controls come from the composers**, never typed out — one call each emits
      the canonical rows in the canonical order, and anything extra the surface needs is appended
      after the block rather than interleaved into it (options-ui-§16). A tab mixing two of them gives

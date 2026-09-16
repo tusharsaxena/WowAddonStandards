@@ -39,7 +39,7 @@ what this section carries is which paths exist, what reads each one, and which a
 | `NEW_ADDON.md` | Playbook: scaffold a born-compliant addon | `/wow-addon:new-addon` |
 | `PERF_ANALYSIS.md` | Playbook: per-addon in-game capture bundle | `/wow-addon:perf-analysis` |
 | `standards/STANDARDS.md` | **The index.** Its Sections list is what a consumer follows to find every section file. | every standards-reading command |
-| `standards/standards/*.md` | The 26 canonical section files — the substance of the standard | followed from the index |
+| `standards/standards/*.md` | The 27 canonical section files — the substance of the standard | followed from the index |
 | `standards/ADDONS.md` | The roster: which repos the standard covers | the standards-refresh process |
 | `standards/NEW_ADDON_CONTEXT.md` | The context pack read at scaffold time, never written into the new addon | `/wow-addon:new-addon` |
 | `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/_raw/` | Background and the research the standard was drawn from | humans |
@@ -76,7 +76,7 @@ Every `.md` in this repo appears in exactly one row below.
 | `docs/ARCHITECTURE.md` | This file — the hub |
 | `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` | The four process playbooks |
 | `standards/STANDARDS.md` | The standard's index |
-| `standards/standards/*.md` (26 files) | The canonical section files |
+| `standards/standards/*.md` (27 files) | The canonical section files |
 | `standards/ADDONS.md` | The roster |
 | `standards/README.md`, `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/NEW_ADDON_CONTEXT.md` | Process entry point, summary, research, scaffold context pack |
 | `standards/_raw/_industry/` | Frozen source material behind `INDUSTRY_RESEARCH.md` |

@@ -77,10 +77,33 @@ Two carve-outs, and no others:
 
 Shipped media **MUST** live in **typed subfolders** under `media/` — nothing loose directly in `media/`:
 
-- `media/logos/` — the addon logo art (the runtime `.tga`/`.blp` plus the source `.jpg`/`.png`).
+- `media/logos/` — the addon logo art (the runtime `.tga`/`.blp` plus the source `.jpg`/`.png`); its required members and their format are **layout-§4**.
 - `media/screenshots/` — README/store screenshots and any demo GIFs.
 - `media/fonts/`, `media/sounds/`, `media/textures/` — as needed for shipped assets of that kind, **and only for assets the shared media library does not already carry**.
 
 **`media/` is for what only THIS addon has.** The icon set, the monospace face and the bar textures every Ka0s addon draws with ship inside the vendored payload at `libs/LibKa0s/media/` (library-stack-§8) and arrive with `Core.lua` in the same copy — so an addon **MUST NOT** ship its own copy of one, and **MUST NOT** copy one out of `libs/` into `media/` to shorten a path. What legitimately remains here is the addon's own identity and its own subject matter: the logo, the screenshots, and any asset that would be meaningless in another addon. An addon whose `media/fonts/` or `media/textures/` holds a second copy of a library asset is anti-pattern #63, and the tell is a `media/` folder that two Ka0s addons could swap without either noticing.
 
 Reference implementation (in the collection): the standalone loot-history browser ships its logo under `media/logos/`. **MUST** keep the runtime texture in a WoW-loadable format (`.tga`/`.blp`) and the editable source (`.jpg`/`.png`) beside it (options-ui-§5).
+
+### 4. The addon logo
+
+`media/logos/` carries the addon's identity, and **two** of its files are required. They are different files doing different jobs, and neither substitutes for the other:
+
+| File | Size | Used by |
+|---|---|---|
+| `<addon>.logo.128.tga` | 128×128 | `## IconTexture` (toc-file-§1), the minimap button's icon, the broker object's icon (launcher-§4) |
+| the landing-page logo `.tga` | drawn at 300×300 | the settings panel's landing page (options-ui-§5) |
+
+Beside them sits the **editable source** — the 2000×2000 `.png` the collection's logo art is authored at — which ships but is never loaded by the client (WoW cannot load `.png`/`.jpg` at runtime).
+
+- **`<addon>` is the addon's folder name, lowercased** (`partyframeenhanced.logo.128.tga`), so the path is derivable from the folder without opening it.
+- **The 128 file MUST be uncompressed, 32-bit — TGA image type 2, 32 bpp.** This is not a style preference. One file in the collection is **proven** to render as an `IconTexture` in-game, and it is type 2 / 32 bpp; the **RLE-compressed (type 10)** logos the collection also ships are unproven in that role, and an icon that silently fails to load draws nothing and raises nothing, so no gate would report it. **128×128 is also power-of-two**, which several existing logos (300×300) are not. Cost is roughly **64 KB** per addon — the whole reason an uncompressed file is affordable here at all.
+- **The recipe is fixed, so the file is reproducible** rather than a one-off export somebody has to remember the settings for. From the `.png` source already in `media/logos/`:
+
+```python
+from PIL import Image
+Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")
+```
+
+  `convert("RGBA")` is what makes it 32 bpp; Pillow's TGA writer emits type 2 (uncompressed) for this call. Regenerate rather than hand-edit: an edited TGA is a file nobody can reproduce.
+- **MUST NOT** substitute a Blizzard icon, a numeric file id, or another addon's art for the 128 file (**anti-pattern #82**). The point of the file is that the addon looks like itself in the AddOns list, on the minimap and in a broker display at once.

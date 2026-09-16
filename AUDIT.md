@@ -234,6 +234,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      not the MUST — grade it accordingly. Do **not** file the within-`core/` sequence itself as a
      deviation: dependency-correct order with its load-bearing positions declared is compliant,
      whatever the sequence (`layout-§1`).
+   - **`## IconTexture` MUST name the addon's own logo (`toc-file-§1`, `layout-§4`).** Read the
+     field. An **absent** field, a **Blizzard icon path** (`Interface\Icons\…`) or a **numeric file
+     id** is a finding (anti-pattern #82). Then check the file the path names actually exists at
+     `media/logos/<addon>.logo.128.tga` and is the right artifact, because the wrong one draws
+     nothing and raises nothing: `file media/logos/*.tga` is **not** evidence here — read the TGA
+     header instead (byte 2 is the image type, **2** = uncompressed and **10** = RLE; bytes 12-13
+     and 14-15 are width and height, both **128**; byte 16 is the bit depth, **32**). An RLE or
+     non-128 file at the right path is the same finding in its subtler form. The **landing-page**
+     logo is a different, larger file in the same folder and is **not** a finding for being neither
+     128 nor uncompressed (`options-ui-§5`).
    - **`X-Curse-Project-ID` on an unpublished addon is not a deviation (`toc-file-§1`).** If the
      field is absent and the TOC carries a comment in its position saying the addon is not published
      yet, that is **compliant** — record it as such and file nothing. A placeholder, invented, or
@@ -345,6 +355,33 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **Not a deviation:** an addon on a LibKa0s tag older than v1.9.0 has no catalog to draw from.
        Say which tag it carries (root `CLAUDE.md`'s provenance line) and file the adoption as a
        re-vendor item rather than as a styling gap.
+   - **Check the launcher — one object, three behaviors, one row** (`launcher`). New in v2.52.0, and
+     **every addon in the collection is expected to be non-compliant until it adopts**; record the
+     gap once, as one finding per addon, not as five.
+     - **One object.** Grep for `LibStub("LibDataBroker-1.1")` and `LibStub("LibDBIcon-1.0")` outside
+       `libs/`. There **MUST** be exactly one `:NewDataObject(` call and exactly one `:Register(`
+       call, the second taking the first's return value. Two objects, or a button with its own
+       `OnClick` beside a broker object with a second one, is anti-pattern #81 — and the tell is two
+       click implementations, not two `LibStub` calls.
+     - **The rung.** Read `ADDONS.md`'s **Launcher left-click** column for this addon, then read the
+       `OnClick`. Left-click **MUST** do what the column says and right-click **MUST** open the
+       settings panel, on every addon. Where the column and the code disagree, decide which is wrong
+       by `launcher-§2`'s rule — primary window, else preview switch, else panel, first match wins —
+       and file against whichever lost. A left-click on the settings panel in an addon with a window
+       or a preview switch is a finding even though it "works".
+     - **The visibility row.** The Master-controls **`Minimap button`** row stores at
+       `minimap.hide` and the same `minimap` table is what `:Register` is handed. A second key
+       (`minimap.show`, `showMinimapIcon`, `minimapButton`) is anti-pattern #81; so is a seed or
+       backfill writing the whole `minimap` table over that row (`architecture-§5`). LibDBIcon's own
+       `minimapPos` writes are the library's and are **not** a finding.
+     - **No broker toggle.** A setting that enables or disables the broker object is a finding
+       (`launcher-§1`). The minimap button's row is the only visibility control.
+   - **Check `/<slash> enable` and `/<slash> disable` exist and are aliases** (`slash-commands-§2`).
+     Both **MUST** be entries in `NS.COMMANDS`, and both **MUST** write the Master-controls *Enable*
+     row's stored path through the addon's single write seam. A handler setting a local, a module
+     flag or a second stored key instead is the finding — the tell is a `get` on the enable path
+     that can disagree with what the verb last did. Re-use of either verb for a module, feature or
+     unit is a finding in its own right: the verbs are reserved collection-wide.
    - **Check the write paths against `architecture-§5` by grep, then classify every hit.** Grep the
      addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
      `db.profile`, `db.global`, `db.char` and the local aliases the files bind them to — and for

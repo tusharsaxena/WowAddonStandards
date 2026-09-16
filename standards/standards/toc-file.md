@@ -12,7 +12,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 ## Notes: <one-line user-facing description>
 ## Author: add1kted2ka0s
 ## Version: <semver>                     -- managed by bump-version skill
-## IconTexture: <path|fileID>            -- optional but encouraged
+## IconTexture: Interface\AddOns\<Folder>\media\logos\<addon>.logo.128.tga   -- the addon's OWN logo (toc-file-§1, layout-§4)
 ## SavedVariables: <Addon>DB, <Addon>PerfDB   -- settings global + diagnostics ring (toc-file-§2)
 ## OptionalDeps: Ace3, LibStub, CallbackHandler-1.0, LibSharedMedia-3.0
 ## DefaultState: enabled
@@ -28,6 +28,7 @@ The metadata block **MUST** use this **exact field order** (omit a line only whe
 - **MUST** have `X-License: MIT`. **MUST NOT** ship "All Rights Reserved".
 - **MUST** have `X-Standard:` pointing at the standards repo, declaring the addon is built to this standard.
 - **MUST** have `X-Curse-Project-ID` once the addon is published on CurseForge (the collection's distribution platform). **Before** it is published the field is **omitted**, and the omission is **compliant**: an unpublished addon **MUST NOT** carry a placeholder, invented, or borrowed id — the packager uploads to whatever project the id names, so a placeholder does not fail loudly, it publishes this addon into somebody else's project. An unpublished addon **SHOULD** carry a one-line comment where the field would go (`# X-Curse-Project-ID: not published on CurseForge yet`), in the field's own position, so the next reader sees a decision rather than an oversight. With that comment present the absence needs **no deviation-register row** — the same shape toc-file-§5 uses for a forced within-section order. Filing the absence as a deviation files a row no act of the addon can close. `X-Wago-ID` and `X-WoWI-ID` are **optional** (**MAY**) — include each only when the addon is actually listed on that platform (Wago / WoW Interface respectively); an addon that doesn't publish there simply omits the line. Keep the field **order** above regardless (Curse → Wago → WoWI).
+- **MUST** set `## IconTexture:` to the addon's **own logo**, at the absolute in-game path `Interface\AddOns\<Folder>\media\logos\<addon>.logo.128.tga`. The field was *optional but encouraged*; it is now required, because that same file is also the minimap button's icon and the broker object's icon (launcher-§4), so the AddOns list, the minimap and a broker display show one identity rather than three. **MUST NOT** use a **Blizzard icon path** (`Interface\Icons\…`) or a **numeric file id**: a borrowed icon makes the addon look like something else in the one list where the player is deciding what to turn off, and a bare number says nothing to the next person reading the TOC. The file's exact format and the recipe that generates it are **layout-§4** (128×128, uncompressed 32-bit TGA), which owns shipped media; do not restate them here (**anti-pattern #82**).
 - **SHOULD NOT** declare hard `Dependencies`. Use `OptionalDeps` and shim missing libs with soft fallbacks. Reference implementation (in the collection): the absorb-shield tracker ships an AceDB-missing flat-table shim and LSM-missing Blizzard fallback constants, so it loads even with no libs present.
 
 **`Category-enUS` — the value MUST be a string the client accepts, and any list here is illustrative.**

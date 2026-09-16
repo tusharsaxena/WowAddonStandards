@@ -16,10 +16,12 @@
 | AceTimer-3.0 | timers | when used |
 | AceConsole-3.0 | slash registration | when used |
 | AceGUI-3.0 | options panel widgets | when used — including where a lib you vendor is what reaches it |
+| LibDataBroker-1.1 | the launcher object (one per addon) | always — every addon ships a launcher (launcher-§1) |
+| LibDBIcon-1.0 | the minimap button drawn from that object | always — same |
 
 Every lib the addon does vendor is **vendored in `libs/` and committed** (library-stack-§3). Nothing in this table obliges an addon to vendor a lib nothing in its install reaches, and "when used" is decided by library-stack-§3's reachability test, not by eye.
 
-**The case this wording was written for.** PrettyChat reaches neither AceEvent-3.0 nor AceTimer-3.0: it starts no timers, and the two combat-boundary events its visibility watcher needs go on a plain frame it creates lazily and drops again (`PrettyChat/modules/Override.lua:67-80`, argued in place). Under the old table it had to vendor both; under §3 it had to vendor neither; it could not do both, so it filed the collision against **itself** — audit `PC-52` of 2026-08-04, carried since as a deviation row at `PrettyChat/docs/ARCHITECTURE.md:230` whose re-check trigger is, in as many words, "the next `library-stack` edit". This is that edit. An addon holding a ratified-deviation row for a contradiction that lives upstream is exactly the graveyard the register exists to prevent, manufactured here rather than there; the row is retired, not re-argued, and PrettyChat vendoring six of the eight rows above is compliant.
+**The case this wording was written for.** PrettyChat reaches neither AceEvent-3.0 nor AceTimer-3.0: it starts no timers, and the two combat-boundary events its visibility watcher needs go on a plain frame it creates lazily and drops again (`PrettyChat/modules/Override.lua:67-80`, argued in place). Under the old table it had to vendor both; under §3 it had to vendor neither; it could not do both, so it filed the collision against **itself** — audit `PC-52` of 2026-08-04, carried since as a deviation row at `PrettyChat/docs/ARCHITECTURE.md:230` whose re-check trigger is, in as many words, "the next `library-stack` edit". This is that edit. An addon holding a ratified-deviation row for a contradiction that lives upstream is exactly the graveyard the register exists to prevent, manufactured here rather than there; the row is retired, not re-argued, and PrettyChat vendoring six of the eight **Ace3** rows above is compliant. (The table's last two rows, LibDataBroker-1.1 and LibDBIcon-1.0, are not Ace3 and are not "when used": every addon reaches them, because every addon ships a launcher.)
 
 ### 2. Common optional libs
 
@@ -31,7 +33,8 @@ Every lib the addon does vendor is **vendored in `libs/` and committed** (librar
 | LibDualSpec-1.0 | spec-aware profile switching |
 | LibSerialize | export/import |
 | LibDeflate | export/import compression |
-| LibDBIcon-1.0 | minimap LDB icon |
+
+**LibDBIcon-1.0 left this table.** It and LibDataBroker-1.1 are now §1 rows, vendored *always*: every Ka0s addon ships a launcher (launcher-§1), so neither is optional any more.
 
 ### 3. Vendoring over externals
 
@@ -223,9 +226,9 @@ default; the other two record how a section that binds is read here.
   (Tier 1's `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`,
   `common-tasks.md`; Tier 2; `## Documentation map`). These describe an addon's runtime shape, its
   settings canvas and its in-game verification, and a library has none of them.
-- **`toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`.** There
-  is no TOC, no settings canvas, no slash surface, no on-screen display, no SavedVariables file and no
-  CurseForge package. Each of these binds the *consumer* that wires the module, and is audited there.
+- **`toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `launcher`, `savedvariables`, `packaging`.** There
+  is no TOC, no settings canvas, no slash surface, no on-screen display, no minimap button or broker
+  object, no SavedVariables file and no CurseForge package. Each of these binds the *consumer* that wires the module, and is audited there.
 
 **Applies, read for a library repo:** these bind, and the only thing that changes is what the words
 point at. They were absent from both lists above until this was written, and the cost of that silence

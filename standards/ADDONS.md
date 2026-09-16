@@ -14,19 +14,25 @@ this repo — each addon audits **itself**, in its own repo, via `/wow-addon:sta
 Each addon lives in its own repository, as a **sibling folder** next to this repo under
 `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. Paths below are relative to this file (`standards/`).
 
-| Addon | Folder | Repository |
-|---|---|---|
-| Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker |
-| Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster |
-| Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger |
-| Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/ConsumableMaster |
-| Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/KickCD |
-| Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory |
-| Ka0s Multi Meters | [`../../MultiMeters/`](../../MultiMeters/) | https://github.com/tusharsaxena/MultiMeters |
-| Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster |
-| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced |
-| Ka0s Pretty Chat | [`../../PrettyChat/`](../../PrettyChat/) | https://github.com/tusharsaxena/PrettyChat |
-| Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup |
+| Addon | Folder | Repository | Launcher left-click (launcher-§2) |
+|---|---|---|---|
+| Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker | **(b)** test mode |
+| Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster | **(b)** lock / unlock — unlocking is the preview |
+| Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger | **(a)** the ledger browser |
+| Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/ConsumableMaster | **(b)** lock / unlock — the macro bar's lock |
+| Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/KickCD | **(b)** lock / unlock — unlocking is the preview |
+| Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory | **(a)** the browser |
+| Ka0s Multi Meters | [`../../MultiMeters/`](../../MultiMeters/) | https://github.com/tusharsaxena/MultiMeters | **(a)** its windows |
+| Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster | **(b)** lock / unlock — unlocking is the preview |
+| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced | **(b)** test mode |
+| Ka0s Pretty Chat | [`../../PrettyChat/`](../../PrettyChat/) | https://github.com/tusharsaxena/PrettyChat | **(c)** the settings panel |
+| Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup | **(a)** the group popup |
+
+**The launcher column is normative input to an audit, not decoration.** Every addon ships one minimap button and one
+broker plugin, from one LibDataBroker-1.1 object (launcher). **Right-click opens the settings panel in every row above.**
+Left-click follows launcher-§2's three rungs, first match wins — **(a)** a primary window, **(b)** else a preview switch,
+**(c)** else the settings panel — and the column records which rung this addon sits on so an audit can check it rather
+than re-derive it from the addon's shape. A new addon picks its rung by the rule and fills the column in with its row.
 
 ## Ka0s-owned library repos
 
@@ -58,7 +64,7 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
 
 ## Adding an addon
 
-1. Add one row above (display name, folder, repository URL). Keep the table alphabetical by folder.
+1. Add one row above (display name, folder, repository URL, launcher left-click rung). Keep the table alphabetical by folder.
 2. That's it for scope. The addon is now covered by **the next standards refresh** — its current
    habits become an input to [`STANDARDS.md`](STANDARDS.md) (see [`README.md`](README.md)).
 3. New addons should be scaffolded from the standard so they are born compliant — see
