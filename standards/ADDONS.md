@@ -16,7 +16,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 
 | Addon | Folder | Repository | Launcher left-click (launcher-§2) |
 |---|---|---|---|
-| Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker | **(b)** test mode |
+| Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker | **(b)** lock / unlock — unlocking is the preview |
 | Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster | **(b)** lock / unlock — unlocking is the preview |
 | Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger | **(a)** the ledger browser |
 | Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/ConsumableMaster | **(b)** lock / unlock — the macro bar's lock |
@@ -24,7 +24,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory | **(a)** the browser |
 | Ka0s Multi Meters | [`../../MultiMeters/`](../../MultiMeters/) | https://github.com/tusharsaxena/MultiMeters | **(a)** its windows |
 | Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster | **(b)** lock / unlock — unlocking is the preview |
-| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced | **(b)** test mode |
+| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced | **(b)** lock / unlock — unlocking is the preview |
 | Ka0s Pretty Chat | [`../../PrettyChat/`](../../PrettyChat/) | https://github.com/tusharsaxena/PrettyChat | **(c)** the settings panel |
 | Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup | **(a)** the group popup |
 

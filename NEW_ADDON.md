@@ -165,8 +165,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
      128×128 logo as its `icon`, and register that same object with LibDBIcon. Its single `OnClick` is
      **right-click → settings panel, always**, and left-click by launcher-§2's three rungs, first match
      wins: the addon's **primary window** if it has one, else its **preview switch** (test mode, or
-     lock/unlock where unlocking is the preview), else the settings panel. Hand `db.profile.minimap`
-     straight to `:Register` so the *Minimap button* row and the library share one `hide` boolean. Give
+     lock/unlock where unlocking is the preview), else the settings panel. Hand `db.global.minimap`
+     straight to `:Register` so the *Minimap button* row and the library share one `hide` boolean —
+     **global**, because the button belongs to the installation and neither a profile switch nor
+     *Reset all settings* may move it (launcher-§3). Give
      the broker object **no** enable setting, deliberately. Then record the addon's rung in
      `standards/ADDONS.md`'s Launcher column in the same pass.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,

@@ -92,11 +92,11 @@ Reference implementation (in the collection): the standalone loot-history browse
 | File | Size | Used by |
 |---|---|---|
 | `<addon>.logo.128.tga` | 128×128 | `## IconTexture` (toc-file-§1), the minimap button's icon, the broker object's icon (launcher-§4) |
-| the landing-page logo `.tga` | drawn at 300×300 | the settings panel's landing page (options-ui-§5) |
+| `<addon>.logo.tga` | drawn at 300×300 | the settings panel's landing page (options-ui-§5) |
 
 Beside them sits the **editable source** — the 2000×2000 `.png` the collection's logo art is authored at — which ships but is never loaded by the client (WoW cannot load `.png`/`.jpg` at runtime).
 
-- **`<addon>` is the addon's folder name, lowercased** (`partyframeenhanced.logo.128.tga`), so the path is derivable from the folder without opening it.
+- **`<addon>` is the addon's folder name, lowercased** in both names (`partyframeenhanced.logo.tga`, `partyframeenhanced.logo.128.tga`), so both paths are derivable from the folder without opening it. The landing-page file is the **unsuffixed** name and every addon in the collection already ships it under exactly that name — it is named here so an audit has a path to check for **both** files rather than only the new one. Nothing about the landing-page file changes: its size, its format and its compression are whatever it already is (options-ui-§5), and it is **not** graded against the 128 file's format rules below.
 - **The 128 file MUST be uncompressed, 32-bit — TGA image type 2, 32 bpp.** This is not a style preference. One file in the collection is **proven** to render as an `IconTexture` in-game, and it is type 2 / 32 bpp; the **RLE-compressed (type 10)** logos the collection also ships are unproven in that role, and an icon that silently fails to load draws nothing and raises nothing, so no gate would report it. **128×128 is also power-of-two**, which several existing logos (300×300) are not. Cost is roughly **64 KB** per addon — the whole reason an uncompressed file is affordable here at all.
 - **The recipe is fixed, so the file is reproducible** rather than a one-off export somebody has to remember the settings for. From the `.png` source already in `media/logos/`:
 

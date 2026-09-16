@@ -66,16 +66,17 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      which was false** for `WowAddonStandards` and `wow-addon` — both have no `.toc` and vendor
      nothing, and both were consequently graded against a rule set written for a Lua payload.
 
-     Measuring a **library** against the addon sections is noise (`documentation-§1`'s player README,
-     `documentation-§3`'s `docs/` trio **and its whole topic-detail tier model**, `toc-file`,
-     `options-ui`, `slash-commands`, `preview-mode`, `savedvariables`, `packaging`). A library has no
-     settings canvas and no in-game pipeline, so Tier 1's `settings-panel.md` and `data-flow.md` are
-     not missing docs there — they are inapplicable. Measuring a **documentation-and-tooling repo**
-     against either of the other two is worse: it has no Lua at all, so `lint`, `testing`,
-     `performance` and `automated-tests` have no instance, and `documentation-§8` reduces
-     `ARCHITECTURE.md` to five sections rather than ten. **Do not file a finding for an absent
-     `docs/testing.md`, an absent test suite or a near-empty `DEPENDENCIES.md` in such a repo** —
-     §8 grants each one, and re-filing it is the duplication that section exists to end.
+     Measuring a **library** against the addon sections is noise (`documentation-§1`'s player
+     README, `documentation-§3`'s `docs/` trio **and its whole topic-detail tier model**,
+     `toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `launcher`, `savedvariables`,
+     `packaging`). A library has no settings canvas, no in-game pipeline and no minimap button, so
+     Tier 1's `settings-panel.md` and `data-flow.md` are not missing docs there — they are
+     inapplicable. Measuring a **documentation-and-tooling repo** against either of the other two is
+     worse: it has no Lua at all, so `lint`, `testing`, `performance` and `automated-tests` have no
+     instance, and `documentation-§8` reduces `ARCHITECTURE.md` to five sections rather than ten.
+     **Do not file a finding for an absent `docs/testing.md`, an absent test suite or a near-empty
+     `DEPENDENCIES.md` in such a repo** — §8 grants each one, and re-filing it is the duplication
+     that section exists to end.
 2. **Create the run folder.** `<REPO_ROOT>/docs/audits/<today>/`. Never edit an existing run's folder.
 3. **Snapshot current state** → `01_CURRENT_STATE.md`. Walk the addon section by section (layout,
    TOC, libraries, patterns, settings, slash, debug, tests, performance, packaging, **`.gitattributes`**
@@ -235,8 +236,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      deviation: dependency-correct order with its load-bearing positions declared is compliant,
      whatever the sequence (`layout-§1`).
    - **`## IconTexture` MUST name the addon's own logo (`toc-file-§1`, `layout-§4`).** Read the
-     field. An **absent** field, a **Blizzard icon path** (`Interface\Icons\…`) or a **numeric file
-     id** is a finding (anti-pattern #82). Then check the file the path names actually exists at
+     field. An **absent** field is a finding against **`toc-file-§1`'s MUST** — the field is required
+     and there is nothing there to point anywhere. A field that is **present and points at the wrong
+     thing** — a **Blizzard icon path** (`Interface\Icons\…`) or a **numeric file id** — is
+     **anti-pattern #82**, which is about where the field points and so has no instance when the
+     field is absent. Then check the file the path names actually exists at
      `media/logos/<addon>.logo.128.tga` and is the right artifact, because the wrong one draws
      nothing and raises nothing: `file media/logos/*.tga` is **not** evidence here — read the TGA
      header instead (byte 2 is the image type, **2** = uncompressed and **10** = RLE; bytes 12-13
@@ -359,10 +363,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      **every addon in the collection is expected to be non-compliant until it adopts**; record the
      gap once, as one finding per addon, not as five.
      - **One object.** Grep for `LibStub("LibDataBroker-1.1")` and `LibStub("LibDBIcon-1.0")` outside
-       `libs/`. There **MUST** be exactly one `:NewDataObject(` call and exactly one `:Register(`
-       call, the second taking the first's return value. Two objects, or a button with its own
-       `OnClick` beside a broker object with a second one, is anti-pattern #81 — and the tell is two
-       click implementations, not two `LibStub` calls.
+       `libs/`, and read what the hits do: `:Register` **MUST** be handed the object `:NewDataObject`
+       returned, so the button and the broker row are drawn from one object. Two objects, or a button
+       with its own `OnClick` beside a broker object with a second one, is anti-pattern #81 — and the
+       tell is **two click implementations**, not a call count. A second `:NewDataObject(` or
+       `:Register(` line is a finder for that, never the finding on its own.
      - **The rung.** Read `ADDONS.md`'s **Launcher left-click** column for this addon, then read the
        `OnClick`. Left-click **MUST** do what the column says and right-click **MUST** open the
        settings panel, on every addon. Where the column and the code disagree, decide which is wrong
@@ -454,7 +459,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **(b) The General page's first tab is exactly `Master controls` (options-ui-§15).** Compare
        the first distinct `group` on the General page against that literal string. Then read the rows
        filed under it, in declaration order, against the canonical set — enable, general visibility,
-       master scale, master alpha, lock frame, debug console, test mode, reset position, reset all settings.
+       master scale, master alpha, lock frame, debug console, minimap button, test mode,
+       reset position, reset all settings.
        They **MUST** be a subsequence of that list, and every canonical row the addon has the state
        for **MUST** be present. A canonical row sitting under a different tab is a finding against
        **§15**, not against the tab it is in. An addon that draws no positionable frame — proven by a
