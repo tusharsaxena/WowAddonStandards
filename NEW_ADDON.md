@@ -165,10 +165,17 @@ disagreeing with the collection's intent while looking, in review, like it had b
      128×128 logo as its `icon`, and register that same object with LibDBIcon. Its single `OnClick` is
      **right-click → settings panel, always**, and left-click by launcher-§2's three rungs, first match
      wins: the addon's **primary window** if it has one, else its **preview switch** (test mode, or
-     lock/unlock where unlocking is the preview), else the settings panel. Hand `db.global.minimap`
+     lock/unlock where unlocking is the preview), else the settings panel. Give the object a `label` of
+     **`Ka0s <Name>`** — the brand name in **plain text**, never the TOC `## Title` (which may carry
+     color escapes) and never the folder name, so the addon groups with its siblings in a broker
+     display (launcher-§1). Hand `db.global.minimap`
      straight to `:Register` so the *Minimap button* row and the library share one `hide` boolean —
-     **global**, because the button belongs to the installation and neither a profile switch nor
-     *Reset all settings* may move it (launcher-§3). Give
+     **global**, because the button belongs to the installation and a profile switch must not move it.
+     Then **veto that one row out of both resets from the start**: the button's shown/hidden state is a
+     per-installation display preference like the position LibDBIcon stores beside it, so neither
+     *Reset all settings* nor the page **Defaults** button may touch it (launcher-§3, anti-pattern #83).
+     `skipRestoreAll` is where that goes (options-ui-§1); a global-only addon carves it out of the
+     wholesale wipe instead. Give
      the broker object **no** enable setting, deliberately. Then record the addon's rung in
      `standards/ADDONS.md`'s Launcher column in the same pass.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
@@ -178,7 +185,12 @@ disagreeing with the collection's intent while looking, in review, like it had b
      (anti-pattern #82). The landing page's logo is a **separate, larger** file in the same folder.
    - **`/<slash> enable` and `/<slash> disable` are in `COMMANDS` from day one** (slash-commands-§2), as
      aliases writing the *Enable `<Addon>`* row's stored path through the single write seam — no second
-     key, no module flag, no local.
+     key, no module flag, no local. **Disabling stands the features down, never the command surface:**
+     the chat command, the `COMMANDS` table, the dispatcher and the settings registration are setup and
+     stay up in either state, and `help`, `config`, `version`, `enable`, `disable`, `debug`, `perf` and
+     the schema CLI keep answering while the addon is off. A **feature** verb **SHOULD** refuse while
+     disabled on one tagged line naming `/<slash> enable`, and do nothing else — a courtesy rather than
+     a correctness rule, and the easiest time to wire it is now.
    - **Font, border and bar controls come from the composers**, never typed out — one call each emits
      the canonical rows in the canonical order, and anything extra the surface needs is appended
      after the block rather than interleaved into it (options-ui-§16). A tab mixing two of them gives

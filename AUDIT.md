@@ -379,6 +379,20 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        (`minimap.show`, `showMinimapIcon`, `minimapButton`) is anti-pattern #81; so is a seed or
        backfill writing the whole `minimap` table over that row (`architecture-§5`). LibDBIcon's own
        `minimapPos` writes are the library's and are **not** a finding.
+     - **No reset reaches the row** (`launcher-§3`, new in v2.54.0). The button's shown/hidden state
+       **MUST** survive both *Reset all settings* and the page-scoped **Defaults** button, so read
+       **both** resets rather than reasoning from where the table is stored — the global scope is
+       **not** the protection and never was. Two shapes fail. An addon with **no `profile` section**
+       resets by emptying its account-wide store wholesale (`options-ui-§12`), which takes `minimap`
+       with it. And any addon whose page **Defaults** button walks the Master-controls rows carrying
+       a `default` rewrites `minimap.hide` along with them. The fix, and what a compliant addon
+       shows, is that one row vetoed out of the walk (`skipRestoreAll`, `options-ui-§1`) or carved
+       out of the wholesale wipe. Either reset reaching it is **anti-pattern #83**.
+     - **The broker label.** The LDB object's `label` **MUST** be the addon's brand name in plain
+       text — **`Ka0s <Name>`** (`launcher-§1`). An ad-hoc spelling with the brand dropped, the
+       folder name, or the TOC's `## Title` (which may carry color escapes) is **anti-pattern #84**.
+       The tell is a `label` field wired to `GetAddOnMetadata(..., "Title")`, or a literal whose
+       spelling differs from the addon's own README H1.
      - **No broker toggle.** A setting that enables or disables the broker object is a finding
        (`launcher-§1`). The minimap button's row is the only visibility control.
    - **Check `/<slash> enable` and `/<slash> disable` exist and are aliases** (`slash-commands-§2`).
@@ -387,6 +401,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      flag or a second stored key instead is the finding — the tell is a `get` on the enable path
      that can disagree with what the verb last did. Re-use of either verb for a module, feature or
      unit is a finding in its own right: the verbs are reserved collection-wide.
+     - **The disabled surface** (`slash-commands-§2`). Read what the addon tears down on disable:
+       unregistering the chat command, dropping the `COMMANDS` table or the dispatcher is a **MUST**
+       failure, because the verb that turns it back on goes with them. Refusing anything on the live
+       list — `help`, `config`, `version`, `enable`, `disable`, `debug`, `perf`, `get`, `set`,
+       `list`, `reset`, `resetall` — is the same failure by the other route. A **feature** verb that
+       acts while disabled instead of answering on one line naming `/<slash> enable` is a **SHOULD**,
+       so file it as one; today **no addon implements it**, and that is expected rather than a sweep
+       of eleven findings.
    - **Check the write paths against `architecture-§5` by grep, then classify every hit.** Grep the
      addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
      `db.profile`, `db.global`, `db.char` and the local aliases the files bind them to — and for
