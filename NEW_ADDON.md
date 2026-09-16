@@ -185,12 +185,18 @@ disagreeing with the collection's intent while looking, in review, like it had b
      (anti-pattern #82). The landing page's logo is a **separate, larger** file in the same folder.
    - **`/<slash> enable` and `/<slash> disable` are in `COMMANDS` from day one** (slash-commands-§2), as
      aliases writing the *Enable `<Addon>`* row's stored path through the single write seam — no second
-     key, no module flag, no local. **Disabling stands the features down, never the command surface:**
-     the chat command, the `COMMANDS` table, the dispatcher and the settings registration are setup and
-     stay up in either state, and `help`, `config`, `version`, `enable`, `disable`, `debug`, `perf` and
-     the schema CLI keep answering while the addon is off. A **feature** verb **SHOULD** refuse while
-     disabled on one tagged line naming `/<slash> enable`, and do nothing else — a courtesy rather than
-     a correctness rule, and the easiest time to wire it is now.
+     key, no module flag, no local. **Disabled means the addon is not running** (slash-commands-§7):
+     frames hidden, every event, message and bucket registration **actually unregistered** — an
+     early-returning handler does not satisfy this — every timer cancelled, and nothing written from a
+     game event. Route it through the **same stand-down latch the perf harness suspends on**, as one of
+     two named holds, never through a second teardown path. The chat command, the `COMMANDS` table, the
+     dispatcher, the settings-category registration and AceDB's profile callbacks are **setup** and stay
+     up in either state; **`enable` and `help` are the only verbs that answer** while the addon is off,
+     and every other verb — `config`, `version`, `debug`, `perf`, the schema CLI, the bare command and
+     an unknown verb alike — prints the one refusal line naming `/<slash> enable`. The launcher's
+     left-click is refused and writes nothing; its right-click still opens the panel. Ship
+     `tests/test_disabled.lua` with the addon. A greenfield addon is the one place this is cheap —
+     retrofitting it is the collection's largest outstanding obligation.
    - **Font, border and bar controls come from the composers**, never typed out — one call each emits
      the canonical rows in the canonical order, and anything extra the surface needs is appended
      after the block rather than interleaved into it (options-ui-§16). A tab mixing two of them gives

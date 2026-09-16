@@ -401,14 +401,44 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      flag or a second stored key instead is the finding — the tell is a `get` on the enable path
      that can disagree with what the verb last did. Re-use of either verb for a module, feature or
      unit is a finding in its own right: the verbs are reserved collection-wide.
-     - **The disabled surface** (`slash-commands-§2`). Read what the addon tears down on disable:
-       unregistering the chat command, dropping the `COMMANDS` table or the dispatcher is a **MUST**
-       failure, because the verb that turns it back on goes with them. Refusing anything on the live
-       list — `help`, `config`, `version`, `enable`, `disable`, `debug`, `perf`, `get`, `set`,
-       `list`, `reset`, `resetall` — is the same failure by the other route. A **feature** verb that
-       acts while disabled instead of answering on one line naming `/<slash> enable` is a **SHOULD**,
-       so file it as one; today **no addon implements it**, and that is expected rather than a sweep
-       of eleven findings.
+     - **The disabled state is TOTAL, and this is now the heaviest check in the step**
+       (`slash-commands-§7`, which **reverses** what `slash-commands-§2` said through v2.55.0 — do
+       not audit against the old text). Follow the enable path from the write seam to what it
+       actually does, and file a **MUST** failure for each of these:
+       - **A draw gate.** The flag read only as a rung in a show-ladder, or by handlers that
+         early-return while still registered. The tell is a grep the auditor can run: every
+         `RegisterEvent`, `RegisterUnitEvent`, `RegisterMessage`, `RegisterBucketEvent` and raw
+         `frame:RegisterEvent` in the addon's own Lua, against the unregistration the disable path
+         performs. **Anything registered and not unregistered is the finding** — an early return is
+         not a stand-down, because the addon still pays the dispatch. Timers, tickers and `OnUpdate`
+         scripts get the same treatment, and so does any SavedVariables write reachable from a game
+         event while disabled (combat entry is the one that bites).
+       - **A second teardown path.** A disable that does not go through the same latch the perf
+         harness's suspend takes a hold on, so the addon carries two mechanisms for *inert*
+         (`performance-§6`, anti-pattern #85). A resume or an enable that stands the addon up
+         without re-evaluating the other hold is the same finding.
+       - **The slash surface.** Exactly **`enable`** and **`help`** answer normally while disabled.
+         **Every** other verb — feature verbs, and also `config`, `version`, `debug`, `perf`, `get`,
+         `set`, `list`, `reset`, `resetall`, the bare command and an unknown verb — answers with the
+         **one** `slash-commands-§7` refusal line naming `/<slash> enable`, and nothing else. `disable`
+         while already disabled echoes rather than refusing. Unregistering the chat command,
+         dropping the `COMMANDS` table or the dispatcher remains a failure for the original reason:
+         the verb that turns it back on goes with them.
+       - **The launcher.** A left-click that acts, or writes SavedVariables, while disabled; a
+         right-click that no longer opens the panel (`launcher-§2`).
+       - **The conformance suite.** `tests/test_disabled.lua` present, listed in `tests/run.lua`, and
+         asserting on the **registration set** rather than on a handler's return
+         (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
+         right (`testing-§12`).
+       As of the 2026-09-16 sweep, **eleven of eleven addons fail this** — 107 survivors across the
+       collection. Expect findings here in every audit until the adoption pass lands, and record the
+       addon as **blocked** rather than overdue while no LibKa0s tag carries
+       `LibKa0s-Lifecycle-1.0` (`slash-commands-§7`, *Adopting it*).
+     - **`lock` / `unlock` are a MAY** (`slash-commands-§8`). Their absence is **not** a finding and
+       owes no register row. Where they exist, check only that both write the *Lock frame* row's
+       stored path through the single write seam, hold no state of their own, and are refused while
+       disabled. **Do not** file Multi Meters' `/mm lock on|off` against §8 — its master-lock
+       semantics hold a ratified deviation row, and §8 does not reach it.
    - **Check the write paths against `architecture-§5` by grep, then classify every hit.** Grep the
      addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
      `db.profile`, `db.global`, `db.char` and the local aliases the files bind them to — and for
