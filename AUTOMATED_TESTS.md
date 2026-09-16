@@ -19,7 +19,7 @@ From the addon repo root:
 
 ```sh
 tests/_kit/run-automated-tests.sh                              # all four suites, writes a bundle
-tests/_kit/run-automated-tests.sh --release X.Y.Z              # a release run (see Step 4)
+tests/_kit/run-automated-tests.sh --release X.Y.Z              # a release run (see Step 5)
 tests/_kit/run-automated-tests.sh --suite complexity           # a subset
 tests/_kit/run-automated-tests.sh --suite lint --suite tests --no-bundle   # the green gate, writes nothing
 ```
@@ -220,7 +220,29 @@ the file saying it is owed one. `None.` where a table would be empty — an empt
 The runner carries a still-true disposition forward rather than making you re-argue it, so a watch
 list that reads differently every release means somebody has been editing the generated half.
 
-## Step 4 — Release runs
+## Step 4 — Normalize what you authored
+
+The runner normalizes the bundle to whatever `.gitattributes` declares, but it does that **as its
+last act** (`normalize_eol "$OUT"/* "$RESULTS"`). Everything Steps 2 and 3 write lands *after* that:
+`ANALYSIS.md` does not yet exist when the runner sweeps the bundle, and the **Disposition** cells
+you edit re-open a `RESULTS.md` the runner had already normalized. Both therefore arrive carrying
+whatever terminator your editor used, and in a repo pinned `* text=auto eol=crlf` that is a bare LF
+the `eol` suite fails on — a red gate caused by the record of a green run.
+
+So, after the last edit of Steps 2 and 3 and **before** you commit:
+
+```sh
+git check-attr text eol -- docs/automated-tests/RESULTS.md <bundle>/ANALYSIS.md
+```
+
+and give each file the terminator that answers back. Content **MUST NOT** change — this is a
+terminator fix and nothing else, so `git diff --stat` after it should show only the lines you
+actually authored.
+
+Do not fix this by editing the runner to sweep again: the runner has exited by the time these files
+are written, and `tests/_kit/` is vendored — see the hard rules below.
+
+## Step 5 — Release runs
 
 A release run is `--release X.Y.Z`, which stamps the manifest. It is produced as part of the version
 bump, **before** the tag (`automated-tests-§6`), and:
@@ -229,7 +251,7 @@ bump, **before** the tag (`automated-tests-§6`), and:
 - **MUST** have its verdict reported to the user while they are deciding whether to tag — a `red` or
   `amber` release run is a decision point, not a footnote.
 
-## Step 5 — Report
+## Step 6 — Report
 
 Print, in chat:
 
@@ -256,5 +278,9 @@ Print, in chat:
   fail a run and must not be presented as one. The **release** is gated on all four plus zero CCN > 15,
   but that gate belongs to `/wow-addon:bump-version`, which reads this run's `manifest.json` — never to
   the runner, whose exit code stays unchanged because the same script is the commit gate.
+- **Never commit a bundle artifact on the wrong line terminator.** `ANALYSIS.md` and the
+  `RESULTS.md` rows you author are written after the runner's own normalization pass and are not
+  covered by it (Step 4). A repo whose `eol` suite is red because of its own test record is a
+  self-inflicted gate failure.
 - **Never hand-write a number into a bundle.** Everything in it came from a tool. A hand-edited record
   is worse than an absent one, because it reads as measured.

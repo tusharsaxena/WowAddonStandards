@@ -40,6 +40,8 @@ NEW_ADDON.md                      -- PLAYBOOK: /wow-addon:new-addon (scaffold, b
 PERF_ANALYSIS.md                  -- PLAYBOOK: /wow-addon:perf-analysis (per-addon in-game capture bundle)
 README.md                         -- repo overview + the four things you can do here
 CLAUDE.md                         -- this file
+DEPENDENCIES.md                   -- toolchain contract (documentation-§7); git only, and why the rest is absent
+docs/ARCHITECTURE.md              -- how this repo is put together + the deviation register (documentation-§3)
 LICENSE
 .gitattributes                    -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
 standards/                        -- THE STANDARD (living, canonical). Everything supports STANDARDS.md.
@@ -57,6 +59,9 @@ media/logos/                      -- the Ka0s collection logo art (an addon READ
 
 Audit and review runs are **not** in this repo — they live under each audited addon's own
 `docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and audit-review-history of the standard).
+
+Ratified exemptions from the addon-shaped rules live in `docs/ARCHITECTURE.md` → `## Documented
+deviations`. That register is the single home: a deviation not in it is not ratified.
 
 Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the playbooks (`AUDIT.md`,
 `NEW_ADDON.md`, `AUTOMATED_TESTS.md`, `PERF_ANALYSIS.md`) → the rest as needed.
