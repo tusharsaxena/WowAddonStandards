@@ -191,9 +191,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
      game event. Route it through the **same stand-down latch the perf harness suspends on**, as one of
      two named holds, never through a second teardown path. The chat command, the `COMMANDS` table, the
      dispatcher, the settings-category registration and AceDB's profile callbacks are **setup** and stay
-     up in either state; **every verb keeps answering** while the addon is off — `config` and the bare `/<slash>` open the panel, and the schema CLI reads and repairs settings, which is exactly when it is most needed — while a **feature** verb SHOULD answer one tagged line naming `/<slash> enable`,
-     and every other verb — `config`, `version`, `debug`, `perf`, the schema CLI, the bare command and
-     an unknown verb alike — prints the one refusal line naming `/<slash> enable`. The launcher's
+     up in either state; **every verb keeps answering** while the addon is off — `config` and the
+     bare `/<slash>` open the panel, and the schema CLI reads and repairs settings, which is exactly
+     when it is most needed — while a **feature** verb SHOULD answer one tagged line naming
+     `/<slash> enable` (slash-commands-§2). Vendor LibKa0s **v1.42.0** or later, whose Slash minor 14
+     answers that surface and whose `LibKa0s-Lifecycle-1.0` is the latch. The launcher's rung (a)/(b)
      left-click is refused and writes nothing; its right-click still opens the panel. Ship
      `tests/test_disabled.lua` with the addon. A greenfield addon is the one place this is cheap —
      retrofitting it is the collection's largest outstanding obligation.

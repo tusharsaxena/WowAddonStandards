@@ -402,9 +402,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      that can disagree with what the verb last did. Re-use of either verb for a module, feature or
      unit is a finding in its own right: the verbs are reserved collection-wide.
      - **The disabled state is TOTAL, and this is now the heaviest check in the step**
-       (`slash-commands-§7`, which **reverses** what `slash-commands-§2` said through v2.55.0 — do
-       not audit against the old text). Follow the enable path from the write seam to what it
-       actually does, and file a **MUST** failure for each of these:
+       (`slash-commands-§7` for the stand-down; the slash surface is `slash-commands-§2`'s, restored
+       verbatim in v2.57.0 — do not audit against v2.56.0's narrowed text). Follow the enable path
+       from the write seam to what it actually does, and file a **MUST** failure for each of these:
        - **A draw gate.** The flag read only as a rung in a show-ladder, or by handlers that
          early-return while still registered. The tell is a grep the auditor can run: every
          `RegisterEvent`, `RegisterUnitEvent`, `RegisterMessage`, `RegisterBucketEvent` and raw
@@ -424,11 +424,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          finding. The only refusal is slash-commands-§2's feature-verb **SHOULD**, and an addon
          that declines a SHOULD owes no deviation row. **Do not confuse this with the
          stand-down**: the surface tells you nothing about whether the addon is inert, which is
-         what the checks above measure.
-         **Every** other verb — feature verbs, and also `config`, `version`, `debug`, `perf`, `get`,
-         `set`, `list`, `reset`, `resetall`, the bare command and an unknown verb — answers with the
-         **one** `slash-commands-§7` refusal line naming `/<slash> enable`, and nothing else. `disable`
-         while already disabled echoes rather than refusing. Unregistering the chat command,
+         what the checks above measure. **The findings here are the other direction**: a disabled
+         addon that refuses `config`, the bare `/<slash>`, `version`, `debug`, `perf` or any schema-CLI
+         verb fails slash-commands-§2's MUST — the v2.56.0 shape, and exactly what LibKa0s
+         v1.40.0's Slash minor 12 shipped, so an addon still vendoring v1.40.0 fails it by
+         construction. Where a feature verb is refused, it is refused on **one** line in
+         *The refusal line*'s shape and reaches no write seam. Unregistering the chat command,
          dropping the `COMMANDS` table or the dispatcher remains a failure for the original reason:
          the verb that turns it back on goes with them.
        - **The launcher.** A left-click that acts, or writes SavedVariables, while disabled; a
@@ -438,13 +439,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
          right (`testing-§12`).
        As of the 2026-09-16 sweep, **eleven of eleven addons fail this** — 107 survivors across the
-       collection. Expect findings here in every audit until the adoption pass lands, and record the
-       addon as **blocked** rather than overdue while no LibKa0s tag carries
-       `LibKa0s-Lifecycle-1.0` (`slash-commands-§7`, *Adopting it*).
+       collection. Expect findings here in every audit until the adoption pass lands. Adoption is
+       **overdue**, not blocked: `LibKa0s-Lifecycle-1.0` ships from LibKa0s **v1.40.0**, and
+       **v1.42.0** (Slash minor 14) is the floor — an addon vendoring an older tag has not adopted,
+       because its dispatcher refuses verbs slash-commands-§2 keeps live (`slash-commands-§7`,
+       *Adopting it*).
      - **`lock` / `unlock` are a MAY** (`slash-commands-§8`). Their absence is **not** a finding and
        owes no register row. Where they exist, check only that both write the *Lock frame* row's
-       stored path through the single write seam, hold no state of their own, and are refused while
-       disabled. **Do not** file Multi Meters' `/mm lock on|off` against §8 — its master-lock
+       stored path through the single write seam and hold no state of their own. Whether they
+       refuse while disabled is slash-commands-§2's feature-verb **SHOULD**, not a finding either
+       way. **Do not** file Multi Meters' `/mm lock on|off` against §8 — its master-lock
        semantics hold a ratified deviation row, and §8 does not reach it.
    - **Check the write paths against `architecture-§5` by grep, then classify every hit.** Grep the
      addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
