@@ -525,3 +525,102 @@ found live, and each is fixed in the vendored kit rather than per repo.
 cache's isolation invariant and `tests/test_parallel.lua` pins the partition. End to end on Ka0s
 Multi Meters, 1,246 cases: **2m10.8s to 3.7s**.
 
+### 15. Every out-of-game run MUST be bounded — memory, time, process depth and leaks (MUST)
+
+A headless run executes on a developer's machine, beside the editor and the agent session driving it,
+and an unbounded one takes all three down together. In this collection one did, repeatedly. A scratch
+probe left in Ka0s Kick CD's `tests/` — never committed, pointing at a sibling checkout by an absolute
+path and doing its work the moment it loaded — was registered in the runner's suite list. One of the
+suites runs `lua tests/run.lua --list` as a child process, the child loaded the probe, and the probe
+started the next child: a chain of ~700 MB `lua` processes, growing at ~145 MB/s until the kernel's
+OOM killer took the whole WSL2 VM. Separately, Ka0s Multi Meters' green gate peaked at **1.75 GB**
+without anyone noticing, because the kit's own mock held every instance a case had built until the
+process exited. Neither was visible as a test failure. This section makes both visible, and makes
+neither able to take the machine with it.
+
+**The bounds are the kit's, never the repo's.**
+
+- **MUST** run every out-of-game entry point bounded: the headless suite, `tests/perf.lua`,
+  `run-automated-tests.sh`, `luacheck` and `lizard`. Bounded means all four of:
+  - a **per-process memory cap** (`ulimit -v`, `KA0S_KIT_PROC_MB`, default 2048). Lua 5.1 answers an
+    allocation past it with a catchable `not enough memory`, so the case that crossed it fails by name;
+  - a **wall-clock timeout** (`timeout --foreground`, `KA0S_KIT_TIMEOUT_S`, default 900), foreground
+    so Ctrl-C still reaches the run;
+  - a **process-tree memory cap** where the host supports cgroups — the outermost process runs inside
+    `systemd-run --user --scope` with `MemoryMax` (`KA0S_KIT_TREE_MB`, default half of RAM), swap
+    off, and `TasksMax` (`KA0S_KIT_TASKS`, default 256), so a runaway tree is killed as one unit by
+    its own cgroup rather than by the kernel choosing among everything on the machine
+    (`KA0S_KIT_CGROUP=off` drops only this layer; a host with no systemd skips it silently);
+  - a **re-launch depth limit** (`KA0S_KIT_DEPTH`, `KA0S_KIT_MAX_DEPTH`, default 4): a process past
+    the limit refuses to start, exit 3, naming the likely cause.
+- **MUST** take those bounds from the vendored kit, never hand-roll them in a runner or a wrapper.
+  `framework.lua` applies them **on load** — every runner's first act — by re-launching itself once
+  under the bounds, so a repo adopts this section by re-vendoring and changes no code of its own.
+  `run-automated-tests.sh` carries the same variables and defaults for `luacheck` and `lizard`, which
+  load no kit.
+- **MUST** understand why the depth limit exists, because the obvious fix does not work: a per-process
+  cap alone would **not** have stopped Kick CD's chain, since every link fit under any sensible cap.
+  The depth travels in an environment variable each guarded process exports one higher, so it holds
+  even when a suite shells out through a bare `io.popen` that knows nothing of the kit; the guarded
+  process recognizes itself by a marker **argument**, which unlike the variable its children do not
+  inherit.
+- **MUST NOT** set `KA0S_KIT_GUARD=off` anywhere a gate runs. It exists for a debugger attached to one
+  process, and a gate run without it is not a gate run.
+
+**The runner holds every case to a budget.**
+
+- **MUST** fail a case whose run leaves the live heap over the **heap budget** (`heapBudgetMB`,
+  default 1024, `KA0S_KIT_HEAP_MB`), and stop the run there. The check reads
+  `collectgarbage("count")` and pays for a full collection only when that cheap reading is already
+  over, so a run inside its budget never pays for it.
+- **MUST** fail a case, and a suite file's load, that passes the **CPU ceiling** (`caseSeconds`,
+  default 120, `KA0S_KIT_CASE_S`). A count hook raises past the ceiling and keeps raising, so a body
+  that swallows the first error in its own `pcall` still cannot outrun it.
+- **MUST** fail the run through the **leak gate** (`leakBudgetMB`, default 256, `KA0S_KIT_LEAK_MB`)
+  when the live heap ends a suite more than the budget above where the run started. A harness that
+  retains a constant amount per case is invisible to every single case and becomes gigabytes over a
+  run; the gate reports once, against the suite in which the run crossed.
+- **MUST** record a raised budget — a larger `heapBudgetMB`, `leakBudgetMB` or `caseSeconds` in a
+  runner's `Kit.run{}` options — as a row in `## Documented deviations`, with the measured figure that
+  needed it and a re-check trigger. An environment override is for a single diagnostic run and is
+  never committed into a script. A budget quietly raised to make a gate pass is the leak it exists to
+  catch, with the evidence removed.
+
+**A suite does no work until it runs.**
+
+- **MUST** keep a suite file to registering cases (§1's *Registration is not execution*, now enforced
+  on the load itself by the CPU ceiling above). Work at load time runs in `--list` too, and in every
+  child process that loads the runner — which is how Kick CD's probe recursed.
+- **MUST NOT** name a path on a developer's machine in a suite: `/mnt/<drive>/`, `/home/<user>/`,
+  `/Users/<user>/` or `<drive>:\Users\`. A suite reaches the repo through the runner's `root`. The kit
+  refuses to load a suite that does, naming the file and the path.
+- **MUST NOT** leave a scratch file, probe or one-off measurement script under `tests/`, committed or
+  not. It belongs in a scratch directory outside the repo. The inventory gate (§9) catches an
+  undeclared file; it cannot catch a stray one that someone also declared.
+
+**An instance a case built is released when the case ends.**
+
+- **MUST** let a fresh addon instance (`T.load()` and its equivalents) become unreachable once the case
+  that built it returns. Nothing process-wide — a module-level table in a mock, a registry, a cache
+  keyed by an instance — may keep a build alive after its last user.
+- **MUST** know the Lua 5.1 trap that caused Multi Meters' 1.75 GB: **5.1 has no ephemerons.** A
+  weak-keyed table whose *value* can reach its own *key* is never collected. The kit's AceEvent fake
+  looked its build up through a process-wide `setmetatable({}, { __mode = "k" })` whose value, the
+  build, reached the key again through AceEvent's `embeds`, so every build and every instance ever
+  embedded in one stayed alive — 1,678 of them, 685 MB live, at exit. Keep such a reference **on** the
+  object it describes (a field, or the object's metatable) so it lives and dies with it. After the fix
+  the same suite peaks at **41 MB**, flat across all 1,678 instances.
+
+**Parallelism is sized by memory as well as CPUs.**
+
+- **MUST** cap `--jobs auto` (§14) by memory: no more workers than three quarters of `MemAvailable`
+  holds at `KA0S_KIT_SHARD_MB` each (default 512). One worker per CPU, whatever each weighs, is more
+  memory than a laptop has for a heavy suite. Several repos' suites **MAY** run at once; the bounds
+  above are what make that safe, and serializing runs by hand is not a substitute for them.
+
+**Reference implementation:** LibKa0s `testkit` revision 23 (LibKa0s v1.43.0) — `framework.lua`'s load-time guard
+(`guardProcess`), the heap, leak and CPU budgets in `Kit.run`, the host-path refusal in suite loading,
+the memory-capped `--jobs`; `mock_base.lua`'s build lookup moved onto the `__events` metatable; and
+`run-automated-tests.sh`'s `bounded` wrapper. `docs/api/testkit/version-23-docs.md` in that repo is
+the contract.
+
