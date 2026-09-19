@@ -140,7 +140,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.60.1 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.60.2 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,

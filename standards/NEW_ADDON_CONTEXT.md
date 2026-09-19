@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.60.1, 2026-09-19)
+# New Ka0s Addon — Context Pack (v2.60.2, 2026-09-20)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
