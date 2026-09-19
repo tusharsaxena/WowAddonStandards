@@ -121,6 +121,8 @@ WowAddonStandards/
   PERF_ANALYSIS.md                        -- PLAYBOOK: /wow-addon:perf-analysis (per-addon in-game capture bundle)
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
+  DEPENDENCIES.md                         -- toolchain contract (documentation-§7): git only, and why the rest is absent
+  docs/ARCHITECTURE.md                    -- how this repo is put together + the deviation register (documentation-§8)
   LICENSE
   .gitattributes                          -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
   standards/                              -- THE STANDARD (living, canonical)
