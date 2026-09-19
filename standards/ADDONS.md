@@ -17,7 +17,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Addon | Folder | Repository | Launcher left-click (launcher-§2) |
 |---|---|---|---|
 | Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker | **(b)** lock / unlock — unlocking is the preview |
-| Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster | **(b)** lock / unlock — unlocking is the preview |
+| Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster | **(b)** test mode |
 | Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger | **(a)** the ledger browser |
 | Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/ConsumableMaster | **(b)** lock / unlock — the macro bar's lock |
 | Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/KickCD | **(b)** lock / unlock — unlocking is the preview |
