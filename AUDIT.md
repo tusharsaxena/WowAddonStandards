@@ -643,6 +643,19 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        (g), (h) and (i) — which have nothing to attach to on a page with no strip — as consequences
        of one decision; six roots would sextuple a single finding. The dependents are still listed
        under the root, because the remediation order is theirs.
+   - **Check nothing closes Blizzard's settings window in combat, and no host guards what the
+     library locks (options-ui-§2, options-ui-§13, anti-pattern #88).** Grep the addon's own code,
+     vendored copies excluded:
+     `grep -rnE 'SettingsPanel|HideUIPanel|ToggleGameMenu|OpenToCategory' --include='*.lua' . | grep -v -e '/libs/' -e '/tests/_kit/'`.
+     Classify every hit. A call behind the open function's `InCombatLockdown()` refusal is the
+     compliant open gate; a `HideUIPanel` of the addon's own frame is not this rule. A close, hide,
+     commit or category switch of Blizzard's settings window reachable while `InCombatLockdown()` —
+     from an `OnShow`, a `PLAYER_REGEN_DISABLED` handler, anywhere — is a MUST failure. Then look
+     for a host-side combat guard beside the library's lock: an `InCombatLockdown()` check in a tab
+     callback, a setter wrapper or a page builder that refuses what the library already refuses is
+     a finding against options-ui-§13 (tabs) or §2 (writes), and the fix is to delete it. The lock
+     itself is the library's from LibKa0s **v1.46.0**; an addon on an earlier tag files it as a
+     re-vendor item, not as a panel deviation.
    - **Check the degradation stub covers every member the addon calls.** For each setup file, list
      the members the addon reaches on the library instance (grep the call sites) and confirm the
      library-absent branch answers **all** of them; a stub missing one is not a fallback, it is a
