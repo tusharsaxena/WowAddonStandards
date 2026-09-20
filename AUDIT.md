@@ -205,8 +205,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (`packaging`).** Two mechanical checks, and the second is the one that has been missed:
 
      ```sh
-     # (a) the named dev-only entries are ignored
-     for e in .luacheckrc .pkgmeta .gitignore .gitattributes .claude .superpowers docs tests _dev; do
+     # (a) the named dev-only entries are ignored. `tools` is conditional: layout-§1 puts a
+     #     generator the repo authors there, so the ignore is owed only by a repo that HAS the folder.
+     entries=".luacheckrc .pkgmeta .gitignore .gitattributes .claude .superpowers docs tests _dev"
+     [ -d tools ] && entries="$entries tools"
+     for e in $entries; do
        grep -q "^  - $e\b" .pkgmeta || echo "NOT IGNORED — $e"
      done
 
@@ -224,6 +227,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      lines in a single file. The consequence is player-facing and concrete: a multi-file agent
      tooling directory inside the packaged AddOn, which is what (b) was added for after five addons
      shipped one and prose alone had already failed to stop it.
+   - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. Known instance at ratification: Pretty Chat's `GlobalStrings/split_globalstrings.py`, named in the v2.61.0 changelog as owing the move — file it as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
    - **Check the TOC's position annotations (`toc-file-§5`).** In the `# Core` block, every line
      whose position is **load-bearing** — a library major taken as an upvalue at file scope, a
      constant resolved from an earlier seam at file load — **MUST** carry a comment at the line

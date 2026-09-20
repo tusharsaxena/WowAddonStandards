@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.60.2, 2026-09-20)
+# New Ka0s Addon — Context Pack (v2.61.0, 2026-09-20)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -144,6 +144,10 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     wow_mock.lua         -- thin extender over _kit/mock_base.lua
     test_*.lua           -- one suite per module
     perf.lua             -- offline scenario runner; OUTSIDE the green gate (performance-§9)
+  tools/                 -- ONLY if the addon authors a generator: the PROGRAM lives here,
+                         -- dev-only, .pkgmeta-ignored, never loaded and never in the TOC;
+                         -- not a source folder, and its output stays where its reader
+                         -- needs it (layout-§1)
   docs/                  -- ARCHITECTURE.md, testing.md, smoke-tests.md, planning; NO agent-context.md (documentation-§3); no TODO.md once released (documentation-§4)
     performance.md       -- required: the addon's perf page (performance)
     perf-analysis/       -- required: the standing IN-GAME capture store (performance-§8)
@@ -911,13 +915,16 @@ the carve-out without the pin above it is explicitly **not** compliance (`line-e
 # (sed, WSL editors, generators) are corrected the moment they are staged.
 * text=auto eol=crlf
 
-# Shell scripts are LF, ALWAYS — even in a CRLF-pinned repo, where everything
-# else is CRLF. `#!/usr/bin/env bash` followed by CRLF makes the kernel look for
-# an interpreter literally named "bash\r", and every `case`/`in` line becomes a
-# syntax error. The vendored tests/_kit/run-automated-tests.sh is the file this
-# protects (automated-tests-§2); without this carve-out the runner is broken on
-# every checkout rather than in one contributor's working tree.
+# A file with a shebang is LF, ALWAYS — even in a CRLF-pinned repo, where
+# everything else is CRLF. `#!/usr/bin/env bash` followed by CRLF makes the
+# kernel look for an interpreter literally named "bash\r", and every `case`/`in`
+# line becomes a syntax error; `#!/usr/bin/env python3` fails identically, and
+# the error names "python3\r". The files this protects are the vendored
+# tests/_kit/run-automated-tests.sh (automated-tests-§2) and any generator
+# under tools/ (layout-§1). Without these carve-outs each is broken on every
+# checkout rather than in one contributor's working tree.
 *.sh text eol=lf
+*.py text eol=lf
 
 # Binaries — never line-end converted, never diffed as text. `text=auto` would
 # usually detect these, but detection is content-based and a truncated or
@@ -1012,6 +1019,8 @@ ignore:
   - .superpowers     # dev-only: agent tooling; never loaded by the client
   - docs        # holds docs/audits/ and docs/reviews/ too — all dev-only
   - tests
+  # - tools          # ONLY in a repo that HAS a tools/ (layout-§1). Left out until the folder
+  #                    exists: a list padded with absent entries goes stale the other way.
   - _dev
   - "*.bak"
 ```
@@ -1209,7 +1218,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 12. Combat lockdown: gate `InCombatLockdown()` (secure writes — settings setters, secure-frame attributes) and defer those with `PLAYER_REGEN_ENABLED`. **Exception — options-panel open (options-ui-§2): refuse under lockdown, do not defer.** Print a gray `NS.PREFIX` notice ("cannot open settings during combat — Blizzard's category-switch is protected") and return; **never** `Settings.OpenToCategory` under lockdown, and **never** auto-open on `PLAYER_REGEN_ENABLED`. **Never** close, hide or commit Blizzard's settings window from addon code in combat (`SettingsPanel:Close`, `HideUIPanel(SettingsPanel)`, `ToggleGameMenu`) — a page shown in combat is locked by the options library, tab strip included, and the host adds no page-level lock of its own — no cover, tab guard, render refusal or close — while a setter that creates, destroys or rebuilds frames still gates itself on `InCombatLockdown()` (options-ui-§2/§13, anti-pattern #88). For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
 13. Per-frame loops: cache db values into module locals, refresh via `M:RefreshUpvalues()` on settings change.
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
-15. File LOC cap: ~1500, over **every authored `.lua` the repo tracks** — `tests/` included; `libs/`, `tests/_kit/` and generated non-shipping data are the only carve-outs (layout-§1). Peel when exceeded, or carry the file as a tracked issue or a ratified register row: those are the three terminal states, and doing none of them is the deviation.
+15. File LOC cap: ~1500, over **every authored `.lua` the repo tracks** — `tests/` included; `libs/`, `tests/_kit/` and generated non-shipping data are the only carve-outs (layout-§1). A **generator the repo authors** and commits — the program, not its output — lives under `tools/`, is `.pkgmeta`-ignored, is never loaded or listed in the TOC, and is capped like any other authored file; `tools/` is **not** a source folder. A non-Lua generator is outside the green gate — the linter and the harness read neither Python nor shell — so it **SHOULD** fail loudly and non-zero, write beside a source file rather than over it, and have its interpreter named in `DEPENDENCIES.md` (layout-§1). Peel when exceeded, or carry the file as a tracked issue or a ratified register row: those are the three terminal states, and doing none of them is the deviation.
 16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries. **`libs/LibKa0s/` is copied WHOLE, every time** — every module, even unwired ones; a partial copy costs the addon majors it was not even touching (anti-pattern #48) — TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml`, and kept **byte-identical** to its source repo (`diff -r` empty), with a re-vendor commit here after every library change, because both repos stay green while the copies silently diverge (library-stack-§7, anti-pattern #45). Nothing under `libs/` is ever edited locally.
 16b. **Consume, never fork** (anti-pattern #47): the chat printer, the debug console, the slash dispatcher, the options toolkit, the performance harness and the test harness are `LibKa0s`. Adopting one is a **descriptor plus a degradation stub** in the addon's own setup file. Anything genuinely missing goes back into the library as an **additive** descriptor field so every consumer gets it — never a local patch, and never a private lookalike.
 16a. **Performance harness** (performance): vendor `LibKa0s-Perf-1.0`, build `NS.Perf` from a descriptor in `core/PerfSetup.lua` (degrading to a working stub if the lib is absent), bracket hot paths with the gated `local t0 = Perf.on and debugprofilestop()` form — **zero work when off**, evidenced by the offline zero-overhead scenario, never by a comment — declare buckets with their `within` nesting, expose the reserved **`perf`** verb through `NS.COMMANDS` (the lib returns lines; never let it register a slash), declare `<Addon>PerfDB`, and implement `suspend`/`resume` so the addon goes inert **without a `/reload`** with visibility refused at the **source** of the show decision. Never hand-roll a probe, and never let a shared harness own a frame on your behalf (anti-patterns #43/#44). The **static** half of the same question — where the addon is getting hard to change — is the `lizard` run recorded in every automated-test bundle (rule 20e, automated-tests).

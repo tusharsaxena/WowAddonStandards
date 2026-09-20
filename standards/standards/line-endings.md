@@ -94,22 +94,32 @@ which trains its readers to ignore the one gate that exists to catch a real drif
   tree is exempt from the repo's own representation, which is exactly the claim testing-§11's gates
   are written to be able to make for themselves.
 
-### 3. `*.sh` is LF in both kinds (MUST)
+### 3. A shebang file is LF in both kinds (MUST)
 
 - Both variants **MUST** carry:
 
   ```gitattributes
   *.sh text eol=lf
+  *.py text eol=lf
   ```
 
   **including the LF-pinned repos**, where it is redundant. It is mandatory there anyway because the
   line is the thing a reader looks for, and a rule you can satisfy by omission is one that gets
   omitted the day someone changes the pin above it.
-- The reason is unconditional: `#!/usr/bin/env bash` followed by CRLF makes the kernel look for an
-  interpreter literally named `bash\r`, and every `case`/`in` line becomes a syntax error. The file
-  this protects in a client-bound repo is the vendored `tests/_kit/run-automated-tests.sh`
-  (automated-tests-§2); in `wow-addon` it is `scripts/normalize-eol.sh`, the hook the plugin runs on
-  every `Write`/`Edit`.
+- The reason is unconditional and is about the **shebang**, not about shell: `#!/usr/bin/env bash`
+  followed by CRLF makes the kernel look for an interpreter literally named `bash\r`, and every
+  `case`/`in` line becomes a syntax error. `#!/usr/bin/env python3` fails the same way, for the same
+  reason, and the kernel's error names `python3\r` — a string nobody greps for. The files this
+  protect in a client-bound repo are the vendored `tests/_kit/run-automated-tests.sh`
+  (automated-tests-§2) and any generator under `tools/` (layout-§1), which since v2.61.0 the standard
+  expressly contemplates being written in Python; in `wow-addon` it is `scripts/normalize-eol.sh`,
+  the hook the plugin runs on every `Write`/`Edit`.
+- **`*.py` is listed because the rule that sanctioned the file and the rule that keeps it runnable
+  landed in the same version.** `layout-§1` gave a committed generator a home, and a CRLF-pinned repo
+  would have handed the first one that arrived a broken shebang on every checkout — the rule creating
+  the bug it already knew how to prevent. Extend the pair to any other interpreter the collection
+  adopts: what binds is a tracked file whose first line is a shebang, and the two extensions named
+  here are the two that exist.
 - The failure is uniform rather than intermittent — the script is broken on **every** checkout, not
   in one contributor's tree — which is why it reads as *"the script is wrong"* and sends the reader
   to the wrong repo.
@@ -177,13 +187,16 @@ sync.
 # (sed, WSL editors, generators) are corrected the moment they are staged.
 * text=auto eol=crlf
 
-# Shell scripts are LF, ALWAYS — even in a CRLF-pinned repo, where everything
-# else is CRLF. `#!/usr/bin/env bash` followed by CRLF makes the kernel look for
-# an interpreter literally named "bash\r", and every `case`/`in` line becomes a
-# syntax error. The vendored tests/_kit/run-automated-tests.sh is the file this
-# protects (automated-tests-§2); without this carve-out the runner is broken on
-# every checkout rather than in one contributor's working tree.
+# A file with a shebang is LF, ALWAYS — even in a CRLF-pinned repo, where
+# everything else is CRLF. `#!/usr/bin/env bash` followed by CRLF makes the
+# kernel look for an interpreter literally named "bash\r", and every `case`/`in`
+# line becomes a syntax error; `#!/usr/bin/env python3` fails identically, and
+# the error names "python3\r". The files this protects are the vendored
+# tests/_kit/run-automated-tests.sh (automated-tests-§2) and any generator
+# under tools/ (layout-§1). Without these carve-outs each is broken on every
+# checkout rather than in one contributor's working tree.
 *.sh text eol=lf
+*.py text eol=lf
 
 # Binaries — never line-end converted, never diffed as text. `text=auto` would
 # usually detect these, but detection is content-based and a truncated or
@@ -265,13 +278,16 @@ sync.
 # staged.
 * text=auto eol=lf
 
-# Shell scripts are LF, ALWAYS — even in a CRLF-pinned repo, where everything
-# else is CRLF. `#!/usr/bin/env bash` followed by CRLF makes the kernel look for
-# an interpreter literally named "bash\r", and every `case`/`in` line becomes a
-# syntax error. The vendored tests/_kit/run-automated-tests.sh is the file this
-# protects (automated-tests-§2); without this carve-out the runner is broken on
-# every checkout rather than in one contributor's working tree.
+# A file with a shebang is LF, ALWAYS — even in a CRLF-pinned repo, where
+# everything else is CRLF. `#!/usr/bin/env bash` followed by CRLF makes the
+# kernel look for an interpreter literally named "bash\r", and every `case`/`in`
+# line becomes a syntax error; `#!/usr/bin/env python3` fails identically, and
+# the error names "python3\r". The files this protects are the vendored
+# tests/_kit/run-automated-tests.sh (automated-tests-§2) and any generator
+# under tools/ (layout-§1). Without these carve-outs each is broken on every
+# checkout rather than in one contributor's working tree.
 *.sh text eol=lf
+*.py text eol=lf
 
 # Binaries — never line-end converted, never diffed as text. `text=auto` would
 # usually detect these, but detection is content-based and a truncated or
@@ -456,7 +472,7 @@ under an `eol=crlf` pin for nine kit revisions with a green suite above them.
 
 ```sh
 # (a) present at root, and (b)/(c)/(d) the pin, the carve-out and the binaries
-test -f .gitattributes && grep -nE '^\* text=auto eol=(crlf|lf)$|^\*\.sh text eol=lf$|binary$' .gitattributes
+test -f .gitattributes && grep -nE '^\* text=auto eol=(crlf|lf)$|^\*\.(sh|py) text eol=lf$|binary$' .gitattributes
 
 # (e) does the WORKING TREE agree with the declared pin? — one number, not a list
 git ls-files -z | xargs -0 -I{} sh -c '
