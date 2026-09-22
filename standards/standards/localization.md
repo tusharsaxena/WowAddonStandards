@@ -260,6 +260,45 @@ whose subject is this rule and which therefore quotes a forbidden spelling **in 
 this section, `anti-patterns` #46, any downstream restatement of either, and the gate's own copy of
 the lists.
 
+**A spelling that is not the repository's English to correct MAY be waived, per FILE and per WORD.**
+The exclusions above answer *which files a gate reads*; this answers the narrower question they do
+not, which is what to do when a scanned file legitimately holds a forbidden spelling. Three shapes
+recur and none of them is a defect:
+
+- **A library's field name.** `AceTimer-3.0` spells its cancellation flag the British way, and a
+  timer handle records it under that name because that is the name the kit's live-timer survey reads
+  off a handle. Correcting it would not fix prose; it would stop the survey seeing a canceled timer
+  as canceled and leave a stand-down suite's timer assertion quietly unfalsifiable, which
+  `slash-commands-§7` forbids outright.
+- **Game data matched on its own token.** Blizzard spells its `LFG_LIST_APPLICATION_STATUS_UPDATED`
+  status the British way; an addon matches it verbatim off the event, and a respelling is a lookup
+  that never matches. This section already requires matching game data on stable IDs and tokens —
+  the waiver is that rule reaching the gate.
+- **A generated dump of the client's own strings**, such as a vendored `GlobalStrings` table. That
+  is the game's English arriving whole, not the addon's.
+
+Three MUSTs govern it, and they exist because a waiver is the one part of this gate that can hide
+the defect it was built to find:
+
+- **Per file AND per word.** A whole-file waiver is forbidden. It hides every *other* British
+  spelling in a file the repository edits often, which is how a gate acquires a blind spot the size
+  of a module.
+- **The reason is written beside it.** A waiver with no stated reason is indistinguishable from a
+  spelling nobody got round to fixing, and the next sweep either re-fixes it or widens it.
+- **It waives, it never extends.** A waiver MUST NOT add an entry to `BRITISH` or remove one from
+  `ALLOWED`; those lists stay whole and are this section's alone, as above.
+
+The kit implementation reads waivers from an optional `tests/prose_waivers.lua` returning
+`{ skipDirs, skipFiles, waived = { [path] = { word = true } } }`. A file that exists but does not
+return a table is a **failure**, not an empty one: the alternative silently widens the gate.
+
+**The gate SHOULD be the one the test kit ships** (`tests/_kit/test_prose.lua`, kit revision 24),
+wired as one entry in the runner's suite list, rather than hand-written per repository. Eleven
+hand-written copies are eleven chances to carry a subset, and the collection proved it: by the time
+the kit shipped one, seven repositories had written their own under three different filenames and
+four had none at all. A repository that still carries its own copy wires one or the other, **never
+both** — two gates over one rule is two lists to keep whole.
+
 Lint cannot catch any of this (`luacheck` does not read English), so enforcement is three-layered:
 the gate above for the mechanical part, `/wow-addon:standards-audit`, which flags a British spelling
 in authored text as a deviation, and review for the rest — the locale-key ripple, the four exceptions,
