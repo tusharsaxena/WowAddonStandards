@@ -127,11 +127,11 @@ WowAddonStandards/
   .gitattributes                          -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
   standards/                              -- THE STANDARD (living, canonical)
     README.md                             -- what's here + how to refresh the standard
-    EXECUTIVE_SUMMARY.md               -- one-page TL;DR of the standard
-    STANDARDS.md                        -- the Ka0s WoW Addon Standard: index/entry point + Sections map (canonical)
-    standards/                          -- the standard's sections, one unnumbered file each (layout.md, ...)
-    NEW_ADDON_CONTEXT.md               -- new-addon kickstart pack; fetched at runtime, never stored in an addon
-    INDUSTRY_RESEARCH.md               -- research foundation: 10 reference addons synthesized
+    EXECUTIVE_SUMMARY.md                  -- one-page TL;DR of the standard
+    STANDARDS.md                          -- the Ka0s WoW Addon Standard: index/entry point + Sections map (canonical)
+    standards/                            -- the standard's sections, one unnumbered file each (layout.md, ...)
+    NEW_ADDON_CONTEXT.md                  -- new-addon kickstart pack; fetched at runtime, never stored in an addon
+    INDUSTRY_RESEARCH.md                  -- research foundation: 10 reference addons synthesized
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
     _raw/_industry/                       -- per-addon raw research reports (evidence)
   harvests/                               -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass
