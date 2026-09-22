@@ -187,7 +187,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
      aliases writing the *Enable `<Addon>`* row's stored path through the single write seam — no second
      key, no module flag, no local. **Disabled means the addon is not running** (slash-commands-§7):
      frames hidden, every event, message and bucket registration **actually unregistered** — an
-     early-returning handler does not satisfy this — every timer cancelled, and nothing written from a
+     early-returning handler does not satisfy this — every timer canceled, and nothing written from a
      game event. Route it through the **same stand-down latch the perf harness suspends on**, as one of
      two named holds, never through a second teardown path. The chat command, the `COMMANDS` table, the
      dispatcher, the settings-category registration and AceDB's profile callbacks are **setup** and stay

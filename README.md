@@ -25,7 +25,7 @@ source code lives here, and this work never modifies the addons themselves.
 > <https://github.com/tusharsaxena/wow-addon>, and is updated there to consume `AUDIT.md` /
 > `AUTOMATED_TESTS.md` / `NEW_ADDON.md` / `PERF_ANALYSIS.md` and the `standards/` docs from here.
 
-## The four things you can do here
+## What you can do here
 
 | I want to… | Go to | Playbook |
 |---|---|---|
@@ -34,6 +34,7 @@ source code lives here, and this work never modifies the addons themselves.
 | Start a new addon, born compliant | [`NEW_ADDON.md`](NEW_ADDON.md) | [C, below](#c-start-a-new-addon) |
 | Turn an in-game perf capture into evidence | [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) | [D, below](#d-analyze-an-in-game-perf-capture) |
 | Add/remove an addon from the roster | [`standards/ADDONS.md`](standards/ADDONS.md) | edit one table row |
+| Harvest learnings from the collection into the standard | [`harvests/`](harvests/) | run `/wow-addon:harvest-standards` |
 
 ## Scope
 
@@ -122,7 +123,7 @@ WowAddonStandards/
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
   DEPENDENCIES.md                         -- toolchain contract (documentation-§7): git only, and why the rest is absent
-  docs/ARCHITECTURE.md                    -- how this repo is put together + the deviation register (documentation-§8)
+  docs/ARCHITECTURE.md                    -- how this repo is put together + the deviation register (documentation-§3, reduced by §8)
   LICENSE
   .gitattributes                          -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
   standards/                              -- THE STANDARD (living, canonical)

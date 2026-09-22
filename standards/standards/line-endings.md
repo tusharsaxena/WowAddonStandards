@@ -462,7 +462,7 @@ under an `eol=crlf` pin for nine kit revisions with a green suite above them.
   which is worse than not existing.
 - A red **MUST** be cleared by §6's per-file re-checkout, never by `git add --renormalize .`. The index
   is already correct in every repository measured — which is exactly why nothing ever reported these —
-  so renormalising rewrites what was never wrong and leaves the bytes on disk as it found them.
+  so renormalizing rewrites what was never wrong and leaves the bytes on disk as it found them.
 - A green suite **MUST NOT** be read as covering (a) through (d). The gate compares bytes against
   declared attributes; it cannot tell you the `.gitattributes` body is byte-for-byte one of the two
   canonical ones (§5), or that a newly vendored binary type reached §4's union list. Those stay the

@@ -39,10 +39,10 @@ AUDIT.md                          -- PLAYBOOK: /wow-addon:standards-audit (per-a
 AUTOMATED_TESTS.md                -- PLAYBOOK: /wow-addon:automated-tests (per-addon test record)
 NEW_ADDON.md                      -- PLAYBOOK: /wow-addon:new-addon (scaffold, born compliant)
 PERF_ANALYSIS.md                  -- PLAYBOOK: /wow-addon:perf-analysis (per-addon in-game capture bundle)
-README.md                         -- repo overview + the four things you can do here
+README.md                         -- repo overview + what you can do here
 CLAUDE.md                         -- this file
 DEPENDENCIES.md                   -- toolchain contract (documentation-§7); git only, and why the rest is absent
-docs/ARCHITECTURE.md              -- how this repo is put together + the deviation register (documentation-§3)
+docs/ARCHITECTURE.md              -- how this repo is put together + the deviation register (documentation-§3, reduced by §8)
 LICENSE
 .gitattributes                    -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
 standards/                        -- THE STANDARD (living, canonical). Everything supports STANDARDS.md.
