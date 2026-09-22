@@ -80,17 +80,24 @@ threshold **SHOULD** say so in that `## Message Bus` section, so the next author
 what the addition costs.
 
 ```lua
+-- core/Bus.lua — every message name declared once, and typed nowhere else in the addon
+NS.MSG = {
+  -- Sender: modules/Roster.lua. Payload: the roster table.
+  ROSTER_CHANGED = "Ka0s_<Addon>_RosterChanged",
+}
+
 -- Producer (one per message; send on any embed — SendMessage fans out to all receivers)
-NS.bus:SendMessage("Ka0s_<Addon>_RosterChanged", roster)
+NS.bus:SendMessage(NS.MSG.ROSTER_CHANGED, roster)
 
 -- Consumer (MUST register on its OWN target, never the shared bus — see the receiver rule)
-NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
+NS.<Module>.__ev:RegisterMessage(NS.MSG.ROSTER_CHANGED, function(_, roster) ... end)
 ```
 
 - **MUST** prefix every message `Ka0s_<Addon>_` to avoid collision.
-- **MUST** document each message in `docs/ARCHITECTURE.md` with: name, sender (one), payload schema, all consumers.
+- **MUST declare every message name once as a constant, and use that constant at every `SendMessage` and `RegisterMessage` call site — never the literal.** A misspelled literal is not an error anywhere: a publisher that types one sends a message no one receives, a subscriber that types one registers for a message no one sends, and no lint rule, no test and no client error sees either. Nothing goes red — the only symptom is a feature that quietly does not work, and it survives every `/reload`. Routed through a constant, the same typo is a nil index at the call site and fails at once. Five addons in the collection already do this, so each `Ka0s_` literal appears exactly once in the repo. Declare the names on the addon's namespace seam as `<NS>.MSG.<SCREAMING_SNAKE> = "Ka0s_<Addon>_<Event>"`, where `<NS>` is whatever that addon calls its namespace table rather than the token `NS`. The table's home is `core/Bus.lua` where the addon has a bus file and `core/Constants.lua` where it does not; a message owned by a single module **MAY** instead be a constant that module declares and exports, provided no other file types the literal. The key's SCREAMING_SNAKE is the constant's casing and not the wire name's — see naming-cheatsheet, which fixes `<Event>` as PascalCase.
+- **MUST** document each message in `docs/ARCHITECTURE.md` with: name, sender (one), payload schema, all consumers. The catalog **MAY** satisfy that same MUST at the declaration as well, by naming the publishing module in a comment beside each constant — a reader who follows a call site arrives at the declaration, not at `ARCHITECTURE.md`, and a bus is the one structure where *who publishes this* cannot be found by reading outward from the call site. It is a **MAY** and not a SHOULD because the obligation is already discharged above: mandating the comment would mandate a second copy of a fact the architecture hub is required to carry, and the two copies would then be free to disagree. Every addon in the collection that keeps a catalog already names its senders in the declaring file — some beside each constant, the rest in that file's own header catalog — which is what a MAY records rather than compels.
 - **MUST NOT** have two senders for the same message.
-- **Each *receiver* MUST register on its own AceEvent target — never register two receivers of the same message on one shared object.** CallbackHandler keys callbacks by `(message, target)` (`events[message][self] = fn`), so if two consumers call `RegisterMessage("Ka0s_<Addon>_X", …)` on the *same* object (typically the shared `NS.bus`/`NS.addon`), the second **silently overwrites** the first — only the last registrant ever receives the message. There is no error, and it is easily masked: a `/reload` re-registers the survivor, so a live change (e.g. a settings toggle broadcast on `SettingsChanged`) appears to "work after a reload" while failing in-session. Two correct target shapes:
+- **Each *receiver* MUST register on its own AceEvent target — never register two receivers of the same message on one shared object.** CallbackHandler keys callbacks by `(message, target)` (`events[message][self] = fn`), so if two consumers call `RegisterMessage(NS.MSG.X, …)` on the *same* object (typically the shared `NS.bus`/`NS.addon`), the second **silently overwrites** the first — only the last registrant ever receives the message. There is no error, and it is easily masked: a `/reload` re-registers the survivor, so a live change (e.g. a settings toggle broadcast on `SettingsChanged`) appears to "work after a reload" while failing in-session. Two correct target shapes:
   - **AceAddon modules** — `addon:NewModule("<Name>", "AceEvent-3.0")` gives each module its own AceEvent embed; register on the module's `self`. (Reference: the interrupt-tracker's per-module handlers.)
   - **Plain-table modules on a single AceAddon object** — each receiver owns a private target from a one-line factory; never register on `NS.bus`/`NS.addon` as `self`:
     ```lua
@@ -101,7 +108,7 @@ NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roste
     end
     -- in each consumer's enable path:
     NS.<Module>.__ev = NS.NewBusTarget()
-    NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
+    NS.<Module>.__ev:RegisterMessage(NS.MSG.ROSTER_CHANGED, function(_, roster) ... end)
     ```
 - **Test harness MUST model real dispatch.** A no-op `RegisterMessage`/`SendMessage` mock hides this class of bug (the clobber only manifests through real `(message, target)` keying). The bus mock **MUST** key callbacks by target and fan `SendMessage` out to every target, so a test can assert two receivers of one message both fire.
 - Implementation: AceEvent-3.0's `:SendMessage`/`:RegisterMessage` (already in the addon); no new lib needed.

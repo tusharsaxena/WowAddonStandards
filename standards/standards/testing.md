@@ -21,8 +21,11 @@ tests/
   run.lua            -- this addon's runner: the load list, the lifecycle kick, the suite list
   wow_mock.lua       -- this addon's thin extender over mock_base
   test_<module>.lua  -- one suite per module (test_schema.lua, test_database.lua, ...)
+  test_<rule-subject>.lua
+                     -- one suite per standard rule this repo gates (test_surface_parity.lua, ...)
 ```
 
+- **A suite whose subject is a rule rather than a module is named for the rule**, `test_<rule-subject>.lua`, and **the section that mandates it names the file**. The standard already does this at `tests/test_disabled.lua` (slash-commands-§7) and `tests/test_kitsync.lua` (§11); `tests/test_surface_parity.lua` (§8) and `tests/test_vendor_sync.lua` (§11) are named for the same reason. The filename is normative rather than habitual because an auditor grading one rule across eleven repos otherwise has to find the suite before grading it, and a repo that renames it fails nothing. Unanimous practice was already here — all eleven addons ship both files under exactly these names, and each opens with a header naming itself — so this writes down what the collection does rather than asking it to move.
 - **`tests/run.lua`** **MUST** keep only what is genuinely this addon's. It `dofile`s the kit's `framework.lua` and `loader.lua`, builds the environment once by loading the vendored library files and then the addon's own files (§9), mirrors the in-game lifecycle (`NS:InitDB()`, and the settings-panel build if the addon has one, so the schema-to-widget layer is exercised as the client exercises it rather than through hand-called fictions), publishes the shared table via `Kit.expose`, and hands the ordered suite list to `Kit.run{ dir = "tests/", suites = { ... } }`. `Kit.run` exits **0** on success and **1** on any failure, so the green gate is a plain shell check.
 - **`Kit.expose`** merges `test` and the assertions (`fail`, `assertEqual`, `assertTrue`, `assertFalse`, `assertNil`, `assertNear`, `assertError`) into the table you pass, so each repo keeps its own global name — `AT_TEST`, `LK_TEST`, … — and its own extra keys. Adopting the kit therefore requires **no change to any existing suite file**, which is what made adoption one commit per repo rather than a rewrite.
 - **`loader.lua`** loads each source with `loadfile`, `setfenv`s it into an environment whose `__index` resolves WoW globals to the mock table first and falls back to `_G`, and calls the chunk as `chunk(addonName, NS)` when `Loader.addonName` is set — reproducing the client's `local addonName, NS = ...` header. Library chunks take no arguments, so a library-only repo leaves `addonName` nil. Its `__newindex` **writes through to `_G`**, deliberately: without that, a sandboxed write to a SavedVariables global or a `StaticPopupDialogs` registration is silently lost and the migration paths become untestable.
@@ -32,6 +35,10 @@ tests/
 **Mock fidelity (MUST).** The kit's `README.md` carries the fidelity rules in full; each exists because a friendlier mock already hid a real bug. An addon's extender **MUST** hold to the same five: a stub that silently succeeds is worse than no stub when production code branches on its return value; getters used in arithmetic or concatenation return real numbers and strings; anything a test needs to **observe** is recorded rather than no-opped (a no-op `RegisterUnitEvent` lets a widened or dropped per-unit event filter pass the entire suite); anything a test needs to **drive** is fireable; and the awkward real behavior is modeled rather than the convenient one (AceDB's in-place `copyDefaults`, AceConsole's `Embed` clobbering a same-named custom `Print`).
 
 **Registration is not execution.** The kit **collects** every case and runs nothing until `Kit.run`. A runner that executes a case body at registration time and short-circuits it in list mode makes `--list` a second code path through the same file, and the inventory can then disagree with the run. An addon **MUST NOT** reintroduce that shape; `--list` is a pure filter over the registry and cannot drift from what actually runs.
+
+**A gate closes a class of deviation only when it reads the whole of its own denominator.** Every gate the kit ships — and every gate a section below mandates — **MUST** state its scope, and that scope **MUST** be the whole set the gate's own rule is about, **enumerated from the tree** rather than hand-listed in the suite, minus the carve-outs the rule itself names. What that set *is* varies by rule, and the MUST is about never typing it out. A gate asserting a property of **the repository's files** takes the whole `git ls-files` set — the EOL gate (line-endings-§7) and the prose gate (localization-§5) both do. A gate whose rule is about a **named payload folder** takes that folder, and reads it **whole**: §11's kit-sync gate compares the source `testkit/` against the vendored `tests/_kit/`, and its consumer-side half compares `libs/<Lib>/` against the sibling checkout's ship folder — each by listing both directories and comparing the **sets**, never the files someone remembered. A gate whose rule is about an **adopted surface** takes the surface: §8's stub-surface parity case is scoped to the LibKa0s modules this addon adopts, which is exactly why its member list **MUST** come from a named `grep` rather than from reading. Anything narrower than the rule's own denominator reports green on the part it read and says nothing about the rest, while the run's pass line and the repo's inventory both read as coverage.
+
+The collection has the controlled experiment: on 2026-09-08 the line-ending class went to zero in all ten repos that had strays the cycle before, three of them naming `tests/_kit/test_eol.lua` as the owner, because that gate asks `git check-attr` about every tracked path (line-endings-§7). On the same date, with the same kind of vendored gate, the British-spelling class did **not** close — the library repo's `tests/test_prose.lua:19` fixes its scope to two hand-written directory names and does not recurse, leaving 216 live hits invisible to a green suite, and a second repo's copy carried a private word list where the standard publishes a canonical one. The difference was not gate-versus-prose, and it was not `git ls-files` versus anything else: one gate derived its denominator from the tree and the other typed it in.
 
 ### 2. Commands
 
@@ -166,6 +173,10 @@ failure that ships. The failure that ships is a degradation stub whose **member 
 what the host actually calls, which loads perfectly and then raises at the moment a user reaches the
 one path that calls the missing member — anti-patterns #56.
 
+- **MUST** live in **`tests/test_surface_parity.lua`**, declared in `tests/run.lua`'s suite list like
+  any other suite (§1) and inside the green gate (§4). This is the rule-subject naming §1 states, and
+  the file is the collection's own: all eleven addons already carry it under exactly that name, as does
+  the library repo where the gate is asserted first.
 - **MUST** carry, **per adopted LibKa0s module**, a **stub-surface parity case**: a declared list of the
   members the addon reaches on that instance, asserted **present on both arms** — the live instance and
   the library-absent stub. Both arms, not just the stub: a list that has drifted from the live surface
@@ -220,23 +231,75 @@ all of them are under the green gate.
   - every path **in the declared list** exists on disk — otherwise a renamed or deleted suite stops
     contributing cases while the run stays green.
   A runner that **auto-discovers** its suites from the directory satisfies this by construction and
-  carries no declared list to pin; the rule binds a runner that **declares** one. Two repos already
-  ship exactly this gate and are the **existing reference implementations** to copy rather than
-  reinvent — this is not a rule nobody has written yet:
-  **BankLedger** (`tests/test_harness.lua:22-32`), and
-  **PanelMaster** (`tests/test_harness.lua:19-32`).
-- The matching kit-side rule: **`loadSuites` MUST report a listed-but-absent suite as a skip carrying
-  its reason** (`Kit.skip`, §11) rather than silently omitting it. That keeps the affordance the
-  silence was protecting — a suite can be listed while it is still being written — while a renamed
-  suite stops disappearing without a trace. The write-in-progress case stays expressible as an explicit
-  `{ name = …, pending = … }` entry, which registers as a skip and says so.
+  carries no declared list to pin; the rule binds a runner that **declares** one. The shape to write is
+  a case in the repo's own harness suite that lists `tests/test_*.lua` off disk and compares it against
+  the list the runner publishes — and this is not a rule nobody has written yet. Evidence that it is
+  already writable: `BankLedger/tests/test_harness.lua:22-32` lists the directory, and
+  `PanelMaster/tests/test_harness.lua:19-32` reads the runner's published list and asserts both
+  directions against it.
+- **A declaration is the pair (basename, directory), and a suite the vendored kit ships MUST be
+  declared with an entry naming the kit directory** — `{ name = "test_prose", dir = "tests/_kit/" }`,
+  not the bare `"test_prose"`. The bare form wires the repo's own file of that name, and the inventory
+  check, keyed by basename, accepts it as covering the kit's file too. Two MUSTs follow. Both are
+  **failures, not silent passes**, and the second carries the one carve-out — a decline the repo has
+  written down — which reports as a skip rather than as a failure and is stated in full there:
+  - a consumer suite whose basename collides with a file in `tests/_kit/`, declared without the kit
+    directory, is a **collision to be reported** — naming **both** paths and saying **which one is
+    running** — never silently accepted. A repo wires the kit's gate or its own, never both
+    (localization-§5 states it for the prose gate; it is general), and the report is what makes the
+    choice visible at the moment it is made rather than at the next audit;
+  - the general form: **any suite file present in `tests/_kit/` that no declaration references** is the
+    same hole and **MUST** be reported — **unless the repo has declined that gate** in favor of its own
+    suite over the same subject **and recorded the decline** as a row in its `## Documented deviations`
+    register (documentation-§3), keyed to the rule the gate serves. A recorded decline is reported
+    **once, as a decline carrying that reason** (`Kit.skip`, §11): never as a hole, and never silently
+    as a pass. An unreferenced kit file with **no** such row is a hole and a **failure**. The carve-out
+    is not a softening — it is what the failure mode actually is. What this rule catches is a gate
+    **nobody knows is not running**, and a register row is precisely the case where somebody knows;
+    without it, the permission localization-§5 grants — a repo carrying its own prose gate wires the
+    kit's copy or its own, **never both** — would be a permission no repo could exercise without
+    failing this MUST. Together these two rules have exactly one reading: wire the kit's file, or wire
+    your own **and** record why the kit's is unwired. Silence about it is the one state neither allows.
+    That is also what makes the next kit gate arrive loudly in a repo that has not wired it, instead of
+    landing as a file nothing loads.
+  The reason is that a gate that silently does not run is **worse** than an absent one: an absent gate
+  leaves a visible gap, while a shadowed one leaves the repo's own record — the runner's suite list,
+  `docs/test-cases.md`, the pass count — asserting the rule is covered. Six of the twelve repos are in
+  exactly that state today, each running a 262–443-line local copy of a gate the kit also ships, and
+  the divergence is already real: the kit's copy reads its waiver file from disk while two of the local
+  copies hardcode the waiver table. The published word lists those six shadow are byte-equal to the
+  kit's **today**, which is why this is worth closing before the next amendment rather than after — an
+  amendment arriving by re-vendor would reach six repos' dark copy and none of their live ones. This is
+  §1's own-denominator rule applied to the suite inventory itself: the inventory reads two
+  directories, so its key has to carry which one.
+  Both reporting MUSTs above bind the kit's inventory check **from LibKa0s test-kit revision 25
+  (LibKa0s v1.55.0)**, the revision in which the declaration key becomes the pair. They bind the kit,
+  not the consumer: a repo whose vendored kit predates that revision owes the **re-vendor**, never a
+  hand-written suite of its own (§1). What the consumer owes on its own account is the declaration —
+  the kit-directory entry, or the register row that says it declined.
+- The matching kit-side rule, and unlike the two above it carries **no commencement**, because it
+  describes the kit already in the tree rather than one a later revision has to deliver. **`loadSuites`
+  MUST raise on a listed-but-absent suite**, naming the path and the declaration's position in the
+  list, rather than silently omitting it — and rather than reporting it as a skip. The reason is the
+  bullet above: a silent omission is exactly the failure that bullet exists to catch, so the kit-side
+  answer to it cannot be a status that is counted and passed over. **An error names the path; a skip
+  buries it**, and a renamed or deleted suite is a defect in the inventory, not a deferral. The
+  write-in-progress affordance the old silence was protecting is **declared, never inferred**: a suite
+  deliberately absent while it is being written is listed as `{ name = …, pending = "why" }`, which
+  registers as a **skip carrying that reason** (`Kit.skip`, §11) and says so in the run. Declaring it
+  is what separates the two cases, which is why the marker cannot be left lying around either — a
+  `pending` entry whose file **does** exist **MUST** raise as well, telling the author to drop the
+  field so the suite's cases actually run. This is what LibKa0s test-kit revision 24 ships today
+  (`testkit/framework.lua`, `loadSuites`), and the rule is written to it.
 
 The rule exists because these failure modes are **silent, and the first two happened during the LibKa0s
 extraction**:
 
-- a suite named in the runner's list but missing from disk is **skipped, not failed** — deliberately,
-  so a suite can be listed while it is being written — so a renamed or deleted suite quietly stops
-  contributing cases while the run stays green and the count barely moves;
+- a suite named in the runner's list but missing from disk **was skipped rather than failed** —
+  deliberately, so a suite could be listed while it was being written — so a renamed or deleted suite
+  quietly stopped contributing cases while the run stayed green and the count barely moved. This is the
+  one of the three the kit has since closed outright, by the bullet above: the absence now raises, and
+  the deliberate case is declared `pending` instead of being inferred from the silence;
 - a **library file omitted** from the load list makes the dependent module refuse to register (its
   dependency guard returns before `LibStub:NewLibrary`, library-stack-§7), so the host's setup file
   falls back to its stub and the suite happily measures **the stub** — green, and testing nothing;
@@ -247,8 +310,9 @@ extraction**:
 
 None of the three shows up in the pass/fail line. Derivation is what makes the first two impossible
 rather than merely noticed; for the third, where no derivation is possible because the list *is* the
-declaration, a two-directional case is the substitute — and `loadSuites` reporting a skip instead of
-silence is what stops the first from being invisible in the meantime.
+declaration, a two-directional case is the substitute — and `loadSuites` raising on the absence instead
+of passing over it is what stops the first from being invisible in a repo whose runner still declares
+its list by hand.
 
 ### 10. The versioning suite (repos that publish per-file LibStub minors)
 
@@ -345,6 +409,14 @@ passing**. Both copies keep working when they drift, so both suites stayed green
   the library repo's ship folder in the sibling checkout. The library-side gate proves the library repo
   is self-consistent; it says nothing about whether **this** addon's copy is current, which is the
   divergence anti-patterns #45 is actually about.
+- **MUST** carry it as **`tests/test_vendor_sync.lua`** (§1's rule-subject naming), and that file
+  **MUST delegate** to the implementation inside the payload it checks — `tests/_kit/vendor_sync.lua` —
+  rather than reimplement the comparison. Every copy in the collection is a registration of thirty-odd
+  lines against the vendored implementation, and that is the shape to keep: two implementations of one
+  gate means the kit can be fixed and eleven repos keep failing the old way, which is the argument
+  library-stack-§7 already makes about the provenance line. The implementation shipping inside the
+  payload it compares is deliberate — a local patch to it breaks the library-side gate's byte-identity
+  assertion, which is the correct outcome.
 - **The `<ref>` it compares against comes from the repo's own root `CLAUDE.md`** — the provenance line
   `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6, library-stack-§7), read with the Lua
   pattern `[Bb]undles %[LibKa0s%]%b() (v[%d%.]+)` so a standalone sentence and a mid-sentence phrasing

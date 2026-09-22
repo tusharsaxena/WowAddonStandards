@@ -299,6 +299,19 @@ the kit shipped one, seven repositories had written their own under three differ
 four had none at all. A repository that still carries its own copy wires one or the other, **never
 both** — two gates over one rule is two lists to keep whole.
 
+**Declining the kit's copy is a deviation from the SHOULD above, and it MUST be recorded** — a row in
+the repository's `## Documented deviations` register (documentation-§3) keyed `localization-§5`,
+carrying the re-check trigger that ends it. The row is not paperwork: it is what the suite inventory
+reads the decline off. An unreferenced `tests/_kit/test_prose.lua` with a row behind it is reported
+once as a **decline**; with no row it is a gate that silently does not run, which is a hole and a
+**failure** (testing-§9). The two rules therefore have one reading between them — wire the kit's copy,
+or wire your own **and** record why the kit's is unwired — and neither permits the third state, the
+kit's copy sitting unwired and unmentioned. Six of the twelve repositories are in exactly that state
+today: each declares a bare `test_prose` naming its own file, and not one of the six carries a row for
+it. That reporting lands with the kit's inventory check **from LibKa0s test-kit revision 25 (LibKa0s
+v1.55.0)**; a repository whose vendored kit predates that revision owes the re-vendor, not a
+hand-written suite (testing-§9).
+
 Lint cannot catch any of this (`luacheck` does not read English), so enforcement is three-layered:
 the gate above for the mechanical part, `/wow-addon:standards-audit`, which flags a British spelling
 in authored text as a deviation, and review for the rest — the locale-key ripple, the four exceptions,

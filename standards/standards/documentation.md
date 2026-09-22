@@ -125,6 +125,8 @@ Reference implementation (in the collection): the absorb-shield tracker's root `
 Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
 
 - **`docs/ARCHITECTURE.md`** — engineer context, and the **hub** of the doc set (documentation-§3's tier model). **Ten** mandated sections, all ten named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema** (which, for every structural registry the addon holds, names its storage keys, its one registry writer and its load pass, and for every piece of **named non-setting state** — geometry only a drag or a resize determines, a remembered view, learned or recorded data, a vendored library's own writes — its storage key, its one owner module and every function that writes it, wherever each lives; that sentence is the compliance and no register row is needed — architecture-§5), **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, **`## Documentation map`** — the per-addon doc register specified below — and **`## Documented deviations`** — the register specified immediately below.
+
+  **The count stays ten, and `layout-§1`'s over-cap census is why that has to be said.** That section mandates a heading named **`Files over the 1500-line cap`** in this same file, which makes it the first heading any repo owes here that this list does not name. It is **not** an eleventh mandated section: it is a **sub-heading of `## Documented deviations`**, and its level follows that register's own. The register is its host because the census's whole job is to say which of three terminal states an over-cap file sits in — the issue that names the seam, the ratifying deviation row, or the scheduled peel — and a reader asking whether a given breach was ratified is already reading the register that would hold the answer. Of the four repositories that carry the heading today, **two** nest it exactly there; a third keeps it under `## Layout`, and the library repo keeps it as a sibling `##` beside the register. That the collection has **not** converged is the argument for fixing the parent here rather than against it: `layout-§1` fixes the heading's name and level but not its parent, and a heading whose parent varies is one a doc-shape gate cannot find twice.
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page. Where it tabulates the four out-of-game suites, the table **MUST** carry the **checkpoint** per suite — run/commit versus the tag — and **MUST NOT** leave a `Gates? no — recorded only` cell unqualified, since that is true of a commit and false of a release (testing-§6, automated-tests-§3/§4).
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
@@ -328,10 +330,30 @@ required doc and an orphaned undocumented one are both findings, where previousl
 
 Frozen and generated material is **out of scope** and **MUST NOT** be enumerated row by row:
 `docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-analysis/<run>/`,
-`docs/superpowers/` and `docs/investigations/` are named as directories, once each. A register that
-grows a row per audit is a register nobody re-reads.
+`docs/revendor/<date>-v<tag>/`, `docs/superpowers/` and `docs/investigations/` are named as
+directories, once each. A register that grows a row per audit is a register nobody re-reads.
 
-###### `### Verification and record` — the fourth table (MUST)
+`docs/revendor/` joined that list late, and what its absence cost is the reason the list is upstream
+rather than per-repo. Ten addons ship the re-vendor store (`audit-review-history`), and all ten had to
+register it before this sentence named it — whereupon ten independent edits produced **five** different
+answers. Nine wrote a prose out-of-scope sentence of their own, and those nine carry **four** different
+directory lists: five name the store beside audits, reviews, automated-tests and superpowers; two add
+perf-analysis; one adds perf-analysis and an investigations store; one adds perf-analysis and a store
+of its own and spells the dated ones `<run>`/`<date>`. The tenth took a different reading altogether
+and it is the instructive one — it declares, in an amendment above its own tables, that *a store gets
+one row and its dated bundles get none*, and then gives each frozen store a single row in its Tier 3
+table. That is **not** a double listing and it does not break the "exactly one table" MUST; it is a
+coherent, stricter reading of the same rule, which registers the store and excludes only the evidence
+underneath it. It diverges from this section because this section puts the whole store out of scope and
+names it in prose instead. Five answers to one question, none of them careless, is what a rule that
+leaves ten repos writing its text produces.
+
+**The list is upstream because these stores are written by a command shared across every repo**, so
+one wrong answer about where a bundle lands is eleven wrong answers. That is the whole of the reason,
+and it takes nothing from Tier 3: a frozen store that is genuinely one addon's own still ships under any name
+that addon picks, with no upstream change needed to create it.
+
+###### `### Verification and record` — the fourth table added (MUST)
 
 Through v2.38.0 this register named **three** tables, one per tier, and it was **unsatisfiable as
 written**. Seven documents belong to no tier and never did: `testing.md` and `smoke-tests.md` are
@@ -573,15 +595,15 @@ files, named rather than counted:
 `packaging`, `preview-mode`, `public-api`, `standalone-windows`, `versioning-git`.
 
 An unnumbered `###` heading is **not** a section number. `standalone-windows` and
-`audit-review-history` each carry one, and counting it as "§2" is exactly the mistake this list exists
-to stop: the count shifts the moment a heading is added above it, so the citation silently comes to
-mean something else. If one of these files ever gains numbered subsections, it leaves this list in the
+`audit-review-history` both carry such headings, and counting one of them as "§2" is exactly the
+mistake this list exists to stop: the count shifts the moment a heading is added above it, so the
+citation silently comes to mean something else. If one of these files ever gains numbered subsections, it leaves this list in the
 same change.
 
-**Frozen bundles are exempt and MUST NOT be swept.** Anything under `docs/audits/`, `docs/reviews/` or
-`docs/automated-tests/` is a point-in-time record and its notation is part of what it recorded —
-the same carve-out `standards/_raw/_industry/` already has. Rewriting a citation inside a frozen bundle
-corrupts evidence to satisfy a cosmetic rule.
+**Frozen bundles are exempt and MUST NOT be swept.** Anything under `docs/audits/`, `docs/reviews/`,
+`docs/automated-tests/` or `docs/revendor/` is a point-in-time record and its notation is part of
+what it recorded — the same carve-out `standards/_raw/_industry/` already has. Rewriting a citation
+inside a frozen bundle corrupts evidence to satisfy a cosmetic rule.
 
 **Reporting shape (MUST).** An audit records the notation sweep as **one** rolled-up finding carrying
 the **command that produces the current count**, e.g.
@@ -589,7 +611,7 @@ the **command that produces the current count**, e.g.
 ```sh
 grep -rEn '§[0-9]+\.[0-9]' . \
   --exclude-dir=libs --exclude-dir=_kit \
-  --exclude-dir=audits --exclude-dir=reviews --exclude-dir=automated-tests
+  --exclude-dir=audits --exclude-dir=reviews --exclude-dir=automated-tests --exclude-dir=revendor
 ```
 
 — never a per-site enumeration. Hand-counted enumerations are what two separate audits of this
@@ -653,7 +675,7 @@ There are two today, both named in `ADDONS.md` → *Documentation-and-tooling re
 |---|---|
 | `documentation-§3`'s `ARCHITECTURE.md` | **Binds, with a reduced section set.** Six of the ten mandated sections — Settings Schema, Message Bus, Slash Commands, Event Subscriptions, Taint Notes, and Module Map *as a Lua module map* — describe a runtime this repo kind does not have, and a file recording six "not applicable" headings is worse than one that never claimed them. The mandated set here is **five**: **Overview**, **Module Map** *read as the file-and-path map* (which paths exist, what reads each one, and which are addressed by URL and therefore breaking to rename), **Known Limitations**, **`## Documentation map`**, and **`## Documented deviations`**. The last two bind unchanged and for the same reasons they bind anywhere. Writing the other five as "not applicable" rows is **not** required and **SHOULD NOT** be done: this section is the exemption, and restating it per repo is the duplication it exists to end. |
 | `documentation-§7` | **Binds.** A new machine needs the toolchain list whatever the repo ships, and the reader must not have to infer "nothing" from an absent file. Where a repo genuinely requires almost nothing, the honest content is **a short required list and an explicit *not used here* list with reasons** — `git` alone is a complete answer. **MUST NOT** invent entries to fill the addon-shaped shape: §7's evidence-based MUST already forbids it, and a padded list here would be the first thing to go stale. §7's *Runtime (in-game)* group has no instance and is omitted rather than answered. |
-| `layout` | The **folder casing** rules bind. The `core/ defaults/ settings/ locales/ modules/` skeleton and the folder load order do not — there is no TOC to order. The **1500-line cap** (`layout-§1`) binds *authored `.lua`*, so it has no instance while the repo has none; it is not re-read onto Markdown, whose length is governed by nothing here. `layout-§1`'s **`tools/`** MUST binds if and when such a repo authors a **generator** — a script that writes a file the repo commits — and its `.pkgmeta` condition is simply void, since `packaging` does not apply here at all. It does **not** reach the scripts a tooling repo exists to ship: the `wow-addon` plugin's `scripts/` holds hooks and a bounded-run wrapper that its own `hooks/hooks.json` invokes by path, and a hook is a program the repo's consumers run, not a generator producing committed output. Moving those would break the manifest for no rule's benefit. |
+| `layout` | The **folder casing** rules bind. The `core/ defaults/ settings/ locales/ modules/` skeleton and the folder load order do not — there is no TOC to order. The **1500-line cap** (`layout-§1`) binds *authored `.lua`*, so it has no instance while the repo has none; it is not re-read onto Markdown, whose length is governed by nothing here. `layout-§1`'s **`tools/`** MUST binds if and when such a repo authors a **generator** — a script that writes a file the repo commits — and its `.pkgmeta` condition is simply void, since `packaging` does not apply here at all. It does **not** reach the scripts a tooling repo exists to ship: the `wow-addon` plugin's `scripts/` holds hooks and a bounded-run wrapper that its own `hooks/hooks.json` invokes by path, and a hook is a program the repo's consumers run, not a generator producing committed output. Moving those would break the manifest for no rule's benefit. The **over-cap census** and **its gate** follow the cap and have no instance here for the same reason it does not: a repo that tracks no authored `.lua` has no over-cap set to record, so it owes neither the `Files over the 1500-line cap` heading in its `ARCHITECTURE.md` nor the vendored `tests/_kit/test_layout_cap.lua` — and by *Does not apply* above it has no `tests/` harness to wire that gate into. Both arrive on the same trigger the three verification sections already state: **the first `.lua` file this repo tracks outside a frozen bundle**. An empty census is a result and an absent one is a gap, but only once there is a set to be empty of. |
 | `naming-cheatsheet` | Binds to whatever identifiers the repo authors — a shell script's functions, a JSON config's keys. With no Lua the surface is small, not absent. |
 | `anti-patterns` | Binds, whole and unchanged. Entries keyed to an addon artifact simply have no instance; nothing is exempted. |
 | `lint`, `testing`, `automated-tests` (**if executable content appears**) | Listed in *Does not apply* above **because there is no Lua today**, and that is a statement about the tree rather than a permanent grant. A repo of this kind that grows a Lua file, a test harness or a script complex enough to have a failure mode **MUST** re-read these three against what it actually has, and record the outcome. The trigger is stated so it cannot be missed: **the first `.lua` file this repo tracks outside a frozen bundle.** A shell script alone does not fire it — the standard mandates no shell linter — but it does oblige the script's own documentation under `documentation-§5`. |
@@ -666,3 +688,45 @@ There are two today, both named in `ADDONS.md` → *Documentation-and-tooling re
 4. A **`README.md` written for contributors and agents**, naming what the repo is and how it is consumed.
 
 **A note on this repo.** `WowAddonStandards` publishes the standard it is audited against, and the temptation is to treat that as either an exemption or an embarrassment. It is neither. A rule this repo cannot satisfy is evidence about the **rule's scope**, not about the repo — which is precisely how this section came to exist, out of three deviation rows that were each individually reasonable and collectively a sign the standard was missing a repo kind.
+
+### 9. The self-naming file header (SHOULD)
+
+An authored `.lua` file under the source folders — `core/`, `modules/`, `settings/`, `defaults/`,
+`locales/` — **SHOULD** open with a comment naming its own path and saying in one line what the file is
+for and why it exists separately from its neighbors.
+
+**The reason is where the answer currently lives.** Everything this standard already mandates —
+`module-map.md`, `## Documentation map`, the TOC's load order — answers *what files exist*, and every
+one of them answers it in a file the reader is not currently in. A file whose purpose is recorded only
+elsewhere is a file a later author merges away, because at the moment that decision is made the record
+is one document away and the file in front of them looks like two hundred lines of nothing in
+particular.
+
+The path has a **second job the collection has already leaned on**: it is what survives the file being
+pasted somewhere else. Lua quoted into a review bundle, a GitHub issue or an agent transcript arrives
+with no directory around it, and the first line is then the only thing that says where it came from.
+Six addons' review and issue history is written on top of that fact.
+
+- **Placement is settled: immediately after the namespace bootstrap** (`architecture-§1`), not above
+  it. The bootstrap stays line 1 of every authored file, which is where every reader and every tool
+  looks for it; the header sits directly beneath. The collection split on this, and a header that
+  moves between files is one a sweep cannot find.
+- It binds **authored** Lua only. Vendored code under `libs/` and the vendored test kit carry their
+  upstream's header and are not the addon's to rewrite, and a generated file's header belongs to its
+  generator. In a documentation-and-tooling repo (documentation-§8) it binds unchanged and has no
+  instance until that repo authors Lua, the way `layout-§1`'s cap does.
+- **Why a SHOULD and not a MUST.** Six of eleven addons already keep the convention, and once a repo
+  has chosen it the convention runs at 87–100% of that repo's authored files — so it holds without
+  enforcement, which is exactly what a SHOULD is for. Written as a MUST it would land 99 files of
+  retroactive header-writing on the five repos that have not chosen it, for a rule whose value is in
+  code not yet written. Those five adopt it going forward, and **an existing header is
+  grandfathered where it sits**: the placement bullet above binds files authored from here, not a
+  retroactive sweep. That carve-out is not a courtesy — the collection's majority practice runs the
+  other way, with most existing headers sitting above the bootstrap rather than beneath it, so a
+  placement rule applied retroactively would make the repos that adopted the convention earliest the
+  most non-compliant of all. Settling placement is worth doing for code not yet written; re-opening
+  every file that already carries a header is not.
+- **Seed it in the scaffold.** Even the repos at the top of that range leave the same scaffolded files
+  bare — the core setup, the slash wiring, the constants table, the namespace and state files — because
+  those arrive from a template rather than from an author. A convention the scaffold does not write is
+  one every addon starts out violating.

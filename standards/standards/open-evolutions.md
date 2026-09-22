@@ -10,7 +10,7 @@ Items recorded for future versions of this standard:
 - ~~**Shared test scaffolding.**~~ **Shipped** as `testkit/` in the LibKa0s repo, vendored to each addon's `tests/_kit/` — the framework, the sandboxed loader and the universal WoW/Ace mock base (testing-§1).
 - **Multi-zone profile model adoption** for group-context addons.
 - ~~**Object pool standard** packaged as a copyable micro-lib.~~ **Shipped**, and not as a copyable micro-lib — as `LibKa0s-Pool-1.0`, in both the array and keyed shapes (library-stack-§7). A copyable micro-lib was the wrong answer for the same reason the pool needed doing at all: four copies shipped across two addons and one of them never returned anything to the free list, which a fifth copy would not have caught either.
-- **Further `LibKa0s` modules.** `LibKa0s` is now the sanctioned path for shared Ka0s-owned code (library-stack-§7), and its per-module-major layout makes each addition independent and purely additive. Shipped so far: the secret-safe/printer seams (Core), the client-fact reader (Env), the widget pool (Pool), the item primitives (Item), the shared media catalog (Media), the flat dropdown and copy window (Widgets), the debug console (DebugLog), the slash dispatcher (Slash), the options toolkit (Options), the perf harness (Perf), the minimap/broker launcher (Launcher) and the stand-down latch (Lifecycle) — **twelve majors across seventeen files**, plus the non-code `media/` payload. Candidates the collection still duplicates: the `Compat` shim, the message bus, and the Schema runtime. Each is its own decision, adopted on its own schedule — deliberately **not** a lockstep migration, and deliberately not a `Ka0s-Core` addon (library-stack-§6 forbids requiring another addon).
+- **Further `LibKa0s` modules.** `LibKa0s` is now the sanctioned path for shared Ka0s-owned code (library-stack-§7), and its per-module-major layout makes each addition independent and purely additive. Shipped so far: the secret-safe/printer seams (Core), the client-fact reader (Env), the widget pool (Pool), the item primitives (Item), the shared media catalog (Media), the flat dropdown, copy window, reorder list and drag handle (Widgets), the debug console (DebugLog), the slash dispatcher (Slash), the options toolkit (Options), the perf harness (Perf), the minimap/broker launcher (Launcher) and the stand-down latch (Lifecycle) — **twelve majors across eighteen files**, plus the non-code `media/` payload. Candidates the collection still duplicates: the `Compat` shim, the message bus, and the Schema runtime. Each is its own decision, adopted on its own schedule — deliberately **not** a lockstep migration, and deliberately not a `Ka0s-Core` addon (library-stack-§6 forbids requiring another addon).
 - **A per-addon adoption command.** Still open, and now broader than when it was written: adoption spans twelve majors rather than one, and most of the newer ones **delete files the addon owns** rather than only adding a descriptor — which is harder to script safely and more valuable to keep identical across addons. `LibKa0s/docs/adoption-prompt.md` carries the per-addon survey and hazards in the meantime.
 - **Migration-stamp ownership.** The collection holds **five incompatible schema-migration variants**
   across eight repos, disagreeing on who writes `schemaVersion` (the runner, or each step), whether it
@@ -69,3 +69,23 @@ Items recorded for future versions of this standard:
   one, given that the panel is the surface a user compares across addons least often and the strip of
   a main window most. Do it as one library minor with a screenshot of every affected page, not as a
   rolling adoption.
+
+- **Whether an unlock anchor has to be the library's handle.** `LibKa0s-Widgets-1.0` ships two drag
+  surfaces and the standard mandates one of them. options-ui-§18 requires `ReorderList` wherever the
+  **order** of a list is the setting, and four addons consume it. `DragHandle` — the labeled strip a
+  player drags to move a positionable frame, with its geometry published as `DRAG_HANDLE` — is
+  required nowhere, and three addons consume it while eight do not. The extraction bar was already
+  met before the module existed: two addons had hand-built the same widget down to the same 18px
+  strip, the same 2px gap and the same centered gold label, which is library-stack-§7's bar 1 — two
+  consumers with the same semantics — stated in the library's own voice. So the open question is not
+  whether the surface belongs in the library, which is settled, but whether it earns a **rule** of
+  §18's kind and where that rule would live: §18 is scoped to list ordering and does not reach a
+  frame-move handle, and standalone-windows governs the window chrome the library owns rather than
+  the anchor a player drags.
+
+  What would settle it is what the eight non-consumers actually draw. A handle that is genuinely
+  absent — an addon with nothing positionable — is a different answer from a fifth hand-built strip,
+  and only the second makes this the shape library-stack-§9 describes, where the count of callers is
+  not what decides. Cross-check preview-mode before writing it: the unlock anchor is the affordance an
+  addon's lock/unlock state is expressed through, so a handle rule and the preview rules must agree
+  about when the strip is on screen.

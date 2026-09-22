@@ -68,7 +68,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
    context pack: the TOC (fixed field order + `#`-section file listing, toc-file-§1/toc-file-§5), entry file, compat
    shims, locale, database/migrations, schema-driven settings (architecture-§5), and the message bus
-   (architecture-§4).
+   (architecture-§4) — whose names are declared **once** as constants in `core/Bus.lua` and used at
+   every `SendMessage` and `RegisterMessage` call site, because a misspelled literal is a message
+   nobody receives and nothing anywhere goes red; through a constant the same typo is a nil index.
+   Every authored file opens with `local addonName, NS = ...` on line 1 and, directly beneath it, a
+   comment naming its own path and saying in one line what it is for (documentation-§9). Write those
+   headers now: the collection's strongest repos all leave the same scaffolded files bare, because
+   those arrive from a template, and a convention the scaffold does not write is one every addon
+   starts out violating.
    **The shared subsystems are not written here — they are consumed.** The chat printer, the debug
    console, the options toolkit, the slash dispatcher and the performance harness are `LibKa0s`
    modules; a new addon is born with one **setup file** per module, each holding a **descriptor** and
@@ -222,7 +229,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
    behavior **test-first** (testing). Test what is **yours** — the descriptors, the degradation stubs,
    and the addon's own logic — and do not re-test the library's internals: they are covered in the
    `LibKa0s` repo, and a second copy of those cases is the duplication this whole arrangement exists
-   to remove. `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate.
+   to remove. `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate. Three suites are named by the rules that mandate them rather than by a module, and a new addon is born with all three under exactly those names: `tests/test_surface_parity.lua` (testing-§8), `tests/test_vendor_sync.lua`, which **delegates** to `tests/_kit/vendor_sync.lua` rather than reimplementing the comparison (testing-§11), and `tests/test_disabled.lua` (slash-commands-§7). **Declare every kit suite by its directory** — `{ name = "…", dir = "tests/_kit/" }` — never by bare basename. The inventory is keyed by the **pair** — name and directory — **from LibKa0s test-kit revision 25 (LibKa0s v1.55.0)**; through revision 24 it is keyed by the bare name alone, so a bare declaration beside a local file of the same name satisfies the gate while the **local** file is what loads: the kit's suite never runs and the repo's own record says the rule is covered. Writing the directory is correct under both, which is why it is the rule rather than the revision. A repo whose vendored kit predates revision 25 owes the **re-vendor**, never a hand-written stand-in — the kit is not edited or reimplemented in a consumer (testing-§9, testing-§11).
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
    (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
    incl. the standard badge, which is **not** a link and MUST NOT be wrapped in one → description →
@@ -249,7 +256,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
    Then evaluate each **Tier 2** trigger against the code you just wrote and either ship the doc or
    record it as a *Not applicable* row carrying the trigger. Finally write `ARCHITECTURE.md`'s
    `## Documentation map` listing every `docs/` page in exactly one of its four tables — Required,
-   Conditional, **Verification and record** and Addon-specific, in that order. The fourth holds
+   Conditional, **Verification and record** and Addon-specific, in that order — with the frozen and
+   generated stores named once each as directories rather than enumerated bundle by bundle. **Which
+   stores those are is `documentation-§3`'s list, read from there rather than copied** — the copy
+   that briefly stood here named five of its seven on the day the list was published, which is what a
+   copy of a list does.
+   Give the hub its `Files over the 1500-line cap` census heading in the
+   same pass, written as "Nothing is over the cap today" — an empty census is a result, and a repo with
+   no heading fails `layout-§1` on the day it is born. **Verification and record** holds
    `testing.md`, `smoke-tests.md` and the record docs, which sit outside the tier model; a v0.1.0
    addon writes all six of its rows. This is the register `standards-audit` reads, and it is easiest
    to write now, while you still know why each file exists. `ARCHITECTURE.md` is a **hub**: keep it

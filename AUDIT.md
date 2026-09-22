@@ -115,7 +115,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      *and* a "Not applicable" row is worse, because the row asserts something false — grade it above
      the bare omission.
      (c) **`## Documentation map` present in `docs/ARCHITECTURE.md`** and covering **every** `.md`
-     under `docs/` in exactly one table, with no row pointing at a file that does not exist. Orphans
+     under `docs/` in exactly one table, with no row pointing at a file that does not exist. The
+     frozen and generated stores are **out of scope** and are named as directories once each rather
+     than enumerated bundle by bundle. **Which stores those are is `documentation-§3`'s list, read
+     from there rather than copied** — open it and exclude every directory it names before you count.
+     The list is not restated here on purpose: it was centralized precisely because ten repos each
+     keeping their own copy produced four different directory lists, and a playbook carrying one more
+     copy would drift the same way and take every audit with it. Miss the re-vendor store alone and a repo
+     files twenty-five to thirty-six unregistered `.md` files that are not findings. Orphans
      and dangling rows are both findings, and this is the check that makes them findable at all.
      The register has **four tables**, in order: Required, Conditional, **Verification and record**,
      Addon-specific (documentation-§3). The fourth is not optional and not a spare tier — it holds
@@ -159,8 +166,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      #     and a documentation-and-tooling repo is exactly the 'neither' case, pinning LF.
      grep -n '^\* text=auto eol=\(crlf\|lf\)$' .gitattributes
 
-     # (c) the *.sh carve-out, mandatory in BOTH kinds (line-endings-§3)
-     grep -n '^\*\.sh text eol=lf$' .gitattributes
+     # (c) the shebang carve-outs, both mandatory in BOTH kinds (line-endings-§3)
+     grep -nE '^\*\.(sh|py) text eol=lf$' .gitattributes
 
      # (d) binaries marked (line-endings-§4)
      grep -c ' binary$' .gitattributes
@@ -180,7 +187,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      that check is a diff, not a reading — and it is a diff over the **body**, because since v2.39.0
      a repo vendoring a binary no extension rule can reach **MAY** carry a `line-endings-§5 appendix`
      below it. Run the three lines §5 specifies: `diff` the first *n* lines against the canonical
-     file (81 client-bound, 82 non-client), then read what is left. Nothing, or a block whose first
+     file (84 client-bound, 85 non-client), then read what is left. Nothing, or a block whose first
      non-blank line is exactly `# --- line-endings-§5 appendix ---`, is **compliant** and files
      nothing — neither a §5 finding nor a register row, and a row written for one before the rule
      existed is retired by bringing the block into that shape. Anything else in the tail, or an entry
@@ -202,13 +209,17 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      and still fails (e) here is a **gate** finding, not a file finding, and it outranks the strays
      it missed.
    - **Check the package ignore list by listing the repo's dot-entries, not by reading `.pkgmeta`
-     (`packaging`).** Two mechanical checks, and the second is the one that has been missed:
+     (`packaging`).** Three mechanical checks. (b) is the one auditors skip; (c) is the one the
+     playbook itself could not see until v2.63.0, so no bundle has ever reported it:
 
      ```sh
-     # (a) the named dev-only entries are ignored. `tools` is conditional: layout-§1 puts a
-     #     generator the repo authors there, so the ignore is owed only by a repo that HAS the folder.
-     entries=".luacheckrc .pkgmeta .gitignore .gitattributes .claude .superpowers docs tests _dev"
+     # (a) the named dev-only entries are ignored. THREE of them are conditional — `tools`,
+     #     `.claude` and `.superpowers`: the ignore is owed only by a repo that HAS the folder, and a
+     #     line for a folder that is not there asserts something false (packaging).
+     entries=".luacheckrc .pkgmeta .gitignore .gitattributes docs tests _dev"
      [ -d tools ] && entries="$entries tools"
+     [ -d .claude ] && entries="$entries .claude"
+     [ -d .superpowers ] && entries="$entries .superpowers"
      for e in $entries; do
        grep -q "^  - $e\b" .pkgmeta || echo "NOT IGNORED — $e"
      done
@@ -219,6 +230,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        [ -e "$e" ] || continue
        grep -q "^  - $e\b" .pkgmeta || echo "UNACCOUNTED — $e"
      done
+
+     # (c) the mirror of (a)'s gate: a CONDITIONAL entry ignored while its folder is absent. (a)
+     #     drops each of these the moment `[ -d ]` fails, so the false line its own comment warns
+     #     about is the one case neither (a) nor (b) can reach — (b) walks what is on disk, and
+     #     this line names what is not.
+     for e in tools .claude .superpowers; do
+       [ -d "$e" ] && continue
+       grep -q "^  - $e\b" .pkgmeta && echo "FALSE CLAIM — $e ignored, no such directory"
+     done
      ```
 
      `.git` is the one entry the packager never sees and never needs a row; everything else that (b)
@@ -227,7 +247,128 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      lines in a single file. The consequence is player-facing and concrete: a multi-file agent
      tooling directory inside the packaged AddOn, which is what (b) was added for after five addons
      shipped one and prose alone had already failed to stop it.
+
+     (c) costs nothing at package time — an ignore line for an absent path never changes a
+     downloaded byte — which is exactly why no build ever contradicts it and why it survives. What
+     it costs is a reader, who cannot tell a forward declaration from a mistake, and two audits have
+     now filed this gap from opposite directions: one for omitting a present directory, one for
+     naming an absent one. Grade it **Info**, roll it into the same single packaging finding as (a)
+     and (b), and quote the line. At v2.63.0 it fires in **two** of the eleven addons and prints
+     **three** lines — one repo names `.claude` alone, the other names both `.claude` and
+     `.superpowers` — so a run that prints nothing here is the expected result in the other nine
+     rather than a check that failed to run. A **commented-out** line is not a hit and must not be
+     read as one: `#   - tools` is an absent entry carrying its own explanation, which is the shape
+     `packaging`'s template teaches.
    - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. Known instance at ratification: Pretty Chat's `GlobalStrings/split_globalstrings.py`, named in the v2.61.0 changelog as owing the move — file it as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
+   - **Check the over-cap census and the gate that reads it (`layout-§1`).** The cap is not audited
+     by counting lines any more — counting was what let four repos in one cycle each answer the
+     scope question differently. Read the **census** instead: the engineer-context hub carries a
+     heading named exactly `Files over the 1500-line cap`, one row per over-cap authored file naming
+     the path, the line count and which of the three terminal states it sits in. An **absent
+     heading** is the MUST failure, and it is the one to file first, because a clean repo owes the
+     heading with "Nothing is over the cap today" — an empty census is a result and an absent one is
+     indistinguishable from a census nobody wrote. Then reconcile it against the tree in both
+     directions, which is the same assertion the kit's gate makes:
+     `git ls-files '*.lua' | grep -v -e '^libs/' -e '^tests/_kit/' | xargs wc -l` — **and then
+     subtract the repo's declared generated-data exemptions, because that pipeline subtracts only the
+     vendored carve-out and `layout-§1` has two.** Run as written it returns a 23,842-line generated
+     dump that §1 exempts at its generator rather than at its output, and filing that as an over-cap
+     breach is a **MUST** failure reported against a repo doing exactly what the rule says. Take the
+     exemptions from what the repo **declares** — a census row dispositioned as exempt, and the
+     carve-out the gate is handed through its opts table — never from a guess at a path, because the
+     carve-out turns on three conditions (generated rather than authored, loaded by nothing, excluded
+     from the package) that no filename states. A file **claimed** exempt with any of the three untrue
+     is itself the finding, and it is the one to file instead. What survives both subtractions is the
+     authored over-cap set, and it is that set the census is reconciled against in both directions:
+     every file in it appears in the census, every census row names a path that still exists and is
+     still over the cap, and every over-cap row carries a terminal state. A row whose breach has gone
+     is a decision about a file nobody has; file it. An exempt file is **not** in the set and owes no
+     terminal state; where a repo records one in the census anyway, the exempt disposition is a
+     record, not a breach, and **MUST NOT** be read as a missing terminal state.
+     Last, check the gate itself is **wired**:
+     `tests/_kit/test_layout_cap.lua`, declared by path in the suite list
+     (`{ name = "test_layout_cap", dir = "tests/_kit/" }`), not a hand-written local copy of it —
+     five repos wrote their own at 232, 221, 209, 380 and 206 lines, no two byte-identical, and a
+     repo carrying both its own and the kit's declaration is the shadowing `testing-§9` forbids. The
+     kit's gate lands **from LibKa0s test-kit revision 25 (LibKa0s v1.55.0)**; a repo whose vendored
+     kit predates that revision owes the re-vendor, not a hand-written suite, and the missing wiring
+     is not yet a finding against it.
+   - **Check every re-vendor commit has its bundle (`audit-review-history`).** Mechanical, and it is
+     a comparison of two listings rather than a judgment. **Both listings come from the payload, not
+     from a name** — the commit subject is not mandated to carry the tag and a grandfathered
+     bare-dated bundle folder does not carry it either, so a check that reads either as a tag source
+     both misses re-vendors and invents unrecorded ones:
+
+     ```sh
+     horizon=$(ls -1 docs/revendor | sort | head -1 | cut -c1-10)   # the store's first bundle
+
+     # tags vendored — read off the payload at each commit that touched libs/LibKa0s/
+     git log --since="$horizon" --format=%H -- libs/LibKa0s | while read -r c; do
+       git show "$c:CLAUDE.md" 2>/dev/null |
+         grep -oE 'Bundles \[LibKa0s\]\([^)]*\) v[0-9]+\.[0-9]+\.[0-9]+' |
+         grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1
+     done | sort -uV > /tmp/vendored.txt
+
+     # tags recorded — the folder name where it carries one, else the bundle's own first line
+     for b in docs/revendor/*/; do
+       t=$(basename "$b" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+       [ -n "$t" ] || t=$(head -1 "$b/01_DELTA.md" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -1)
+       [ -n "$t" ] && echo "$t"
+     done | sort -uV > /tmp/recorded.txt
+
+     grep -vxF -f /tmp/recorded.txt /tmp/vendored.txt               # vendored, in scope, unrecorded
+     ```
+
+     **The trigger is the commit that touches `libs/LibKa0s/`.** `versioning-git` makes the re-vendor
+     commit a **MUST** and its standing alone only a **SHOULD**, so a folded re-vendor — the shape
+     the bulk sweeps actually took, and the shape this convention lapsed under — is compliant and
+     must still be found. `git log -- libs/LibKa0s` finds it; a `grep` over subjects does not. **And
+     the tag comes from root `CLAUDE.md`'s `Bundles [LibKa0s](…) vX.Y.Z` provenance line at that
+     commit** (documentation-§2 item 6, library-stack-§7), which rolls in the same commit as the copy.
+     Measured across the ten stores, every in-scope commit resolves a tag this way and none is lost
+     to a subject that named no version.
+
+     **On the recorded side, read a bare-dated bundle's tag out of the bundle.** `audit-review-history`
+     grandfathers the bare-dated folders rather than renaming them, and twenty-eight of the collection's
+     sixty-eight bundles are bare-dated, spread across all ten stores. Each names its tag in the first
+     line of its `01_DELTA.md`; a check that compared raw folder names would file every one of those
+     twenty-eight as an unrecorded tag — a **High** finding against ten repos for records that exist,
+     in the very repos the no-rename rule promised not to disturb. Never file one without opening the
+     bundle.
+
+     **Scope it to commits at or after the repo's oldest bundle** — re-vendor commits older than the
+     store predate the convention and a check that files them reports a number nobody can act on;
+     a repo with no store yet is measured from its next re-vendor. A tag vendored with no bundle
+     naming it and no `## Documented deviations` row saying why is a **High** finding. File it as
+     **one** rolled-up finding carrying the commands and the count, never a per-tag enumeration:
+     the convention lapsed collection-wide at once, nine stores stopping at LibKa0s v1.34.0 against
+     a library at v1.54.2 and nineteen to thirty-one unrecorded tags apiece, so the honest remediation
+     is one consolidated bundle naming the span it covers rather than a folder per tag recording
+     deliberation that never happened.
+   - **Check every bus message name is a constant, and check its casing (`architecture-§4`,
+     `naming-cheatsheet`).** Two greps, both mechanical:
+     `grep -rnE '(Send|Register)Message\("Ka0s_' --include='*.lua' . | grep -v -e '/libs/' -e '/tests/_kit/'`
+     returns the literals typed at call sites, and every hit outside the one file that declares the
+     constants is a MUST failure — the reason is that a misspelled literal is not an error anywhere,
+     so a publisher's typo is a message nobody receives and a subscriber's is a subscription that
+     never fires, with nothing red to say so. Then
+     `grep -rnoE '"Ka0s_[A-Za-z]+_[A-Za-z0-9_]+"' --include='*.lua' . | grep -v -e '/libs/' -e '/tests/_kit/'`
+     and read the `<Event>` tail: **PascalCase** is the MUST and a SCREAMING_SNAKE tail is the
+     finding, which is the constant's key casing leaking into the wire string. A module-scoped
+     exported constant is a **compliant** home for a message that module owns, so do not file one as
+     a missing table; what is filed is a literal at a call site. An addon that publishes no `Ka0s_`
+     message at all is outside the rule — record *Not applicable* and file nothing.
+   - **Check the event-registration block survives one retired name (`events-frames-taint-§1`).**
+     Modern retail **raises** on a name the client does not know rather than ignoring it, so a bare
+     loop over a name list turns one retired event into a silently deaf addon: the throw aborts the
+     loop and every registration after it goes unbound, with no visible error unless the player has
+     script errors switched on. Find the registration sites and read the shape. Registration
+     isolated per event through one `pcall`ed helper is the MUST; a recorded list of rejected names,
+     reachable by the player through the reserved `debug` verb or the debug console, is the second
+     MUST, because a deaf event nobody can see is the same silence one layer down. A bare loop with
+     neither is the finding. `C_EventUtils.IsEventValid` in front of the `pcall` is the SHOULD and
+     never a substitute for it — grade its absence accordingly, and grade its presence **alone** as
+     the MUST failure it is.
    - **Check the TOC's position annotations (`toc-file-§5`).** In the `# Core` block, every line
      whose position is **load-bearing** — a library major taken as an upvalue at file scope, a
      constant resolved from an earlier seam at file load — **MUST** carry a comment at the line
@@ -664,6 +805,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      already in flight when combat starts). The lock
      itself is the library's from LibKa0s **v1.46.0**; an addon on an earlier tag files it as a
      re-vendor item, not as a panel deviation.
+     **The same grep answers a second question, so classify each `OpenToCategory` hit twice**
+     (options-ui-§2). The open is the library's, and a host **MUST NOT** wire a second one beside it
+     — a second place for the ID capture, the ordering constraint and the `pcall` to drift. The one
+     carve-out is the **page jump**: a combat-gated open against an ID the host recorded for one of
+     its **own** subcategories, to land the player on a named page. Confirm both halves of the
+     carve-out before clearing a hit — the ID is a subcategory's and the call is combat-gated — and
+     confirm the ID is the integer `:GetID()` returned at registration (or the **second** return of
+     `AceConfigDialog:AddToBlizOptions`), never the category object, the frame, or a string written
+     over `category.ID`. The string form is the one to look for hardest: it raises nothing and the
+     open silently becomes a no-op.
    - **Check the degradation stub covers every member the addon calls.** For each setup file, list
      the members the addon reaches on the library instance (grep the call sites) and confirm the
      library-absent branch answers **all** of them; a stub missing one is not a fallback, it is a
@@ -697,9 +848,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    both.
 
    Where a section states its own **applicability condition** or names a **terminal compliant state**
-   (architecture-§4, localization-§3, events-frames-taint-§8, performance-§12), check the condition
-   **before** grading — an addon outside a rule's scope is compliant, not deviant, and is not an entry
-   at all.
+   (architecture-§4, localization-§3, events-frames-taint-§1, events-frames-taint-§8, layout-§1,
+   performance-§12), check the condition **before** grading — an addon outside a rule's scope is
+   compliant, not deviant, and is not an entry at all. `events-frames-taint-§1`'s carve-out is the
+   newest of these and the one most easily misgraded: a private `CreateFrame("Frame")` whose **only**
+   job is `RegisterUnitEvent` for a named unit, held on the module or `NS` rather than in a closure,
+   unregistered in the module's disable path and re-used across a disable/enable cycle, is
+   **compliant** and is not an entry. A frame that misses any of the three conditions, a
+   general-purpose private-frame factory, or a frame that has picked up a second job is the entry.
+   `layout-§1`'s three terminal states work the same way: an over-cap file carrying an issue, a
+   ratified row or a scheduled peel is compliant, and what is filed is a breach nothing remarks on.
 
    **One root, derived dependents listed under it.** Where several observations follow from a **single
    unadopted subsystem or single upstream cause**, file **one root deviation** and list the rest as
@@ -757,8 +915,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      invocation **verbatim** — a locally "improved" one produces numbers that cannot be compared with
      the recorded run, which is the whole point of the check. A record whose numbers no longer match
      the code is stale (anti-pattern #51); a hand-edited one is worse, because it reads as measured.
-     The checkpoint is **release, not commit**, so a stale record is a finding about the release
-     process — never a reason to flag the addon for failing to gate commits on complexity. If
+     **Staleness is only legible once a row names the commit it measured** (automated-tests-§4), so
+     read the newest row's commit cell and its clean/dirty mark first: compare the SHA against
+     `git rev-parse HEAD`, and count the distance with `git rev-list --count <sha>..HEAD`. A row with
+     no commit cell at all is a **pre-rule** row and is carried forward as *unknown*, which is a fact
+     about the record rather than a finding against the addon; what is filed is a repo whose runner
+     has been re-vendored at the revision that emits the cells and whose next run still wrote none,
+     and a row recorded from a **dirty** tree that is not marked as such. The checkpoint is
+     **release, not commit**, so a stale record is a finding about the release process — never a
+     reason to flag the addon for failing to gate commits on complexity. If
      `lizard` is not installed on the machine, mark the check **not run** and say so — never reason
      the numbers out from reading the code, and never quietly skip it.
    - **Read the watch list as a decision record, not an inventory.** Count the entries whose
