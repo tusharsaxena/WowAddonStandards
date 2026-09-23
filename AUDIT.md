@@ -327,10 +327,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      grep -vxF -f /tmp/recorded.txt /tmp/vendored.txt               # vendored, in scope, unrecorded
      ```
 
-     **The trigger is the commit that touches `libs/LibKa0s/`.** `versioning-git` makes the re-vendor
-     commit a **MUST** and its standing alone only a **SHOULD**, so a folded re-vendor — the shape
-     the bulk sweeps actually took, and the shape this convention lapsed under — is compliant and
-     must still be found. `git log -- libs/LibKa0s` finds it; a `grep` over subjects does not. **And
+     **The trigger is the commit that touches `libs/LibKa0s/` or `tests/_kit/`.** `versioning-git`
+     makes the re-vendor commit a **MUST** and its standing alone only a **SHOULD**, so a folded
+     re-vendor — the shape the bulk sweeps actually took, and the shape this convention lapsed
+     under — is compliant and must still be found. `git log -- libs/LibKa0s tests/_kit` finds it; a
+     `grep` over subjects does not. **And
      the tag comes from root `CLAUDE.md`'s `Bundles [LibKa0s](…) vX.Y.Z` provenance line at that
      commit** (documentation-§2 item 6, library-stack-§7), which rolls in the same commit as the copy.
      Measured across the ten stores, every in-scope commit resolves a tag this way and none is lost
