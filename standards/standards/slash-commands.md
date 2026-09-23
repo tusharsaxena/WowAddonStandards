@@ -20,7 +20,17 @@ addon:RegisterChatCommand("<addonname>", function(msg) Sl:OnSlash(msg) end)  -- 
 ```
 
 - **MUST** degrade rather than error when the lib is absent. `/<slash>` is registered unconditionally, so something has to answer it: the setup file falls back to a stub carrying every member the addon calls (`OnSlash`, `PrintHelp`, `LandingRows`, `SetRowAnnotator`, and each `Cli*` verb). The host verbs never went to the library, so they keep working; what is lost is the schema CLI, and each of those verbs **MUST** name the missing library rather than going quiet.
+- **The library-absent line.** A verb that cannot run because LibKa0s did not load, and a host verb refusing a composed-row write under options-ui-§1's route (b), **MUST** print exactly one line, routed through the addon's locale as **one sentence with one placeholder**:
+
+  ```lua
+  L["%s is unavailable: the LibKa0s library did not load."]   -- %s = the full verb, e.g. "/wg enable"
+  ```
+
+  The placeholder is the whole verb as the player typed it, leading slash included, so the line names what was refused without a second sentence. It goes through the addon's tagged printer (slash-commands-§4), writes nothing and raises nothing. A schema CLI verb's *names the missing library* line above **MAY** be this same line.
 - The stub **MUST NOT** re-implement the library's rendering — no copied row formatter, no copied parser, no copied `key = value` shape. Hand-copying the strings whose drift the extraction exists to end is precisely the duplication testing-§8 forbids; a degraded help row renders plainly and says so.
+  - **In particular it MUST NOT copy `FormatRow`.** A degraded help row prints `cmd  desc` plainly, with no gold command and no em dash.
+  - **One library string MAY be carried verbatim, and only one: `LibKa0s-Slash-1.0`'s `DISABLED_LINE_FORMAT`**, the format of the refusal line (slash-commands-§7). A disabled addon's refusal has to read the same whether the library loaded or not, and that needs the bytes. A stub that carries it **MUST** pin it against the live library with the kit's `Kit.assertLibraryConstant` (test-kit revision 26, LibKa0s v1.56.0), which reads the member off the loaded major and fails naming both strings, so a one-byte drift turns the suite red.
+  - **Minimal `OnSlash` dispatch is sanctioned.** The stub may split the message, look the verb up in the host's `COMMANDS` table and call its handler; that routing is the host's, not a copy of the library's dispatcher (options-ui-§1).
 - The lib depends on **LibStub and `LibKa0s-Core-1.0` and nothing else** — no AceEvent, AceGUI or AceConsole. That is a property to preserve when extending it: it is what lets a non-Ace addon adopt the same command surface.
 
 ### 2. Verb naming
@@ -252,6 +262,7 @@ Rendered, with the color codes stripped for legibility:
 - **`<BrandName>` is the addon's brand name in plain text — `Ka0s <Name>`** — the **same string** launcher-§1 already **MUST**s as the LDB object's `label`. Reusing it is not an aesthetic choice: launcher-§1 already forbids escape sequences in that field, which is what makes it safe to drop into a colored line, and it means an addon has exactly one brand spelling rather than a second one invented for this message.
 - The command is **gold** (`|cFFFFFF00…|r`), the same color the row formatter gives a command in the help index (slash-commands-§4), and it carries the **leading slash**. The rest of the line is default-colored. **MUST NOT** substitute other colors.
 - **An em dash with a single space either side**, matching the row formatter. **No trailing colon** (slash-commands-§4's house style) and **no trailing period**.
+- **A library-absent Slash stub carries this format verbatim**, the one library string slash-commands-§1 lets it hold, pinned against the live `DISABLED_LINE_FORMAT` with `Kit.assertLibraryConstant`. The refusal therefore reads the same on a degraded load, and a stub that re-spells it fails its own suite.
 - **One line, and the wording is the collection's, not the addon's.** It **MUST NOT** be re-spelled per addon, per verb or per call site, and it **MUST NOT** gain a second line explaining what the addon does, what the verb would have done, or how to reach the panel. A paragraph is a lecture stapled to a command the player is about to re-run anyway, and eleven addons each wording it slightly differently is the drift the shared printer and the shared formatters exist to end.
 
 #### Disabled and perf-suspended are two holds on ONE latch

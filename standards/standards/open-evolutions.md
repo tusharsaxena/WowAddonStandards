@@ -148,9 +148,10 @@ Items recorded for future versions of this standard:
   `C_Timer.NewTicker` (`:961`), the call an adopter routes through the major. Without the floor, a
   payload missing `Core.lua` would lose the panel and the CLI and keep settings and spell reads. The
   question is for every runtime-critical major, not for Schema alone.
-  **Reading A, keep the floor:** the fall-together property options-ui-§1's composed-content ruling
-  rests on, and whole-folder vendoring (anti-pattern #48) makes a Core-less payload a defect rather
-  than a state to design for; library-stack-§7 might then state the floor as a rule for every major.
+  **Reading A, keep the floor:** the fall-together property (the whole payload loads or none of it
+  does), which options-ui-§1's composed-content ruling rested on through v2.64.0, and whole-folder
+  vendoring (anti-pattern #48) makes a Core-less payload a defect rather than a state to design for;
+  library-stack-§7 might then state the floor as a rule for every major.
   **Reading B, no floor for such a major:** a runtime-critical major that calls nothing in Core
   declares none, so a payload missing `Core.lua` still keeps settings and spell reads. Schema minor 1
   and Compat minor 1 floor today, as the majority convention does; that is the current state, not a
