@@ -107,7 +107,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    - `core/CoreSetup.lua` — `LibKa0s-Core-1.0`: the secret-safe stringifier and the prefixed chat
      printer (`NS.Print` / `NS.Util.print`, one function object — architecture-§2). Placed after the
      file defining `NS.PREFIX` and before everything that prints; pass the prefix as a **function**
-     so a later change to it is not frozen in at load.
+     so a later change to it is not frozen in at load. It also publishes the `SafeRegisterEvent`
+     family every event registration goes through, and its stub carries the three as one-rung
+     `pcall` bodies; the host owns the rejected list (events-frames-taint-§1).
    - `core/PerfSetup.lua` — `LibKa0s-Perf-1.0` (performance): the descriptor's declared buckets with
      their `within` nesting, `<Addon>PerfDB` as `sv`, `suspend`/`resume`, gated brackets on the hot
      paths, and the reserved `perf` verb dispatched by the host. Placed before any module taking
@@ -126,11 +128,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
      the first hands the library a path into nowhere.
    - the **slash descriptor** in `settings/Slash.lua` — `LibKa0s-Slash-1.0` (slash-commands): the
      addon keeps its ordered `NS.COMMANDS` table and its host verbs and passes them in; the library
-     supplies the dispatcher, help renderer, formatters and the type-aware value parser.
+     supplies the dispatcher, help renderer, formatters and the type-aware value parser. The stub
+     carries no library string but `DISABLED_LINE_FORMAT`, pinned with `Kit.assertLibraryConstant`,
+     and a composed-row verb on a library-absent load writes through `writeThrough` or prints the
+     library-absent line (slash-commands-§1, options-ui-§1).
    - `settings/OptionsSetup.lua` — `LibKa0s-Options-1.0` (options-ui): the `get`/`set`/`applyDefault`
      seams, `rowsForPage`/`allRows`, the color codecs, and eager settings-category registration with a
      lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5). Loads before
-     every `settings/<page>.lua`.
+     every `settings/<page>.lua`. The stub's composers answer `{}` (options-ui-§1).
    Each stub **MUST** answer every member the addon actually calls — a stub missing one is a crash
    moved to a rarer code path, not a fallback.
 
@@ -168,7 +173,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      every addon with a positionable display: its test mode (placeholder content, on until turned off,
      ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
      (anti-pattern #80). An addon whose unlocked view already shows those placeholders omits it:
-     *Lock frame* is its switch. A frameless addon
+     *Lock frame* is its switch, it ships no `test` verb, and a one-shot value hold, if kept, lives at
+     `/<slash> debug hold <value> [secs]` (options-ui-§15). A frameless addon
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.
