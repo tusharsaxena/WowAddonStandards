@@ -711,12 +711,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        frameless addon omits the row and is compliant.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
-       row whose type changed with **no** bumped `schemaVersion` and **no** migration step in
+       row whose type changed with **no** raised `NS.SCHEMA_VERSION` and **no** migration step in
        `Database.lua`'s runner (savedvariables) is a finding in its own right, graded at least
        **medium**: the panel reads a stored `true` as an unrecognized dropdown value on every
        existing install, so the addon silently loses a setting the player already made. The
        migration is `true` → `inCombat`, `false` → `always`. Cite the runner's `file:line` and the
-       version it bumped to as the evidence that it exists; adopting the *name* `Master controls`
+       version it raised the target to as the evidence that it exists; adopting the *name* `Master controls`
        moved a `group` and needs no migration, and the two must not be confused for each other.
      - **(c) Every color row has its class-color companion beside it (options-ui-§17).** Grep the
        schema for color rows and, for each, require its companion — a `Use class color` bool or a

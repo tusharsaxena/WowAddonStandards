@@ -180,7 +180,9 @@ And the rule that catches the most tempting mistake:
   first read, masking a legacy account as already-current. A shared runner needs five escape hatches to
   own an eight-line loop, and the blast radius of getting it wrong is silent corruption of users'
   SavedVariables. **Duplication was the cheaper answer**, and the complexity win it was nominated for
-  was available locally anyway (anti-patterns #55).
+  was available locally anyway (anti-patterns #55). The disagreement was since ruled in the standard's
+  template instead (savedvariables-§1, v2.65.0): defaults declare `schemaVersion = 0`, which AceDB can
+  neither strip nor mistake for current, and the runner alone advances the stamp.
 - **SHOULD** record a rejection with its reason where the next author will look, not just the
   acceptances. A candidate rejected once will be re-nominated — the shape really does look shared —
   and the reason is the only thing that stops the second attempt from succeeding.

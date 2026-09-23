@@ -7,7 +7,7 @@
 ```lua
 NS.defaults = {
   profile = { display = {...}, behavior = {...} },
-  global  = { schemaVersion = 1, ignored = {} },
+  global  = { schemaVersion = 0, ignored = {} },   -- 0, never the current version (below)
   char    = {},   -- only if genuinely per-character
 }
 local AceDB = LibStub("AceDB-3.0")
@@ -15,15 +15,63 @@ NS.db = AceDB:New("<Addon>DB", NS.defaults, true)   -- true = use current profil
 ```
 
 - **MUST** keep one global namespace `<Addon>DB`.
-- **MUST** declare `schemaVersion` in the global namespace and ship a migration function in `core/Database.lua`:
+- **MUST** declare `schemaVersion = 0` in the global namespace's defaults and ship a migration runner in `core/Database.lua`:
 
 ```lua
+NS.SCHEMA_VERSION = 2   -- the runner's target: the highest step's `to`
+
+local STEPS = {
+  { to = 1, run = function() end },                   -- 0 -> 1: pre-versioning, a no-op
+  { to = 2, run = function(sv, profile) ... end, perProfile = true },
+}
+
 function NS:RunMigrations()
-  local g = NS.db.global
-  g.schemaVersion = g.schemaVersion or 1
-  if g.schemaVersion < 2 then ... ; g.schemaVersion = 2 end
+  local g, sv = NS.db.global, _G["<Addon>DB"]
+  for _, step in ipairs(STEPS) do
+    if g.schemaVersion < step.to then
+      if step.perProfile then
+        for _, profile in pairs(sv.profiles or {}) do step.run(sv, profile) end
+      else
+        step.run(sv)
+      end
+      g.schemaVersion = step.to   -- reached only when the step returned
+    end
+  end
 end
 ```
+
+**Why the default is 0 and never the current version.** AceDB's `removeDefaults` strips every stored
+value equal to its default at logout. A `schemaVersion` default equal to the current version therefore
+never persists: the stamp is deleted on every logout, the next login reads the default back, and when
+the version is next raised the default rises with it, so the first real migration never runs for any
+existing user. AceDB's defaults merge also backfills a declared default onto a legacy account that
+stored no stamp at all, so a current-version default makes an account from before the runner existed
+read as already migrated. A default of **0** has neither problem: a stamp the runner advanced past 0
+differs from the default and persists, and an account with no stamp reads 0 and runs every step. The
+collection's worked cases are the three that hit it: a default of `NS.SCHEMA_VERSION` that the logout
+strip would have erased, a floor of 1 held against a runner that walks to 8 with the reason only in a
+comment, and a declared default that masked legacy accounts until the addon stopped seeding the stamp.
+
+**Who owns the stamp** (ruled at v2.65.0; open-evolutions records the history):
+
+- **MUST** hold the runner's target in `NS.SCHEMA_VERSION`, equal to the highest step's `to`. The
+  defaults value **MUST** stay `0`; it is the pre-migration floor, not the current version, and it never
+  moves.
+- **MUST** let the **runner** own the stamp. A step does not write `schemaVersion`; the runner advances
+  it to a step's `to` only **after that step returned without raising**. A step that raises leaves the
+  stamp at the last completed step, so the next load retries it rather than skipping it.
+- **MUST** run a **profile-scoped** step for **every stored profile**, either by walking the raw
+  SavedVariables `profiles` table as above, or idempotently from AceDB's `OnProfileChanged` (and
+  `OnProfileCopied` / `OnProfileReset`) callbacks against a **per-profile** stamp. A profile-scoped step
+  **MUST NOT** be gated by the account-wide stamp alone: that runs it for the profile active at the
+  first login after the upgrade and never for the others, which then carry the old shape forever. A step
+  walking the raw table sees only what AceDB stored, never the defaults merged over it, so it reads an
+  absent key as the default and leaves it absent.
+- **MUST** write every step **idempotent against a fresh default profile**: a profile created after the
+  stamp advanced, or one that already has the new shape, passes through the step unchanged.
+- The executable form of these rules is each addon's own red-first migration test: a stamp that survives
+  AceDB's logout strip, a raising step that leaves the stamp at the last completed step, and a
+  non-active stored profile that a profile-scoped step still reaches.
 
 - The runner, and any profile-preparation step called with it at initialization and from AceDB's profile callbacks, is the **load pass**: it writes stored data directly, before any reader has seen it, and its entry points are reachable from nothing else (a seed routine it shares with a registry writer's reset verb belongs to that writer — architecture-§5). Where it seeds or repairs a **structural registry**, architecture-§5 makes it part of that registry's writer surface and requires it named in `docs/ARCHITECTURE.md` beside the writer. It **MAY** also migrate, backfill or seed architecture-§5's **named non-setting state** — a pre-migration position lifted onto its new key, an empty learned cache — which does not make it a runtime writer that state's naming has to list.
 - **SHOULD** allow the user to opt out via a soft-fallback path (an AceDB-missing shim, as the absorb-shield tracker ships). Not mandatory.

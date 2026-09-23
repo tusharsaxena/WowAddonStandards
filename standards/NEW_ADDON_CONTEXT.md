@@ -311,7 +311,17 @@ NS.defaults = {
     -- NOTE: the debug flag is NOT here. It is session-only (NS.State.debug,
     -- default off, reset every /reload) and never persisted to SV (debug-logging-§5).
   },
-  global = { schemaVersion = 1 },
+  -- 0, never the current version: AceDB strips a value equal to its default at
+  -- logout and backfills it onto legacy accounts (savedvariables-§1).
+  global = { schemaVersion = 0 },
+}
+
+NS.SCHEMA_VERSION = 1   -- the runner's target: the highest step's `to`
+
+-- Each step is idempotent against a fresh default profile. A profile-scoped
+-- step sets `perProfile = true` and runs for every stored profile.
+local STEPS = {
+  { to = 1, run = function() end },   -- 0 -> 1: pre-versioning, a no-op
 }
 
 function NS:InitDB()
@@ -319,9 +329,17 @@ function NS:InitDB()
 end
 
 function NS:RunMigrations()
-  local g = NS.db.global
-  g.schemaVersion = g.schemaVersion or 1
-  -- if g.schemaVersion < 2 then ... ; g.schemaVersion = 2 end
+  local g, sv = NS.db.global, _G[addonName .. "DB"]
+  for _, step in ipairs(STEPS) do
+    if g.schemaVersion < step.to then
+      if step.perProfile then
+        for _, profile in pairs(sv.profiles or {}) do step.run(sv, profile) end
+      else
+        step.run(sv)
+      end
+      g.schemaVersion = step.to   -- the runner owns the stamp; reached only if the step returned
+    end
+  end
 end
 ```
 
@@ -1245,7 +1263,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 ## Hard rules cheat sheet (memorize)
 
 1. Every file starts with `local addonName, NS = ...`. No `_G[addonName] = {}`. Directly **beneath** that bootstrap, an authored `.lua` under `core/`, `modules/`, `settings/`, `defaults/` or `locales/` **SHOULD** carry a comment naming its own path and saying in one line what it is for (documentation-§9) — the bootstrap stays line 1, where every reader and every tool looks for it. Nothing else in the standard answers *what is this file for* at the point where the reader has the file open, and the path is what survives the file being pasted into a review bundle, an issue or an agent transcript.
-2. SavedVariables: `<Addon>DB` with `schemaVersion`, plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
+2. SavedVariables: `<Addon>DB` with `schemaVersion = 0` in defaults and the runner's target in `NS.SCHEMA_VERSION` (savedvariables-§1), plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
 5. TOC: single latest-Retail `## Interface:` (Retail only), plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge; **before that, omitted with a one-line comment in its position — never a placeholder id, which would publish this addon into somebody else's project**). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
