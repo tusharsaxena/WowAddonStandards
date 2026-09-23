@@ -8,7 +8,7 @@ Every addon **MUST** ship `.luacheckrc` at the root. Base it on the common WoW-a
 std = "lua51"
 max_line_length = false
 codes = true
-exclude_files = { "libs/", "docs/audits/", "docs/reviews/", "_dev/", "tests/_kit/" }
+exclude_files = { "libs/", "docs/audits/", "docs/reviews/", "docs/revendor/", "_dev/", "tests/_kit/" }
 ignore = {
   "212/self",   -- unused argument self
   "212/event",  -- unused argument event

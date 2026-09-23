@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.62.1, 2026-09-22)
+# New Ka0s Addon — Context Pack (v2.64.0, 2026-09-23)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -143,6 +143,9 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     run.lua              -- this addon's load list, lifecycle kick and suite list
     wow_mock.lua         -- thin extender over _kit/mock_base.lua
     test_*.lua           -- one suite per module
+    test_surface_parity.lua  -- the stub-surface parity case, under exactly this name (testing-§8)
+    test_vendor_sync.lua     -- delegates to tests/_kit/vendor_sync.lua; never reimplements it (testing-§11)
+    test_disabled.lua        -- the disabled-state teardown (slash-commands-§7)
     perf.lua             -- offline scenario runner; OUTSIDE the green gate (performance-§9)
   tools/                 -- ONLY if the addon authors a generator: the PROGRAM lives here,
                          -- dev-only, .pkgmeta-ignored, never loaded and never in the TOC;
@@ -155,10 +158,15 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
       <run>/             --   one frozen bundle per capture: report.md, dump.json, ANALYSIS.md
     automated-tests/     -- required: the consolidated test record (automated-tests)
       README.md          --   what it is and how to run it
-      RESULTS.md         --   GENERATED trend line, overwritten in place (automated-tests-§4)
+      RESULTS.md         --   GENERATED trend line, overwritten in place; every row names the
+                         --   commit it measured and whether that tree was clean (automated-tests-§4)
       <run>/             --   one frozen bundle per run (automated-tests-§1)
     audits/<YYYY-MM-DD>/ -- retained audit-run history (audit-review-history)
     reviews/<YYYY-MM-DD>/-- retained code-review history (audit-review-history)
+    revendor/<YYYY-MM-DD>-v<tag>/
+                         -- retained re-vendor history, the folder naming the LibKa0s tag;
+                            01_DELTA.md and 05_SUMMARY.md always, the rest as there is
+                            something to write (audit-review-history)
   README.md (root, full)  CLAUDE.md (root, stub)  DEPENDENCIES.md (root)  LICENSE (root)
   .luacheckrc  .pkgmeta  .gitattributes   -- written FIRST, before anything above it (line-endings)
 ```
@@ -238,6 +246,7 @@ The `## Interface:` is a **single** latest-Retail number (Retail only, toc-file-
 
 ```lua
 local addonName, NS = ...
+-- core/<Addon>.lua — AceAddon registration; the one place NS is promoted to an addon object.
 local AceAddon = LibStub("AceAddon-3.0")
 local addon = AceAddon:NewAddon(NS, addonName, "AceEvent-3.0", "AceTimer-3.0", "AceConsole-3.0")
 NS.addon = addon
@@ -260,27 +269,28 @@ end
 
 ```lua
 local addonName, NS = ...
+-- core/Compat.lua — the sole home of every deprecated or cross-patch API call (compat).
 NS.Compat = NS.Compat or {}
 local Compat = NS.Compat
 -- Retail only: shims cross-patch API differences, NOT game flavors.
+local CompatLib = LibStub and LibStub("LibKa0s-Compat-1.0", true)
 
-function Compat.GetSpellInfo(id)
-  if C_Spell and C_Spell.GetSpellInfo then
-    local info = C_Spell.GetSpellInfo(id)
-    if info then return info.name, nil, info.iconID end
-  end
-  return GetSpellInfo and GetSpellInfo(id)
-end
+-- Illustrative (compat): a member LibKa0s-Compat-1.0 carries is routed through it. Contract:
+--   name, iconID, castTime, minRange, maxRange, spellID   -- or a single nil
+-- Library absent: the major's documented absent answer (its API document, "Degradation").
+Compat.GetSpellInfo = CompatLib and CompatLib.GetSpellInfo or function() return nil end
+Compat.GetSpecialization = CompatLib and CompatLib.GetSpecialization or function() return nil end
 
-function Compat.GetSpecialization()
-  return (C_SpecializationInfo and C_SpecializationInfo.GetSpecialization()) or GetSpecialization()
-end
+-- A shim no major carries is written here, by hand.
 ```
+
+Adopting `LibKa0s-Compat-1.0` (from `LibKa0s v1.55.0`) is optional, from v2.64.0 until a later version of the standard makes it a requirement (library-stack-§7). A reader's library-absent stub answers the absent value, as above, with no line. If you wire a guard member (`IsSecret`, `CanAccess`, `IsSafeKey`), its library-absent stub is the one-rung body the Compat API document's *Degradation* section gives, commented as a deliberate duplication — not the hand-rolling anti-pattern #47 (options-ui-§1).
 
 ### `Locale.lua`
 
 ```lua
 local addonName, NS = ...
+-- core/Locale.lua — NS.L and its metatable fallback; the key IS the English source string.
 NS.L = setmetatable({}, { __index = function(_, k) return k end })
 -- For non-enUS locales, gate at top of file:
 -- if GetLocale() ~= "deDE" then return end
@@ -294,6 +304,7 @@ NS.L = setmetatable({}, { __index = function(_, k) return k end })
 
 ```lua
 local addonName, NS = ...
+-- core/Database.lua — AceDB setup, the defaults tree and the schemaVersion migration runner.
 
 NS.defaults = {
   profile = { -- defaults referenced by Schema rows
@@ -322,6 +333,7 @@ prints (`core/PerfSetup.lua` first).
 
 ```lua
 local addonName, NS = ...
+-- core/CoreSetup.lua — NS.Print from LibKa0s-Core-1.0; every tagged chat line leaves through here.
 NS.Util = NS.Util or {}
 
 local lib = LibStub and LibStub("LibKa0s-Core-1.0", true)
@@ -390,6 +402,7 @@ The write seam is the addon's, and both the panel and the CLI go through it.
 
 ```lua
 local addonName, NS = ...
+-- settings/Schema.lua — the schema rows and the one write seam every path is written through.
 
 NS.Schema = {
   { path = "display.scale", default = 1.0, type = "number", min = 0.5, max = 2.0,
@@ -414,6 +427,7 @@ a table of named fields is silently invisible to the library and every verb beco
 
 ```lua
 local addonName, NS = ...
+-- settings/Slash.lua — the ordered NS.COMMANDS table and the LibKa0s-Slash-1.0 descriptor.
 NS.Slash = NS.Slash or {}
 local Sl, print = NS.Slash, NS.Print
 
@@ -485,12 +499,13 @@ it (performance-§4).
 ### `settings/OptionsSetup.lua` — the settings panel (`LibKa0s-Options-1.0`)
 
 The canvas shell, the schema-row → AceGUI widget makers, the two-column flow engine, the header and
-the always-shown scrollbar patch are the library's across **three** files (`Options.lua`,
-`OptionsWidgets.lua`, `OptionsScroll.lua`). The descriptor is entirely *where a value lives*, never
+the always-shown scrollbar patch are the library's across **five** files (`Options.lua`,
+`OptionsWidgets.lua`, `OptionsTabs.lua`, `OptionsCompose.lua`, `OptionsScroll.lua`). The descriptor is entirely *where a value lives*, never
 *how a panel looks*. Loads after `settings/Slash.lua` and **before** every `settings/<Page>.lua`.
 
 ```lua
 local addonName, NS = ...
+-- settings/OptionsSetup.lua — the panel descriptor; NS.Helpers IS the library instance.
 local print = NS.Print
 
 -- Named ONCE and enforced twice — by the library through skipRestoreAll, and by the stub's own
@@ -542,8 +557,9 @@ local descriptor = {
 }
 
 if not lib then
-  -- THE ONE EXCEPTION to the member-answering stub (options-ui-§1). Page files call
-  -- Helpers.LSMValues INSIDE schema-row literals, at FILE LOAD — with it nil the page file raises,
+  -- ONE OF THE NAMED SHAPES options-ui-§1 sets beside the member-answering stub: the
+  -- LOAD-COMPLETING one. Page files call Helpers.LSMValues INSIDE schema-row literals, at
+  -- FILE LOAD — with it nil the page file raises,
   -- its RegisterSchemaRows never runs, and a third of the schema silently vanishes along with
   -- list/get/set/reset and the profile defaults. So this stub is LOAD-COMPLETING: publish every
   -- member a page file touches at load (measure that set by deleting one and re-running the
@@ -598,6 +614,7 @@ that reaches them, and it is three lines of real work:
 
 ```lua
 local addonName, NS = ...
+-- core/MediaSetup.lua — NS.Icon / NS.MediaFont from LibKa0s-Media-1.0 and the one RegisterLSM call.
 
 local Media = LibStub and LibStub("LibKa0s-Media-1.0", true)
 
@@ -649,6 +666,7 @@ printer), and before everything that calls the sink.
 
 ```lua
 local addonName, NS = ...
+-- core/DebugLogSetup.lua — NS.DebugLog from a descriptor; publishes the bare NS.Debug seam.
 
 local lib = LibStub and LibStub("LibKa0s-DebugLog-1.0", true)
 
@@ -809,12 +827,26 @@ local NS = {}
 Loader.addonName = "<Addon>"
 
 -- The vendored library's files, in the order LibKa0s.xml uses them. The TOC pulls them in through
--- that one .xml, which tocFiles cannot see, so they are spelled out here — ALL of them. Omit one
--- and its module refuses to register, the host takes its degradation stub, and the suite happily
--- measures the stub: green, and testing nothing (testing-§9).
+-- that one .xml, which tocFiles cannot see, so they are spelled out here — ALL of them, in that
+-- order, and read out of LibKa0s.xml rather than remembered. Omit one and its module refuses to
+-- register, the host takes its degradation stub, and the suite happily measures the stub: green,
+-- and testing nothing (testing-§9).
+--
+-- A module's FLOOR DEPENDENCIES are part of "all of them", and this is the half that gets dropped:
+-- a module whose floor is unmet resolves it, `return`s BEFORE `LibStub:NewLibrary`, and is simply
+-- ABSENT — no error, no warning, nothing to see. DebugLog.lua floors on Widgets (Widgets.lua plus
+-- WidgetsDragHandle.lua), Perf.lua floors on Lifecycle.lua, and OptionsWidgets.lua and
+-- OptionsTabs.lua both floor on Pool.lua. Load a major without its floor and the suite tests a stub
+-- it cannot tell from the real thing. Whole-folder vendoring is mandatory for the same reason, so
+-- the whole folder is what this list names.
 local LIB_FILES = {
-  "libs/LibKa0s/Core.lua", "libs/LibKa0s/DebugLog.lua", "libs/LibKa0s/Slash.lua",
-  "libs/LibKa0s/Options.lua", "libs/LibKa0s/OptionsWidgets.lua", "libs/LibKa0s/OptionsScroll.lua",
+  "libs/LibKa0s/Core.lua", "libs/LibKa0s/Env.lua", "libs/LibKa0s/Compat.lua",
+  "libs/LibKa0s/Lifecycle.lua", "libs/LibKa0s/Bus.lua", "libs/LibKa0s/Schema.lua",
+  "libs/LibKa0s/Pool.lua", "libs/LibKa0s/Item.lua", "libs/LibKa0s/Media.lua",
+  "libs/LibKa0s/Widgets.lua", "libs/LibKa0s/WidgetsDragHandle.lua",
+  "libs/LibKa0s/DebugLog.lua", "libs/LibKa0s/Slash.lua", "libs/LibKa0s/Launcher.lua",
+  "libs/LibKa0s/Options.lua", "libs/LibKa0s/OptionsWidgets.lua", "libs/LibKa0s/OptionsTabs.lua",
+  "libs/LibKa0s/OptionsCompose.lua", "libs/LibKa0s/OptionsScroll.lua",
   "libs/LibKa0s/Perf.lua", "libs/LibKa0s/PerfPanel.lua",
 }
 -- The addon's own files come from the TOC rather than a copy of it, so this runner cannot drift
@@ -863,14 +895,26 @@ sudo luarocks install luacheck
 ### Message bus
 
 ```lua
+-- core/Bus.lua — every message name declared ONCE, and typed as a literal nowhere else.
+-- A misspelled literal is not an error anywhere: a publisher that types one sends a message
+-- nobody receives, a subscriber that types one never fires, and nothing goes red. Through a
+-- constant the same typo is a nil name at the call site: a subscriber raises at once, a
+-- publisher's SendMessage stays silent unless the table is strict (LibKa0s-Bus-1.0's Catalog,
+-- a MAY: NS.MSG = Bus and Bus.Catalog(addonName, MSG) or MSG). <Event> is PascalCase; the key's
+-- SCREAMING_SNAKE is the constant's casing, not the wire name's (architecture-§4, naming-cheatsheet).
+NS.MSG = {
+  -- Sender: modules/Roster.lua. Payload: the roster table.
+  ROSTER_CHANGED = "Ka0s_<Addon>_RosterChanged",
+}
+
 -- Producer (pick exactly one; send on any embed — SendMessage fans out to all receivers)
-NS.addon:SendMessage("Ka0s_<Addon>_RosterChanged", roster)
+NS.addon:SendMessage(NS.MSG.ROSTER_CHANGED, roster)
 
 -- Consumer — MUST register on its OWN AceEvent target, never the shared bus-as-self:
 -- CallbackHandler keys callbacks by (message, target), so two receivers sharing one object
 -- clobber each other (last registrant wins, silently). See architecture-§4.
 NS.<Module>.__ev = NS.NewBusTarget()   -- AceEvent:Embed({}); or an AceAddon module `self`
-NS.<Module>.__ev:RegisterMessage("Ka0s_<Addon>_RosterChanged", function(_, roster) ... end)
+NS.<Module>.__ev:RegisterMessage(NS.MSG.ROSTER_CHANGED, function(_, roster) ... end)
 ```
 
 ### `.gitattributes`
@@ -975,7 +1019,8 @@ the carve-out without the pin above it is explicitly **not** compliance (`line-e
 ```
 
 Then add `- .gitattributes` to `.pkgmeta`'s `ignore:` block below — it is dev-only, exactly as
-`.gitignore`, `.luacheckrc`, `.claude/` and `.superpowers/` are (`packaging`).
+`.gitignore` and `.luacheckrc` are, and exactly as `.claude/` and `.superpowers/` are **in a repo that
+has them** (`packaging`).
 
 ### `.luacheckrc`
 
@@ -983,7 +1028,7 @@ Then add `- .gitattributes` to `.pkgmeta`'s `ignore:` block below — it is dev-
 std = "lua51"
 max_line_length = false
 codes = true
-exclude_files = { "libs/", "docs/audits/", "docs/reviews/", "_dev/", "tests/_kit/" }
+exclude_files = { "libs/", "docs/audits/", "docs/reviews/", "docs/revendor/", "_dev/", "tests/_kit/" }
 ignore = { "212/self", "212/event" }
 read_globals = {
   "_G", "LibStub", "CreateFrame", "GetTime", "UnitName", "UnitGUID",
@@ -1015,9 +1060,10 @@ ignore:
   - .pkgmeta         # dev-only: this file configures the packager; it is not part of the package
   - .gitignore
   - .gitattributes   # dev-only: the repo's line-ending policy (line-endings)
-  - .claude          # dev-only: agent tooling; never loaded by the client
-  - .superpowers     # dev-only: agent tooling; never loaded by the client
-  - docs        # holds docs/audits/ and docs/reviews/ too — all dev-only
+  # - .claude        # ONLY in a repo that HAS a .claude/ — dev-only agent tooling, never loaded by
+  #                    the client. Copied in when the directory appears, and left out until then.
+  # - .superpowers   # ONLY in a repo that HAS a .superpowers/ — same tooling, same condition.
+  - docs        # holds docs/audits/, docs/reviews/ and docs/revendor/ too — all dev-only
   - tests
   # - tools          # ONLY in a repo that HAS a tools/ (layout-§1). Left out until the folder
   #                    exists: a list padded with absent entries goes stale the other way.
@@ -1025,16 +1071,19 @@ ignore:
   - "*.bak"
 ```
 
-**The list above is a starting point, not the rule.** The rule is that **every** root dotfile and
-dot-directory in the repo is either on this list or justified in a comment beside it (`packaging`) —
-`.git` excepted, since the packager never sees it. Agent tooling is named here because leaving it to
-judgment failed: five addons in the collection were packaging a multi-file `.superpowers/` directory
-into the AddOn players install. When a new tool writes a new dot-directory, it goes on this list in
-the same change.
+**The list above is a template, and an entry binds only when the entry exists.** The rule is that
+**every** root dotfile and dot-directory in the repo is either on this list or justified in a comment
+beside it (`packaging`) — `.git` excepted, since the packager never sees it. Agent tooling is named in
+the template because leaving it to judgment failed: five addons in the collection were packaging a
+multi-file `.superpowers/` directory into the AddOn players install. But a line for a directory the
+repo does not have asserts something false, and the next reader cannot tell a forward declaration from
+a mistake — so `.claude`, `.superpowers` and `tools` are written commented out and uncommented on the
+day the folder appears. When a new tool writes a new dot-directory, it goes on this list in the same
+change.
 
 Libraries are **vendored under `libs/` and committed** (`STANDARDS.md library-stack-§3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon's `libs/` so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). **LibDataBroker-1.1 and LibDBIcon-1.0 are not optional** — every addon ships a launcher (launcher-§1) — so vendor both from the start. Pull libs the suite doesn't yet vendor from a current retail install or the upstream release.
 
-`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because ten of the eleven majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
+`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because fourteen of the fifteen majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). That commit owes a frozen `docs/revendor/<YYYY-MM-DD>-v<tag>/` bundle naming the tag it vendored, or a `## Documented deviations` row saying why — the convention was consensual and lapsed in every repo that held it, because nothing checked it (audit-review-history). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
 
 ### Docs — the root three + the `docs/` trio
 
@@ -1195,7 +1244,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 
 ## Hard rules cheat sheet (memorize)
 
-1. Every file starts with `local addonName, NS = ...`. No `_G[addonName] = {}`.
+1. Every file starts with `local addonName, NS = ...`. No `_G[addonName] = {}`. Directly **beneath** that bootstrap, an authored `.lua` under `core/`, `modules/`, `settings/`, `defaults/` or `locales/` **SHOULD** carry a comment naming its own path and saying in one line what it is for (documentation-§9) — the bootstrap stays line 1, where every reader and every tool looks for it. Nothing else in the standard answers *what is this file for* at the point where the reader has the file open, and the path is what survives the file being pasted into a review bundle, an issue or an agent transcript.
 2. SavedVariables: `<Addon>DB` with `schemaVersion`, plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
@@ -1203,7 +1252,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 6. Slash: AceConsole `:RegisterChatCommand`. Never raw `SLASH_*`.
 7. Locale: metatable fallback `__index = function(_,k) return k end`. Never AceLocale strict.
 7a. **US English everywhere** (localization-§5): every English word you author — locale keys and their `enUS` values, chat/console output, options labels and tooltips, slash help, README and `docs/` prose, code comments, and identifiers — uses **US** spelling. `color` not `colour`, `gray` not `grey`, `behavior` not `behaviour`, `center`/`centered` not `centre`/`centred`, `canceled` not `cancelled`, `-ize`/`-ization` not `-ise`/`-isation`, `catalog`/`dialog`/`defense`/`license`/`analyze`. WoW's own API is US-spelled (`SetTextColor`, `GRAY_FONT_COLOR`), so a British-spelled identifier sits one letter from the Blizzard symbol beside it and greps miss. Locale **keys are the English string**, so fixing a spelling **changes the key** — update it in every `locales/*.lua` and at every call site in the same change, or the metatable silently renders the raw key on that client. Reproduce verbatim (never "correct"): Blizzard/library symbols, quoted external text, published proper nouns, and a deliberate `locales/enGB.lua` translation.
-8. Options UI: **consume `LibKa0s-Options-1.0`** — one instance from a descriptor in `settings/OptionsSetup.lua`, and `NS.Helpers` **is** that instance, decorated in place, never a copy-across (options-ui-§1). Never hand-roll the shell, the widget makers, the flow engine, the header or the scrollbar patch (anti-pattern #47), and never copy a `LAYOUT` constant into the addon. Behind it: Blizzard `Settings.RegisterCanvasLayoutCategory` + raw AceGUI body, **category registered eagerly at load** (always visible), **body built lazily** on first `OnShow`, and the header's **Defaults button built lazily too**, in that same first `OnShow`, never at registration time (options-ui-§5) — AceGUI is shared and UI skins hook `RegisterAsWidget`, so a widget created during load keeps Blizzard's stock red `UI-Panel-Button-Up` art forever while later-created ones come out skinned, making the look a race against addon load order. Never AceConfigDialog for content; never defer registration to first `/config`. This one setup file's fallback is **load-completing, not member-answering** — the documented exception, because page files call into it inside schema-row literals at file load.
+8. Options UI: **consume `LibKa0s-Options-1.0`** — one instance from a descriptor in `settings/OptionsSetup.lua`, and `NS.Helpers` **is** that instance, decorated in place, never a copy-across (options-ui-§1). Never hand-roll the shell, the widget makers, the flow engine, the header or the scrollbar patch (anti-pattern #47), and never copy a `LAYOUT` constant into the addon. Behind it: Blizzard `Settings.RegisterCanvasLayoutCategory` + raw AceGUI body, **category registered eagerly at load** (always visible), **body built lazily** on first `OnShow`, and the header's **Defaults button built lazily too**, in that same first `OnShow`, never at registration time (options-ui-§5) — AceGUI is shared and UI skins hook `RegisterAsWidget`, so a widget created during load keeps Blizzard's stock red `UI-Panel-Button-Up` art forever while later-created ones come out skinned, making the look a race against addon load order. Never AceConfigDialog for content; never defer registration to first `/config`. This one setup file's fallback is **load-completing, not member-answering** — the load-completing exception options-ui-§1 names, because page files call into it inside schema-row literals at file load.
 8b. Options UI — the panel's **content**, which is the half a player compares between two addons, and all of it MUST (options-ui-§13/§14/§15/§16/§17/§18):
     - **Every settings page draws a tab strip**, one tab per `group`, **including a page with exactly one section** — the one tab that cannot be clicked is that page's section label. The untabbed heading form is for a page the host does not render through the flow engine, which today means **two** pages and both of them — the AceConfig-drawn **Profiles** sub-page and the **landing page**, whose `buildMain` body (logo, tagline, *Slash Commands* heading, one Label per `COMMANDS` row) declares no `group` and is mandated in exactly that shape by options-ui-§5; a renderer that falls back to it below some tab count is itself the defect, because it makes a page's chrome a function of how many sections it happens to hold. **Every row carries a `group`** — a row without one belongs to no tab and is an authoring defect the library reports. A wrapped strip's **geometry must not change with the selection**: the row pitch and the reserved band are one measurement taken from a state no click can change, never read off whichever tab was drawn first, because a selected tab's art is a **different atlas** from an unselected tab's. One secondary strip **MAY** divide a single primary tab's content, drawn inside the scroll rather than as a second pinned band; never a third level.
     - **Above the strip sits at most ONE chrome block** (options-ui-§14): the page's picker for the instance it edits, plus every control that applies to all of its tabs — create, enable, unlock, copy, reset, delete. A page-wide control drawn under one tab reads as belonging to that tab and vanishes when the player clicks another. The band is already delimited by its divider and the content panel's top edge, so the block is **never boxed a second time**.
@@ -1213,12 +1262,12 @@ fetching it at build time — libraries are vendored and committed (documentatio
     - **Anything a player orders is the shared drag-to-reorder list**, never up/down arrows or a position field. The library owns the hamburger handle in its gutter at the far left, the bounded row box, the ghost, the insertion line, the index arithmetic and the boundary clamp; the row's **contents** are yours and are meant to differ. Rows in one list are a uniform height, a drag never crosses a fixed section boundary, and the controller is **canceled at the top of a render**, before the first widget is created.
 8a. Slash: **consume `LibKa0s-Slash-1.0`** — the dispatcher, help renderer, formatters, list builder and type-aware parser (slash-commands-§1). The addon keeps its ordered `NS.COMMANDS` table of **positional triples** `{name, desc, fn}` and passes it in; the library never owns it and never registers a chat command. Reserved verbs — `help get set list reset resetall config version debug perf` — mean the same thing in every Ka0s addon; `reset` takes a **path**, not a page.
 9. Schema-as-single-source: one table drives panel widgets + slash + defaults reset. One write seam for every schema-row path, whole-section and instance-relative writes included — the descriptors' `set`/`applyDefault` route through it, so a CLI change takes exactly the path a checkbox change takes. **If the player creates and deletes things** (windows, containers, panels, tracked lists), that collection is a **structural registry** no row can address, unless it is a flat set the seam writes whole at one normalized path, which makes it a value: its membership, order, id counter and keys go through **one registry writer** module that both the panel and the slash verbs call, and `docs/ARCHITECTURE.md` → Settings Schema names the writer and the load pass (the migration runner / profile-prepare step) that seeds and repairs it. Rows inside a member still go through the seam, and a preference the player sets on a member (a color, a size, a toggle) is a row, not the writer's to keep (architecture-§5). State **no control sets and no row addresses** — geometry only a drag or a resize determines, a remembered view, a cache or log the addon learns or records, and a vendored library's own writes into a table you hand it (LibDBIcon's `minimapPos`) — **MAY** be written outside the seam by writers `docs/ARCHITECTURE.md` lists under **one named owner module**: Settings Schema names its storage key, that owner and every function that writes it, wherever each lives; that sentence is the compliance and no register row is needed. A value any control also sets is a preference and gets a row, your own write into the library's table is yours rather than the library's, and a *forget*, *purge* or per-entry delete of learned data is the owner's operation and belongs in its naming, like any other writer (architecture-§5).
-10. Closed message bus: modules talk via `Ka0s_<Addon>_<Event>` messages, one sender each. No cross-module table reach.
+10. Closed message bus: modules talk via `Ka0s_<Addon>_<Event>` messages, one sender each. No cross-module table reach. **Every message name is declared once as a constant** — `NS.MSG.<SCREAMING_SNAKE>` in `core/Bus.lua`, or in `core/Constants.lua` where there is no bus file, or a module-scoped exported constant for a message one module owns — and every `SendMessage` and `RegisterMessage` call site uses that constant, never the literal (architecture-§4). `<Event>` is **PascalCase** and SHOULD name what happened, preferably as a past participle; the constant's SCREAMING_SNAKE key is the key's casing and never leaks into the wire string (naming-cheatsheet).
 11. All deprecated-API calls live in `Compat.lua`. Modules call `NS.Compat.X`. No `WOW_PROJECT_ID` flavor branching (Retail only).
-12. Combat lockdown: gate `InCombatLockdown()` (secure writes — settings setters, secure-frame attributes) and defer those with `PLAYER_REGEN_ENABLED`. **Exception — options-panel open (options-ui-§2): refuse under lockdown, do not defer.** Print a gray `NS.PREFIX` notice ("cannot open settings during combat — Blizzard's category-switch is protected") and return; **never** `Settings.OpenToCategory` under lockdown, and **never** auto-open on `PLAYER_REGEN_ENABLED`. **Never** close, hide or commit Blizzard's settings window from addon code in combat (`SettingsPanel:Close`, `HideUIPanel(SettingsPanel)`, `ToggleGameMenu`) — a page shown in combat is locked by the options library, tab strip included, and the host adds no page-level lock of its own — no cover, tab guard, render refusal or close — while a setter that creates, destroys or rebuilds frames still gates itself on `InCombatLockdown()` (options-ui-§2/§13, anti-pattern #88). For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
+12. Combat lockdown: gate `InCombatLockdown()` (secure writes — settings setters, secure-frame attributes) and defer those with `PLAYER_REGEN_ENABLED`. **Exception — options-panel open (options-ui-§2): refuse under lockdown, do not defer.** Outside combat the open is the library's: `Settings.OpenToCategory` takes the numeric category ID captured with `:GetID()` at registration — never the category object, never the frame, and never a string written over `category.ID`, which fails silently — and the `pcall`'d `SettingsPanel:GetCategoryList():GetCategoryEntry(category):SetExpanded(true)` walk that opens a parent's collapsed tree runs **after** it. Do not hand-roll either; `LibKa0s-Options-1.0` does both once for every addon. Print a gray `NS.PREFIX` notice ("cannot open settings during combat — Blizzard's category-switch is protected") and return; **never** `Settings.OpenToCategory` under lockdown, and **never** auto-open on `PLAYER_REGEN_ENABLED`. **Never** close, hide or commit Blizzard's settings window from addon code in combat (`SettingsPanel:Close`, `HideUIPanel(SettingsPanel)`, `ToggleGameMenu`) — a page shown in combat is locked by the options library, tab strip included, and the host adds no page-level lock of its own — no cover, tab guard, render refusal or close — while a setter that creates, destroys or rebuilds frames still gates itself on `InCombatLockdown()` (options-ui-§2/§13, anti-pattern #88). For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
 13. Per-frame loops: cache db values into module locals, refresh via `M:RefreshUpvalues()` on settings change.
 14. ≥10 dynamic frames: use object pool (Acquire/Release/HideAll).
-15. File LOC cap: ~1500, over **every authored `.lua` the repo tracks** — `tests/` included; `libs/`, `tests/_kit/` and generated non-shipping data are the only carve-outs (layout-§1). A **generator the repo authors** and commits — the program, not its output — lives under `tools/`, is `.pkgmeta`-ignored, is never loaded or listed in the TOC, and is capped like any other authored file; `tools/` is **not** a source folder. A non-Lua generator is outside the green gate — the linter and the harness read neither Python nor shell — so it **SHOULD** fail loudly and non-zero, write beside a source file rather than over it, and have its interpreter named in `DEPENDENCIES.md` (layout-§1). Peel when exceeded, or carry the file as a tracked issue or a ratified register row: those are the three terminal states, and doing none of them is the deviation.
+15. File LOC cap: ~1500, over **every authored `.lua` the repo tracks** — `tests/` included; `libs/`, `tests/_kit/` and generated non-shipping data are the only carve-outs (layout-§1). `docs/ARCHITECTURE.md` carries a **`Files over the 1500-line cap`** heading, one row per over-cap file naming its terminal state (an open issue naming the seam, a ratified deviation row, or a scheduled peel); a v0.1.0 addon writes the heading with "Nothing is over the cap today", because an empty census is a result and an absent one is indistinguishable from a census nobody wrote. **From LibKa0s test-kit revision 25 (LibKa0s v1.55.0)** the kit ships `tests/_kit/test_layout_cap.lua`, declared by its directory — `{ name = "test_layout_cap", dir = "tests/_kit/" }` — and asserting the census against the tree in both directions, so an over-cap file missing from the census and a census row naming a file that is no longer over the cap both go red. A repo whose vendored kit predates that revision owes the **re-vendor**, not a hand-written suite: the kit is not edited or reimplemented in a consumer (testing-§11). A **generator the repo authors** and commits — the program, not its output — lives under `tools/`, is `.pkgmeta`-ignored, is never loaded or listed in the TOC, and is capped like any other authored file; `tools/` is **not** a source folder. A non-Lua generator is outside the green gate — the linter and the harness read neither Python nor shell — so it **SHOULD** fail loudly and non-zero, write beside a source file rather than over it, and have its interpreter named in `DEPENDENCIES.md` (layout-§1). Peel when exceeded, or carry the file as a tracked issue or a ratified register row: those are the three terminal states, and doing none of them is the deviation.
 16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries. **`libs/LibKa0s/` is copied WHOLE, every time** — every module, even unwired ones; a partial copy costs the addon majors it was not even touching (anti-pattern #48) — TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml`, and kept **byte-identical** to its source repo (`diff -r` empty), with a re-vendor commit here after every library change, because both repos stay green while the copies silently diverge (library-stack-§7, anti-pattern #45). Nothing under `libs/` is ever edited locally.
 16b. **Consume, never fork** (anti-pattern #47): the chat printer, the debug console, the slash dispatcher, the options toolkit, the performance harness and the test harness are `LibKa0s`. Adopting one is a **descriptor plus a degradation stub** in the addon's own setup file. Anything genuinely missing goes back into the library as an **additive** descriptor field so every consumer gets it — never a local patch, and never a private lookalike.
 16a. **Performance harness** (performance): vendor `LibKa0s-Perf-1.0`, build `NS.Perf` from a descriptor in `core/PerfSetup.lua` (degrading to a working stub if the lib is absent), bracket hot paths with the gated `local t0 = Perf.on and debugprofilestop()` form — **zero work when off**, evidenced by the offline zero-overhead scenario, never by a comment — declare buckets with their `within` nesting, expose the reserved **`perf`** verb through `NS.COMMANDS` (the lib returns lines; never let it register a slash), declare `<Addon>PerfDB`, and implement `suspend`/`resume` so the addon goes inert **without a `/reload`** with visibility refused at the **source** of the show decision. Never hand-roll a probe, and never let a shared harness own a frame on your behalf (anti-patterns #43/#44). The **static** half of the same question — where the addon is getting hard to change — is the `lizard` run recorded in every automated-test bundle (rule 20e, automated-tests).
@@ -1228,13 +1277,13 @@ fetching it at build time — libraries are vendored and committed (documentatio
 18b. **The logo files** (layout-§4, toc-file-§1): `media/logos/<addon>.logo.128.tga`, **128×128, uncompressed 32-bit** (TGA type 2, 32 bpp, ~64 KB), generated from the 2000×2000 `.png` source with `Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")`. That one file is `## IconTexture`, the minimap button's icon and the broker object's icon — never a Blizzard icon path or a numeric file id (anti-pattern #82). The settings landing page's logo is a **separate, larger** file in the same folder (options-ui-§5).
 19. Tests: **vendor the shared kit** — the LibKa0s repo's root-level `testkit/` → `tests/_kit/`, never `libs/`, never edited locally (testing-§1). `tests/run.lua` keeps only the load list, the lifecycle kick and the suite list; `tests/wow_mock.lua` is a **thin extender** over `_kit/mock_base.lua`. Derive the addon's file list from the **TOC** and spell out the vendored library files explicitly, in XML order (testing-§9). TDD. `lua tests/run.lua` green **and** `luacheck .` clean **before every commit**. Keep the gate fast (testing-§14): the vendored kit caches compiled chunks for you, so a new addon starts fast; if the serial run ever passes ~10s, verify `lua tests/run.lua -j auto` agrees with the serial run and then set `Kit.run{ ..., jobs = "auto" }`. Keep it bounded (testing-§15): take the kit's memory, time, depth, heap, CPU and leak bounds as vendored and raise no budget without a deviation row; suites register cases and do nothing at load, name no host path, and let every `T.load()` instance go when the case ends; scratch probes never go in `tests/`.
 19a. Test-case inventory & badge (testing-§5): ship a **generated** `docs/test-cases.md` (full per-suite case enumeration + totals, produced by a `--list` mode of the runner — `lua tests/run.lua --list > docs/test-cases.md`, never hand-authored; it is the authoritative pass count) and a **static** X/Y `[tests]` README badge. Regenerate the doc and update the badge **in the same change** whenever the suite changes (a case added/removed/renamed or the count moved). No CI.
-20. Docs: root ships **exactly three** docs plus `LICENSE`, and never a fourth — full `README.md`, **stub** `CLAUDE.md`, `DEPENDENCIES.md` (documentation-§7); everything else under `docs/`. Canonical `docs/` **trio** (all addons): `ARCHITECTURE.md`, `testing.md` (verify-how-to), `smoke-tests.md`. `ARCHITECTURE.md` carries **nine** mandated sections, named rather than counted: Overview, Module Map, Settings Schema, Message Bus, Slash Commands, Event Subscriptions, Taint Notes, Known Limitations, and **`## Documented deviations`** — the single home for a ratified deviation, rows shaped `| Rule | What differs | Why | Decided | Re-check trigger |` with Rule a `filename-§N` reference and Re-check trigger the condition that ends it. Present even when empty ("None."); a deviation not in the register is **not** ratified, and an audit reads it first rather than re-filing what it records (documentation-§3, audit-review-history). **Five** topic-detail docs are required, not optional: generated `test-cases.md` (testing-§5), `performance.md`, `perf-analysis/README.md` (performance-§8, the in-game capture store and its index), `automated-tests/README.md` and generated `automated-tests/RESULTS.md` (automated-tests); further topic-detail docs as needed. **MUST NOT** ship `docs/agent-context.md` — this pack is fetched at runtime, never stored (documentation-§3, anti-pattern #49). The **stub `CLAUDE.md`** carries, in order: the H1, the adherence line, `## Standards compliance (read first)`, the "read the docs" pointer list, the green-gate line, and — in any addon that vendors `libs/LibKa0s/` — the **LibKa0s provenance line**, exactly `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).` naming the **tag** the payload was copied from and moving in the **same commit** as the bytes. `tests/_kit/vendor_sync.lua` greps that line out of `CLAUDE.md` with `[Bb]undles %[LibKa0s%]%b() (v[%d%.]+)` — a standalone sentence and a mid-sentence phrasing both satisfy it — and since **LibKa0s v1.8.1 / testkit revision 9** there is **no fallback to `README.md`**: a line left in the README reads as no line at all and the gate fails, naming `CLAUDE.md` (documentation-§2 item 6, testing-§11). Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
+20. Docs: root ships **exactly three** docs plus `LICENSE`, and never a fourth — full `README.md`, **stub** `CLAUDE.md`, `DEPENDENCIES.md` (documentation-§7); everything else under `docs/`. Canonical `docs/` **trio** (all addons): `ARCHITECTURE.md`, `testing.md` (verify-how-to), `smoke-tests.md`. `ARCHITECTURE.md` carries **ten** mandated sections, named rather than counted: Overview, Module Map, Settings Schema, Message Bus, Slash Commands, Event Subscriptions, Taint Notes, Known Limitations, **`## Documentation map`** — the per-addon doc register, every `.md` under `docs/` in exactly one of its four tables and frozen stores named once each as directories (documentation-§3, spelled out in the definition of done below) — and **`## Documented deviations`** — the single home for a ratified deviation, rows shaped `| Rule | What differs | Why | Decided | Re-check trigger |` with Rule a `filename-§N` reference and Re-check trigger the condition that ends it. Present even when empty ("None."); a deviation not in the register is **not** ratified, and an audit reads it first rather than re-filing what it records (documentation-§3, audit-review-history). **Five** topic-detail docs are required, not optional: generated `test-cases.md` (testing-§5), `performance.md`, `perf-analysis/README.md` (performance-§8, the in-game capture store and its index), `automated-tests/README.md` and generated `automated-tests/RESULTS.md` (automated-tests); further topic-detail docs as needed. **MUST NOT** ship `docs/agent-context.md` — this pack is fetched at runtime, never stored (documentation-§3, anti-pattern #49). The **stub `CLAUDE.md`** carries, in order: the H1, the adherence line, `## Standards compliance (read first)`, the "read the docs" pointer list, the green-gate line, and — in any addon that vendors `libs/LibKa0s/` — the **LibKa0s provenance line**, exactly `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).` naming the **tag** the payload was copied from and moving in the **same commit** as the bytes. `tests/_kit/vendor_sync.lua` greps that line out of `CLAUDE.md` with `[Bb]undles %[LibKa0s%]%b() (v[%d%.]+)` — a standalone sentence and a mid-sentence phrasing both satisfy it — and since **LibKa0s v1.8.1 / testkit revision 9** there is **no fallback to `README.md`**: a line left in the README reads as no line at all and the gate fails, naming `CLAUDE.md` (documentation-§2 item 6, testing-§11). Beside the mandated sections the hub also carries the `Files over the 1500-line cap` census (layout-§1), written as "Nothing is over the cap today" at v0.1.0 — its heading level follows its host's nesting and its name does not vary. Media in typed `media/` subfolders. No drift; sync before every release. (documentation-§3)
 20d. **`DEPENDENCIES.md` at root** (documentation-§7): every piece of software needed to build, run, test or release the addon, each with the **evidence** for it (file:line, a script's import, a documented command — never a speculative entry), split **runtime / development / release-and-assets** because most readers need one group only, with copy-pasteable **WSL2 / Ubuntu** install commands that actually work and a one-line **verification** per tool. `lua5.1` is a hard version requirement (the harness uses `setfenv`); `luacheck`/`lizard` are "any recent". `pip install lizard` **fails** on Ubuntu 24.04 (PEP 668 `EXTERNALLY-MANAGED`) — use `pipx install lizard`. Refresh it in the change that adds the dependency, not at the next audit; an undocumented or drifted toolchain is anti-pattern #50.
-20e. **Automated test record** (automated-tests): run the **vendored** `tests/_kit/run-automated-tests.sh` — never an addon-side copy — and commit the frozen bundle it writes to `docs/automated-tests/<YYYYMMDD-HHMMSS>/` (one file per suite plus `manifest.json`), plus the row it prepends to `docs/automated-tests/RESULTS.md`. **`lint` and `tests` gate; `perf` and `complexity` are recorded and never fail a run** — a threshold that fails a run teaches the collection to reach for `--no-verify`, after which the gate protects nothing and the habit remains. A missing tool is a **skip recorded with its reason**, never a pass: a green run that silently measured nothing is worse than a red one, because it is believed. `RESULTS.md` is **one** file overwritten in place — never dated, never a directory — so its git history is the trend line, and it carries the current complexity watch list with a one-line disposition for everything the tool warned on and every file in the 1000–1500 LOC band ("None." when empty). The checkpoint is **release, not commit**: a full bundle with an `ANALYSIS.md` in the same change that bumps the version, **before** the tag. Never gate commits on the full bundle (the green gate is `--suite lint --suite tests --no-bundle`, which writes nothing), never hand-write a number into a bundle, and never edit a bundle once written. `.gitattributes` **MUST** exist at the root and carry the **whole** policy rather than the exception alone: the pin its repo kind requires (`* text=auto eol=crlf` for an addon), `*.sh text eol=lf` — without which the vendored runner arrives CRLF and the kernel looks for an interpreter named `bash\r` — and the `binary` markings, all verbatim from `line-endings-§5`. A file carrying only the `*.sh` line satisfies nothing (`line-endings-§1/§2/§3/§4`, automated-tests-§2, anti-pattern #57).
+20e. **Automated test record** (automated-tests): run the **vendored** `tests/_kit/run-automated-tests.sh` — never an addon-side copy — and commit the frozen bundle it writes to `docs/automated-tests/<YYYYMMDD-HHMMSS>/` (one file per suite plus `manifest.json`), plus the commit-pinned row it prepends to `docs/automated-tests/RESULTS.md`. **`lint` and `tests` gate; `perf` and `complexity` are recorded and never fail a run** — a threshold that fails a run teaches the collection to reach for `--no-verify`, after which the gate protects nothing and the habit remains. A missing tool is a **skip recorded with its reason**, never a pass: a green run that silently measured nothing is worse than a red one, because it is believed. `RESULTS.md` is **one** file overwritten in place — never dated, never a directory — so its git history is the trend line, and it carries the current complexity watch list with a one-line disposition for everything the tool warned on and every file in the 1000–1500 LOC band ("None." when empty). The checkpoint is **release, not commit**: a full bundle with an `ANALYSIS.md` in the same change that bumps the version, **before** the tag. Never gate commits on the full bundle (the green gate is `--suite lint --suite tests --no-bundle`, which writes nothing), never hand-write a number into a bundle, and never edit a bundle once written. `.gitattributes` **MUST** exist at the root and carry the **whole** policy rather than the exception alone: the pin its repo kind requires (`* text=auto eol=crlf` for an addon), `*.sh text eol=lf` — without which the vendored runner arrives CRLF and the kernel looks for an interpreter named `bash\r` — and the `binary` markings, all verbatim from `line-endings-§5`. A file carrying only the `*.sh` line satisfies nothing (`line-endings-§1/§2/§3/§4`, automated-tests-§2, anti-pattern #57).
 20a. `README.md` is a **player-facing** document that renders on **CurseForge as well as GitHub** — so it **MUST NOT** use `<…>` angle-bracket placeholders anywhere (CurseForge strips them as HTML even inside backticks; write the argument bare, keep `[…]` for optional ones) nor percent-escapes for spaces in badge URLs. Deliberate HTML like `<br>` is fine. It is a document — written for the person who installed the addon (what it does, how to use it, how to fix common problems), in plain language, free of internal jargon and machine-generated tells; contributor material (test harness, lint, build, internals) stays out of it, under `docs/`. It follows the **canonical section order** (documentation-§1): title → badges (`[wow]` → version → license → standard → `[tests]`, that exact order and these exact templates: `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, `![CurseForge Version](https://img.shields.io/curseforge/v/<projectId>)`, `![License](https://img.shields.io/badge/License-MIT-orange)`, `![Standard](https://img.shields.io/badge/Ka0s-WoW_Addon_Standard-yellow)`, `![Tests](https://img.shields.io/badge/Tests-<X>%2F<Y>_passing-green)`; the `[wow]` and `[tests]` badges MUST be updated in lockstep with the TOC `## Interface:` and the test inventory respectively; **the standard badge is deliberately NOT a link and MUST NOT be re-wrapped in one** — the binding standards-repo reference is the TOC `X-Standard` field and the `CLAUDE.md` "Standards compliance" section (documentation-§6), so the badge is a declaration on a player-facing page, not navigation for a reader who was never its audience) → logo → description → Screenshots → Usage (**prose, five paragraphs or fewer, no tables** — how the display is shown, hidden, moved and locked, what test/preview mode is for, what the chrome's controls do, and the addon's core interactions; closing on ONE line pointing at Settings → AddOns and the slash verb that prints the command list. The `Command | What it does` and `Tab \| Covers` tables were mandated here until v2.41.0 and are gone: the command list is generated from `NS.COMMANDS` for `/<slash> help`, and the settings table lives in `docs/settings-panel.md`) → How it works → FAQ → Troubleshooting → **Issues and feature requests** (→ GitHub issues) → Version History → **optional `## Credits`, last** (there is **no** `## Testing` section — verify-how-to lives in `docs/`; the README keeps only the `[tests]` badge). **Every edit to `README.md` MUST go through a de-AI writing pass** (`/humanize` or an equivalent AI-writing audit) before it is committed — the README alone, because it is the only player-facing document in the repo; `docs/`, `CLAUDE.md`, `DEPENDENCIES.md`, commit messages and code comments are contributor surfaces and are deliberately exempt (documentation-§1, anti-pattern #77). **The README MUST NOT carry a bundled-library inventory** — no `## Libraries`, `## Bundled libraries`, `## Libraries and credits`, `## Credits and libraries` or `## Credits and bundled libraries` section, and no library list in the intro prose. Which libraries the build vendors is a contributor fact and lives in `DEPENDENCIES.md` and `docs/ARCHITECTURE.md`; the LibKa0s provenance line lives in root `CLAUDE.md` (rule 20, documentation-§2). A `## Credits` section is **optional** and carries **only external** credit — third-party artwork, another author's work, a font or a sound pack — never a vendored-library list; with nothing external to credit, ship no such section. TOC follows the fixed field order + `#`-section file listing (toc-file-§1/toc-file-§5).
 20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (documentation-§4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
 20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **three** places — TOC `X-Standard`, README standard badge, and the root `CLAUDE.md` `## Standards compliance (read first)` section. There is no fourth place; the old one was a file the standard now forbids. STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
-21. Audits & reviews: archive every audit under `docs/audits/<YYYY-MM-DD>/` and every code review under `docs/reviews/<YYYY-MM-DD>/`, each a 5-artifact bundle (audit-review-history). Kept, not deleted.
+21. Audits, reviews & re-vendors: archive every audit under `docs/audits/<YYYY-MM-DD>/`, every code review under `docs/reviews/<YYYY-MM-DD>/` and every LibKa0s re-vendor under `docs/revendor/<YYYY-MM-DD>-v<tag>/`, each a numbered-prefix bundle — five artifacts for the first two, `01_DELTA.md` and `05_SUMMARY.md` always for the third with the middle three written when there is something to write (audit-review-history). A re-vendor commit owes a bundle naming its tag, or a `## Documented deviations` row saying why. Kept, not deleted; none of the three carries a `README.md`.
 22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
 24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. **Every close control the addon builds — on any window, and inside any decoration hook it hands a shared module — goes through the single `NS.MakeCloseButton` wrapper defined in `core/CoreSetup.lua`, which supplies the folder name (MUST).** A bare two-argument call to the factory silently draws the fallback glyph instead of the shared mark: no path is built, so nothing draws and nothing raises, and no gate can see it (anti-patterns #64, #65). The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px gray highlight just inside it, plus a gold title and a gray divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See standalone-windows, "The Ka0s window edge".
@@ -1296,12 +1345,12 @@ fetching it at build time — libraries are vendored and committed (documentatio
 
 - [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge; until then a commented placeholder-free line saying so).
 - [ ] Every **load-bearing** TOC position carries a comment naming what resolves at load; conventional positions are marked too (toc-file-§5). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
-- [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`.
+- [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`; the `ignore:` list names every root dot-entry the repo **actually has** and no entry it does not — `.claude/`, `.superpowers/` and `tools/` only once the folder exists (packaging).
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors** **with `tests/` in scope** — only `tests/_kit/` is excluded, and the harness global is declared in the `files["tests/"]` stanza rather than in top-level `read_globals` (lint).
 - [ ] **`libs/LibKa0s/` vendored WHOLE** from the library repo's ship folder — every module, byte-identical (`diff -r` empty, library-stack-§7) — and TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block after Ace3.
 - [ ] **The six setup files present**, each a descriptor plus a degradation stub and nothing more: `core/MediaSetup.lua`, `core/CoreSetup.lua`, `core/PerfSetup.lua`, `core/DebugLogSetup.lua`, `settings/Slash.lua`, `settings/OptionsSetup.lua`. No hand-rolled console, options toolkit, dispatcher, printer or harness anywhere in the addon's own source (anti-pattern #47). Each stub answers **every** member the addon actually calls.
 - [ ] `tests/_kit/` vendored from the LibKa0s repo's root-level `testkit/` (**not** under `libs/`, not edited); `tests/wow_mock.lua` is a thin extender over `mock_base.lua`; `tests/run.lua` derives the addon's file list from the TOC and lists the vendored library files explicitly in XML order (testing-§1, testing-§9).
-- [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing).
+- [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing). The rule-subject conformance suites are under exactly their mandated names — `tests/test_surface_parity.lua` (testing-§8), `tests/test_vendor_sync.lua` delegating to `tests/_kit/vendor_sync.lua` rather than reimplementing it (testing-§11), `tests/test_disabled.lua` (slash-commands-§7) — and **every kit suite is declared by its directory**, `{ name = "…", dir = "tests/_kit/" }`, never by bare basename beside a local file of the same name (testing-§9).
 - [ ] Generated `docs/test-cases.md` inventory present and in sync (`lua tests/run.lua --list`); README carries a static X/Y `[tests]` badge (testing-§5).
 - [ ] `Compat.lua` exists (even if scaffold); no `WOW_PROJECT_ID` flavor branching.
 - [ ] `Locale.lua` exists with metatable fallback.
@@ -1324,7 +1373,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] **Every color row has its class-color companion** beside it (default off), with `classColorSource` declared on both rows, resolved through **one** helper that keeps the swatch's alpha, falls through to the stored swatch on an unresolvable class and leaves the swatch enabled under both modes — no `disabledIf` on a color row anywhere in the repo (options-ui-§17).
 - [ ] **Anything a player orders is the shared drag-to-reorder list** — no up/down arrows, no position field; the handle and the row box come from the library and the row's contents from the addon, rows are a uniform height, no drag crosses a fixed section boundary, and the controller is canceled at the top of the render (options-ui-§18).
 - [ ] The header **Defaults button** is created in the first `OnShow` (not at registration), via the library's `EnsureDefaultsButton` called at the **top of every `OnShow`**, with its callback parked on the panel (`panel.defaultsOnClick`) — options-ui-§5, anti-pattern #42.
-- [ ] The options setup file's fallback is **load-completing** (the documented exception, options-ui-§1) and its member set was determined by **measurement** — deleting one and re-running the library-absent load — with both the member set and the resulting schema row count pinned by cases.
+- [ ] The options setup file's fallback is **load-completing** (the load-completing exception, options-ui-§1) and its member set was determined by **measurement** — deleting one and re-running the library-absent load — with both the member set and the resulting schema row count pinned by cases.
 - [ ] Combat-lockdown: secure writes defer on `PLAYER_REGEN_ENABLED`; options-panel open **refuses** under lockdown (gray notice, no defer — options-ui-§2); no addon code closes or hides `SettingsPanel` in combat, and no host-side page-level lock (cover, tab guard, render refusal, close) sits beside the library's; a frame-rebuilding setter still gates itself (options-ui-§2/§13, anti-pattern #88).
 - [ ] **Shared media wired (library-stack-§8)** — `core/MediaSetup.lua` publishes `NS.Icon` / `NS.MediaFont` from `LibKa0s-Media-1.0`, passing the addon's own **folder name**, and makes the one `Media.RegisterLSM(addonName)` call at file load. It loads **before** `core/Constants.lua`, whose `FONT_MONO` reads the seam and falls back to a **real client font** rather than `nil` or a dead path. The addon's own `media/` holds only what no other addon could use — the logo, the screenshots — and **no copy of any icon, face or bar texture the payload already ships** (layout-§3, anti-pattern #63). Every mark the addon draws comes from the catalog: window close controls through the **one** `NS.MakeCloseButton` wrapper in `core/CoreSetup.lua` (never a bare two-argument call anywhere, decoration hooks included — `grep -rn 'MakeCloseButton(' --include='*.lua' | grep -v '/libs/'` returns the wrapper and its callers and nothing else), title-bar strips, modals and their copy windows, and action buttons where the mark sits **beside** the label. A mark the catalog lacks is added **upstream**, never locally.
 - [ ] **Debug console wired (debug-logging)** — `core/DebugLogSetup.lua` builds `NS.DebugLog` from a descriptor (`name`, `title`, `font`, `isEnabled`/`setEnabled` over the addon's **own** flag, `initSummary`, call-time `print`/`safeToString` forwarders) and publishes `NS.Debug` bare; the monospace face comes from `libs/LibKa0s/media/fonts/` through `NS.MediaFont` and is LSM-registered by `Media.RegisterLSM` (**never** a second copy under the addon's own `media/fonts/`, anti-pattern #63); the descriptor passes **`addonName`**, so the console's close, copy and clear draw the shared marks; enabled-state is **session-only** and never in SV, decoupled from window visibility; `/<slash> debug` toggles the window and `on|off` route through the single `SetEnabled` seam. **The window, the formatters, the buffer, the scrollbar and the counter are NOT in the addon's source** — an audit must not ask for them. (No-window addons MAY use chat.)
@@ -1338,7 +1387,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] **A full automated-test bundle produced by the vendored runner** — `tests/_kit/run-automated-tests.sh`, never an addon-side copy — committed under `docs/automated-tests/<YYYYMMDD-HHMMSS>/` with one file per suite plus `manifest.json`, and its row prepended to `docs/automated-tests/RESULTS.md`. `RESULTS.md` carries the current watch list with a disposition for everything `lizard` warned on and every file in the 1000–1500 LOC band ("None." if empty). Produced at every **release**, before the tag; commits are **not** gated on it, and `perf`/`complexity` never fail a run (automated-tests-§3/§4/§6, anti-pattern #51).
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
-- [ ] Root = the three docs plus `LICENSE`, and nothing else: full `README.md` (with `[wow]` badge + the **unlinked** standard badge), **stub** `CLAUDE.md`, `DEPENDENCIES.md`. Canonical `docs/` **trio** present (`ARCHITECTURE.md` — all **ten** mandated sections including `## Documentation map` and `## Documented deviations`, the latter written as "None." at v0.1.0 rather than omitted; `testing.md`; `smoke-tests.md`) plus the five verification-and-record docs (`test-cases.md`, `performance.md`, `perf-analysis/README.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md`) plus **all six Tier 1 topic-detail docs** under exactly those names (`scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`, `common-tasks.md` — documentation-§3), with every **Tier 2** trigger evaluated and each doc either shipped or carrying a *Not applicable* row in `## Documentation map`, and every `.md` under `docs/` appearing in that map exactly once, across its **four tables** — Required, Conditional, **Verification and record** (`testing.md`, `smoke-tests.md`, `test-cases.md`, `performance.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md` — six rows, always) and Addon-specific, in that order, with `perf-analysis/README.md` registered in Conditional against its trigger and the hub's own row optional; **no `docs/agent-context.md`**, **no `docs/complexity.md`** (retired v2.19.0), **no `docs/file-index.md`** and **no `docs/conventions.md`** (retired v2.23.0); passes the drift check.
+- [ ] Root = the three docs plus `LICENSE`, and nothing else: full `README.md` (with `[wow]` badge + the **unlinked** standard badge), **stub** `CLAUDE.md`, `DEPENDENCIES.md`. Canonical `docs/` **trio** present (`ARCHITECTURE.md` — all **ten** mandated sections including `## Documentation map` and `## Documented deviations`, the latter written as "None." at v0.1.0 rather than omitted, plus the `Files over the 1500-line cap` census written as "Nothing is over the cap today" (layout-§1); `testing.md`; `smoke-tests.md`) plus the five verification-and-record docs (`test-cases.md`, `performance.md`, `perf-analysis/README.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md`) plus **all six Tier 1 topic-detail docs** under exactly those names (`scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`, `common-tasks.md` — documentation-§3), with every **Tier 2** trigger evaluated and each doc either shipped or carrying a *Not applicable* row in `## Documentation map`, and every `.md` under `docs/` appearing in that map exactly once, across its **four tables** — Required, Conditional, **Verification and record** (`testing.md`, `smoke-tests.md`, `test-cases.md`, `performance.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md` — six rows, always) and Addon-specific, in that order, with `perf-analysis/README.md` registered in Conditional against its trigger and the hub's own row optional; **no `docs/agent-context.md`**, **no `docs/complexity.md`** (retired v2.19.0), **no `docs/file-index.md`** and **no `docs/conventions.md`** (retired v2.23.0); passes the drift check.
 - [ ] **Root `DEPENDENCIES.md` present and evidence-based** (documentation-§7) — runtime / development / release-and-assets kept separate, every entry naming what needs it and how that is known, WSL2/Ubuntu install commands that actually run (`pipx install lizard`, **never** `pip install lizard` — PEP 668) with a one-line verification per tool, `lua5.1` stated as a hard requirement with its reason (`setfenv`), and the release/assets group saying "none" plainly when the addon has no such tooling.
 - [ ] **Standards reference in memory & context (documentation-§6)** — all three present: TOC `X-Standard`, README standard badge (**not** wrapped in a link), and the root `CLAUDE.md` `## Standards compliance (read first)` section.
 - [ ] `README.md` is player-facing and plain-language (no contributor material, no `## Testing` section) and follows the canonical section order (documentation-§1) with **no logo image** (anti-pattern #79), including **Usage** (prose, five paragraphs or fewer, no tables, closing on one line pointing at Settings → AddOns and the slash command list), **Issues and feature requests** (→ GitHub issues), and **Version History**. Every edit to it has been through a de-AI writing pass (`/humanize` or equivalent) — the README only; `docs/` and `CLAUDE.md` are contributor surfaces and exempt.

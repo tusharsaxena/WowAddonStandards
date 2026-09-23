@@ -198,6 +198,39 @@ is not a judgment call the release notes can absorb.
   whose row reads `0/0` for tests is indistinguishable from a full run that found no tests, and the
   trend line carries that forever. Not-selected and tool-absent are different facts about why a
   number is missing, and both are different from zero.
+- **MUST** carry, per row, the **commit SHA** the run measured and whether the tree was **clean** at
+  that SHA. A results row without its SHA is a claim about a tree nobody can identify: its figures can
+  be read but not reproduced, not bisected, and not attributed to the change that moved them, and the
+  trend line this file exists to be stops being a trend line, because two rows whose numbers differ no
+  longer say what happened between them. On 2026-09-07 the newest bundle was behind the tree it was
+  read against in **ten of ten** reviewed repositories, by margins that moved the very figures the row
+  carries: `AbsorbTracker`'s newest row recorded 508 tests and 7997 NLOC against a tree running 547 and
+  8903. Going stale between releases is expected — §6 makes the release the checkpoint that refreshes
+  this file — but staleness is only legible *as* staleness once the row names the commit it measured.
+  The short SHA and a clean/dirty mark are enough in the table; the full value goes in the manifest.
+  **The two cells arrive with the kit revision that emits them**, and this **MUST** binds from each
+  repo's first run on it: **LibKa0s test-kit revision 25 (LibKa0s v1.55.0)**. The vendored runner
+  (`tests/_kit/run-automated-tests.sh`) fixes the header, and through revision 24 it emits no
+  commit cells at all, so a repo whose vendored kit predates revision 25 owes the **re-vendor** and
+  not a hand-typed column — both cells are generated, on the boundary stated below, and typing them
+  by hand is the drift that boundary exists to prevent.
+- **MUST NOT** record a run from a **dirty** tree without marking the row as such. A dirty tree is not
+  a commit, so the SHA printed beside the figures names bytes that are not the bytes that were
+  measured, and the run cannot be reproduced from its own record by anyone, including the person who
+  made it. The collection paid for this at a **release**: `LibKa0s`'s v1.25.0 release bundle stamps its
+  version against a sha whose tree cannot be checked out, and to every later reader it is
+  indistinguishable from a reproducible run. Marked, a dirty row is still worth keeping — it is an
+  experiment, honestly labeled. Unmarked, it is the one row in the file that cannot be checked.
+- **MUST** record both facts in the run's **`manifest.json`** as well, as a `git` object carrying the
+  full `sha`, the `branch` and a boolean `dirty`, on the same footing as the `gates` object below: the
+  row is what a person reads, and the manifest is what the release command and every later tool parse.
+- A row written before the runner emitted these cells **MUST NOT** be migrated to *clean*, and
+  **MUST NOT** be reconstructed from git archaeology either. Widening the table
+  carries every earlier row forward with both cells **unknown**, which is a third fact and not the
+  first — unknown is what the record actually holds about those runs. It is the rule the two bullets
+  above already apply to a missing figure: a skip is recorded as a skip and never as a pass, and
+  not-selected is not zero. A runner that cannot widen the table says so and leaves the file alone,
+  as the column-set bullet below already requires.
 - **The generated lead-in MUST name the checkpoint for each suite, not merely the verdict.** The
   prose the runner writes above the table is not decoration — it is the sentence eight repos quote
   back — and *"perf and complexity never fail a run"* is true and, standing alone, misleading, because
@@ -220,7 +253,8 @@ is not a judgment call the release notes can absorb.
   says so and leaves the file alone.
 
 **What is generated and what is authored — the one boundary.** Everything in `RESULTS.md` is the
-runner's output: the header, the lead-in, every table row and every figure in it, both watch-list
+runner's output: the header, the lead-in, every table row and every figure in it — the commit SHA and
+the clean/dirty mark included, which the runner reads from git and nobody types — both watch-list
 tables' entries, and the standing section for each suite. **The watch list's `Disposition` column is
 the one authored cell in the file**, and nothing else in it is ever hand-edited (documentation-§3).
 
@@ -269,6 +303,17 @@ and what it costs is the trend line the whole section exists to keep.
   cap) and the standard may add or move one; a column absorbs that, whereas a heading per band makes
   every addon's record need restructuring when it changes. It also keeps a file that moved between
   bands on one line in the diff rather than two.
+- **The band table is the generated observation; `layout-§1`'s cap census is the authored
+  disposition, and the two MUST agree.** This table carries **both** bands, because both are
+  measurements and the runner takes them on every run. The over-cap band is *also* the subject of the
+  census `layout-§1` mandates in each repo's engineer-context hub, which records which of the three
+  terminal states each breach sits in — a judgment no tool can make. Neither document replaces the
+  other and neither may contradict it: an over-cap file in this table with no census row is the
+  unremarked breach `layout-§1` refuses, and a census row for a file this table no longer reports
+  over the cap is a decision about a file nobody has. For an over-cap entry this table's
+  `Disposition` cell **points at** the census row rather than ruling a second time, which keeps one
+  authored judgment on one path. The **1000–1500 band is dispositioned here and only here**, since
+  `layout-§1` keeps no heading for it.
 - **MUST** carry a short standing section for each of the **other three** suites as well — test
   suite, lint, perf — **generated from the same manifest** as the table, on the boundary stated
   above, so that the requirement has a producer rather than an aspiration. The complexity watch list

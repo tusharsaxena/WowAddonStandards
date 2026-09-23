@@ -13,11 +13,13 @@ Meanwhile eight repos — `LibKa0s`, `AbsorbTracker`, `BankLedger`, `ConsumableM
 **34, 36, 34, 35, 22, 31, 68 and 30 lines**, and the two repos that ship the standard and the
 tooling — `WowAddonStandards` and `wow-addon` — had **no `.gitattributes` at all**.
 
-**That census is the state this section was written against, and it has since been closed.** All
-eleven repos now carry an explicit root `.gitattributes` holding the §5 canonical body for their
-kind — the nine client-bound repos at 81 lines, `WowAddonStandards` and `wow-addon` at 82. The
-figures above are kept because they are why the rule reads the way it does, not because they
-describe the collection today.
+**That census is the state this section was written against, and half of it has since been closed.**
+All fourteen repos in the collection carry an explicit root `.gitattributes` at its root, so §1 is
+satisfied everywhere. §5 is not: measured on 2026-09-22, **one** of the fourteen diffs clean against
+the canonical body and the other **thirteen** carry the pre-v2.61.0 shell-scripts comment, because
+the edit that widened it never traveled past the two repos it was written in. That is the gap §7
+gates rather than re-sweeps. The figures above are kept because they are why the rule reads the way
+it does, not because they describe the collection today.
 
 **Treat the straggler counts in that census, and in the v2.24.0 changelog, as indicative rather than
 measured.** They were produced by the superseded §7 (e) check, which counted every binary and every
@@ -67,9 +69,10 @@ which trains its readers to ignore the one gate that exists to catch a real drif
   * text=auto eol=crlf
   ```
 
-  That is the eight addon repos (`AbsorbTracker`, `BankLedger`, `ConsumableMaster`, `KickCD`,
-  `LootHistory`, `PanelMaster`, `WhatGroup`, `prettychat`) plus `LibKa0s`, whose ship folder lands
-  in every one of their `libs/` trees. The client expects CRLF in addon source, and a Linux or macOS
+  That is the eleven addon repos — `AbsorbTracker`, `AuraMaster`, `BankLedger`,
+  `ConsumableMaster`, `KickCD`, `LootHistory`, `MultiMeters`, `PanelMaster`, `PartyFrameEnhanced`,
+  `PrettyChat`, `WhatGroup` — plus `LibKa0s`, whose ship folder lands in every one of their `libs/`
+  trees. The client expects CRLF in addon source, and a Linux or macOS
   contributor on `core.autocrlf=input` would otherwise check out LF without noticing.
 
 - A repo that **ships nothing to the WoW client** **MUST** pin LF:
@@ -157,7 +160,7 @@ Fixing the body is what makes this section **checkable**: an auditor diffs rathe
 eight hand-written 22-to-68-line variants that existed before it stop being eight things to keep in
 sync.
 
-**Client-bound repos** — the eight addons and `LibKa0s`:
+**Client-bound repos** — the eleven addons and `LibKa0s`:
 
 ```gitattributes
 # =============================================================================
@@ -358,7 +361,7 @@ A repo holding such a file **MAY** carry an **appendix** below the canonical bod
   follow the appendix. That is what lets an auditor tell an appendix from an edited body without
   reading either.
 - It **MUST** hold only marks an extension rule cannot express — a `binary` mark keyed by **path**.
-  Anything reachable by extension belongs in §4's union list, upstream, where all eleven repos get
+  Anything reachable by extension belongs in §4's union list, upstream, where all fourteen repos get
   it; a private extension list in one repo's appendix is the eight-hand-written-files problem this
   section closed, restarted one repo at a time.
 - Each entry **MUST** name a **single path** rather than a glob. `tools/**` swallows the text file
@@ -378,7 +381,7 @@ that a file may legitimately be longer than the body:
 
 ```sh
 # is the body intact, and is anything extra a conforming appendix?
-n=$(wc -l < <canonical>)                                  # 81 client-bound, 82 non-client
+n=$(wc -l < <canonical>)                                  # 84 client-bound, 85 non-client
 diff <(head -n "$n" .gitattributes) <canonical>           # MUST be empty
 tail -n +"$((n + 1))" .gitattributes | tr -d '\r' | grep -m1 .   # nothing, or the delimiter
 ```
@@ -433,10 +436,13 @@ warning: in the working copy of 'core/Namespace.lua', LF will be replaced by CRL
 
 ### 7. Checking it (MUST)
 
-An audit **MUST** check all four properties mechanically and **MUST** report working-tree strays as
-**one** rolled-up finding carrying the command that produced the count — never a file-by-file
-enumeration, which inflates the tally for what is a single `--renormalize` sweep (documentation-§6
-applies the same rolled-up rule to citation sweeps).
+Every property this section states **MUST** be checked mechanically, and **MUST NOT** be eye-checked
+against the text. Both halves are gated by the kit rather than by an auditor's attention — the working
+tree from revision 15, the body from revision 25 — and an audit runs the hand equivalents below only
+where the gate has not arrived. Whichever runs it, working-tree strays **MUST** be reported as **one**
+rolled-up finding carrying the command that produced the count, never a file-by-file enumeration, which
+inflates the tally for what is a single `--renormalize` sweep (documentation-§6 applies the same
+rolled-up rule to citation sweeps).
 
 **Property (e) is a test before it is a finding.** Every repo **MUST** carry the vendored EOL gate —
 `tests/_kit/test_eol.lua`, LibKa0s test-kit revision 15 — loaded by `tests/run.lua` with the rest of
@@ -463,12 +469,14 @@ under an `eol=crlf` pin for nine kit revisions with a green suite above them.
 - A red **MUST** be cleared by §6's per-file re-checkout, never by `git add --renormalize .`. The index
   is already correct in every repository measured — which is exactly why nothing ever reported these —
   so renormalizing rewrites what was never wrong and leaves the bytes on disk as it found them.
-- A green suite **MUST NOT** be read as covering (a) through (d). The gate compares bytes against
-  declared attributes; it cannot tell you the `.gitattributes` body is byte-for-byte one of the two
-  canonical ones (§5), or that a newly vendored binary type reached §4's union list. Those stay the
-  audit's work, every cycle.
-- A repo whose vendored kit predates revision 15 still owes `(e)` by hand, and that is the only reason
-  the one-liner below stays in this section.
+- **Through kit revision 24 a green suite MUST NOT be read as covering (a) through (d).** That case
+  compares bytes against declared attributes, so it can say nothing about the body those attributes
+  came from — whether it is byte-for-byte one of §5's two, or whether a newly vendored binary type
+  reached §4's union list. **From LibKa0s test-kit revision 25 (LibKa0s v1.55.0) the second case
+  below covers them**, and in a repo carrying that kit they stop being the audit's work every cycle.
+- A repo whose vendored kit predates revision 15 still owes `(e)` by hand, and one predating revision
+  25 still owes (a) through (d) by hand. That, and the two repos that run no suite at all, is the only
+  reason the one-liner below stays in this section.
 
 ```sh
 # (a) present at root, and (b)/(c)/(d) the pin, the carve-out and the binaries
@@ -511,3 +519,49 @@ git ls-files -z | xargs -0 -I{} sh -c '
   a discovered defect. An audit that finds strays where `tests/_kit/test_eol.lua` reports green
   **MUST** file the gate as the finding, not the files: the working tree is one commit from clean
   either way, and a check that passes over what it was written to catch is the more expensive defect.
+
+**Properties (a)–(d) are a test too, from revision 25, and this section's own argument is why.** *A rule
+with an auditor and no seam is a rule that gets re-swept every cycle* was written four paragraphs above
+about the working tree, and it holds word for word for the body. The body was left to the eye, and the
+measurement says what that produced. On 2026-09-22, **twelve of the fourteen repos were missing
+`*.py text eol=lf`** — a §3 MUST since v2.61.0 — and **thirteen of the fourteen** diverged from §5's
+canonical body. Every one of the thirteen diverged in the *same place*, on the *same* six lines: the
+shell-scripts comment §3 widened to eight when it took in the shebang rule. `AuraMaster` and `LibKa0s`
+carry the `*.py` line, and `AuraMaster` alone diffs clean. So thirteen repositories did not each make a
+judgment about their `.gitattributes`. One edit failed to travel, and between the audit that shipped it
+and the next one, nothing in any repository mentioned it again.
+
+**And the missing line is not cosmetic in at least one of the twelve.** One repository tracks four
+`#!/usr/bin/env python3` generators under `tools/`; with no `*.py` carve-out above them its CRLF pin
+applies, and all four sit CRLF on disk — which is `python3\r`, on every checkout, for everyone. That is
+precisely the failure §3 was extended to prevent, sitting in the tree since the release that extended
+it, under a green suite, because the rule was published and the line that carries it was not.
+
+**From LibKa0s test-kit revision 25 (LibKa0s v1.55.0), the body is gated by a second case in the kit's
+existing `tests/_kit/test_eol.lua`** — a second case and not a second suite, because one file already
+owns this question and two gates over one rule is two lists to keep whole (testing-§9). It is declared
+by the pair (basename, kit directory) like any other kit suite, and it asserts:
+
+- **(a)** `.gitattributes` is present at the repo **root** and tracked;
+- **(b)** the file carries **exactly one** `* text=auto` pin, and it is the one §2 gives this repo kind
+  — `eol=crlf` where the repo ships Lua to the client, `eol=lf` where it ships none. The gate decides
+  which by §2's mechanical discriminator — a `.toc`, a client-bound `libs/`, or the tracked payload folder a Ka0s-owned library repo ships under `library-stack-§7`, which has neither of the first two — rather than by carrying a
+  roster of its own: a list inside the gate is one more copy to update the day a repo is added;
+- **(c)** §3's per-extension pins are both present — `*.sh text eol=lf` and `*.py text eol=lf` — along
+  with §4's binary marks;
+- **(d)** the file is **byte-identical to §5's canonical body for that kind** from its first byte through
+  that body's final line, and the only thing permitted below it is a §5 appendix graded against §5's own
+  rules: it begins after the body's last line, its first non-blank line is exactly
+  `# --- line-endings-§5 appendix ---`, every entry is a single path carrying its one-line reason, and
+  nothing follows it.
+
+The two canonical bodies are **copied whole out of §5** into the kit rather than re-authored there, so
+this section stays the one place the body is written down: changing a comment in §5 is then one kit
+revision and one re-vendor, not fourteen hand edits that diverge the way the last one did. The case
+**MUST** fail rather than pass when it cannot look — no git, no file, no answer from `check-attr` — on
+the same bargain the working-tree case already strikes.
+
+A repo whose vendored kit **predates revision 25 owes the re-vendor, not a hand-written suite**: a
+fourteenth local copy of a gate the kit ships is the drift this paragraph exists to end. The two repos
+with no `tests/` harness to wire it into — the documentation-and-tooling repos (documentation-§8) —
+keep the audit's one-liner above, and that is what it is still for.
