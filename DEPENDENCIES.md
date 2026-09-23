@@ -11,7 +11,7 @@ The toolchain contract for **this** repository (documentation-§7).
 > second list exists. §7's *Runtime (in-game)* group has no instance and is omitted rather than
 > answered.
 >
-> The repo is 61 tracked files: 57 Markdown plus `LICENSE`, `.gitattributes` and two logo images. No
+> The repo is 67 tracked files: 63 Markdown plus `LICENSE`, `.gitattributes` and two logo images. No
 > line of it reaches the WoW client.
 
 ## The short version
