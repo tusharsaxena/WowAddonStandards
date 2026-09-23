@@ -56,7 +56,8 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
    - the repo's root-level **`testkit/` folder → `tests/_kit/`** — a *sibling* of the ship folder, not
      inside it, so there is no `LibKa0s/testkit/` to copy from. It goes under `tests/`, **never**
      `libs/`, because it must not ship to the player (testing-§1).
-4. **Fill in the starters.** Work through the *Starter snippets* (TOC, entry, `Compat`, `Locale`,
+4. **Fill in the starters.** Work through the *Starter snippets* (TOC, entry, `Compat` only if compat's
+   applicability condition fires, `Locale`,
    `Database`, `Schema`, the six setup files, tests, message bus, `.luacheckrc`, `.pkgmeta`,
    `DEPENDENCIES.md`) and the
    *Hard rules cheat sheet* below. **The shared subsystems are consumed, not written**: the chat
@@ -210,7 +211,7 @@ locales\enUS.lua
 # Core — dependency-correct order (layout-§1). Every LOAD-BEARING position says what resolves at
 #        load; the unmarked lines are conventional and free to move (toc-file-§5).
 core\Namespace.lua                       -- LOAD-BEARING: publishes NS and NS.PREFIX
-core\Compat.lua                          -- conventional
+core\Compat.lua                          -- conventional; omit if the addon owns no deprecated or version-variant call (compat)
 core\MediaSetup.lua                      -- LOAD-BEARING: publishes the seam Constants reads FONT_MONO from
 core\Constants.lua                       -- incl. FONT_MONO, resolved from NS.MediaFont at file load
 core\State.lua                           -- NS.State.debug; conventional
@@ -1372,7 +1373,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] `tests/_kit/` vendored from the LibKa0s repo's root-level `testkit/` (**not** under `libs/`, not edited); `tests/wow_mock.lua` is a thin extender over `mock_base.lua`; `tests/run.lua` derives the addon's file list from the TOC and lists the vendored library files explicitly in XML order (testing-§1, testing-§9).
 - [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing). The rule-subject conformance suites are under exactly their mandated names — `tests/test_surface_parity.lua` (testing-§8), `tests/test_vendor_sync.lua` delegating to `tests/_kit/vendor_sync.lua` rather than reimplementing it (testing-§11), `tests/test_disabled.lua` (slash-commands-§7) — and **every kit suite is declared by its directory**, `{ name = "…", dir = "tests/_kit/" }`, never by bare basename beside a local file of the same name (testing-§9).
 - [ ] Generated `docs/test-cases.md` inventory present and in sync (`lua tests/run.lua --list`); README carries a static X/Y `[tests]` badge (testing-§5).
-- [ ] `Compat.lua` exists **if and only if** the addon makes a deprecated or version-variant client call outside `LibKa0s`'s majors (compat's applicability condition); with none, no file and a `compat-layer` *Not applicable* row citing the condition. No dead library-absent rung to a global every supported client provides only through a newer namespace. No `WOW_PROJECT_ID` flavor branching.
+- [ ] `Compat.lua` exists **if and only if** the addon makes a deprecated or version-variant client call outside `LibKa0s`'s majors (compat's applicability condition); with none, no file and a `compat-layer` *Not applicable* row citing the condition. No dead fallback rung to a global no client the `## Interface` line admits provides, in a library-absent stub or in `Compat.lua`'s own ladder (compat). No `WOW_PROJECT_ID` flavor branching.
 - [ ] `Locale.lua` exists with metatable fallback.
 - [ ] **US English spelling** throughout (localization-§5) — locale keys/`enUS` values, all player-visible strings, comments, identifiers, README and `docs/`; no `colour`/`grey`/`behaviour`/`centre`/`cancelled`/`-ise` in authored text (Blizzard/library symbols, quoted external text, and any `enGB.lua` translation excepted). **A mechanical prose gate copies `localization-§5`'s published `BRITISH` and `ALLOWED` lists whole** — every entry, no additions — and a spelling the lists miss is amended upstream in the standard before it is added locally. A private subset is a coverage claim nobody outside this repo can check, and the first one written stayed green for months while `CANCELLED` shipped in chat text a player reads.
 - [ ] `Database.lua` exists with `RunMigrations()` (even if no migrations yet).

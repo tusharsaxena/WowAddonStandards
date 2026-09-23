@@ -67,7 +67,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      under `tests/`, **never** `libs/`, because it must not ship with the addon.
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
    context pack: the TOC (fixed field order + `#`-section file listing, toc-file-§1/toc-file-§5), entry file, compat
-   shims, locale, database/migrations, schema-driven settings (architecture-§5), and the message bus
+   shims (only if the addon owns a deprecated or version-variant client call — compat's
+   applicability condition), locale, database/migrations, schema-driven settings (architecture-§5), and the message bus
    (architecture-§4) — whose names are declared **once** as constants in `core/Bus.lua` and used at
    every `SendMessage` and `RegisterMessage` call site, because a misspelled literal is a message
    nobody receives and nothing anywhere goes red; through a constant the same typo is a nil name, so a
