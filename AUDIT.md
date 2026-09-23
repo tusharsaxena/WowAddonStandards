@@ -802,11 +802,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        backdrop, is the finding whether or not this addon currently has a page that wraps, because
        it becomes visible the day a label is added. Note that the row pitch and `TAB_H` are two
        different quantities (options-ui-§8) and that reading the band off `TAB_H` alone is not the
-       same defect. Second, the suite: a case asserting the reserved band **and every row's y
-       offset** are identical for every value of the selection. Check what it runs against — a
-       harness that answers **one** height for every atlas cannot fail the case, so it is green
-       against nothing and is reported as a **missing** case, not a passing one (testing-§12). Name
-       the mutation the case dies under.
+       same defect. Second, the suite — and which suite depends on who draws the strip. A strip
+       the library draws (`O.TabStrip`, `O.RenderTabbedSchema`) is pinned by the **library's**
+       suite, and the addon **MUST NOT** duplicate that case (options-ui-§13, testing-§8): its
+       absence from the addon's suite is compliant and is **not** filed, while a copy of it there is
+       the finding. Only a strip the host draws itself owes a case in the addon's suite asserting
+       the reserved band **and every row's y offset** are identical for every value of the
+       selection. Check what it runs against — a harness that answers **one** height for every
+       atlas cannot fail the case, so it is green against nothing and is reported as a **missing**
+       case, not a passing one (testing-§12). Name the mutation the case dies under.
      - **(i) A secondary strip lives in the scroll, and there is no third level (options-ui-§13).**
        Where a page divides one primary tab's content with a second strip, confirm three things from
        the builder: it is drawn as ordinary page content rather than pinned into the chrome band;
