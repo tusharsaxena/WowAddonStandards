@@ -385,7 +385,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      loop over a name list turns one retired event into a silently deaf addon: the throw aborts the
      loop and every registration after it goes unbound, with no visible error unless the player has
      script errors switched on. Find the registration sites and read the shape. Registration
-     isolated per event through one `pcall`ed helper is the MUST; a recorded list of rejected names,
+     isolated per event through one `pcall`ed helper is the MUST — from LibKa0s v1.56.0 that helper
+     is `LibKa0s-Core-1.0`'s `SafeRegisterEvent` family, with the host's Core stub carrying one-rung
+     `pcall` bodies, so a host on v1.56.0 or later that keeps a private loop is the finding; a recorded list of rejected names,
      reachable by the player through the reserved `debug` verb or the debug console, is the second
      MUST, because a deaf event nobody can see is the same silence one layer down. A bare loop with
      neither is the finding. `C_EventUtils.IsEventValid` in front of the `pcall` is the SHOULD and
@@ -903,6 +905,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    unregistered in the module's disable path and re-used across a disable/enable cycle, is
    **compliant** and is not an entry. A frame that misses any of the three conditions, a
    general-purpose private-frame factory, or a frame that has picked up a second job is the entry.
+   Its second carve-out, the **boundary watcher**, works the same way: in an addon that embeds **no**
+   AceEvent-3.0 at all, one lazily created private frame for non-unit boundary events
+   (`PLAYER_REGEN_DISABLED`/`_ENABLED`), fully unregistered on stand-down and listed in
+   `## Event Subscriptions`, is **compliant** and takes no register row; the same frame in an addon
+   that embeds AceEvent is the entry. architecture-§4's threshold is the other one most easily
+   misgraded: the AceAddon object's own event handlers are not a feature module, so a shell that
+   registers events and calls its one feature module directly is below it.
    `layout-§1`'s three terminal states work the same way: an over-cap file carrying an issue, a
    ratified row or a scheduled peel is compliant, and what is filed is a breach nothing remarks on.
 

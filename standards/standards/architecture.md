@@ -61,23 +61,35 @@ function M:HandleSomething(...) ... end
 
 Modules **MUST** communicate via named messages, not direct calls.
 
-**Applicability.** This MUST binds an addon with **two or more feature modules**, or **any module that
-registers game events**. Below that threshold — one feature module and no event traffic — direct calls
-are **permitted**, and `docs/ARCHITECTURE.md`'s `## Message Bus` section (documentation-§3) **MUST**
-record that there is no bus and why, in a sentence or two.
+**Applicability.** This MUST binds an addon with **two or more feature modules**, or **a feature module
+that registers game events and whose events a second feature module must react to**. Below that
+threshold direct calls are **permitted**, and `docs/ARCHITECTURE.md`'s `## Message Bus` section
+(documentation-§3) **MUST** record that there is no bus and why, in a sentence or two, citing this
+threshold.
+
+**The AceAddon object's own event handlers are not a feature module.** A shell — the addon object
+created by `NewAddon`, with its `OnInitialize`/`OnEnable` and the game-event handlers registered on it —
+that registers events and calls its **one** feature module directly is below the threshold. So is a
+single feature module that registers its own events and reacts to them itself, and so is a private
+frame one module owns (events-frames-taint-§1's two carve-outs). Registering a game event does not, on
+its own, create a second party; the event arm counts only when a **second** feature module has to hear
+about it.
 
 The condition is stated because the rule's entire rationale is the CallbackHandler same-target clobber
-described below, and that hazard **cannot arise** with a single feature module and no events: there is
-no second party to name a message to, and no second receiver to be overwritten. Without the condition
+described below, and that hazard **cannot arise** below the threshold: there is no second party to name
+a message to, and no second receiver to be overwritten. Through v2.64.0 the event arm read *any module
+that registers game events*, which caught a shell calling its one module and a single module with one
+private frame — shapes with one receiver, where the clobber cannot happen — and it was filed against
+them as a deviation (PrettyChat PC-102, WhatGroup WG-57, both 2026-09-23). Without the condition
 the MUST is unsatisfiable in principle for a single-module addon — it would be re-filed as a deviation
 against every such addon, forever, including every future one. That is a defect in the **rule**, which
 is why it is fixed here rather than absorbed one addon at a time by the deviation register
 (documentation-§3).
 
-Crossing the threshold is a real event, not a formality: the second feature module, or the first module
-to register a game event, is the point at which the bus **MUST** exist. An addon sitting just under the
-threshold **SHOULD** say so in that `## Message Bus` section, so the next author adding a module knows
-what the addition costs.
+Crossing the threshold is a real event, not a formality: the second feature module, or the first time a
+second feature module has to react to game events another feature module registers, is the point at
+which the bus **MUST** exist. An addon sitting just under the threshold **SHOULD** say so in that
+`## Message Bus` section, so the next author adding a module knows what the addition costs.
 
 ```lua
 -- core/Bus.lua — every message name declared once, and typed nowhere else in the addon
