@@ -552,7 +552,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `minimap.hide` and the same `minimap` table is what `:Register` is handed. A second key
        (`minimap.show`, `showMinimapIcon`, `minimapButton`) is anti-pattern #81; so is a seed or
        backfill writing the whole `minimap` table over that row (`architecture-§5`). LibDBIcon's own
-       `minimapPos` writes are the library's and are **not** a finding.
+       `minimapPos` writes are the library's and are **not** a finding. **The row's path**, which is
+       its CLI name, reads `<root>.minimap.shown` with `get`/`set` closures inverting onto the stored
+       `minimap.hide` (`launcher-§3`, new in v2.65.0). A row still declared at `…minimap.hide` is a
+       finding from the addon's first release after v2.65.0, and the fix owes no migration.
      - **No reset reaches the row** (`launcher-§3`, new in v2.54.0). The button's shown/hidden state
        **MUST** survive both *Reset all settings* and the page-scoped **Defaults** button, so read
        **both** resets rather than reasoning from where the table is stored — the global scope is
@@ -708,7 +711,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        **Test mode is required in every addon with a positionable display** — proven by the same
        whole-repo `SetMovable` sweep that proves a frameless addon — **unless unticking Lock frame
        already shows the display with its placeholder content**, in which case Lock frame is the
-       switch and a Test mode row or `test` verb would be the finding. Otherwise its absence, a test
+       switch and a Test mode row or `test` verb would be the finding (a one-shot value hold at
+       `/<slash> debug hold <value> [secs]` is not, `options-ui-§15`). Otherwise its absence, a test
        mode that is only a one-shot verb, its switch drawn as a button or hand-written, or a test
        mode that survives the start of combat or can be started during it, is anti-pattern #80. A
        frameless addon omits the row and is compliant.

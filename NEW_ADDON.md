@@ -162,7 +162,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      `Reset position` | `Reset all settings` — including only the rows the addon has the state for.
      `Minimap button` is **unconditional** (every addon ships a launcher) and takes the **first** column
      precisely because only some addons have a `Test mode` to pair beside it; it stores at LibDBIcon's own
-     `minimap.hide` and never at a second key (launcher-§3). `Test mode` is there in
+     `minimap.hide` and never at a second key, and its schema path reads `global.minimap.shown`, with
+     `get`/`set` closures inverting onto that stored key (launcher-§3). `Test mode` is there in
      every addon with a positionable display: its test mode (placeholder content, on until turned off,
      ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
      (anti-pattern #80). An addon whose unlocked view already shows those placeholders omits it:
