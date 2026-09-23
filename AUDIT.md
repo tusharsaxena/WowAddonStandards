@@ -102,6 +102,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      search for a hand-built console.
 4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
    `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
+   Step 5's impact table governs every grade this step files; no check below hard-codes a grade
+   that overrides it.
    - **Check the documentation shape against documentation-§3's tier model — it is a directory
      listing, so measure it rather than reading prose.** Six checks, and all six are mechanical:
      (a) **Tier 1 present**, under exactly those names — `scope.md`, `module-map.md`, `schema.md`,
@@ -302,18 +304,24 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      ```sh
      horizon=$(ls -1 docs/revendor | sort | head -1 | cut -c1-10)   # the store's first bundle
 
-     # tags vendored — read off the payload at each commit that touched libs/LibKa0s/
-     git log --since="$horizon" --format=%H -- libs/LibKa0s | while read -r c; do
+     # tags vendored — read off the payload at each commit that touched libs/LibKa0s/ or tests/_kit/
+     git log --since="$horizon 00:00" --format=%H -- libs/LibKa0s tests/_kit | while read -r c; do
        git show "$c:CLAUDE.md" 2>/dev/null |
          grep -oE 'Bundles \[LibKa0s\]\([^)]*\) v[0-9]+\.[0-9]+\.[0-9]+' |
          grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1
      done | sort -uV > /tmp/vendored.txt
 
-     # tags recorded — the folder name where it carries one, else the bundle's own first line
+     # tags recorded — a span folder (two tags in its name) records every tag on its 01_DELTA.md
+     # line 1; a single-tag folder records its name's tag; a bare-dated folder, its line 1's last tag
      for b in docs/revendor/*/; do
-       t=$(basename "$b" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-       [ -n "$t" ] || t=$(head -1 "$b/01_DELTA.md" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -1)
-       [ -n "$t" ] && echo "$t"
+       n=$(basename "$b" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | wc -l)
+       if [ "$n" -ge 2 ]; then
+         head -1 "$b/01_DELTA.md" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+'
+       else
+         t=$(basename "$b" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+         [ -n "$t" ] || t=$(head -1 "$b/01_DELTA.md" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -1)
+         [ -n "$t" ] && echo "$t"
+       fi
      done | sort -uV > /tmp/recorded.txt
 
      grep -vxF -f /tmp/recorded.txt /tmp/vendored.txt               # vendored, in scope, unrecorded
@@ -332,14 +340,27 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      grandfathers the bare-dated folders rather than renaming them, and twenty-eight of the collection's
      sixty-eight bundles are bare-dated, spread across all ten stores. Each names its tag in the first
      line of its `01_DELTA.md`; a check that compared raw folder names would file every one of those
-     twenty-eight as an unrecorded tag — a **High** finding against ten repos for records that exist,
-     in the very repos the no-rename rule promised not to disturb. Never file one without opening the
-     bundle.
+     twenty-eight as an unrecorded tag — a finding against ten repos for records that exist, in the
+     very repos the no-rename rule promised not to disturb. Never file one without opening the
+     bundle. **A consolidated span bundle** (`docs/revendor/<YYYY-MM-DD>-v<A>-v<B>/`, defined in
+     `audit-review-history`) names two tags in its folder and every tag it covers on line 1 of its
+     `01_DELTA.md` — `Delta: LibKa0s v<A> -> v<B> (span: v<A> v<...> v<B>)` — so the loop reads
+     every tag on that line, never the folder's first tag alone; the single-tag and bare-dated
+     branches are unchanged.
+
+     **The `--since` bound is `"$horizon 00:00"`, never the bare date.** Git fills a bare date's time
+     of day from the clock, so `--since="2026-09-12"` run at 15:00 means *since 15:00 that day* and
+     silently drops the re-vendor commits made on the horizon's own morning — the day the store
+     opened, which is exactly the day a re-vendor is most likely to have happened. **And the log
+     walks `tests/_kit` beside `libs/LibKa0s`**: a kit-only re-vendor rolls the provenance line too,
+     and a walk over the library folder alone misses it and misreads the next bundle's base.
 
      **Scope it to commits at or after the repo's oldest bundle** — re-vendor commits older than the
      store predate the convention and a check that files them reports a number nobody can act on;
      a repo with no store yet is measured from its next re-vendor. A tag vendored with no bundle
-     naming it and no `## Documented deviations` row saying why is a **High** finding. File it as
+     naming it and no `## Documented deviations` row saying why is a finding, graded by step 5 like
+     every other: an unrecorded re-vendor is doc-only, so **Low**, and the entry names the
+     `audit-review-history` MUST it fails. File it as
      **one** rolled-up finding carrying the commands and the count, never a per-tag enumeration:
      the convention lapsed collection-wide at once, nine stores stopping at LibKa0s v1.34.0 against
      a library at v1.54.2 and nineteen to thirty-one unrecorded tags apiece, so the honest remediation

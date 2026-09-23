@@ -33,8 +33,9 @@ paragraph would not have held it**, which is why this one is written to be read 
 
 - **MUST** — every **re-vendor commit** in the repo's history has a `docs/revendor/` bundle naming the
   tag that commit vendored, **or** the absence is a row in `## Documented deviations`
-  (`documentation-§3`) saying why. **The trigger is the commit that touches `libs/LibKa0s/`, never the
-  commit subject.** `versioning-git` mandates the commit and only prefers its shape — *"a lib change
+  (`documentation-§3`) saying why. **The trigger is the commit that touches `libs/LibKa0s/` or
+  `tests/_kit/` — the library's two payloads, so a kit-only re-vendor counts — never the commit
+  subject.** `versioning-git` mandates the commit and only prefers its shape — *"a lib change
   **MUST** produce a **re-vendor commit** in every consuming addon, and that commit **SHOULD** stand
   alone so the sync is legible in history"* — so what is guaranteed to exist is the payload change,
   not a stand-alone commit announcing it. That distinction is the whole reason the rule is needed: the
@@ -59,6 +60,19 @@ paragraph would not have held it**, which is why this one is written to be read 
   is what arrived and what was done about it, and for nineteen of those tags the answer is *nothing,
   carried by a sweep*. Back-filling a folder per tag would manufacture a record of deliberation that
   never happened, which is worse than the gap it fills.
+- **The consolidated span bundle is the sanctioned record for a lapsed span, and its shape is fixed
+  because a check reads it.** It is one folder, `docs/revendor/<YYYY-MM-DD>-v<A>-v<B>/`, named for the
+  span's first and last tags, holding the two stable members **only** — `01_DELTA.md` and
+  `05_SUMMARY.md`; the middle three record deliberation, and a span that was carried by sweeps had
+  none. **Line 1 of `01_DELTA.md` is exactly**
+  `Delta: LibKa0s v<A> -> v<B> (span: v<A> v<...> v<B>)`, the `span:` list naming **every** tag the
+  bundle covers, in order, first and last included — the `AUDIT.md` check reads every
+  `vX.Y.Z` on that line as recorded, so a tag left off it is a tag reported unrecorded.
+  `05_SUMMARY.md` carries **one line per tag**, saying either *carried by sweep, nothing adopted* or
+  the sha of the commit that adopted something from it. The bundle is frozen like every other: it is
+  **never** edited after the fact, and a base it misstated (a `v<A>` that was not the tag actually
+  vendored before the span) is corrected in the **next** bundle, which says so, never by rewriting
+  this one.
 
 ### The deviation register is an input to an audit, not a finding of one
 
