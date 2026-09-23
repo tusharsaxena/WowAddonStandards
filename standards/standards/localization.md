@@ -224,11 +224,14 @@ local ALLOWED = {
   "paralysis", "paralyses", "synthesis", "syntheses", "emphasis", "emphases",
   "fulfill", "fulfills", "fulfilled", "fulfilling", "fulfillment",
   "programmer", "programmers", "programmed",
+  "synchronism", "synchronisms", "synchronistic",
 }
 ```
 
-**The published counts are 92 and 30.** `BRITISH` holds **92** entries and `ALLOWED` **30** (from
-v2.65.0, which added `synchronis`; kit revision 26 pins the same pair in the kit's gate). A gate's copy
+**The published counts are 92 and 33.** `BRITISH` holds **92** entries and `ALLOWED` **33** (from
+v2.65.0, which added `synchronis` and, because *synchronism*, *synchronisms* and *synchronistic* are
+correct US words that contain it, allowed those three; kit revision 26 pins the same pair in the kit's
+gate). A gate's copy
 with any other count is not whole, and this line moves in the same change as the lists.
 
 **How a gate MUST read them.**
@@ -246,7 +249,8 @@ with any other count is not whole, and this line moves in the same change as the
 - **A `BRITISH` entry MUST NOT be a substring of a correct US word** unless that word is on `ALLOWED`.
   This is the admissibility test for any future entry, and it is why the list is shaped the way it is:
   `cancelled` and `cancelling` are listed separately rather than as `cancell`, because *cancellation*
-  is US-correct; `synthesis` and `emphasis` are entries whose own noun forms sit on `ALLOWED`; and
+  is US-correct; `synthesis` and `emphasis` are entries whose own noun forms sit on `ALLOWED`;
+  `synchronis` is admissible only beside *synchronism*, *synchronisms* and *synchronistic*; and
   `fulfil` is admissible **only** because *fulfill* and its inflections are allowed beside it.
 - **Some words are deliberately absent, and stay absent.** *towards*, *afterwards*, *forwards* and
   *learned* are acceptable US English, not British-only, and a gate that reddens on a correct word
