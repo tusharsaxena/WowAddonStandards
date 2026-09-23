@@ -555,7 +555,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `minimapPos` writes are the library's and are **not** a finding. **The row's path**, which is
        its CLI name, reads `<root>.minimap.shown` with `get`/`set` closures inverting onto the stored
        `minimap.hide` (`launcher-§3`, new in v2.65.0). A row still declared at `…minimap.hide` is a
-       finding from the addon's first release after v2.65.0, and the fix owes no migration.
+       finding from the addon's first release after v2.65.0, and the fix owes no migration. A `shown`
+       default added to quiet the boot defaults check is anti-pattern #81; the check skips that row and
+       resolves `minimap.hide` instead (`architecture-§5`'s closure-backed exemption).
      - **No reset reaches the row** (`launcher-§3`, new in v2.54.0). The button's shown/hidden state
        **MUST** survive both *Reset all settings* and the page-scoped **Defaults** button, so read
        **both** resets rather than reasoning from where the table is stored — the global scope is
