@@ -111,8 +111,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
      `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`, evaluate
      the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the shims
-     `core/Compat.lua` publishes with documentation-§3's own grep — it is a count now, not a
-     judgment) and require either the doc or a *Not applicable* row carrying that trigger.
+     a **present** `core/Compat.lua` publishes with documentation-§3's own grep — it is a count now, not a
+     judgment; an absent file counts zero, and is itself a finding only if the addon makes a
+     deprecated or version-variant call outside `LibKa0s`'s majors, per compat's applicability condition) and require either the doc or a *Not applicable* row carrying that trigger.
      An absent doc whose trigger **has** fired is a MUST failure; an absent doc with a fired trigger
      *and* a "Not applicable" row is worse, because the row asserts something false — grade it above
      the bare omission.

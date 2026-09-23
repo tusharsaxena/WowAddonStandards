@@ -250,7 +250,7 @@ rather than inventing one.
 | `docs/perf-analysis/README.md` | the performance harness is wired (performance-§12) — specified above |
 | `docs/slash-dispatch.md` | `NS.COMMANDS` carries **eight or more** commands, or **any** subcommand tree |
 | `docs/midnight-quirks.md` | the addon carries **at least one** client-version workaround of its own |
-| `docs/compat-layer.md` | `core/Compat.lua` publishes **three or more** addon-specific shims beyond what `LibKa0s` supplies |
+| `docs/compat-layer.md` | a **present** `core/Compat.lua` publishes **three or more** addon-specific shims beyond what `LibKa0s` supplies; an addon compat's applicability condition exempts ships no `core/Compat.lua` and the trigger has not fired |
 | `docs/message-bus.md` | the addon defines **more than ten** distinct messages |
 | `docs/profiles.md` | AceDB profiles are **user-visible** (a profile control ships in the options UI) |
 | `docs/debug.md` | the addon ships debug surfaces **beyond** the `LibKa0s` default console |
@@ -258,7 +258,8 @@ rather than inventing one.
 **The `compat-layer.md` trigger counts, and this is what it counts.** A shim is one entry point
 published on the addon's own `Compat` table — the wrapper a feature module calls in place of a
 version-variant or optional client API. It is counted mechanically, over the addon's own file and
-nothing else:
+nothing else, and only when that file is present — an addon with no `core/Compat.lua` (compat's
+applicability condition) counts zero and records the row *Not applicable*, citing the condition:
 
 ```
 grep -cE '^\s*function\s+[A-Za-z_][A-Za-z0-9_]*\.' core/Compat.lua

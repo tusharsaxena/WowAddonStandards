@@ -2,7 +2,11 @@
 
 ## Compat / deprecated APIs
 
-Every addon **MUST** ship a `core/Compat.lua`. It is the **only** file that calls deprecated APIs and exposes shimmed versions. Retail-only, so it shims across **Retail patch** differences — not across game flavors.
+An addon that calls any deprecated or version-variant client API outside `LibKa0s`'s majors **MUST** own those calls in `core/Compat.lua`, the **only** file allowed to make them; it exposes shimmed versions to the rest of the addon. Retail-only, so it shims across **Retail patch** differences — not across game flavors. A read a `LibKa0s` major makes for the addon with no host seam of its own — `LibKa0s-Env-1.0`'s TOC-metadata read is the case — is the library's call, and does not count toward the condition. A `LibKa0s-Compat-1.0` member the addon consumes **does** count: library-stack-§7 routes it from `core/Compat.lua`, the host's single seam, which also carries its library-absent stub.
+
+**The applicability condition.** An addon with **no** such call carries **no** `core/Compat.lua` — an empty scaffold or a file of pass-through aliases is not required and not wanted — and records `compat-layer` as *Not applicable* in `docs/ARCHITECTURE.md`'s `## Documentation map`, citing this condition (*no deprecated or version-variant client call outside `LibKa0s`'s majors*). The first such call the addon adds brings the file with it, in the same change. Through v2.64.0 this section said every addon **MUST** ship the file, while library-stack-§7 counted two addons (AbsorbTracker, PrettyChat) that carry none and documentation-§3's `compat-layer.md` trigger counted shims in a file that might not exist; the condition is the ruling between them.
+
+**A dead fallback rung is deleted, not shimmed.** A library-absent fallback rung that calls a global every supported client provides **only** through a newer namespace — `GetAddOnMetadata` behind `C_AddOns.GetAddOnMetadata` is the worked case — is dead code: no client the addon's `## Interface` line admits can reach a working global through it. Such a rung **MUST** be deleted rather than moved into `core/Compat.lua` as a shim, and deleting it does not bring a `Compat.lua` into being. The newer-namespace rung, and the caller-supplied fallback after it, stay.
 
 ```lua
 local addonName, NS = ...
@@ -22,5 +26,5 @@ Compat.GetSpecialization = CompatLib and CompatLib.GetSpecialization or function
 
 The example is **illustrative**: it routes two members through `LibKa0s-Compat-1.0`, which ships from `LibKa0s v1.55.0` (library-stack-§7), and shows the library's `GetSpellInfo` contract — `name, iconID, castTime, minRange, maxRange, spellID` — rather than the legacy positional shape with a `nil` rank slot. Adopting the major is on each addon's own schedule and this section does not require it; what it requires is below. A shim no major carries is written in this same file, by hand, as before.
 
-- **MUST** route every deprecated-API call through `Compat`. Direct calls to deprecated spec/spell APIs scattered through feature modules are a violation — a current addon still calls `GetSpecialization`/`GetSpecializationInfo` directly in two modules and must be migrated.
+- **MUST** route every deprecated-API call through `Compat` (an addon the applicability condition above exempts has none to route). Direct calls to deprecated spec/spell APIs scattered through feature modules are a violation — a current addon still calls `GetSpecialization`/`GetSpecializationInfo` directly in two modules and must be migrated.
 - **MUST NOT** branch on `WOW_PROJECT_ID` for game flavor (Retail only). Any Retail-patch version check that is genuinely needed lives here behind a named flag.
