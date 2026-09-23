@@ -64,9 +64,17 @@ comment, and a declared default that masked legacy accounts until the addon stop
   SavedVariables `profiles` table as above, or idempotently from AceDB's `OnProfileChanged` (and
   `OnProfileCopied` / `OnProfileReset`) callbacks against a **per-profile** stamp. A profile-scoped step
   **MUST NOT** be gated by the account-wide stamp alone: that runs it for the profile active at the
-  first login after the upgrade and never for the others, which then carry the old shape forever. A step
-  walking the raw table sees only what AceDB stored, never the defaults merged over it, so it reads an
-  absent key as the default and leaves it absent.
+  first login after the upgrade and never for the others, which then carry the old shape forever.
+- **MUST NOT** tell a user-set value from a default by whether its key is present in the raw table. AceDB
+  writes defaults into stored profiles: the first read of `db.profile` copies every absent scalar
+  default into the active profile's stored table (`initSection` → `copyDefaults`, which `rawset`s
+  them), the same happens to any profile a session switches to, and only the logout strip removes them
+  again. A raw `profiles` walk that runs after anything has read `db.profile` therefore sees the
+  active profile's defaults as if the player had set them, and a step that treats *present* as
+  *user-set* migrates defaults as player choices in that one profile. The runner **MUST** run before
+  anything first reads `db.profile` (straight after `AceDB:New`, as the scaffold's `OnInitialize`
+  does), and a step that needs the distinction **MUST** compare the stored value against the default
+  rather than test for the key.
 - **MUST** write every step **idempotent against a fresh default profile**: a profile created after the
   stamp advanced, or one that already has the new shape, passes through the step unchanged.
 - The executable form of these rules is each addon's own red-first migration test: a stamp that survives
