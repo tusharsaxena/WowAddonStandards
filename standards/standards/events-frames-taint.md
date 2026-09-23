@@ -8,7 +8,7 @@
 - **SHOULD** centralize CLEU dispatch on a single shared frame with a spellID hash table when CLEU is the hot path (the boss-mod `mod:Log(subevent, fn, spellId)` model). **MUST NOT** subscribe N modules separately to CLEU.
 - **MAY** use AceEvent's `:RegisterMessage`/`:SendMessage` for the closed message bus (architecture-§4).
 
-#### The one permitted private frame — a `RegisterUnitEvent` filter
+#### The unit-filter frame — a `RegisterUnitEvent` filter
 
 The vendored AceEvent-3.0 exposes no `RegisterUnitEvent` (zero hits in `libs/AceEvent-3.0`) and shares one frame across every registrant, so it structurally cannot ask the client to filter a `UNIT_*` event down to named units. An addon that wants that filter has no route through the library — and the standard already assumes the route it takes instead. slash-commands-§7 requires the disabled-state teardown to unregister "every `RegisterEvent`, `RegisterUnitEvent` … **including the per-unit frames** — gone, not gated", and testing-§1 makes recording `RegisterUnitEvent` a mock-fidelity MUST because "a no-op `RegisterUnitEvent` lets a widened or dropped per-unit event filter pass the entire suite". Two sections tear down and test a frame the first bullet forbade.
 
