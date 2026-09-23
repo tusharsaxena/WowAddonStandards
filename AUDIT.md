@@ -431,9 +431,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      **compliant** and **MUST NOT** be flagged for "not implementing" what those sections describe —
      the sections describe behavior the library supplies. The deviation to raise is the opposite one:
      an addon carrying its own console window, widget makers/flow engine, dispatcher/parser or test
-     framework, or a locally patched `libs/LibKa0s/` copy, is **anti-pattern #47**. Vendoring only
-     part of the library — some files of a multi-file major, or a dependent module without
-     `Core.lua` — is **anti-pattern #48**.
+     framework, or a locally patched `libs/LibKa0s/` copy, is **anti-pattern #47**. **Not** #47,
+     from v2.64.0 and until a later version of this standard makes adopting them a requirement
+     (library-stack-§7): a host's own spell ladder, secret guard, bus stand-down record or schema
+     seam, the shapes `LibKa0s-Compat-1.0`, `LibKa0s-Bus-1.0` and `LibKa0s-Schema-1.0` carry from
+     `LibKa0s v1.55.0`. Nor is a library-absent stub of a shape options-ui-§1 names (the check
+     below). Vendoring only part of the library — some files of a multi-file major, or a dependent
+     module without `Core.lua` — is **anti-pattern #48**.
    - **Check the vendoring is whole.** `libs/LibKa0s/` is the library repo's whole ship folder and
      the TOC lists its packaged `libs\LibKa0s\LibKa0s.xml` once, in `# Libraries` after Ace3
      (toc-file-§4/§5). A TOC listing individual `LibKa0s` `.lua` files, or a folder missing files the
@@ -555,7 +559,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          `RegisterEvent`, `RegisterUnitEvent`, `RegisterMessage`, `RegisterBucketEvent` and raw
          `frame:RegisterEvent` in the addon's own Lua, against the unregistration the disable path
          performs. **Anything registered and not unregistered is the finding** — an early return is
-         not a stand-down, because the addon still pays the dispatch. Timers, tickers and `OnUpdate`
+         not a stand-down, because the addon still pays the dispatch. One registration is not filed
+         either way while open-evolutions records it as open: a settings panel's subscription to its
+         own refresh message (slash-commands-§7). Timers, tickers and `OnUpdate`
          scripts get the same treatment, and so does any SavedVariables write reachable from a game
          event while disabled (combat entry is the one that bites).
        - **A second teardown path.** A disable that does not go through the same latch the perf
@@ -818,13 +824,32 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    - **Check the degradation stub covers every member the addon calls.** For each setup file, list
      the members the addon reaches on the library instance (grep the call sites) and confirm the
      library-absent branch answers **all** of them; a stub missing one is not a fallback, it is a
-     crash moved to a rarer code path (performance-§1). Two things not to misread as inconsistency:
+     crash moved to a rarer code path (performance-§1). Three things not to misread as inconsistency:
      (a) the **Options** stub is deliberately **load-completing rather than member-answering** — its
      job is to let the settings page files finish loading (they call members like the shared-media
      value provider inside schema-row literals at file load), so it publishes real-enough load-time
      members and no-ops the rest, and it is **correct** that it does not print an honest line per
      member the way the other stubs do; (b) a stub that deliberately omits a member, with the reason
-     written down, is a decision, not a gap — read the comment before raising it.
+     written down, is a decision, not a gap — read the comment before raising it; (c) the other
+     stub shapes options-ui-§1 names are not anti-pattern #47. A **runtime-completing** stub, for a
+     major whose own API document's degradation section prescribes one (today
+     `LibKa0s-Schema-1.0` alone, which the feature runtime and host writers both reach), completes
+     stored reads and writes, logs no per-write debug line and keeps no console-only count (its
+     refusals and `Validate`'s one honest line are part of the shape). `LibKa0s-Compat-1.0`'s **reader arm** answers the
+     absent value its API document's absent table gives, with no line, and copies nothing. Its
+     **guard arm** re-implements the one-rung `IsSecret` / `CanAccess` / `IsSafeKey` body.
+     `LibKa0s-Bus-1.0`'s **untracked-target stub** (its API document's *Worked example*) keeps
+     `NewTarget` handing out a private, untracked AceEvent target, answering `nil` only when
+     `AceEvent-3.0` is itself absent, hands `Catalog`'s table back, and records and prints nothing.
+     A Bus stub whose `NewTarget` answers `nil` while AceEvent is present is not that shape (no
+     consumer carries one at v2.64.0): it gets the member-coverage check above like any stub, and
+     the report names the receivers it leaves unregistered on the degraded load. On a
+     runtime-completing stub or a guard arm, check the comment citing the major's API document,
+     and check that the stub logs no per-write line and keeps no count only the debug console
+     reads (the bulk bracket's tally, the profile-reset count: debug-logging-§10). A stub's own
+     state, such as a latch stub's hold count, is not such a count. options-ui-§1's list is not
+     exhaustive: a stub for a major no section rules on yet, such as the collection's
+     `LibKa0s-Lifecycle-1.0` stubs, gets the member-coverage check above and nothing from (c).
 5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap, carrying five things: the **ID**;
    the **section violated**, written as `filename-§N` (documentation-§5/§6 — and by **bare filename**
    for the eleven section files that carry no numbered subsections); the **impact grade**; a **one-line

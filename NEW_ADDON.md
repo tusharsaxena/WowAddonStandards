@@ -70,7 +70,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    shims, locale, database/migrations, schema-driven settings (architecture-§5), and the message bus
    (architecture-§4) — whose names are declared **once** as constants in `core/Bus.lua` and used at
    every `SendMessage` and `RegisterMessage` call site, because a misspelled literal is a message
-   nobody receives and nothing anywhere goes red; through a constant the same typo is a nil index.
+   nobody receives and nothing anywhere goes red; through a constant the same typo is a nil name, so a
+   subscriber raises at once, and a publisher stays silent unless the table is a strict catalog
+   (`LibKa0s-Bus-1.0`'s `Catalog`, a MAY).
    Every authored file opens with `local addonName, NS = ...` on line 1 and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
    headers now: the collection's strongest repos all leave the same scaffolded files bare, because

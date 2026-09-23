@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.63.0, 2026-09-22)
+# New Ka0s Addon — Context Pack (v2.64.0, 2026-09-23)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -273,19 +273,18 @@ local addonName, NS = ...
 NS.Compat = NS.Compat or {}
 local Compat = NS.Compat
 -- Retail only: shims cross-patch API differences, NOT game flavors.
+local CompatLib = LibStub and LibStub("LibKa0s-Compat-1.0", true)
 
-function Compat.GetSpellInfo(id)
-  if C_Spell and C_Spell.GetSpellInfo then
-    local info = C_Spell.GetSpellInfo(id)
-    if info then return info.name, nil, info.iconID end
-  end
-  return GetSpellInfo and GetSpellInfo(id)
-end
+-- Illustrative (compat): a member LibKa0s-Compat-1.0 carries is routed through it. Contract:
+--   name, iconID, castTime, minRange, maxRange, spellID   -- or a single nil
+-- Library absent: the major's documented absent answer (its API document, "Degradation").
+Compat.GetSpellInfo = CompatLib and CompatLib.GetSpellInfo or function() return nil end
+Compat.GetSpecialization = CompatLib and CompatLib.GetSpecialization or function() return nil end
 
-function Compat.GetSpecialization()
-  return (C_SpecializationInfo and C_SpecializationInfo.GetSpecialization()) or GetSpecialization()
-end
+-- A shim no major carries is written here, by hand.
 ```
+
+Adopting `LibKa0s-Compat-1.0` (from `LibKa0s v1.55.0`) is optional, from v2.64.0 until a later version of the standard makes it a requirement (library-stack-§7). A reader's library-absent stub answers the absent value, as above, with no line. If you wire a guard member (`IsSecret`, `CanAccess`, `IsSafeKey`), its library-absent stub is the one-rung body the Compat API document's *Degradation* section gives, commented as a deliberate duplication — not the hand-rolling anti-pattern #47 (options-ui-§1).
 
 ### `Locale.lua`
 
@@ -558,8 +557,9 @@ local descriptor = {
 }
 
 if not lib then
-  -- THE ONE EXCEPTION to the member-answering stub (options-ui-§1). Page files call
-  -- Helpers.LSMValues INSIDE schema-row literals, at FILE LOAD — with it nil the page file raises,
+  -- ONE OF THE NAMED SHAPES options-ui-§1 sets beside the member-answering stub: the
+  -- LOAD-COMPLETING one. Page files call Helpers.LSMValues INSIDE schema-row literals, at
+  -- FILE LOAD — with it nil the page file raises,
   -- its RegisterSchemaRows never runs, and a third of the schema silently vanishes along with
   -- list/get/set/reset and the profile defaults. So this stub is LOAD-COMPLETING: publish every
   -- member a page file touches at load (measure that set by deleting one and re-running the
@@ -840,7 +840,8 @@ Loader.addonName = "<Addon>"
 -- it cannot tell from the real thing. Whole-folder vendoring is mandatory for the same reason, so
 -- the whole folder is what this list names.
 local LIB_FILES = {
-  "libs/LibKa0s/Core.lua", "libs/LibKa0s/Env.lua", "libs/LibKa0s/Lifecycle.lua",
+  "libs/LibKa0s/Core.lua", "libs/LibKa0s/Env.lua", "libs/LibKa0s/Compat.lua",
+  "libs/LibKa0s/Lifecycle.lua", "libs/LibKa0s/Bus.lua", "libs/LibKa0s/Schema.lua",
   "libs/LibKa0s/Pool.lua", "libs/LibKa0s/Item.lua", "libs/LibKa0s/Media.lua",
   "libs/LibKa0s/Widgets.lua", "libs/LibKa0s/WidgetsDragHandle.lua",
   "libs/LibKa0s/DebugLog.lua", "libs/LibKa0s/Slash.lua", "libs/LibKa0s/Launcher.lua",
@@ -897,7 +898,9 @@ sudo luarocks install luacheck
 -- core/Bus.lua — every message name declared ONCE, and typed as a literal nowhere else.
 -- A misspelled literal is not an error anywhere: a publisher that types one sends a message
 -- nobody receives, a subscriber that types one never fires, and nothing goes red. Through a
--- constant the same typo is a nil index at the call site. <Event> is PascalCase; the key's
+-- constant the same typo is a nil name at the call site: a subscriber raises at once, a
+-- publisher's SendMessage stays silent unless the table is strict (LibKa0s-Bus-1.0's Catalog,
+-- a MAY: NS.MSG = Bus and Bus.Catalog(addonName, MSG) or MSG). <Event> is PascalCase; the key's
 -- SCREAMING_SNAKE is the constant's casing, not the wire name's (architecture-§4, naming-cheatsheet).
 NS.MSG = {
   -- Sender: modules/Roster.lua. Payload: the roster table.
@@ -1080,7 +1083,7 @@ change.
 
 Libraries are **vendored under `libs/` and committed** (`STANDARDS.md library-stack-§3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon's `libs/` so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). **LibDataBroker-1.1 and LibDBIcon-1.0 are not optional** — every addon ships a launcher (launcher-§1) — so vendor both from the start. Pull libs the suite doesn't yet vendor from a current retail install or the upstream release.
 
-`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because eleven of the twelve majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). That commit owes a frozen `docs/revendor/<YYYY-MM-DD>-v<tag>/` bundle naming the tag it vendored, or a `## Documented deviations` row saying why — the convention was consensual and lapsed in every repo that held it, because nothing checked it (audit-review-history). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
+`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, even the modules this release does not wire, because fourteen of the fifteen majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). That commit owes a frozen `docs/revendor/<YYYY-MM-DD>-v<tag>/` bundle naming the tag it vendored, or a `## Documented deviations` row saying why — the convention was consensual and lapsed in every repo that held it, because nothing checked it (audit-review-history). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
 
 ### Docs — the root three + the `docs/` trio
 
@@ -1249,7 +1252,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 6. Slash: AceConsole `:RegisterChatCommand`. Never raw `SLASH_*`.
 7. Locale: metatable fallback `__index = function(_,k) return k end`. Never AceLocale strict.
 7a. **US English everywhere** (localization-§5): every English word you author — locale keys and their `enUS` values, chat/console output, options labels and tooltips, slash help, README and `docs/` prose, code comments, and identifiers — uses **US** spelling. `color` not `colour`, `gray` not `grey`, `behavior` not `behaviour`, `center`/`centered` not `centre`/`centred`, `canceled` not `cancelled`, `-ize`/`-ization` not `-ise`/`-isation`, `catalog`/`dialog`/`defense`/`license`/`analyze`. WoW's own API is US-spelled (`SetTextColor`, `GRAY_FONT_COLOR`), so a British-spelled identifier sits one letter from the Blizzard symbol beside it and greps miss. Locale **keys are the English string**, so fixing a spelling **changes the key** — update it in every `locales/*.lua` and at every call site in the same change, or the metatable silently renders the raw key on that client. Reproduce verbatim (never "correct"): Blizzard/library symbols, quoted external text, published proper nouns, and a deliberate `locales/enGB.lua` translation.
-8. Options UI: **consume `LibKa0s-Options-1.0`** — one instance from a descriptor in `settings/OptionsSetup.lua`, and `NS.Helpers` **is** that instance, decorated in place, never a copy-across (options-ui-§1). Never hand-roll the shell, the widget makers, the flow engine, the header or the scrollbar patch (anti-pattern #47), and never copy a `LAYOUT` constant into the addon. Behind it: Blizzard `Settings.RegisterCanvasLayoutCategory` + raw AceGUI body, **category registered eagerly at load** (always visible), **body built lazily** on first `OnShow`, and the header's **Defaults button built lazily too**, in that same first `OnShow`, never at registration time (options-ui-§5) — AceGUI is shared and UI skins hook `RegisterAsWidget`, so a widget created during load keeps Blizzard's stock red `UI-Panel-Button-Up` art forever while later-created ones come out skinned, making the look a race against addon load order. Never AceConfigDialog for content; never defer registration to first `/config`. This one setup file's fallback is **load-completing, not member-answering** — the documented exception, because page files call into it inside schema-row literals at file load.
+8. Options UI: **consume `LibKa0s-Options-1.0`** — one instance from a descriptor in `settings/OptionsSetup.lua`, and `NS.Helpers` **is** that instance, decorated in place, never a copy-across (options-ui-§1). Never hand-roll the shell, the widget makers, the flow engine, the header or the scrollbar patch (anti-pattern #47), and never copy a `LAYOUT` constant into the addon. Behind it: Blizzard `Settings.RegisterCanvasLayoutCategory` + raw AceGUI body, **category registered eagerly at load** (always visible), **body built lazily** on first `OnShow`, and the header's **Defaults button built lazily too**, in that same first `OnShow`, never at registration time (options-ui-§5) — AceGUI is shared and UI skins hook `RegisterAsWidget`, so a widget created during load keeps Blizzard's stock red `UI-Panel-Button-Up` art forever while later-created ones come out skinned, making the look a race against addon load order. Never AceConfigDialog for content; never defer registration to first `/config`. This one setup file's fallback is **load-completing, not member-answering** — the load-completing exception options-ui-§1 names, because page files call into it inside schema-row literals at file load.
 8b. Options UI — the panel's **content**, which is the half a player compares between two addons, and all of it MUST (options-ui-§13/§14/§15/§16/§17/§18):
     - **Every settings page draws a tab strip**, one tab per `group`, **including a page with exactly one section** — the one tab that cannot be clicked is that page's section label. The untabbed heading form is for a page the host does not render through the flow engine, which today means **two** pages and both of them — the AceConfig-drawn **Profiles** sub-page and the **landing page**, whose `buildMain` body (logo, tagline, *Slash Commands* heading, one Label per `COMMANDS` row) declares no `group` and is mandated in exactly that shape by options-ui-§5; a renderer that falls back to it below some tab count is itself the defect, because it makes a page's chrome a function of how many sections it happens to hold. **Every row carries a `group`** — a row without one belongs to no tab and is an authoring defect the library reports. A wrapped strip's **geometry must not change with the selection**: the row pitch and the reserved band are one measurement taken from a state no click can change, never read off whichever tab was drawn first, because a selected tab's art is a **different atlas** from an unselected tab's. One secondary strip **MAY** divide a single primary tab's content, drawn inside the scroll rather than as a second pinned band; never a third level.
     - **Above the strip sits at most ONE chrome block** (options-ui-§14): the page's picker for the instance it edits, plus every control that applies to all of its tabs — create, enable, unlock, copy, reset, delete. A page-wide control drawn under one tab reads as belonging to that tab and vanishes when the player clicks another. The band is already delimited by its divider and the content panel's top edge, so the block is **never boxed a second time**.
@@ -1370,7 +1373,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] **Every color row has its class-color companion** beside it (default off), with `classColorSource` declared on both rows, resolved through **one** helper that keeps the swatch's alpha, falls through to the stored swatch on an unresolvable class and leaves the swatch enabled under both modes — no `disabledIf` on a color row anywhere in the repo (options-ui-§17).
 - [ ] **Anything a player orders is the shared drag-to-reorder list** — no up/down arrows, no position field; the handle and the row box come from the library and the row's contents from the addon, rows are a uniform height, no drag crosses a fixed section boundary, and the controller is canceled at the top of the render (options-ui-§18).
 - [ ] The header **Defaults button** is created in the first `OnShow` (not at registration), via the library's `EnsureDefaultsButton` called at the **top of every `OnShow`**, with its callback parked on the panel (`panel.defaultsOnClick`) — options-ui-§5, anti-pattern #42.
-- [ ] The options setup file's fallback is **load-completing** (the documented exception, options-ui-§1) and its member set was determined by **measurement** — deleting one and re-running the library-absent load — with both the member set and the resulting schema row count pinned by cases.
+- [ ] The options setup file's fallback is **load-completing** (the load-completing exception, options-ui-§1) and its member set was determined by **measurement** — deleting one and re-running the library-absent load — with both the member set and the resulting schema row count pinned by cases.
 - [ ] Combat-lockdown: secure writes defer on `PLAYER_REGEN_ENABLED`; options-panel open **refuses** under lockdown (gray notice, no defer — options-ui-§2); no addon code closes or hides `SettingsPanel` in combat, and no host-side page-level lock (cover, tab guard, render refusal, close) sits beside the library's; a frame-rebuilding setter still gates itself (options-ui-§2/§13, anti-pattern #88).
 - [ ] **Shared media wired (library-stack-§8)** — `core/MediaSetup.lua` publishes `NS.Icon` / `NS.MediaFont` from `LibKa0s-Media-1.0`, passing the addon's own **folder name**, and makes the one `Media.RegisterLSM(addonName)` call at file load. It loads **before** `core/Constants.lua`, whose `FONT_MONO` reads the seam and falls back to a **real client font** rather than `nil` or a dead path. The addon's own `media/` holds only what no other addon could use — the logo, the screenshots — and **no copy of any icon, face or bar texture the payload already ships** (layout-§3, anti-pattern #63). Every mark the addon draws comes from the catalog: window close controls through the **one** `NS.MakeCloseButton` wrapper in `core/CoreSetup.lua` (never a bare two-argument call anywhere, decoration hooks included — `grep -rn 'MakeCloseButton(' --include='*.lua' | grep -v '/libs/'` returns the wrapper and its callers and nothing else), title-bar strips, modals and their copy windows, and action buttons where the mark sits **beside** the label. A mark the catalog lacks is added **upstream**, never locally.
 - [ ] **Debug console wired (debug-logging)** — `core/DebugLogSetup.lua` builds `NS.DebugLog` from a descriptor (`name`, `title`, `font`, `isEnabled`/`setEnabled` over the addon's **own** flag, `initSummary`, call-time `print`/`safeToString` forwarders) and publishes `NS.Debug` bare; the monospace face comes from `libs/LibKa0s/media/fonts/` through `NS.MediaFont` and is LSM-registered by `Media.RegisterLSM` (**never** a second copy under the addon's own `media/fonts/`, anti-pattern #63); the descriptor passes **`addonName`**, so the console's close, copy and clear draw the shared marks; enabled-state is **session-only** and never in SV, decoupled from window visibility; `/<slash> debug` toggles the window and `on|off` route through the single `SetEnabled` seam. **The window, the formatters, the buffer, the scrollbar and the counter are NOT in the addon's source** — an audit must not ask for them. (No-window addons MAY use chat.)

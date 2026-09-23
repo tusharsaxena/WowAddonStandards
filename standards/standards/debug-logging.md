@@ -141,6 +141,13 @@ second `[Cfg] …` line restating a value the `[Set]` line already showed is red
 reactor logs **only** a *material effect* the reader cannot infer from the `[Set]` line (e.g.
 "capture disabled", "test data swapped in"), never a restatement of the new value.
 
+**A runtime-completing stub is outside this section** (options-ui-§1). On a load missing
+`LibKa0s-Schema-1.0`, a host's library-absent stub of that shape is the single write seam, and it
+logs no `[Set]` line, per row or bulk, and keeps neither the bulk bracket's tally nor the
+profile-reset count. A degraded build that writes none of this section's lines through such a stub
+is not a finding under this section. The writes, their validation and each row's `onChange` still
+complete, and a host whose degraded seam is its own keeps logging as this section writes it.
+
 **A batch through the helper logs per row, unless the act is a bulk copy or reset.** When one act
 writes many rows through the helper, the act decides the shape of the log, never the row count:
 
