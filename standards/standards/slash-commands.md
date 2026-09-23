@@ -20,13 +20,13 @@ addon:RegisterChatCommand("<addonname>", function(msg) Sl:OnSlash(msg) end)  -- 
 ```
 
 - **MUST** degrade rather than error when the lib is absent. `/<slash>` is registered unconditionally, so something has to answer it: the setup file falls back to a stub carrying every member the addon calls (`OnSlash`, `PrintHelp`, `LandingRows`, `SetRowAnnotator`, and each `Cli*` verb). The host verbs never went to the library, so they keep working; what is lost is the schema CLI, and each of those verbs **MUST** name the missing library rather than going quiet.
-- **The library-absent line.** A verb that cannot run because LibKa0s did not load, and a host verb refusing a composed-row write under options-ui-§1's route (b), **MUST** print exactly one line, routed through the addon's locale as **one sentence with one placeholder**:
+- **The library-absent line.** A host verb refusing a composed-row write under options-ui-§1's route (b) **MUST** print exactly one line, routed through the addon's locale as **one sentence with one placeholder**:
 
   ```lua
   L["%s is unavailable: the LibKa0s library did not load."]   -- %s = the full verb, e.g. "/wg enable"
   ```
 
-  The placeholder is the whole verb as the player typed it, leading slash included, so the line names what was refused without a second sentence. It goes through the addon's tagged printer (slash-commands-§4), writes nothing and raises nothing. A schema CLI verb's *names the missing library* line above **MAY** be this same line.
+  The placeholder is the whole verb as the player typed it, leading slash included, so the line names what was refused without a second sentence. It goes through the addon's tagged printer (slash-commands-§4), writes nothing and raises nothing. The **MUST** binds only that refusal. Any other verb a degraded host chooses to refuse, and a schema CLI verb's *names the missing library* line above, **MAY** use this same line, and a stub whose schema CLI verbs print their own wording (for example `set unavailable: LibKa0s-Slash-1.0 not loaded`) stays compliant as long as that wording names the missing library.
 - The stub **MUST NOT** re-implement the library's rendering — no copied row formatter, no copied parser, no copied `key = value` shape. Hand-copying the strings whose drift the extraction exists to end is precisely the duplication testing-§8 forbids; a degraded help row renders plainly and says so.
   - **In particular it MUST NOT copy `FormatRow`.** A degraded help row prints `cmd  desc` plainly, with no gold command and no em dash.
   - **One library string MAY be carried verbatim, and only one: `LibKa0s-Slash-1.0`'s `DISABLED_LINE_FORMAT`**, the format of the refusal line (slash-commands-§7). A disabled addon's refusal has to read the same whether the library loaded or not, and that needs the bytes. A stub that carries it **MUST** pin it against the live library with the kit's `Kit.assertLibraryConstant` (test-kit revision 26, LibKa0s v1.56.0), which reads the member off the loaded major and fails naming both strings, so a one-byte drift turns the suite red.
