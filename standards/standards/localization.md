@@ -202,8 +202,8 @@ local BRITISH = {
   "serialis", "summaris", "utilis", "organis", "authoris", "prioritis",
   "alphabetis", "categoris", "sanitis", "visualis", "minimis", "maximis",
   "itemis", "randomis", "tokenis", "capitalis", "localis", "modularis",
-  "standardis", "memois", "recognis", "analys", "paralys", "synthesis",
-  "emphasis",
+  "standardis", "memois", "recognis", "synchronis", "analys", "paralys",
+  "synthesis", "emphasis",
   -- a doubled consonant before a suffix, where US English keeps one
   "cancelled", "cancelling", "cancellable", "labelled", "labelling",
   "travelled", "travelling", "modelled", "modelling", "signalled",
@@ -226,6 +226,10 @@ local ALLOWED = {
   "programmer", "programmers", "programmed",
 }
 ```
+
+**The published counts are 92 and 30.** `BRITISH` holds **92** entries and `ALLOWED` **30** (from
+v2.65.0, which added `synchronis`; kit revision 26 pins the same pair in the kit's gate). A gate's copy
+with any other count is not whole, and this line moves in the same change as the lists.
 
 **How a gate MUST read them.**
 

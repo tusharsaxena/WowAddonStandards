@@ -4,11 +4,13 @@
 
 ### 1. Namespace bootstrap
 
-Every file **MUST** start with:
+Every file **MUST** start by destructuring **both** varargs:
 
 ```lua
 local addonName, NS = ...
 ```
+
+A file that never reads the first vararg names it `_` (`local _, NS = ...`). Both forms are compliant. The second is how a file meets this section and lint's unused-variable warning (211) together, with no per-file `211/addonName` ignore stanza in `.luacheckrc` (lint).
 
 `NS` is a single shared private table populated by ordered TOC loading. `addonName` is a string constant. **MUST NOT** create a `_G[addonName]` table; if a public surface is needed, expose it via `NS.API.v1` (see public-api).
 

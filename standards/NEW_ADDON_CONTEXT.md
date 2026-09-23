@@ -181,7 +181,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
 Fixed field order (toc-file-§1), then a blank line, then the file listing in commented sections (toc-file-§5):
 
 ```
-## Interface: 120007
+## Interface: <latest Retail>
 ## Title: Ka0s <Name>
 ## Notes: <one-line description>
 ## Author: add1kted2ka0s
@@ -676,7 +676,7 @@ ladder it already has for art that fails to load. A mark the catalog lacks is ad
 
 ### `core/DebugLogSetup.lua` — the debug console (`LibKa0s-DebugLog-1.0`)
 
-The console window, the copy window, both formatters, the 500-line buffer, the scrollbar, the line
+The console window, the copy window, both formatters, the 1500-line buffer, the scrollbar, the line
 counter and the enable seam are the library's — **none of it is the addon's code to write, and an
 audit MUST NOT ask for it in the addon's source**. This file supplies the frame-name prefix, the
 title, the monospace font path, **the addon folder name** (`addonName`, which is what makes the
@@ -750,7 +750,7 @@ descriptor expresses rather than code to write.
   which pays for the formatting on every pass forever, gate or no gate. Use the ungated
   `NS.DebugLog:Add(tag, msg)` only for lines that must land regardless of the flag.
 - **Coalesce.** One summary line per pass, never one per item/slot/frame, with the string-building
-  itself behind the gate (debug-logging-§9). The buffer is 500 lines, so per-item spam *evicts* the
+  itself behind the gate (debug-logging-§9). The buffer is 1500 lines, so per-item spam *evicts* the
   signal rather than merely burying it.
 - **Log settings changes once**, at the single write seam, as `[Set] <path> = <value>`; a downstream
   reactor logs only a material effect the `[Set]` line cannot imply (debug-logging-§10). A batch
@@ -1088,6 +1088,8 @@ ignore:
   - tests
   # - tools          # ONLY in a repo that HAS a tools/ (layout-§1). Left out until the folder
   #                    exists: a list padded with absent entries goes stale the other way.
+  - media/logos/*.png   # the editable logo source (layout-§4): committed, never loadable, never shipped
+  - media/logos/*.jpg   # a .jpg render of the logo, for the project page; same reason
   - _dev
   - "*.bak"
 ```
@@ -1265,7 +1267,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 
 ## Hard rules cheat sheet (memorize)
 
-1. Every file starts with `local addonName, NS = ...`. No `_G[addonName] = {}`. Directly **beneath** that bootstrap, an authored `.lua` under `core/`, `modules/`, `settings/`, `defaults/` or `locales/` **SHOULD** carry a comment naming its own path and saying in one line what it is for (documentation-§9) — the bootstrap stays line 1, where every reader and every tool looks for it. Nothing else in the standard answers *what is this file for* at the point where the reader has the file open, and the path is what survives the file being pasted into a review bundle, an issue or an agent transcript.
+1. Every file starts with `local addonName, NS = ...`, or `local _, NS = ...` where the file never reads the name (architecture-§1). No `_G[addonName] = {}`. Directly **beneath** that bootstrap, an authored `.lua` under `core/`, `modules/`, `settings/`, `defaults/` or `locales/` **SHOULD** carry a comment naming its own path and saying in one line what it is for (documentation-§9) — the bootstrap stays line 1, where every reader and every tool looks for it. Nothing else in the standard answers *what is this file for* at the point where the reader has the file open, and the path is what survives the file being pasted into a review bundle, an issue or an agent transcript.
 2. SavedVariables: `<Addon>DB` with `schemaVersion = 0` in defaults and the runner's target in `NS.SCHEMA_VERSION` (savedvariables-§1), plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
@@ -1292,7 +1294,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 16. Vendor everything: commit all libs in `libs/`, loaded first in the TOC. Never use `.pkgmeta` `externals:` for libraries. **`libs/LibKa0s/` is copied WHOLE, every time** — every module, even unwired ones; a partial copy costs the addon majors it was not even touching (anti-pattern #48) — TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml`, and kept **byte-identical** to its source repo (`diff -r` empty), with a re-vendor commit here after every library change, because both repos stay green while the copies silently diverge (library-stack-§7, anti-pattern #45). Nothing under `libs/` is ever edited locally.
 16b. **Consume, never fork** (anti-pattern #47): the chat printer, the debug console, the slash dispatcher, the options toolkit, the performance harness and the test harness are `LibKa0s`. Adopting one is a **descriptor plus a degradation stub** in the addon's own setup file. Anything genuinely missing goes back into the library as an **additive** descriptor field so every consumer gets it — never a local patch, and never a private lookalike.
 16a. **Performance harness** (performance): vendor `LibKa0s-Perf-1.0`, build `NS.Perf` from a descriptor in `core/PerfSetup.lua` (degrading to a working stub if the lib is absent), bracket hot paths with the gated `local t0 = Perf.on and debugprofilestop()` form — **zero work when off**, evidenced by the offline zero-overhead scenario, never by a comment — declare buckets with their `within` nesting, expose the reserved **`perf`** verb through `NS.COMMANDS` (the lib returns lines; never let it register a slash), declare `<Addon>PerfDB`, and implement `suspend`/`resume` so the addon goes inert **without a `/reload`** with visibility refused at the **source** of the show decision. Never hand-roll a probe, and never let a shared harness own a frame on your behalf (anti-patterns #43/#44). The **static** half of the same question — where the addon is getting hard to change — is the `lizard` run recorded in every automated-test bundle (rule 20e, automated-tests).
-17. Debug: **consume `LibKa0s-DebugLog-1.0`** — one instance from a descriptor in `core/DebugLogSetup.lua`, with `NS.Debug` bound **bare** off it (debug-logging-§1). The window, both formatters, the 500-line buffer, the scrollbar, the counter and the enable seam are the library's; the addon owns the shipped monospace font (10pt), the flag, the `[Init]` summary and which flows are worth tracing. Enabled-state is **session-only** (`NS.State.debug`, default off, reset every `/reload`; never in SV, never copied into the library), decoupled from window visibility. Call the sink tag-first with the format deferred, coalesce to one line per pass, and log a settings change once, at the write seam — one line per row in a batch, one line for a bulk copy or reset (debug-logging-§10).
+17. Debug: **consume `LibKa0s-DebugLog-1.0`** — one instance from a descriptor in `core/DebugLogSetup.lua`, with `NS.Debug` bound **bare** off it (debug-logging-§1). The window, both formatters, the 1500-line buffer, the scrollbar, the counter and the enable seam are the library's; the addon owns the shipped monospace font (10pt), the flag, the `[Init]` summary and which flows are worth tracing. Enabled-state is **session-only** (`NS.State.debug`, default off, reset every `/reload`; never in SV, never copied into the library), decoupled from window visibility. Call the sink tag-first with the format deferred, coalesce to one line per pass, and log a settings change once, at the write seam — one line per row in a batch, one line for a bulk copy or reset (debug-logging-§10).
 18. Preview/test mode (preview-mode): addons with a positionable display MUST ship a test mode (placeholder data, on until turned off, session-only, ended by combat), switched by the Master controls `Test mode` checkbox (options-ui-§15); an addon whose unlocked view already shows the placeholders lets Lock frame be the switch and omits the row and the `test` verb.
 18a. **Launcher** (launcher): every addon ships a minimap button **and** a broker plugin, and they are **one** LibDataBroker-1.1 object registered twice — LibDBIcon-1.0 draws the button from it, a broker display draws its row from the same object, one `OnClick` serves both. Name it for the addon folder. **Right-click always opens the settings panel**; **left-click** follows three rungs, first match wins — the **primary window** if there is one, else the **preview switch** (test mode, or lock/unlock where unlocking is the preview), else the settings panel — and the chosen rung goes in `standards/ADDONS.md`'s Launcher column. Visibility is the Master-controls `Minimap button` row stored at LibDBIcon's own `minimap.hide`, with that same `minimap` table handed to `:Register`. The row's schema path, its CLI name, reads `global.minimap.shown`, and its `get`/`set` closures invert onto the stored key, which never gains a `shown` twin, stored or defaulted (launcher-§3). The boot defaults check skips that row and resolves `global.minimap.hide` instead, architecture-§5's one closure-backed exemption. That row is **vetoed out of both resets from the start** (`skipRestoreAll`, options-ui-§1; a global-only addon carves it out of the wholesale wipe instead), because whether the button is shown is a **per-installation display preference** like the position LibDBIcon stores beside it, and neither *Reset all settings* nor the page **Defaults** button may touch it (launcher-§3, anti-pattern #83). Storing the table globally is not the protection. The object's **`label` is the brand name in plain text, `Ka0s <Name>`** — never the TOC `## Title`, which may carry color escapes and would splatter the addon's row across a broker display, and never the folder name, which is the registration **name** LibDBIcon keys the saved position by (anti-pattern #84). The **broker object gets no enable setting at all**, deliberately. Its icon is the addon's own logo (18b).
 18b. **The logo files** (layout-§4, toc-file-§1): `media/logos/<addon>.logo.128.tga`, **128×128, uncompressed 32-bit** (TGA type 2, 32 bpp, ~64 KB), generated from the 2000×2000 `.png` source with `Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")`. That one file is `## IconTexture`, the minimap button's icon and the broker object's icon — never a Blizzard icon path or a numeric file id (anti-pattern #82). The settings landing page's logo is a **separate, larger** file in the same folder (options-ui-§5).

@@ -74,7 +74,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    nobody receives and nothing anywhere goes red; through a constant the same typo is a nil name, so a
    subscriber raises at once, and a publisher stays silent unless the table is a strict catalog
    (`LibKa0s-Bus-1.0`'s `Catalog`, a MAY).
-   Every authored file opens with `local addonName, NS = ...` on line 1 and, directly beneath it, a
+   Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
+   the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
    headers now: the collection's strongest repos all leave the same scaffolded files bare, because
    those arrive from a template, and a convention the scaffold does not write is one every addon

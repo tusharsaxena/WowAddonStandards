@@ -504,9 +504,12 @@ git ls-files -z | xargs -0 -I{} sh -c '
   is skipped: there is nothing on disk to convert.
 - **The one accuracy the one-liner gives up is the lone `\r`.** Comparing totals treats every CR as
   half of a CRLF pair, so a file carrying a bare `\r` **inside** a line reads wrong in both
-  directions — flagged when it is clean, and passed when a stray CR masks a real bare `\n`. No file
-  in the collection has one, and the trade buys a check that stays pasteable; a repo that acquires
-  old-Mac endings needs a scanner that counts `\r\n` pairs rather than this. **Do not "simplify" the
+  directions — flagged when it is clean, and passed when a stray CR masks a real bare `\n`. The
+  trade buys a check that stays pasteable, and the kit closes the gap it leaves: **from LibKa0s
+  test-kit revision 26, `test_eol` counts lone CRs** (a byte 13 not followed by a byte 10) in every
+  path it scans, so in a repo carrying that kit a lone `\r` turns the suite red rather than waiting
+  for an audit to find it. A repo on an older kit that suspects one needs a scanner that counts
+  `\r\n` pairs rather than this. **Do not "simplify" the
   command back toward `file(1)`** — that shape is the defect this replaced, not a shorter spelling of
   it.
 - A count of `0` is the compliant state. Anything else is **one** finding: *"N tracked files disagree
