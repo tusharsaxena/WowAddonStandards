@@ -26,6 +26,8 @@ ignore:
   #                    until then — PanelMaster/.pkgmeta:10-15 records the collection's own call
   #                    on this, that "a list padded with absent entries goes stale in the other
   #                    direction". The audit check gates on `[ -d tools ]` for the same reason.
+  - media/logos/*.png   # the editable logo source (layout-§4): committed, never loadable, never shipped
+  - media/logos/*.jpg   # a .jpg render of the logo, for the project page; same reason
   - _dev
   - "*.bak"
 ```

@@ -10,7 +10,7 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
 <AddonName>/
   <AddonName>.toc          -- single file, single Interface line (latest Retail), lists all .lua in dependency order
   core/
-    Compat.lua             -- deprecated-API shims
+    Compat.lua             -- deprecated-API shims (only when the addon owns one: compat)
     Constants.lua          -- numeric constants, enum-like tables
     Namespace.lua          -- bootstrap: local addonName, NS = ...; sets up shared upvalues
     State.lua              -- mutable runtime state, message bus
@@ -122,7 +122,7 @@ Reference implementation (in the collection): the standalone loot-history browse
 | `<addon>.logo.128.tga` | 128×128 | `## IconTexture` (toc-file-§1), the minimap button's icon, the broker object's icon (launcher-§4) |
 | `<addon>.logo.tga` | drawn at 300×300 | the settings panel's landing page (options-ui-§5) |
 
-Beside them sits the **editable source** — the 2000×2000 `.png` the collection's logo art is authored at — which ships but is never loaded by the client (WoW cannot load `.png`/`.jpg` at runtime).
+Beside them sits the **editable source** — the 2000×2000 `.png` the collection's logo art is authored at — which is **committed** to the repository but **excluded from the package** by a `.pkgmeta` ignore line (`media/logos/*.png`, beside `media/logos/*.jpg` for a `.jpg` render, packaging). WoW cannot load `.png`/`.jpg` at runtime, so the file exists for the project page and for regenerating the `.tga` below, and shipping it would only make every download larger.
 
 - **`<addon>` is the addon's folder name, lowercased** in both names (`partyframeenhanced.logo.tga`, `partyframeenhanced.logo.128.tga`), so both paths are derivable from the folder without opening it. The landing-page file is the **unsuffixed** name and every addon in the collection already ships it under exactly that name — it is named here so an audit has a path to check for **both** files rather than only the new one. Nothing about the landing-page file changes: its size, its format and its compression are whatever it already is (options-ui-§5), and it is **not** graded against the 128 file's format rules below.
 - **The 128 file MUST be uncompressed, 32-bit — TGA image type 2, 32 bpp.** This is not a style preference. One file in the collection is **proven** to render as an `IconTexture` in-game, and it is type 2 / 32 bpp; the **RLE-compressed (type 10)** logos the collection also ships are unproven in that role, and an icon that silently fails to load draws nothing and raises nothing, so no gate would report it. **128×128 is also power-of-two**, which several existing logos (300×300) are not. Cost is roughly **64 KB** per addon — the whole reason an uncompressed file is affordable here at all.

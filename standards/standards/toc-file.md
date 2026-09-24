@@ -7,7 +7,7 @@
 The metadata block **MUST** use this **exact field order** (omit a line only when the field genuinely doesn't apply); no blank lines inside the block:
 
 ```
-## Interface: 120007                     -- SINGLE number; latest Retail patch (toc-file-§3)
+## Interface: <latest Retail>            -- SINGLE number; latest Retail patch (toc-file-§3)
 ## Title: Ka0s <Human Name>              -- prefix every Ka0s addon
 ## Notes: <one-line user-facing description>
 ## Author: add1kted2ka0s
@@ -52,13 +52,13 @@ against the client.
 - **MUST** name the settings global `<Addon>DB`. Already universal in the collection.
 - **MUST** declare exactly **two** SavedVariables globals in the order above **when the performance harness is wired**: `<Addon>DB` (the AceDB tree) and `<Addon>PerfDB` (the performance capture ring, performance-§5). The second is the standard's **one sanctioned non-AceDB SV global** (savedvariables-§4) — a diagnostics store deliberately outside the profile tree so it never rides profile copy, reset, or switch. An addon holding a recorded **no-combat-path exemption** (performance-§12) declares **one**: `<Addon>DB` alone, because nothing would ever write the ring. So: **two when wired, one when exempt, never three** — a **third** top-level global is non-compliant either way, and a `<Addon>PerfDB` declared by an exempt addon is a global nothing writes.
 - **SHOULD NOT** use `SavedVariablesPerCharacter` unless the data is genuinely per-character (most Ka0s addons run profile-per-character via AceDB; that's enough).
-- **MUST** declare a `schemaVersion` integer in defaults. **MUST** ship a `Database.lua` migration runner even if the body is empty — schema migration is a from-day-one concern.
+- **MUST** declare `schemaVersion = 0` in defaults — the pre-migration floor, never the current version, which lives in `NS.SCHEMA_VERSION` (savedvariables-§1 says why and who advances the stamp). **MUST** ship a `Database.lua` migration runner even if the body is empty — schema migration is a from-day-one concern.
 
 ### 3. Retail only — single Interface line
 
 The collection targets **Retail (Mainline) only**. Classic/other flavors are out of scope for the standard.
 
-- **MUST** ship a single TOC with a **single** `## Interface:` value = the **latest Retail patch** interface number (currently `120007`). Bump it each patch with the `wow-addon:bump-interface` skill.
+- **MUST** ship a single TOC with a **single** `## Interface:` value = the **latest Retail patch** interface number. The standard deliberately carries no literal for it, because a number written here goes stale the next patch: the collection's current value is the one its addons ship (the roster, `ADDONS.md`, lists them), and `/wow-addon:bump-interface` determines the Live value and bumps it each patch.
 - **MUST NOT** use a comma-separated multi-flavor Interface list, per-flavor TOC files, or `enable-toc-creation` flavor fan-out.
 - **MUST NOT** ship `_Mainline`/`_Classic` data splits. Data files are plain (`Spells.lua`, `Data*.lua`).
 - **MUST NOT** use `if WOW_PROJECT_ID == ...` ladders inline in feature code. Any genuine cross-patch version check is a Retail-patch check and is branched in `Compat.lua` behind a named flag (compat).

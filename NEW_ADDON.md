@@ -67,13 +67,15 @@ disagreeing with the collection's intent while looking, in review, like it had b
      under `tests/`, **never** `libs/`, because it must not ship with the addon.
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
    context pack: the TOC (fixed field order + `#`-section file listing, toc-file-§1/toc-file-§5), entry file, compat
-   shims, locale, database/migrations, schema-driven settings (architecture-§5), and the message bus
+   shims (only if the addon owns a deprecated or version-variant client call — compat's
+   applicability condition), locale, database/migrations, schema-driven settings (architecture-§5), and the message bus
    (architecture-§4) — whose names are declared **once** as constants in `core/Bus.lua` and used at
    every `SendMessage` and `RegisterMessage` call site, because a misspelled literal is a message
    nobody receives and nothing anywhere goes red; through a constant the same typo is a nil name, so a
    subscriber raises at once, and a publisher stays silent unless the table is a strict catalog
    (`LibKa0s-Bus-1.0`'s `Catalog`, a MAY).
-   Every authored file opens with `local addonName, NS = ...` on line 1 and, directly beneath it, a
+   Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
+   the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
    headers now: the collection's strongest repos all leave the same scaffolded files bare, because
    those arrive from a template, and a convention the scaffold does not write is one every addon
@@ -105,7 +107,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    - `core/CoreSetup.lua` — `LibKa0s-Core-1.0`: the secret-safe stringifier and the prefixed chat
      printer (`NS.Print` / `NS.Util.print`, one function object — architecture-§2). Placed after the
      file defining `NS.PREFIX` and before everything that prints; pass the prefix as a **function**
-     so a later change to it is not frozen in at load.
+     so a later change to it is not frozen in at load. It also publishes the `SafeRegisterEvent`
+     family every event registration goes through, and its stub carries the three as one-rung
+     `pcall` bodies; the host owns the rejected list (events-frames-taint-§1).
    - `core/PerfSetup.lua` — `LibKa0s-Perf-1.0` (performance): the descriptor's declared buckets with
      their `within` nesting, `<Addon>PerfDB` as `sv`, `suspend`/`resume`, gated brackets on the hot
      paths, and the reserved `perf` verb dispatched by the host. Placed before any module taking
@@ -124,11 +128,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
      the first hands the library a path into nowhere.
    - the **slash descriptor** in `settings/Slash.lua` — `LibKa0s-Slash-1.0` (slash-commands): the
      addon keeps its ordered `NS.COMMANDS` table and its host verbs and passes them in; the library
-     supplies the dispatcher, help renderer, formatters and the type-aware value parser.
+     supplies the dispatcher, help renderer, formatters and the type-aware value parser. The stub
+     carries no library string but `DISABLED_LINE_FORMAT`, pinned with `Kit.assertLibraryConstant`,
+     and a composed-row verb on a library-absent load writes through `writeThrough` or prints the
+     library-absent line (slash-commands-§1, options-ui-§1).
    - `settings/OptionsSetup.lua` — `LibKa0s-Options-1.0` (options-ui): the `get`/`set`/`applyDefault`
      seams, `rowsForPage`/`allRows`, the color codecs, and eager settings-category registration with a
      lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5). Loads before
-     every `settings/<page>.lua`.
+     every `settings/<page>.lua`. The stub's composers answer `{}` (options-ui-§1).
    Each stub **MUST** answer every member the addon actually calls — a stub missing one is a crash
    moved to a rarer code path, not a fallback.
 
@@ -161,11 +168,13 @@ disagreeing with the collection's intent while looking, in review, like it had b
      `Reset position` | `Reset all settings` — including only the rows the addon has the state for.
      `Minimap button` is **unconditional** (every addon ships a launcher) and takes the **first** column
      precisely because only some addons have a `Test mode` to pair beside it; it stores at LibDBIcon's own
-     `minimap.hide` and never at a second key (launcher-§3). `Test mode` is there in
+     `minimap.hide` and never at a second key, and its schema path reads `global.minimap.shown`, with
+     `get`/`set` closures inverting onto that stored key (launcher-§3). Declare no `shown` default: have your `defaultsRoot` answer no root for that row and resolve `global.minimap.hide` against the defaults instead (architecture-§5's one exemption). `Test mode` is there in
      every addon with a positionable display: its test mode (placeholder content, on until turned off,
      ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
      (anti-pattern #80). An addon whose unlocked view already shows those placeholders omits it:
-     *Lock frame* is its switch. A frameless addon
+     *Lock frame* is its switch, it ships no `test` verb, and a one-shot value hold, if kept, lives at
+     `/<slash> debug hold <value> [secs]` (options-ui-§15). A frameless addon
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.

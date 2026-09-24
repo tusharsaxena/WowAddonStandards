@@ -102,6 +102,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      search for a hand-built console.
 4. **Measure against every section + anti-pattern.** Go through each section of the standard and the
    `anti-patterns` list. For each MUST/SHOULD it fails or partially meets, record a deviation.
+   Step 5's impact table governs every grade this step files; no check below hard-codes a grade
+   that overrides it.
    - **Check the documentation shape against documentation-§3's tier model — it is a directory
      listing, so measure it rather than reading prose.** Six checks, and all six are mechanical:
      (a) **Tier 1 present**, under exactly those names — `scope.md`, `module-map.md`, `schema.md`,
@@ -109,8 +111,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
      `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`, evaluate
      the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the shims
-     `core/Compat.lua` publishes with documentation-§3's own grep — it is a count now, not a
-     judgment) and require either the doc or a *Not applicable* row carrying that trigger.
+     a **present** `core/Compat.lua` publishes with documentation-§3's own grep — it is a count now, not a
+     judgment; an absent file counts zero, and is itself a finding only if the addon makes a
+     deprecated or version-variant call outside `LibKa0s`'s majors, per compat's applicability condition) and require either the doc or a *Not applicable* row carrying that trigger.
      An absent doc whose trigger **has** fired is a MUST failure; an absent doc with a fired trigger
      *and* a "Not applicable" row is worse, because the row asserts something false — grade it above
      the bare omission.
@@ -302,27 +305,34 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      ```sh
      horizon=$(ls -1 docs/revendor | sort | head -1 | cut -c1-10)   # the store's first bundle
 
-     # tags vendored — read off the payload at each commit that touched libs/LibKa0s/
-     git log --since="$horizon" --format=%H -- libs/LibKa0s | while read -r c; do
+     # tags vendored — read off the payload at each commit that touched libs/LibKa0s/ or tests/_kit/
+     git log --since="$horizon 00:00" --format=%H -- libs/LibKa0s tests/_kit | while read -r c; do
        git show "$c:CLAUDE.md" 2>/dev/null |
          grep -oE 'Bundles \[LibKa0s\]\([^)]*\) v[0-9]+\.[0-9]+\.[0-9]+' |
          grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1
      done | sort -uV > /tmp/vendored.txt
 
-     # tags recorded — the folder name where it carries one, else the bundle's own first line
+     # tags recorded — a span folder (two tags in its name) records every tag on its 01_DELTA.md
+     # line 1; a single-tag folder records its name's tag; a bare-dated folder, its line 1's last tag
      for b in docs/revendor/*/; do
-       t=$(basename "$b" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-       [ -n "$t" ] || t=$(head -1 "$b/01_DELTA.md" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -1)
-       [ -n "$t" ] && echo "$t"
+       n=$(basename "$b" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | wc -l)
+       if [ "$n" -ge 2 ]; then
+         head -1 "$b/01_DELTA.md" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+'
+       else
+         t=$(basename "$b" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+         [ -n "$t" ] || t=$(head -1 "$b/01_DELTA.md" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | tail -1)
+         [ -n "$t" ] && echo "$t"
+       fi
      done | sort -uV > /tmp/recorded.txt
 
      grep -vxF -f /tmp/recorded.txt /tmp/vendored.txt               # vendored, in scope, unrecorded
      ```
 
-     **The trigger is the commit that touches `libs/LibKa0s/`.** `versioning-git` makes the re-vendor
-     commit a **MUST** and its standing alone only a **SHOULD**, so a folded re-vendor — the shape
-     the bulk sweeps actually took, and the shape this convention lapsed under — is compliant and
-     must still be found. `git log -- libs/LibKa0s` finds it; a `grep` over subjects does not. **And
+     **The trigger is the commit that touches `libs/LibKa0s/` or `tests/_kit/`.** `versioning-git`
+     makes the re-vendor commit a **MUST** and its standing alone only a **SHOULD**, so a folded
+     re-vendor — the shape the bulk sweeps actually took, and the shape this convention lapsed
+     under — is compliant and must still be found. `git log -- libs/LibKa0s tests/_kit` finds it; a
+     `grep` over subjects does not. **And
      the tag comes from root `CLAUDE.md`'s `Bundles [LibKa0s](…) vX.Y.Z` provenance line at that
      commit** (documentation-§2 item 6, library-stack-§7), which rolls in the same commit as the copy.
      Measured across the ten stores, every in-scope commit resolves a tag this way and none is lost
@@ -332,14 +342,27 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      grandfathers the bare-dated folders rather than renaming them, and twenty-eight of the collection's
      sixty-eight bundles are bare-dated, spread across all ten stores. Each names its tag in the first
      line of its `01_DELTA.md`; a check that compared raw folder names would file every one of those
-     twenty-eight as an unrecorded tag — a **High** finding against ten repos for records that exist,
-     in the very repos the no-rename rule promised not to disturb. Never file one without opening the
-     bundle.
+     twenty-eight as an unrecorded tag — a finding against ten repos for records that exist, in the
+     very repos the no-rename rule promised not to disturb. Never file one without opening the
+     bundle. **A consolidated span bundle** (`docs/revendor/<YYYY-MM-DD>-v<A>-v<B>/`, defined in
+     `audit-review-history`) names two tags in its folder and every tag it covers on line 1 of its
+     `01_DELTA.md` — `Delta: LibKa0s v<A> -> v<B> (span: v<A> v<...> v<B>)` — so the loop reads
+     every tag on that line, never the folder's first tag alone; the single-tag and bare-dated
+     branches are unchanged.
+
+     **The `--since` bound is `"$horizon 00:00"`, never the bare date.** Git fills a bare date's time
+     of day from the clock, so `--since="2026-09-12"` run at 15:00 means *since 15:00 that day* and
+     silently drops the re-vendor commits made on the horizon's own morning — the day the store
+     opened, which is exactly the day a re-vendor is most likely to have happened. **And the log
+     walks `tests/_kit` beside `libs/LibKa0s`**: a kit-only re-vendor rolls the provenance line too,
+     and a walk over the library folder alone misses it and misreads the next bundle's base.
 
      **Scope it to commits at or after the repo's oldest bundle** — re-vendor commits older than the
      store predate the convention and a check that files them reports a number nobody can act on;
      a repo with no store yet is measured from its next re-vendor. A tag vendored with no bundle
-     naming it and no `## Documented deviations` row saying why is a **High** finding. File it as
+     naming it and no `## Documented deviations` row saying why is a finding, graded by step 5 like
+     every other: an unrecorded re-vendor is doc-only, so **Low**, and the entry names the
+     `audit-review-history` MUST it fails. File it as
      **one** rolled-up finding carrying the commands and the count, never a per-tag enumeration:
      the convention lapsed collection-wide at once, nine stores stopping at LibKa0s v1.34.0 against
      a library at v1.54.2 and nineteen to thirty-one unrecorded tags apiece, so the honest remediation
@@ -363,7 +386,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      loop over a name list turns one retired event into a silently deaf addon: the throw aborts the
      loop and every registration after it goes unbound, with no visible error unless the player has
      script errors switched on. Find the registration sites and read the shape. Registration
-     isolated per event through one `pcall`ed helper is the MUST; a recorded list of rejected names,
+     isolated per event through one `pcall`ed helper is the MUST — from LibKa0s v1.56.0 that helper
+     is `LibKa0s-Core-1.0`'s `SafeRegisterEvent` family, with the host's Core stub carrying one-rung
+     `pcall` bodies, so a host on v1.56.0 or later that keeps a private loop is the finding; a recorded list of rejected names,
      reachable by the player through the reserved `debug` verb or the debug console, is the second
      MUST, because a deaf event nobody can see is the same silence one layer down. A bare loop with
      neither is the finding. `C_EventUtils.IsEventValid` in front of the `pcall` is the SHOULD and
@@ -527,7 +552,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `minimap.hide` and the same `minimap` table is what `:Register` is handed. A second key
        (`minimap.show`, `showMinimapIcon`, `minimapButton`) is anti-pattern #81; so is a seed or
        backfill writing the whole `minimap` table over that row (`architecture-§5`). LibDBIcon's own
-       `minimapPos` writes are the library's and are **not** a finding.
+       `minimapPos` writes are the library's and are **not** a finding. **The row's path**, which is
+       its CLI name, reads `<root>.minimap.shown` with `get`/`set` closures inverting onto the stored
+       `minimap.hide` (`launcher-§3`, new in v2.65.0). A row still declared at `…minimap.hide` is a
+       finding from the addon's first release after v2.65.0, and the fix owes no migration. A `shown`
+       default added to quiet the boot defaults check is anti-pattern #81; the check skips that row and
+       resolves `minimap.hide` instead (`architecture-§5`'s closure-backed exemption).
      - **No reset reaches the row** (`launcher-§3`, new in v2.54.0). The button's shown/hidden state
        **MUST** survive both *Reset all settings* and the page-scoped **Defaults** button, so read
        **both** resets rather than reasoning from where the table is stored — the global scope is
@@ -683,18 +713,19 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        **Test mode is required in every addon with a positionable display** — proven by the same
        whole-repo `SetMovable` sweep that proves a frameless addon — **unless unticking Lock frame
        already shows the display with its placeholder content**, in which case Lock frame is the
-       switch and a Test mode row or `test` verb would be the finding. Otherwise its absence, a test
+       switch and a Test mode row or `test` verb would be the finding (a one-shot value hold at
+       `/<slash> debug hold <value> [secs]` is not, `options-ui-§15`). Otherwise its absence, a test
        mode that is only a one-shot verb, its switch drawn as a button or hand-written, or a test
        mode that survives the start of combat or can be started during it, is anti-pattern #80. A
        frameless addon omits the row and is compliant.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
-       row whose type changed with **no** bumped `schemaVersion` and **no** migration step in
+       row whose type changed with **no** raised `NS.SCHEMA_VERSION` and **no** migration step in
        `Database.lua`'s runner (savedvariables) is a finding in its own right, graded at least
        **medium**: the panel reads a stored `true` as an unrecognized dropdown value on every
        existing install, so the addon silently loses a setting the player already made. The
        migration is `true` → `inCombat`, `false` → `always`. Cite the runner's `file:line` and the
-       version it bumped to as the evidence that it exists; adopting the *name* `Master controls`
+       version it raised the target to as the evidence that it exists; adopting the *name* `Master controls`
        moved a `group` and needs no migration, and the two must not be confused for each other.
      - **(c) Every color row has its class-color companion beside it (options-ui-§17).** Grep the
        schema for color rows and, for each, require its companion — a `Use class color` bool or a
@@ -771,11 +802,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        backdrop, is the finding whether or not this addon currently has a page that wraps, because
        it becomes visible the day a label is added. Note that the row pitch and `TAB_H` are two
        different quantities (options-ui-§8) and that reading the band off `TAB_H` alone is not the
-       same defect. Second, the suite: a case asserting the reserved band **and every row's y
-       offset** are identical for every value of the selection. Check what it runs against — a
-       harness that answers **one** height for every atlas cannot fail the case, so it is green
-       against nothing and is reported as a **missing** case, not a passing one (testing-§12). Name
-       the mutation the case dies under.
+       same defect. Second, the suite — and which suite depends on who draws the strip. A strip
+       the library draws (`O.TabStrip`, `O.RenderTabbedSchema`) is pinned by the **library's**
+       suite, and the addon **MUST NOT** duplicate that case (options-ui-§13, testing-§8): its
+       absence from the addon's suite is compliant and is **not** filed, while a copy of it there is
+       the finding. Only a strip the host draws itself owes a case in the addon's suite asserting
+       the reserved band **and every row's y offset** are identical for every value of the
+       selection. Check what it runs against — a harness that answers **one** height for every
+       atlas cannot fail the case, so it is green against nothing and is reported as a **missing**
+       case, not a passing one (testing-§12). Name the mutation the case dies under.
      - **(i) A secondary strip lives in the scroll, and there is no third level (options-ui-§13).**
        Where a page divides one primary tab's content with a second strip, confirm three things from
        the builder: it is drawn as ordinary page content rather than pinned into the chrome band;
@@ -881,6 +916,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    unregistered in the module's disable path and re-used across a disable/enable cycle, is
    **compliant** and is not an entry. A frame that misses any of the three conditions, a
    general-purpose private-frame factory, or a frame that has picked up a second job is the entry.
+   Its second carve-out, the **boundary watcher**, works the same way: in an addon that embeds **no**
+   AceEvent-3.0 at all, one lazily created private frame for non-unit boundary events
+   (`PLAYER_REGEN_DISABLED`/`_ENABLED`), fully unregistered on stand-down and listed in
+   `## Event Subscriptions`, is **compliant** and takes no register row; the same frame in an addon
+   that embeds AceEvent is the entry. architecture-§4's threshold is the other one most easily
+   misgraded: the AceAddon object's own event handlers are not a feature module, so a shell that
+   registers events and calls its one feature module directly is below it.
    `layout-§1`'s three terminal states work the same way: an over-cap file carrying an issue, a
    ratified row or a scheduled peel is compliant, and what is filed is a breach nothing remarks on.
 
