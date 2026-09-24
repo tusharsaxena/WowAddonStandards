@@ -180,10 +180,15 @@ disagreeing with the collection's intent while looking, in review, like it had b
      shipping the *show only in combat* boolean instead buys a migration later for nothing.
    - **Scaffold the launcher — one object, registered twice** (launcher). Vendor LibDataBroker-1.1 and
      LibDBIcon-1.0, create **one** LDB `type = "launcher"` object named for the addon folder, give it the
-     128×128 logo as its `icon`, and register that same object with LibDBIcon. Its single `OnClick` is
-     **right-click → settings panel, always**, and left-click by launcher-§2's three rungs, first match
-     wins: the addon's **primary window** if it has one, else its **preview switch** (test mode, or
-     lock/unlock where unlocking is the preview), else the settings panel. Give the object a `label` of
+     128×128 logo as its `icon`, and register that same object with LibDBIcon — through
+     `LibKa0s-Launcher-1.0` (Launcher minor 4, `LibKa0s v1.58.0`), which owns its single `OnClick`:
+     **left-click → settings panel** and **right-click → the options menu**, on every addon
+     (launcher-§2). Write no click handler and no menu of your own; pass `openSettings`, then the
+     accessor-and-toggle pair for each toggle the addon has — `isEnabled` + `setEnabled` always,
+     `isLocked` + `toggleLock` if it has a lock, `isTestMode` + `toggleTestMode` if it has a test mode,
+     `isWindowShown` + `toggleWindow` if it has a primary window — each toggle calling the **same
+     handler** its slash verb or window toggle calls, never a copy. The library grays every entry but
+     *Enabled* while the addon is disabled. Give the object a `label` of
      **`Ka0s <Name>`** — the brand name in **plain text**, never the TOC `## Title` (which may carry
      color escapes) and never the folder name, so the addon groups with its siblings in a broker
      display (launcher-§1). Hand `db.global.minimap`
@@ -196,10 +201,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
      wholesale wipe instead. Give
      the broker object **no** enable setting, deliberately. Let `LibKa0s-Launcher-1.0` (Launcher
      minor 3, `LibKa0s v1.57.0`) draw the **status tooltip**, shown while disabled too: pass
-     `isLocked` / `isTestMode` for the states the addon has, `leftClickLabel` on rung (a)/(b) and
-     `version`, and keep any `onTooltipShow` to the addon's own lines, with no title, status line or
-     click hint (launcher-§1, anti-pattern #89). Then record the addon's rung in
-     `standards/ADDONS.md`'s Launcher column in the same pass.
+     `isLocked` / `isTestMode` for the states the addon has and `version`, and keep any
+     `onTooltipShow` to the addon's own lines, with no title, status line or click hint (launcher-§1,
+     anti-pattern #89). Then record the addon's menu entries in `standards/ADDONS.md`'s Launcher menu
+     entries column in the same pass.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
      128×128, **uncompressed 32-bit**, from the 2000×2000 `.png` source:
      `Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")`. Point
@@ -217,8 +222,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      bare `/<slash>` open the panel, and the schema CLI reads and repairs settings, which is exactly
      when it is most needed — while a **feature** verb SHOULD answer one tagged line naming
      `/<slash> enable` (slash-commands-§2). Vendor LibKa0s **v1.42.0** or later, whose Slash minor 14
-     answers that surface and whose `LibKa0s-Lifecycle-1.0` is the latch. The launcher's rung (a)/(b)
-     left-click is refused and writes nothing; its right-click still opens the panel. Ship
+     answers that surface and whose `LibKa0s-Lifecycle-1.0` is the latch. The launcher's left-click
+     still opens the panel, and its right-click menu keeps *Enabled* live and grays the rest. Ship
      `tests/test_disabled.lua` with the addon. A greenfield addon is the one place this is cheap —
      retrofitting it is the collection's largest outstanding obligation.
    - **Font, border and bar controls come from the composers**, never typed out — one call each emits

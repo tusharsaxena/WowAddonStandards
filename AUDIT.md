@@ -542,12 +542,21 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        with its own `OnClick` beside a broker object with a second one, is anti-pattern #81 — and the
        tell is **two click implementations**, not a call count. A second `:NewDataObject(` or
        `:Register(` line is a finder for that, never the finding on its own.
-     - **The rung.** Read `ADDONS.md`'s **Launcher left-click** column for this addon, then read the
-       `OnClick`. Left-click **MUST** do what the column says and right-click **MUST** open the
-       settings panel, on every addon. Where the column and the code disagree, decide which is wrong
-       by `launcher-§2`'s rule — primary window, else preview switch, else panel, first match wins —
-       and file against whichever lost. A left-click on the settings panel in an addon with a window
-       or a preview switch is a finding even though it "works".
+     - **The clicks and the options menu** (`launcher-§2`, rewritten in v2.67.0). Read the addon's
+       `LibKa0s` tag first: on a tag older than **v1.58.0** (Launcher minor 4) the library still
+       dispatches the retired rungs, so the gap is a **blocked** re-vendor item, not a click finding.
+       On v1.58.0 or later, left-click **MUST** open the settings panel and right-click **MUST** open
+       the library's options menu, on every addon. Read `ADDONS.md`'s **Launcher menu entries**
+       column for this addon, then the launcher descriptor: it passes `isEnabled` + `setEnabled`
+       always, and `isLocked` + `toggleLock`, `isTestMode` + `toggleTestMode`, `isWindowShown` +
+       `toggleWindow` exactly for the entries the column lists. Where the column and the code
+       disagree, decide which is wrong from the addon's Master-controls rows and its primary window
+       (standalone-windows) and file against whichever lost. Each toggle **MUST** call the same
+       handler the slash verb or window toggle calls — a body that re-implements the write, the
+       refusal or the combat rule beside that handler is a copy, and **anti-pattern #81**. So is an
+       `OnClick` assigned by the host, a `MenuUtil` / `EasyMenu` / dropdown-menu call of the host's
+       own for the launcher (grep outside `libs/`), or a descriptor still passing the retired
+       `onClick` / `leftClickLabel`.
      - **The visibility row.** The Master-controls **`Minimap button`** row stores at
        `minimap.hide` and the same `minimap` table is what `:Register` is handed. A second key
        (`minimap.show`, `showMinimapIcon`, `minimapButton`) is anti-pattern #81; so is a seed or
@@ -578,8 +587,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        (root `CLAUDE.md`'s provenance line) first: on a tag older than **v1.57.0** (Launcher minor 3)
        the library draws no status block, so the gap is a **blocked** re-vendor item, not a tooltip
        finding. On v1.57.0 or later, read the launcher descriptor: it passes `isLocked` where the
-       addon has a lock, `isTestMode` where it has a test mode, and `leftClickLabel` on rung (a)/(b)
-       (per `ADDONS.md`'s column); a state the addon has and does not pass is a finding, and so is
+       addon has a lock, and `isTestMode` where it has a test mode (per `ADDONS.md`'s column; the
+       `leftClickLabel` v2.66.0 asked for is retired in v2.67.0); a state the addon has and does not
+       pass is a finding, and so is
        one passed for a state it does not have. Then grep the addon's code outside `libs/` for
        `OnTooltipShow` and read its `onTooltipShow`: an assignment to the LDB object's own
        `OnTooltipShow`, or host lines that draw a title, a version, a status line or a
@@ -625,8 +635,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          *The refusal line*'s shape and reaches no write seam. Unregistering the chat command,
          dropping the `COMMANDS` table or the dispatcher remains a failure for the original reason:
          the verb that turns it back on goes with them.
-       - **The launcher.** A left-click that acts, or writes SavedVariables, while disabled; a
-         right-click that no longer opens the panel (`launcher-§2`).
+       - **The launcher.** A left-click that no longer opens the panel while disabled; a right-click
+         menu whose *Locked* / *Test mode* / *Show window* entries are live while disabled, or whose
+         *Enabled* entry is not; any click that writes SavedVariables while disabled other than
+         ticking *Enabled* (`launcher-§2`, `slash-commands-§7`).
        - **The conformance suite.** `tests/test_disabled.lua` present, listed in `tests/run.lua`, and
          asserting on the **registration set** rather than on a handler's return
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
