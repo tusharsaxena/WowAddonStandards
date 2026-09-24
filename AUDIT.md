@@ -574,6 +574,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        spelling differs from the addon's own README H1.
      - **No broker toggle.** A setting that enables or disables the broker object is a finding
        (`launcher-§1`). The minimap button's row is the only visibility control.
+     - **The status tooltip** (`launcher-§1`, new in v2.66.0). Read the addon's `LibKa0s` tag
+       (root `CLAUDE.md`'s provenance line) first: on a tag older than **v1.57.0** (Launcher minor 3)
+       the library draws no status block, so the gap is a **blocked** re-vendor item, not a tooltip
+       finding. On v1.57.0 or later, read the launcher descriptor: it passes `isLocked` where the
+       addon has a lock, `isTestMode` where it has a test mode, and `leftClickLabel` on rung (a)/(b)
+       (per `ADDONS.md`'s column); a state the addon has and does not pass is a finding, and so is
+       one passed for a state it does not have. Then grep the addon's code outside `libs/` for
+       `OnTooltipShow` and read its `onTooltipShow`: an assignment to the LDB object's own
+       `OnTooltipShow`, or host lines that draw a title, a version, a status line or a
+       `Left-click:` / `Right-click:` hint, is **anti-pattern #89**. Host lines that add nothing
+       while the addon is disabled are fine; anything that hides the whole tooltip while disabled
+       is #89.
    - **Check `/<slash> enable` and `/<slash> disable` exist and are aliases** (`slash-commands-§2`).
      Both **MUST** be entries in `NS.COMMANDS`, and both **MUST** write the Master-controls *Enable*
      row's stored path through the addon's single write seam. A handler setting a local, a module

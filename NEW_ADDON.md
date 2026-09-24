@@ -194,7 +194,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
      *Reset all settings* nor the page **Defaults** button may touch it (launcher-§3, anti-pattern #83).
      `skipRestoreAll` is where that goes (options-ui-§1); a global-only addon carves it out of the
      wholesale wipe instead. Give
-     the broker object **no** enable setting, deliberately. Then record the addon's rung in
+     the broker object **no** enable setting, deliberately. Let `LibKa0s-Launcher-1.0` (Launcher
+     minor 3, `LibKa0s v1.57.0`) draw the **status tooltip**, shown while disabled too: pass
+     `isLocked` / `isTestMode` for the states the addon has, `leftClickLabel` on rung (a)/(b) and
+     `version`, and keep any `onTooltipShow` to the addon's own lines, with no title, status line or
+     click hint (launcher-§1, anti-pattern #89). Then record the addon's rung in
      `standards/ADDONS.md`'s Launcher column in the same pass.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
      128×128, **uncompressed 32-bit**, from the 2000×2000 `.png` source:
