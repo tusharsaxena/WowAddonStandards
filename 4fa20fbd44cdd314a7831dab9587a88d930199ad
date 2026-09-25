@@ -1,0 +1,1 @@
+fixed: STD-24 ripple complete and consistent with OWNER_RULINGS (verbatim README text, no alias, no destination); one fix in DR-WS-06R (changelog named runDebug, which the context pack does not use); gate clean
