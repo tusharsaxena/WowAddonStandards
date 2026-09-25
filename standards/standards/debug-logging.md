@@ -333,7 +333,7 @@ its adoption is blocked rather than overdue.
 - **MUST** build the report on `LibKa0s-DebugLog-1.0`'s helper: the host supplies the descriptor's
   `brandName` and a `diagnostics` function returning its sections, and writes **sections only**. It
   **MUST NOT** hand-roll the line buffer, the per-section `pcall`, the markers, the cap or the `Add`
-  loop (anti-patterns #47). Those are the parts eleven copies would drift in, and the parts the
+  loop (anti-patterns #47 and #90). Those are the parts eleven copies would drift in, and the parts the
   library tests once.
 - The library writes around the host's sections: the markers, the library half of the identity
   header (build, locale, debug flag, combat state, running minors, and the host's `initSummary`),

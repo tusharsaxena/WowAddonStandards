@@ -621,15 +621,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          (`performance-§6`, anti-pattern #85). A resume or an enable that stands the addon up
          without re-evaluating the other hold is the same finding.
        - **The slash surface.** **Every** verb answers while disabled — `config` and the bare
-         `/<slash>` open the panel, the schema CLI reads and repairs, `debug` and `perf` run.
+         `/<slash>` open the panel, the schema CLI reads and repairs, `debug`, `perf` and
+         `diagnostics` run.
          v2.56.0 narrowed this to `enable` and `help`; **v2.57.0 reversed that**, so an audit
          that finds a full command surface on a disabled addon has found CONFORMANCE, not a
          finding. The only refusal is slash-commands-§2's feature-verb **SHOULD**, and an addon
          that declines a SHOULD owes no deviation row. **Do not confuse this with the
          stand-down**: the surface tells you nothing about whether the addon is inert, which is
          what the checks above measure. **The findings here are the other direction**: a disabled
-         addon that refuses `config`, the bare `/<slash>`, `version`, `debug`, `perf` or any schema-CLI
-         verb fails slash-commands-§2's MUST — the v2.56.0 shape, and exactly what LibKa0s
+         addon that refuses `config`, the bare `/<slash>`, `version`, `debug`, `diagnostics`, `perf`
+         or any schema-CLI verb fails slash-commands-§2's MUST — the v2.56.0 shape, and exactly what LibKa0s
          v1.40.0's Slash minor 12 shipped, so an addon still vendoring v1.40.0 fails it by
          construction. Where a feature verb is refused, it is refused on **one** line in
          *The refusal line*'s shape and reaches no write seam. Unregistering the chat command,
@@ -655,6 +656,35 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        refuse while disabled is slash-commands-§2's feature-verb **SHOULD**, not a finding either
        way. **Do not** file Multi Meters' `/mm lock on|off` against §8 — its master-lock
        semantics hold a ratified deviation row, and §8 does not reach it.
+   - **Check the diagnostics dump: two forms, no alias, live while disabled, built on the library**
+     (`debug-logging-§14`, `slash-commands-§2`; new in v2.68.0). Read the addon's `LibKa0s` tag
+     (root `CLAUDE.md`'s provenance line) first: on a tag older than **v1.60.0** (DebugLog minor 14
+     with `DebugLogDiagnostics.lua`, Slash minor 16) the helper does not exist, so a missing report
+     is a **blocked** re-vendor item, not an overdue one. On v1.60.0 or later, check each of these:
+     1. `grep -n '"diagnostics"' settings/*.lua core/*.lua` hits **exactly one** `COMMANDS` row, and
+        the `debug` handler tests `diagnostics` before its other words (`on`, `off`, the window
+        toggle, the usage fallback).
+     2. `grep -rniE '"(diag|dump|dx)"' settings core modules` is empty in `COMMANDS`, in the `debug`
+        word tables and in the Slash descriptor's `aliases`. A hit that is a **separate topic dump**
+        (debug-logging-§4's MAY), not another name for the report, is noted, not filed.
+     3. `diagnostics` answers while disabled: the host passes no `liveVerbs` (the Slash minor 16
+        default), or builds its `liveVerbs` on `SlashLib.LIVE_VERBS`. A hand-written list that omits
+        `diagnostics` is the finding. `tests/test_disabled.lua` dispatches **both** forms.
+     4. Both forms reach `NS.DebugLog:RunDiagnostics`, and no `:Clear()` is reachable from the
+        addon's sections module.
+     5. The DebugLog stub answers `RunDiagnostics` with the library-absent line (debug-logging-§7);
+        the degradation-stub check below covers the member's presence.
+     6. `README.md` carries `## Reporting a bug` between `## Troubleshooting` and
+        `## Issues and feature requests`, with the three steps and the closing note verbatim for
+        this addon's slash (documentation-§1).
+
+     **Grading.** A missing form, an alias, a gated sink, a `Clear()` before the report, a report
+     refused while disabled, or a missing README section is a **MUST** failure and
+     **anti-pattern #90**. A host-written line buffer, marker set or per-section `pcall` on a vendor
+     of v1.60.0 or later is **#47 and #90**. **Applicability:** the check runs in the addons only.
+     A Ka0s-owned library repo is audited against library-stack-§7's list, and a
+     documentation-and-tooling repo against documentation-§8's, which already exempts
+     debug-logging.
    - **Check the write paths against `architecture-§5` by grep, then classify every hit.** Grep the
      addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
      `db.profile`, `db.global`, `db.char` and the local aliases the files bind them to — and for
