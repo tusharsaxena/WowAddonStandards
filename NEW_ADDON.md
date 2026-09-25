@@ -9,7 +9,8 @@ This playbook is the entry point; the substance lives in `standards/`:
 - **[`standards/STANDARDS.md`](standards/STANDARDS.md)** — the canonical rules (the `§`-sections).
 - **[`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md)** — the full context pack:
   kickstart walkthrough, the modular starter tree, starter snippets (TOC, entry, `Compat`, `Locale`, `Database`,
-  `Settings`, debug console, tests, message bus, `.luacheckrc`, `.pkgmeta`), hard-rules cheat sheet,
+  `Settings`, debug console, the diagnostics sections, tests, message bus, `.luacheckrc`, `.pkgmeta`),
+  hard-rules cheat sheet,
   and the Definition-of-Done checklist. **It is scaffolding you read, never a file you ship** (see step 2).
 
 ## Steps
@@ -125,13 +126,22 @@ disagreeing with the collection's intent while looking, in review, like it had b
      the console's close/copy/clear draw the shared marks, the `isEnabled`/`setEnabled` pair over the
      addon's **own** flag, and the `[Init]` session summary. Publishes the gated sink `NS.Debug`.
      `addonName` and `name` are different fields: the second seeds frame globals, and passing it for
-     the first hands the library a path into nowhere.
+     the first hands the library a path into nowhere. The descriptor also carries the **diagnostics
+     dump** (debug-logging-§14, **MUST**): `brandName`, the full `Ka0s <Name>` brand for the report's
+     markers, and `diagnostics`, a function read at run time that returns the sections written in
+     **`modules/Diagnostics.lua`**, the one file of the report the addon owns. The stub's
+     `RunDiagnostics` prints the library-absent line and writes nothing. Needs LibKa0s **v1.60.0**
+     or later.
    - the **slash descriptor** in `settings/Slash.lua` — `LibKa0s-Slash-1.0` (slash-commands): the
      addon keeps its ordered `NS.COMMANDS` table and its host verbs and passes them in; the library
      supplies the dispatcher, help renderer, formatters and the type-aware value parser. The stub
      carries no library string but `DISABLED_LINE_FORMAT`, pinned with `Kit.assertLibraryConstant`,
      and a composed-row verb on a library-absent load writes through `writeThrough` or prints the
-     library-absent line (slash-commands-§1, options-ui-§1).
+     library-absent line (slash-commands-§1, options-ui-§1). `NS.COMMANDS` carries the
+     **`diagnostics`** row from day one, and the `debug` handler tests `diagnostics` **first**
+     (`NS.DebugLog:DebugVerb(rest)`, then the window toggle), so `/<slash> diagnostics` and
+     `/<slash> debug diagnostics` run the same report. No `diag`, `dump` or other alias
+     (slash-commands-§2, debug-logging-§14).
    - `settings/OptionsSetup.lua` — `LibKa0s-Options-1.0` (options-ui): the `get`/`set`/`applyDefault`
      seams, `rowsForPage`/`allRows`, the color codecs, and eager settings-category registration with a
      lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5). Loads before
@@ -249,13 +259,16 @@ disagreeing with the collection's intent while looking, in review, like it had b
    behavior **test-first** (testing). Test what is **yours** — the descriptors, the degradation stubs,
    and the addon's own logic — and do not re-test the library's internals: they are covered in the
    `LibKa0s` repo, and a second copy of those cases is the duplication this whole arrangement exists
-   to remove. `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate. Three suites are named by the rules that mandate them rather than by a module, and a new addon is born with all three under exactly those names: `tests/test_surface_parity.lua` (testing-§8), `tests/test_vendor_sync.lua`, which **delegates** to `tests/_kit/vendor_sync.lua` rather than reimplementing the comparison (testing-§11), and `tests/test_disabled.lua` (slash-commands-§7). **Declare every kit suite by its directory** — `{ name = "…", dir = "tests/_kit/" }` — never by bare basename. The inventory is keyed by the **pair** — name and directory — **from LibKa0s test-kit revision 25 (LibKa0s v1.55.0)**; through revision 24 it is keyed by the bare name alone, so a bare declaration beside a local file of the same name satisfies the gate while the **local** file is what loads: the kit's suite never runs and the repo's own record says the rule is covered. Writing the directory is correct under both, which is why it is the rule rather than the revision. A repo whose vendored kit predates revision 25 owes the **re-vendor**, never a hand-written stand-in — the kit is not edited or reimplemented in a consumer (testing-§9, testing-§11).
+   to remove. `lua tests/run.lua` green **and** `luacheck .` clean is the commit gate. Three suites are named by the rules that mandate them rather than by a module, and a new addon is born with all three under exactly those names: `tests/test_surface_parity.lua` (testing-§8), `tests/test_vendor_sync.lua`, which **delegates** to `tests/_kit/vendor_sync.lua` rather than reimplementing the comparison (testing-§11), and `tests/test_disabled.lua` (slash-commands-§7). The kit's `test_diagnostics_contract` suite runs the diagnostics dump's contract cases against this addon's dispatcher (debug-logging-§14). **Declare every kit suite by its directory** — `{ name = "…", dir = "tests/_kit/" }` — never by bare basename. The inventory is keyed by the **pair** — name and directory — **from LibKa0s test-kit revision 25 (LibKa0s v1.55.0)**; through revision 24 it is keyed by the bare name alone, so a bare declaration beside a local file of the same name satisfies the gate while the **local** file is what loads: the kit's suite never runs and the repo's own record says the rule is covered. Writing the directory is correct under both, which is why it is the rule rather than the revision. A repo whose vendored kit predates revision 25 owes the **re-vendor**, never a hand-written stand-in — the kit is not edited or reimplemented in a consumer (testing-§9, testing-§11).
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
    (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
    incl. the standard badge, which is **not** a link and MUST NOT be wrapped in one → description →
    Screenshots → Usage (prose, no tables) → How it works → FAQ →
-   Troubleshooting → Issues and feature requests → Version History → optional `## Credits`, last — there is
+   Troubleshooting → Reporting a bug → Issues and feature requests → Version History → optional `## Credits`, last — there is
    **no** `## Testing` section; verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
+   `## Reporting a bug` is **MUST**, and its three steps and closing line are documentation-§1 item 9's
+   text, copied verbatim with the addon's real slash in place of `/<slash>`. It names no destination
+   and carries no GitHub link.
    The README carries **no logo image** (the logo is the in-game landing page's, options-ui-§5;
    anti-pattern #79) and **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
    `## Libraries and credits` section and no library list in the intro prose; that fact lives in
@@ -274,7 +287,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
    omitting it, because the tier model's whole value is that the same question has the same filename
    in every repo, and a slot left for later is a slot the next agent fills with a name of its own.
    Then evaluate each **Tier 2** trigger against the code you just wrote and either ship the doc or
-   record it as a *Not applicable* row carrying the trigger. Finally write `ARCHITECTURE.md`'s
+   record it as a *Not applicable* row carrying the trigger. `docs/debug.md` is never *Not
+   applicable*: the diagnostics dump is a debug surface, so its trigger has fired in every addon, and
+   the page documents the report — both forms, append semantics, the section list, the caps and what
+   the report does not read or call (debug-logging-§14). Finally write `ARCHITECTURE.md`'s
    `## Documentation map` listing every `docs/` page in exactly one of its four tables — Required,
    Conditional, **Verification and record** and Addon-specific, in that order — with the frozen and
    generated stores named once each as directories rather than enumerated bundle by bundle. **Which

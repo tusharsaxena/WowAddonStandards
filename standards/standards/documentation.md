@@ -7,7 +7,7 @@ Documentation is a **first-class compliance surface**, not an afterthought. Ever
 **`CHANGELOG.md` is named explicitly, because the count alone left it arguable.**
 
 - **In an addon repo, a root `CHANGELOG.md` is FORBIDDEN.** The player-facing history already has a
-  home the standard mandates — `## Version History` in the README (documentation-§1, item 10) — and a second history is precisely the drift the never-a-fourth-doc
+  home the standard mandates — `## Version History` in the README (documentation-§1, item 11) — and a second history is precisely the drift the never-a-fourth-doc
   rule exists to prevent. `/wow-addon:bump-version` rolls those two README sections for an addon and
   writes no `CHANGELOG.md`.
 - **In a Ka0s-owned library repo, a root `CHANGELOG.md` is REQUIRED** (library-stack-§7's applicability
@@ -68,10 +68,23 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
    - **Write it like a person.** This section is read by players, not by an auditor, and it is the section where machine-shaped prose shows most: uniform paragraph lengths, `**Bold lead.**` sentence openers, see-saw pairs ("That is the manual version. The automatic version is…"), and the same contrast made three times in three sections. A README that reads as generated is a README nobody finishes.
 6. **`## How <it> works`** — **MUST**. A short, player-facing narrative — a numbered pipeline or prose — of how the addon produces what the user sees, titled for the domain (e.g. `## How picking & ranking works`, `## How the bar works`). Center it on the addon's core mechanic (ranking, attribution, scheduling, pick-selection, the value it tracks, …) and describe what happens, not the code behind it. Required even when the mechanic is simple — give the reader the one-paragraph "what's going on" rather than omit the section.
 7. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
-8. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table.
-9. **`## Issues and feature requests`** — **MUST**. A short paragraph pointing users to the addon's **GitHub issues** (`<repo>/issues`) as the **single source of truth for the backlog**, asking them to file there rather than in comments. (This is why a released addon ships no `TODO.md` — documentation-§4.)
-10. **`## Version History`** — **MUST**. A **Version | Date | Highlights** table, most-recent first, written for players — user-visible changes, not internal refactors. It is the addon's only player-facing history; the top row is the current release. **Every highlight in the Highlights cell MUST be prefixed `- `, and highlights are separated by `<br>`** — including in a row with only one highlight, so the column reads uniformly down the table. Markdown will not render a real `<ul>` inside a table cell, so the literal hyphen is the mechanism rather than a workaround for one; without it a release with six or eight highlights renders on GitHub as a single justified paragraph and a reader cannot see where one item ends and the next begins. Adding the prefixes is **punctuation only**: no highlight is reworded, reordered, merged or split, and a row already carrying `- ` is left alone rather than given a second one.
-11. **`## Credits`** — **MAY**, and **only** for genuinely **external** credit: third-party artwork, a font, a sound pack, another author's work the addon builds on or ships. It is the **last** section, after `## Version History`, because it is an acknowledgment rather than something a player came here to read. It **MUST NOT** carry a vendored-library list of any kind — see the rule immediately below. An addon with nothing external to credit ships no `## Credits` section at all; an empty or library-only one is a deviation, not a courtesy.
+8. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table. It **SHOULD** carry the row `| Something looks wrong and I want to report it | Follow [Reporting a bug](#reporting-a-bug) below. |`, and a row that told players to paste logs some other way points at that section instead.
+9. **`## Reporting a bug`** — **MUST**, in every addon, because every addon ships the diagnostics dump (debug-logging-§14). Its body is **exactly** the following, with the addon's real slash command written in place of `/<slash>` (the README carries no angle-bracket placeholder, per the rule above):
+
+   ```markdown
+   ## Reporting a bug
+
+   1. Type `/<slash> debug on` and reproduce the bug.
+   2. Type `/<slash> diagnostics`.
+   3. If the debug window isn't open, open it with `/<slash> debug`. Press **Copy**, copy the entire output, and include it with your bug report.
+
+   The report is added after the debug trace in the same window, so one copy carries both.
+   ```
+
+   The section names **no destination** and carries **no** GitHub or issues link: a player sends the report to the maintainer privately, so it never lands in a public issue (debug-logging-§14 redacts nothing). Nothing else is added to the section, and nothing is reworded apart from the slash, so a player who has reported a bug in one Ka0s addon knows the steps in all of them. The section and the Troubleshooting row still go through the de-AI pass below, like any README edit; the pass does not reword the fixed text.
+10. **`## Issues and feature requests`** — **MUST**. A short paragraph pointing users to the addon's **GitHub issues** (`<repo>/issues`) as the **single source of truth for the backlog**, asking them to file there rather than in comments. (This is why a released addon ships no `TODO.md` — documentation-§4.)
+11. **`## Version History`** — **MUST**. A **Version | Date | Highlights** table, most-recent first, written for players — user-visible changes, not internal refactors. It is the addon's only player-facing history; the top row is the current release. **Every highlight in the Highlights cell MUST be prefixed `- `, and highlights are separated by `<br>`** — including in a row with only one highlight, so the column reads uniformly down the table. Markdown will not render a real `<ul>` inside a table cell, so the literal hyphen is the mechanism rather than a workaround for one; without it a release with six or eight highlights renders on GitHub as a single justified paragraph and a reader cannot see where one item ends and the next begins. Adding the prefixes is **punctuation only**: no highlight is reworded, reordered, merged or split, and a row already carrying `- ` is left alone rather than given a second one.
+12. **`## Credits`** — **MAY**, and **only** for genuinely **external** credit: third-party artwork, a font, a sound pack, another author's work the addon builds on or ships. It is the **last** section, after `## Version History`, because it is an acknowledgment rather than something a player came here to read. It **MUST NOT** carry a vendored-library list of any kind — see the rule immediately below. An addon with nothing external to credit ships no `## Credits` section at all; an empty or library-only one is a deviation, not a courtesy.
 
 **The README MUST NOT carry a logo image.** No `![…](media/logos/…)` line, no `<img>`, no banner or
 artwork above or below the title: the page opens on the H1, the badge row and the description. The
@@ -89,11 +102,11 @@ v2.45.0; `wow-addon:standards-audit` now flags one (anti-pattern #79).
 
 Which libraries a build vendors is a **contributor** fact, and it already has two homes that are read by the people it is for: `DEPENDENCIES.md` (documentation-§7) names every dependency with the evidence for it, and `docs/ARCHITECTURE.md` (documentation-§3) says what the addon does with each one. The **LibKa0s provenance line** — `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).` — moves to root `CLAUDE.md` (documentation-§2), where the vendored-payload gate now reads it. A player has no decision to make with any of this: the libraries ship inside the addon, there is nothing to install, and nothing to choose. A third copy of the inventory on the player-facing page is one more place to go stale, and the one place no gate has ever looked.
 
-What survives the removal is external credit and nothing else. If the deleted section carried a third-party artist, a font or a sound pack, keep those lines as a plain `## Credits` (item 11) holding **only** them. If nothing external remains, delete the section outright — along with any link, table-of-contents row or cross-reference elsewhere in the README that pointed at it, since a live link to a deleted heading is the same failure one step removed.
+What survives the removal is external credit and nothing else. If the deleted section carried a third-party artist, a font or a sound pack, keep those lines as a plain `## Credits` (item 12) holding **only** them. If nothing external remains, delete the section outright — along with any link, table-of-contents row or cross-reference elsewhere in the README that pointed at it, since a live link to a deleted heading is the same failure one step removed.
 
 There is **no** `## Testing` section in the README (removed in the standard's v2.1.0 — it was contributor-facing). How to verify the addon — the headless harness (`lua tests/run.lua`), lint (`luacheck .`), the generated case inventory (`docs/test-cases.md`, testing-§5), and the in-game smoke tests (`docs/smoke-tests.md`) — lives entirely under `docs/` (testing, audit-review-history). The README still carries the `[tests]` X/Y badge in its badge row (item 2); the badge is the only test-related thing that belongs in the README.
 
-- The optional sections (4, 7, 8) are **SHOULD** — omit one only when it would be empty — and `## Credits` (11) is **MAY**, omitted entirely when there is nothing external to credit. When present, their **relative order MUST** be preserved.
+- The optional sections (4, 7, 8) are **SHOULD** — omit one only when it would be empty — and `## Credits` (12) is **MAY**, omitted entirely when there is nothing external to credit. When present, their **relative order MUST** be preserved.
 - `wow-addon:sync-docs` keeps the README's slash-command and version-history tables in lockstep with code; `wow-addon:standards-audit` flags a README that departs from this canonical structure.
 - The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `bump-version`).
 
@@ -253,7 +266,7 @@ rather than inventing one.
 | `docs/compat-layer.md` | a **present** `core/Compat.lua` publishes **three or more** addon-specific shims beyond what `LibKa0s` supplies; an addon compat's applicability condition exempts ships no `core/Compat.lua` and the trigger has not fired |
 | `docs/message-bus.md` | the addon defines **more than ten** distinct messages |
 | `docs/profiles.md` | AceDB profiles are **user-visible** (a profile control ships in the options UI) |
-| `docs/debug.md` | the addon ships debug surfaces **beyond** the `LibKa0s` default console |
+| `docs/debug.md` | the addon ships debug surfaces **beyond** the `LibKa0s` default console. The diagnostics dump (debug-logging-§14) **is** such a surface, and every addon ships it, so this trigger has fired in **every** addon: `docs/debug.md` is never *Not applicable*, and it documents the report as debug-logging-§14 requires |
 
 **The `compat-layer.md` trigger counts, and this is what it counts.** A shim is one entry point
 published on the addon's own `Compat` table — the wrapper a feature module calls in place of a
