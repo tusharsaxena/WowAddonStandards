@@ -6,7 +6,7 @@ Every addon **MUST** ship a debug seam, and debug output **MUST** route to a **d
 
 The console itself is **not addon code**. It is a **Ka0s-owned shared library**, `LibKa0s-DebugLog-1.0`, that every addon in the collection vendors and instantiates. Seven hand-written consoles is what this section used to describe, and seven copies of a window, two formatters, a ring buffer and a scroll sync drifted in seven directions — the color codes agreed, the scrollbar behavior did not. What each addon still owns is the part only it can know: where its debug flag lives, what its session summary says, and which of its flows are worth tracing.
 
-**Adoption strength.** **MUST** for the **wiring** — vendor the lib, create one instance at load from a descriptor, stash it on the namespace, bind the gated sink, degrade to a stub. **SHOULD** for **coverage** — §8–§10 govern *what* gets logged, and which flows matter is genuinely addon-specific. MUST on the wiring is what makes *"turn on `/<slash> debug on`, reproduce it, hit Copy, paste it to me"* true of **any** Ka0s addon, in the same format, with the same line numbers on the same scrollbar.
+**Adoption strength.** **MUST** for the **wiring** — vendor the lib, create one instance at load from a descriptor, stash it on the namespace, bind the gated sink, degrade to a stub. **SHOULD** for **coverage** — §8–§10 govern *what* gets logged, and which flows matter is genuinely addon-specific. MUST on the wiring is what makes *"turn on `/<slash> debug on`, reproduce it, run `/<slash> diagnostics`, hit Copy, paste it to me"* true of **any** Ka0s addon, in the same format, with the same line numbers on the same scrollbar. The diagnostics step is **MUST** in full, wiring and content contract alike (§14): the report is what makes the pasted trace readable without a round of follow-up questions.
 
 ### 1. The console library
 
@@ -55,8 +55,8 @@ NS.Debug("Loot", "%s x%d", name, qty)     -- NS.Debug = NS.DebugLog.Debug, bound
 - The **tag is the first argument** so every call site self-documents its category.
 - **MUST NOT** build the message before the call. `NS.Debug("Loot", "%s x%d", name, qty)` defers the formatting behind the gate; `NS.Debug("Loot", ("%s x%d"):format(name, qty))` pays for it on every pass forever, gate or no gate.
 - Every logged value is **secret-safe** (events-frames-taint-§8): the library routes each vararg through the descriptor's `safeToString` — `LibKa0s-Core-1.0`'s `SafeToString` by default, which probes `table.concat` rather than `..`, because a `..` probe wrongly passes secrets through. This is why the sink is the library's and not a local `string.format` at the call site: an unguarded combat-protected absorb/health total raises the instant it is logged, and a sink on a repeating ticker then freezes the feature until `/reload`.
-- The instance also exposes an **ungated raw append**, `NS.DebugLog:Add(tag, msg)`. It exists for the lines that **must** land regardless of the flag (§5's disable bracket) and for an explicit user-initiated diagnostic run (§12). Ordinary tracing **MUST NOT** use it — an ungated trace on a hot path is a cost paid forever.
-- **MAY** support structured dump verbs (`/<slash> debug <topic>`) for large addons.
+- The instance also exposes an **ungated raw append**, `NS.DebugLog:Add(tag, msg)`. It exists for the lines that **must** land regardless of the flag (§5's disable bracket) and for an explicit user-initiated diagnostic run (§12, §14). Ordinary tracing **MUST NOT** use it — an ungated trace on a hot path is a cost paid forever.
+- **MUST** ship the diagnostics dump (§14). **MAY** support further structured dump verbs (`/<slash> debug <topic>`) for large addons; `diagnostics` is the one topic that is reserved and mandatory.
 
 ### 5. Enabled-state — the addon's flag, the library's seam
 
@@ -64,7 +64,7 @@ NS.Debug("Loot", "%s x%d", name, qty)     -- NS.Debug = NS.DebugLog.Debug, bound
 
 - **MUST** be **session-only**: default **off**, held in `NS.State.debug` (**never** in SavedVariables), and **reset to off on every `/reload` and fresh login**. *(A persisted debug flag too easily gets left on; persisting it is the documented deviation, not the default.)*
 - Logging and the window are **independent** — capture runs even when the console is closed, so a bug can be reproduced first and the log opened after.
-- Slash (slash-commands): `/<slash> debug` **toggles the window only** (`NS.DebugLog:Toggle()`, state untouched); `/<slash> debug on` and `/<slash> debug off` route to `NS.DebugLog:SetEnabled(true|false)`. The verb dispatches through the addon's own ordered `NS.COMMANDS` table like every other verb (slash-commands-§3); the library registers **no** slash command of its own.
+- Slash (slash-commands): `/<slash> debug` **toggles the window only** (`NS.DebugLog:Toggle()`, state untouched); `/<slash> debug on` and `/<slash> debug off` route to `NS.DebugLog:SetEnabled(true|false)`; `/<slash> debug diagnostics` runs the diagnostics dump (`NS.DebugLog:RunDiagnostics()`, §14), and the handler tests that word **first**, before `on` / `off` and before the toggle or usage fallback. The verb dispatches through the addon's own ordered `NS.COMMANDS` table like every other verb (slash-commands-§3); the library registers **no** slash command of its own.
 - **MUST** route **every** state change through that one `SetEnabled` seam — the slash verb, the title-bar toggle, and anything else — so no two paths can diverge. The seam's single write path is: write the host's flag → refresh the header label → print the chat ack → append the console bracket line → on enable, append the `[Init]` summary.
 - The **chat ack** is color-coded by the library — **`ON` green (`40ff40`)**, **`OFF` red (`ff4040`)** — e.g. `[XY] debug logging |cff40ff40ON|r`. The addon supplies the `NS.PREFIX`-tagged printer via the descriptor's `print` (slash-commands-§4, events-frames-taint-§8); the coloring of the state word is not the addon's to restyle. The colors mirror the title-bar toggle so the flag reads identically in chat and on the console header.
 - A **console line** lands at **both** transitions — `[Debug] logging enabled` / `[Debug] logging disabled`. The disable line is written through the raw append (§4), **not** the gated sink, because the flag has already flipped off by then and the sink would swallow it.
@@ -83,7 +83,7 @@ The Clear and Copy controls are the library's; this is the behavior they guarant
 
 A missing vendored library **MUST NOT** error at load, and **MUST NOT** silently break the addon's own function.
 
-- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, the raw `buffer`, and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
+- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, `RunDiagnostics` (which answers with the library-absent line, §14), the raw `buffer`, and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
 - The stub **MUST** still flip the flag and still print the ack. `NS.State.debug` is the addon's, not the library's, and a user who types `/<slash> debug on` must not be told nothing happened. What is lost is the **window**, and the stub **SHOULD** say so once, honestly, through the addon's printer — once, not per call.
 - The stub **MUST NOT** re-implement the formatters or the line format (§3).
 - **Utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
@@ -230,3 +230,138 @@ by design — so it is the surface where a lone addon still drawing words is mos
 - Requires **DebugLog minor 10** (LibKa0s v1.10.1). Minor 9 accepted `addonName` but its own close
   forwarder dropped the third argument on the way to `Core.MakeCloseButton`, so the console came out
   with two icons and a multiplication sign — see anti-patterns #64 for the class.
+
+### 14. The diagnostics dump (MUST)
+
+A trace says what the addon did. It rarely says what the addon was working with: which build, which
+profile, which settings differ from their defaults, whether the addon was stood down, whether the
+player was in combat. Those are the first questions a maintainer asks after reading a pasted log,
+and a player answering them from memory, a turn at a time, is how a bug report stalls. The
+diagnostics dump answers them in the same window as the trace, so one Copy carries both.
+
+Before this section the collection had three such reports under three spellings (`diagnostics`,
+`debug diag`, `debug dump`) and most addons had none. This section makes the report a **MUST** for
+**every** Ka0s addon, small ones included, and fixes one spelling.
+
+**Requires `LibKa0s v1.60.0`**: `LibKa0s-DebugLog-1.0` minor 14 with its secondary file
+`DebugLogDiagnostics.lua`, and `LibKa0s-Slash-1.0` minor 16. Until an addon has vendored that tag,
+its adoption is blocked rather than overdue.
+
+**The two forms, and no third.**
+
+- **MUST** run the report from **exactly two forms**: `/<slash> diagnostics`, a row of the addon's
+  `NS.COMMANDS` (slash-commands-§3), and `/<slash> debug diagnostics`, a word of the `debug` verb
+  (§5). The addon's long slash alias (for example `/auramaster` beside `/am`) reaches both, as it
+  reaches every verb.
+- The `debug` handler **MUST** test `diagnostics` **first**, before `on` / `off` and before its
+  window toggle or usage fallback. Matching is case-insensitive.
+- **MUST NOT** run the report from any other verb or word: no `diag`, `dump`, `dx` or any other
+  alias, whether as a `COMMANDS` row, a `debug` word, or an `aliases` entry in the Slash descriptor.
+  A retired name (`diag`, `dump`) becomes an **ordinary unknown word**, handled however that addon
+  already handles unknown `debug` words (toggle, or usage), with no hint line and no special case.
+  A word the dispatcher still recognizes is one edit away from being an alias again.
+- Separate topic dumps (`/<slash> debug events`, `/<slash> debug scan` and the like) stay **MAY**
+  (§4). They are other topics, not other names for this report, and their content **MAY** be folded
+  into the report as sections.
+
+**What the report may touch.**
+
+- **MUST** work while the addon is **disabled or stood down** (slash-commands-§7). `diagnostics` is a
+  reserved verb on the live list (slash-commands-§2), so the top-level form answers while disabled
+  as well as the `debug` form. The report **reads state only**: it **MUST NOT** take or release a
+  Lifecycle hold, register an event, arm a timer, or stand anything up. While stood down it still
+  runs **every** section; a section whose runtime state has been released prints that it is stood
+  down rather than printing empty data, and stored configuration prints as normal.
+- **MUST** write through the **ungated** sink, `NS.DebugLog:RunDiagnostics()`, which appends through
+  the library's raw `Add` path (§4). The report **MUST NOT** read or change the debug flag (§5): it
+  lands in full with logging off, and the flag reads the same afterwards. This is §12's rule for an
+  explicit user-initiated run, applied to the report.
+- **MUST** append and **MUST NOT** clear. Nothing reachable from the report calls `Clear()` (§6).
+  The trace the player has just reproduced stays above the report, which is the point of running it
+  second.
+- **MUST** be **secret-value safe** (events-frames-taint-§8). Every value is stringified through
+  `SafeToString` before any format sees it; formats are `%s`-only over pre-stringified arguments;
+  every number is tested readable before any arithmetic or comparison; no API known to raise on a
+  secret is called while values are secret; and every section runs under its own `pcall`, so a raise
+  costs exactly one line, `section <name> failed: <err>`, and the rest of the report still lands.
+- The report is read-only and calls no protected API, so it is **safe in combat**. A section that
+  cannot read its data in combat says so (`unreadable in combat`) instead of guessing.
+
+**What the report writes.**
+
+- **Markers.** The first line is `[Diag] ==== <BrandName> diagnostics begin ====`. The last line is
+  `[Diag] ==== <BrandName> diagnostics end: N line(s) ====`, where `N` counts every report line,
+  both markers included. `<BrandName>` is the addon's full brand (`Ka0s Aura Master`, not `AM`), so
+  a paste holding reports from several addons can be split, and the end marker proves which report
+  finished.
+- **Content, in this order:**
+  1. the begin marker;
+  2. the **identity header**: brand and version; schema version, stored and code; the active profile
+     (or `account-wide` for an addon with global settings only); the client build from
+     `GetBuildInfo()` (version, build, interface); the locale; the **running** LibKa0s minors, read
+     from `LibKa0s-Core-1.0`'s `MODULES` table and labeled *running*, because under LibStub the
+     running copy may come from another addon's vendor (the library has no runtime release string,
+     so none is printed); and the state flags — stored-enabled, stood-down, Lifecycle holds, the
+     debug flag, test mode where the addon has one, `InCombatLockdown()` and
+     `UnitAffectingCombat("player")`;
+  3. **settings that differ from their defaults**, each as `path = value (default)`, walked over the
+     addon's schema, plus the rows the addon names as always printed;
+  4. **domain state**: the addon's own sections, which only it can write;
+  5. rejected events and any error record the addon keeps;
+  6. the `truncated` line, when a cap bit;
+  7. the end marker.
+- **Nothing is redacted.** Players send the report to the maintainer privately, so it prints whatever
+  a maintainer needs to reproduce the bug.
+- **Plain text.** Color, texture, atlas and hyperlink escapes are stripped, so the Copy text is clean
+  (§6). A value whose escapes **are** the evidence, such as a chat format string, is written with
+  every `|` doubled to `||`, which pastes back into `/<slash> set` unchanged.
+- **English body.** Report lines are English diagnostic text and do not go through `NS.L`, like trace
+  lines (§3). The one chat line below is localized.
+- **Reveal, then one chat line.** If the console is hidden, the report shows it. It then prints
+  **one** localized, tagged chat line through the addon's printer, giving the line count and naming
+  **Copy**. The README's bug-reporting steps (documentation-§1) still tell a player how to open the
+  console, for the player who closed it afterwards.
+- **Capped below the buffer.** The report's total stays at or under `lib.DIAG_MAX_LINES`, which the
+  library owns and clamps to `lib.MAX_BUFFER - 100`, so the report never evicts itself. Unbounded
+  lists carry a per-list cap (40 ids by default; a host **MAY** set its own per list). A capped
+  report still ends with the end marker, preceded by
+  `truncated: N line(s) omitted, per-list caps hit=yes|no`. The report is guaranteed whole in the
+  console; the trace ahead of it is best effort.
+
+**Built on the library.**
+
+- **MUST** build the report on `LibKa0s-DebugLog-1.0`'s helper: the host supplies the descriptor's
+  `brandName` and a `diagnostics` function returning its sections, and writes **sections only**. It
+  **MUST NOT** hand-roll the line buffer, the per-section `pcall`, the markers, the cap or the `Add`
+  loop (anti-patterns #47). Those are the parts eleven copies would drift in, and the parts the
+  library tests once.
+- The library writes around the host's sections: the markers, the library half of the identity
+  header (build, locale, debug flag, combat state, running minors, and the host's `initSummary`),
+  each section under its own `pcall`, the cap and the `truncated` line. The host's own identity
+  section adds schema, profile, Lifecycle holds, stored-enabled, stood-down and test mode.
+- `NS.DebugLog:DebugVerb(rest)` routes `diagnostics`, `on` and `off` and returns `false` for any
+  other word, so a host keeps its own fallback and topic words. A host **MAY** use it; the standard
+  requires the behavior, not the call.
+- **Library absent.** The stub's `RunDiagnostics` (§7) prints the collection's library-absent line,
+  `L["%s is unavailable: the LibKa0s library did not load."]` with `%s = "/<slash> diagnostics"`,
+  writes nothing and returns `0`. A report of hundreds of lines printed to chat instead would be
+  worse than none.
+
+**Tested.**
+
+- Every addon's suite **MUST** assert: both markers present; console lines that existed before the
+  run survive it (append); with the debug flag off the lines land and the flag is unchanged; the
+  report runs while disabled through **both** forms; a raising section costs exactly one line; an
+  over-cap report ends with the `truncated` line and then the end marker; a secret mock does not
+  raise; and `debug diag` (with the addon's own retired names) does not run the report.
+- These contract cases come from the test kit's shared `test_diagnostics_contract.lua`, run against
+  the addon's own dispatcher; the addon's suite adds its domain cases. The append, ungated and
+  while-disabled steps carry testing-§12 falsification comments, because each is a property a
+  careless fake would satisfy by accident.
+
+**Documented.**
+
+- The addon's `docs/debug.md` (documentation-§3) **MUST** document the report: both forms, append
+  semantics, the section list, the caps, and what the report deliberately does not read or call
+  (secret values, protected APIs). Each addon's sections differ, and a maintainer reading a pasted
+  report needs that page to read it.
