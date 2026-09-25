@@ -14,25 +14,28 @@ this repo — each addon audits **itself**, in its own repo, via `/wow-addon:sta
 Each addon lives in its own repository, as a **sibling folder** next to this repo under
 `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. Paths below are relative to this file (`standards/`).
 
-| Addon | Folder | Repository | Launcher left-click (launcher-§2) |
+| Addon | Folder | Repository | Launcher menu entries (launcher-§2) |
 |---|---|---|---|
-| Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker | **(b)** lock / unlock — unlocking is the preview |
-| Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster | **(b)** test mode |
-| Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger | **(a)** the ledger browser |
-| Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/ConsumableMaster | **(b)** lock / unlock — the macro bar's lock |
-| Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/KickCD | **(b)** lock / unlock — unlocking is the preview |
-| Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory | **(a)** the browser |
-| Ka0s Multi Meters | [`../../MultiMeters/`](../../MultiMeters/) | https://github.com/tusharsaxena/MultiMeters | **(a)** its windows |
-| Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster | **(b)** lock / unlock — unlocking is the preview |
-| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced | **(b)** lock / unlock — unlocking is the preview |
-| Ka0s Pretty Chat | [`../../PrettyChat/`](../../PrettyChat/) | https://github.com/tusharsaxena/PrettyChat | **(c)** the settings panel |
-| Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup | **(a)** the group popup |
+| Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked |
+| Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode |
+| Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Show window (the ledger browser) |
+| Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) |
+| Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/KickCD | Enabled · Locked |
+| Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) |
+| Ka0s Multi Meters | [`../../MultiMeters/`](../../MultiMeters/) | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) |
+| Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked |
+| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked |
+| Ka0s Pretty Chat | [`../../PrettyChat/`](../../PrettyChat/) | https://github.com/tusharsaxena/PrettyChat | Enabled |
+| Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) |
 
 **The launcher column is normative input to an audit, not decoration.** Every addon ships one minimap button and one
-broker plugin, from one LibDataBroker-1.1 object (launcher). **Right-click opens the settings panel in every row above.**
-Left-click follows launcher-§2's three rungs, first match wins — **(a)** a primary window, **(b)** else a preview switch,
-**(c)** else the settings panel — and the column records which rung this addon sits on so an audit can check it rather
-than re-derive it from the addon's shape. A new addon picks its rung by the rule and fills the column in with its row.
+broker plugin, from one LibDataBroker-1.1 object (launcher). **Left-click opens the settings panel and right-click opens
+the options menu in every row above** (launcher-§2). The column lists that menu's entries, which are the toggles the addon
+has, in the menu's fixed order — **Enabled** always, then **Locked** where it has a lock, **Test mode** where it has a
+test mode, and **Show window** where it has a primary window, a parenthesis naming the window or what the lock holds — read from each addon's
+`core/LauncherSetup.lua` and Master-controls rows, so an audit checks the descriptor against it rather than re-deriving
+it from the addon's shape. A new addon lists its entries with its row. The column replaced v2.66.0's left-click rung
+column when v2.67.0 retired the rungs.
 
 ## Ka0s-owned library repos
 
@@ -64,7 +67,7 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
 
 ## Adding an addon
 
-1. Add one row above (display name, folder, repository URL, launcher left-click rung). Keep the table alphabetical by folder.
+1. Add one row above (display name, folder, repository URL, launcher menu entries). Keep the table alphabetical by folder.
 2. That's it for scope. The addon is now covered by **the next standards refresh** — its current
    habits become an input to [`STANDARDS.md`](STANDARDS.md) (see [`README.md`](README.md)).
 3. New addons should be scaffolded from the standard so they are born compliant — see
