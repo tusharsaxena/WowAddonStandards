@@ -1,0 +1,1 @@
+clean: 3000/128 and the 378/246 ms measurement land in debug-logging §1/§9/§11, library-stack §7, NEW_ADDON_CONTEXT (3 sites, file-cap 1500 untouched) and the v2.68.0 entry in place; #41 de-numbered; docs gate rc=0
