@@ -1,29 +1,31 @@
 # WoW Addon Standards — Ka0s Collection
 
-This repo holds the house standard for the Ka0s World of Warcraft addon collection, plus the four
-**process playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md`,
-`NEW_ADDON.md` and `PERF_ANALYSIS.md`:
+This repo holds the house standard for the Ka0s World of Warcraft addon collection. It also holds the
+four process playbooks that the `wow-addon` plugin consumes: `AUDIT.md`, `AUTOMATED_TESTS.md`,
+`NEW_ADDON.md` and `PERF_ANALYSIS.md`. So it has two jobs.
 
-1. **Define the standard.** A detailed house standard — built from industry research and the
-   collection's own best patterns — covering not just technical design but **UX and user-behavior
-   patterns**: slash-command handling, settings-panel look and feel, debug-mode conventions,
-   standalone windows, packaging, localization, and more. → [`standards/`](standards/)
-2. **Ship the process playbooks.** Four thin orchestrator specs the plugin fetches and runs **inside
-   each addon's own repo**: → [`AUDIT.md`](AUDIT.md) (`/wow-addon:standards-audit`),
+1. Define the standard. The house standard draws on industry research and on the best patterns
+   already in the collection. It covers technical design, and it also covers UX and user-behavior
+   patterns: slash-command handling, how the settings panel looks and feels, debug-mode conventions,
+   standalone windows, packaging, localization and more. → [`standards/`](standards/)
+2. Ship the process playbooks. There are four, each a thin orchestrator spec that the plugin fetches
+   and runs **inside each addon's own repo**: → [`AUDIT.md`](AUDIT.md) (`/wow-addon:standards-audit`),
    [`NEW_ADDON.md`](NEW_ADDON.md) (`/wow-addon:new-addon`),
    [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`) and
    [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) (`/wow-addon:perf-analysis`).
 
-The standard is the source of truth and evolves in place. **Auditing no longer happens here** — each
-addon audits *itself*, in its own repo, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle there. Which
-addons make up the collection is defined in one editable place: [`standards/ADDONS.md`](standards/ADDONS.md).
+The standard is the source of truth, and it evolves in place. Auditing doesn't happen here any more.
+Each addon audits itself, in its own repo, and writes a dated `docs/audits/<YYYY-MM-DD>/` bundle
+there. The list of addons that make up the collection lives in one editable place:
+[`standards/ADDONS.md`](standards/ADDONS.md).
 
-This repository is a **research and analysis deliverable** — it contains documents only. No addon
-source code lives here, and this work never modifies the addons themselves.
+This repository is a research and analysis deliverable, and it contains only documents. No addon
+source code lives here. Nothing done here modifies the addons themselves.
 
-> The plugin that invokes these playbooks lives in a **separate repo**,
-> <https://github.com/tusharsaxena/wow-addon>, and is updated there to consume `AUDIT.md` /
-> `AUTOMATED_TESTS.md` / `NEW_ADDON.md` / `PERF_ANALYSIS.md` and the `standards/` docs from here.
+> The plugin that invokes these playbooks lives in a separate repo,
+> <https://github.com/tusharsaxena/wow-addon>. That repo, not this one, is where the plugin gets
+> updated to consume `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` and the
+> `standards/` docs from here.
 
 ## What you can do here
 
@@ -38,77 +40,85 @@ source code lives here, and this work never modifies the addons themselves.
 
 ## Scope
 
-The repos the standard codifies rules for are listed in
-**[`standards/ADDONS.md`](standards/ADDONS.md)** — the single, editable roster, in three tables, one
-per repo kind: addons, Ka0s-owned library repos and documentation-and-tooling repos. Edit
-that one file to change collection scope.
+[`standards/ADDONS.md`](standards/ADDONS.md) lists the repos the standard codifies rules for. It is
+the single editable roster, split into three tables by repo kind: addons, Ka0s-owned library repos,
+and documentation-and-tooling repos. To change the collection's scope, edit that one file.
 
-- **In scope:** see [`standards/ADDONS.md`](standards/ADDONS.md) — currently 11 Ka0s addons: Absorb
-  Tracker, Aura Master, Bank Ledger, Consumable Master, KickCD, Loot History, Multi Meters, Panel
-  Master, Party Frame Enhanced, Pretty Chat, WhatGroup.
-- **Plus the Ka0s-owned library repos** those addons vendor — currently 1: LibKa0s. A library repo is
-  in scope for the standards process and is audited, but against **library-stack-§7's applicability
-  list** rather than the addon rule set: no TOC, no player-facing README, no settings panel, no
-  install, so the addon-shaped sections do not bind it.
-- **Reference addons studied for the standard (10):** DBM, BigWigs, Auctionator, Plater, Plumber,
-  Details!, WeakAuras, ElvUI, Bagnon, OmniCD — see
+- In scope are the addons in [`standards/ADDONS.md`](standards/ADDONS.md), currently 11 Ka0s
+  addons: Absorb Tracker, Aura Master, Bank Ledger, Consumable Master, KickCD, Loot History,
+  Multi Meters, Panel Master, Party Frame Enhanced, Pretty Chat, WhatGroup.
+- The Ka0s-owned library repos those addons vendor are in scope too. There is currently 1, LibKa0s.
+  A library repo is in scope for the standards process and gets audited, but against library-stack-§7's
+  applicability list rather than the addon rule set. It has no TOC, no player-facing README, no
+  settings panel and no install, so the addon-shaped sections don't bind it.
+- The standard draws on a study of 10 reference addons: DBM, BigWigs, Auctionator, Plater, Plumber,
+  Details!, WeakAuras, ElvUI, Bagnon, OmniCD. The research is in
   [`standards/INDUSTRY_RESEARCH.md`](standards/INDUSTRY_RESEARCH.md).
 
 ## Start here
 
-New to this? Read [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md) — the
+New to this? Read [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md) first. It is a
 one-page TL;DR of the standard. The canonical output is
-[`standards/STANDARDS.md`](standards/STANDARDS.md) — **the standard**.
+[`standards/STANDARDS.md`](standards/STANDARDS.md), which is the standard itself.
 
 ---
 
 ## A. Refresh the standard
 
-Revise the living house rules. Full, authoritative steps: [`standards/README.md`](standards/README.md).
-At a glance:
+This is how the living house rules get revised. The full, authoritative steps are in
+[`standards/README.md`](standards/README.md). In outline:
 
-1. **Refresh the research.** Re-survey the reference addons (add/remove as needed) and update
-   [`standards/INDUSTRY_RESEARCH.md`](standards/INDUSTRY_RESEARCH.md) + its
+1. Refresh the research. Re-survey the reference addons, adding or dropping some as needed, then
+   update [`standards/INDUSTRY_RESEARCH.md`](standards/INDUSTRY_RESEARCH.md) and its
    `standards/_raw/_industry/` reports.
-2. **Read the collection's current state.** For the in-scope addons in
-   [`standards/ADDONS.md`](standards/ADDONS.md), pull each addon's own most-recent
-   `docs/audits/<date>/01_CURRENT_STATE.md` (in its repo) for what it does today.
-3. **Synthesize into the rules.** Fold both inputs into
-   [`standards/STANDARDS.md`](standards/STANDARDS.md) as MUST/SHOULD/MAY rules, each with a
-   rationale and a reference implementation. Preserve each section's local numbering and the
-   `filename-§N` cross-reference scheme.
-4. **Bump the changelog.** Update the version + date at the top of `STANDARDS.md`.
-5. **Ripple the change.** Sync [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md)
-   and [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md).
+2. Read the collection's current state. For each in-scope addon in
+   [`standards/ADDONS.md`](standards/ADDONS.md), pull that addon's most recent
+   `docs/audits/<date>/01_CURRENT_STATE.md` from its own repo. It tells you what the addon does today.
+3. Fold both inputs into [`standards/STANDARDS.md`](standards/STANDARDS.md) as MUST/SHOULD/MAY
+   rules. Each rule gets a rationale and a reference implementation. Keep each section's local
+   numbering and the `filename-§N` cross-reference scheme intact.
+4. Bump the changelog: update the version and date at the top of `STANDARDS.md`.
+5. Ripple the change into [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md) and
+   [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) so they stay in sync.
 
 ## B. Audit an addon
 
-Measure one addon against the current standard — run **in that addon's own repo**. Full,
-authoritative steps: [`AUDIT.md`](AUDIT.md). At a glance:
+An audit measures one addon against the current standard. You run it **in that addon's own repo**,
+and [`AUDIT.md`](AUDIT.md) has the full, authoritative steps. Roughly:
 
 1. Run `/wow-addon:standards-audit` in the addon's repo.
-2. It resolves the current [`standards/STANDARDS.md`](standards/STANDARDS.md), snapshots the
-   addon, and writes a **frozen** dated bundle to that repo's `docs/audits/<today>/`:
-   `01_CURRENT_STATE`, `02_DEVIATIONS` (stable deviation IDs), `03_EVIDENCE`, `04_TECHNICAL_DESIGN`,
-   `05_EXECUTION_PLAN`.
-3. The audit is **read-only** — it produces a remediation plan; executing it is a separate engagement.
+2. The command resolves the current [`standards/STANDARDS.md`](standards/STANDARDS.md), snapshots the
+   addon, and writes a frozen, dated bundle to that repo's `docs/audits/<today>/`. The bundle holds
+   `01_CURRENT_STATE`, `02_DEVIATIONS` (with stable deviation IDs), `03_EVIDENCE`,
+   `04_TECHNICAL_DESIGN` and `05_EXECUTION_PLAN`.
+3. The audit is read-only. It produces a remediation plan, and carrying that plan out is a separate
+   engagement.
 
 ## C. Start a new addon
 
-Scaffold a new Ka0s addon that is compliant from day one. Full walkthrough: [`NEW_ADDON.md`](NEW_ADDON.md).
-In short: run `/wow-addon:new-addon` to scaffold the Ace3 skeleton, build against the standard
-working from the [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) pack — which is
-fetched to a temp directory and **never** written into the addon (documentation-§3), and add the addon's row to [`standards/ADDONS.md`](standards/ADDONS.md). A born-compliant addon ships three root docs plus `LICENSE` — a full `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§7) — over the canonical `docs/` trio (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`).
+Use this to scaffold a new Ka0s addon that is compliant from day one. The full walkthrough is
+[`NEW_ADDON.md`](NEW_ADDON.md). In short, you run `/wow-addon:new-addon` to scaffold the Ace3
+skeleton, then build against the standard, working from the
+[`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) pack. That pack is fetched to a
+temp directory and **never** written into the addon (documentation-§3). You also add the addon's row
+to [`standards/ADDONS.md`](standards/ADDONS.md).
+
+A born-compliant addon ships three root docs plus `LICENSE`: a full `README.md`, a stub `CLAUDE.md`
+and `DEPENDENCIES.md` (documentation-§7). Beneath them sits the canonical `docs/` trio:
+`ARCHITECTURE.md`, `testing.md` and `smoke-tests.md`.
 
 ## D. Analyze an in-game perf capture
 
-Turn a capture a player took in a live client into committed evidence — run **in that addon's own
-repo**. Full, authoritative steps: [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md). In short: run
-`/wow-addon:perf-analysis` with the paste of `/<slash> perf report` **and** `/<slash> perf dump`; it
-splits, validates and stamps them into a **frozen** `docs/perf-analysis/<YYYYMMDD-HHMMSS>/` bundle —
-`report.md`, a verbatim one-line `dump.json`, and an `ANALYSIS.md` written to the playbook's uniform
-prompt — and refreshes the store's `README.md` and its capture index. Nothing is ever recorded here,
-and a capture is never invented: no paste, no bundle.
+A player takes a capture in a live client, and this playbook turns it into committed evidence. It
+also runs **in that addon's own repo**, and [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) is where the
+full, authoritative steps live.
+
+In short, run `/wow-addon:perf-analysis` with the paste of `/<slash> perf report` **and**
+`/<slash> perf dump`. The command splits, validates and stamps them into a frozen
+`docs/perf-analysis/<YYYYMMDD-HHMMSS>/` bundle. That bundle holds `report.md`, a verbatim one-line
+`dump.json`, and an `ANALYSIS.md` written to the playbook's uniform prompt. The command also
+refreshes the store's `README.md` and its capture index. Nothing is ever recorded in this repo, and
+a capture is never invented. No paste means no bundle.
 
 ---
 
@@ -139,13 +149,15 @@ WowAddonStandards/
   media/logos/                            -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
 ```
 
-Audit and review runs are **not** stored here — each lives under its own addon's `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` (audit-review-history).
+Audit and review runs are not stored here. Audits live under each addon's own
+`docs/audits/<YYYY-MM-DD>/`, and reviews under its `docs/reviews/<YYYY-MM-DD>/`
+(audit-review-history).
 
 ## Status
 
-Standard is at **v2.69.0** and living. Compliance auditing has moved out of this repo into each addon's
-own repository, driven by the `AUDIT.md` / `AUTOMATED_TESTS.md` / `NEW_ADDON.md` / `PERF_ANALYSIS.md`
-playbooks that the `wow-addon` plugin consumes.
+The standard is at **v2.69.0** and is a living document. Compliance auditing has moved out of
+this repo and into each addon's own repository. The `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`
+and `PERF_ANALYSIS.md` playbooks drive it, and the `wow-addon` plugin is what consumes them.
 
 ## License
 
