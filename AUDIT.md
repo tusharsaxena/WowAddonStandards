@@ -843,7 +843,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        since acts split across the band and a tab are worse than either shape alone. A `General` tab
        that is not first, or a band left as a bare divider because the picker moved into it, is the
        finding. Do not file the tab itself — that was the rule until v2.40.0 and it was wrong about
-       a page carrying six acts. Two findings share
+       a page carrying six acts. On a page with a **nav rail** (options-ui-§13), read the three conditions with *rail entry* for *tab*: `General` is the rail's first entry, the band spans the rail and the strip, and a rail entry carrying a picker is a second picker and the finding. Two findings share
        this check: a page drawing **two** chrome blocks (a banner plus a separate control band — the
        picker belongs *inside* the one block), and a **second box** around the band's contents. The
        second is one grep over the same builder: an `InlineGroup`, a backdropped `SimpleGroup`, or a
@@ -865,7 +865,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        selection. Check what it runs against — a harness that answers **one** height for every
        atlas cannot fail the case, so it is green against nothing and is reported as a **missing**
        case, not a passing one (testing-§12). Name the mutation the case dies under.
-     - **(i) A secondary strip lives in the scroll, and there is no third level (options-ui-§13).**
+     - **(i) A secondary strip lives in the scroll, a nav rail is a first level, and there is no third level (options-ui-§13).**
        Where a page divides one primary tab's content with a second strip, confirm three things from
        the builder: it is drawn as ordinary page content rather than pinned into the chrome band;
        its selection is kept **per primary tab** so returning to a category returns to the subject
@@ -873,7 +873,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        secondary selection is a finding against the same rule that forbids storing the primary one.
        Then check no third level exists, in either of its two shapes: a strip nested inside a
        secondary tab, and a `subgroup` heading used to fake one, which is a finding against
-       options-ui-§7's rule that a subsection wanting its own tab should be given one.
+       options-ui-§7's rule that a subsection wanting its own tab should be given one. Where a page draws a **nav rail**, count it as a level: a secondary strip on a railed page is a third level and the finding. Confirm the rail's selection and each entry's active tab are session state (a stored rail entry or per-entry tab is a finding against the same rule), that a rail click is refused in combat by the library with no host guard, and that the page's Defaults restores the active rail entry's rows and nothing wider or narrower.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a
