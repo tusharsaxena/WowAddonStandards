@@ -585,8 +585,8 @@ debug-logging-§14). It is on the library's live list, so it answers while the a
 ### `settings/OptionsSetup.lua` — the settings panel (`LibKa0s-Options-1.0`)
 
 The canvas shell, the schema-row → AceGUI widget makers, the two-column flow engine, the header and
-the always-shown scrollbar patch are the library's across **five** files (`Options.lua`,
-`OptionsWidgets.lua`, `OptionsTabs.lua`, `OptionsCompose.lua`, `OptionsScroll.lua`). The descriptor is entirely *where a value lives*, never
+the always-shown scrollbar patch are the library's across **six** files (`Options.lua`,
+`OptionsWidgets.lua`, `OptionsTabs.lua`, `OptionsCompose.lua`, `OptionsScroll.lua`, `OptionsNav.lua`). The descriptor is entirely *where a value lives*, never
 *how a panel looks*. Loads after `settings/Slash.lua` and **before** every `settings/<Page>.lua`.
 
 ```lua
@@ -1000,6 +1000,7 @@ local LIB_FILES = {
   "libs/LibKa0s/Slash.lua", "libs/LibKa0s/Launcher.lua",
   "libs/LibKa0s/Options.lua", "libs/LibKa0s/OptionsWidgets.lua", "libs/LibKa0s/OptionsTabs.lua",
   "libs/LibKa0s/OptionsCompose.lua", "libs/LibKa0s/OptionsScroll.lua",
+  "libs/LibKa0s/OptionsNav.lua",   -- from v1.61.0
   "libs/LibKa0s/Perf.lua", "libs/LibKa0s/PerfPanel.lua",
 }
 -- The addon's own files come from the TOC rather than a copy of it, so this runner cannot drift
