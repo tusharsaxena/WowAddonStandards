@@ -1,0 +1,1 @@
+fixed: all planned SR-WS-02 edits landed verbatim; c684262 finishes the OptionsNav.lua ripple the plan missed (EXECUTIVE_SUMMARY:56 file count, NEW_ADDON_CONTEXT five->six files and LIB_FILES, anti-pattern #48, changelog ripple list)
