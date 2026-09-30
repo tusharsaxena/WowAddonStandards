@@ -19,7 +19,11 @@ The console itself is **not addon code**. It is a **Ka0s-owned shared library**,
 - The descriptor's five **required** fields are `name` (seeds the frame globals and the `UISpecialFrames` entries), `title`, `font` (§2), and `isEnabled` / `setEnabled` (§5). The useful optional ones are `fontSize` (default `10`), `print`, `safeToString`, `initSummary`, `onVisibilityChanged`, `slash` (composes the console checkbox's tooltip), `L` (locale override) and `skin`.
 - **MUST** pass `print` and `safeToString` as **thin call-time forwarders** — `function(line) NS.Print(line) end`, not `NS.Print` — when the host's printer is established after this file loads. Capturing the reference freezes it to whatever happened to exist at load; an addon that reclaims its printer from AceConsole's embed later would then acknowledge through the wrong function forever (anti-patterns #36).
 
-**What the library guarantees** (so the standard describes the behavior, not the build): a `BackdropTemplate` window named `<name>DebugWindow`, **700 × 344**, on **`DIALOG`** strata so it sits above the addon's main window, draggable, clamped to screen, registered in `UISpecialFrames`, skinned from `LibKa0s-Core-1.0`'s shared `SKIN` — the flat 1px black edge with its gray inner highlight, the gold title and the gray divider specified normatively in standalone-windows, "The Ka0s window edge" — with **Core's** close glyph — which the addon **MUST NOT** replace with its main window's, even where the two differ by design (standalone-windows); a `ScrollingMessageFrame` capped at `lib.MAX_BUFFER` (**3000**) lines — raised from 500 to 1500 because the perf capture workflow pastes out of this buffer, and a long run's `perf dump` overflowed the old cap and lost its head with nothing saying so; then from 1500 to 3000 at DebugLog minor 14 (`LibKa0s v1.60.0`), so that the diagnostics report (§14) and the trace reproduced above it fit in one Copy. The figure is measured, not chosen: opening Copy on 5000 lines of width 120 took 378 ms against a 250 ms limit and felt sluggish by hand, while 3000 took 246 ms, so 3000 is the ceiling that passes. The compaction slack, `lib.BUFFER_SLACK`, scales with it to **128** — with the always-shown scrollbar and line counter of §11; the two formatters of §3; the Clear/Copy pair of §6; the title-bar state toggle and single `SetEnabled` seam of §5; and `ConsoleCheckbox()`, a plain `{ label, tooltip, get, set }` table a settings page renders itself (options-ui). None of that is an addon's code to write, and an audit **MUST NOT** ask for it in the addon's own source.
+**What the library guarantees** (so the standard describes the behavior, not the build): a `BackdropTemplate` window named `<name>DebugWindow`, **700 × 344 by default**, resizable from a bottom-right grip down to a minimum that keeps the title bar's controls clear, the size kept on the window **for the session only** (never saved; a `/reload` restores the default), on **`DIALOG`** strata so it sits above the addon's main window, draggable, clamped to screen, registered in `UISpecialFrames`, skinned from `LibKa0s-Core-1.0`'s shared `SKIN` — the flat 1px black edge with its gray inner highlight, the gold title and the gray divider specified normatively in standalone-windows, "The Ka0s window edge" — with **Core's** close glyph — which the addon **MUST NOT** replace with its main window's, even where the two differ by design (standalone-windows); a `ScrollingMessageFrame` capped at `lib.MAX_BUFFER` (**3000**) lines — raised from 500 to 1500 because the perf capture workflow pastes out of this buffer, and a long run's `perf dump` overflowed the old cap and lost its head with nothing saying so; then from 1500 to 3000 at DebugLog minor 14 (`LibKa0s v1.60.0`), so that the diagnostics report (§14) and the trace reproduced above it fit in one Copy. The figure is measured, not chosen: opening Copy on 5000 lines of width 120 took 378 ms against a 250 ms limit and felt sluggish by hand, while 3000 took 246 ms, so 3000 is the ceiling that passes. The compaction slack, `lib.BUFFER_SLACK`, scales with it to **128** — with the always-shown scrollbar and line counter of §11; the two formatters of §3; the Clear/Copy pair of §6; the title-bar state toggle and single `SetEnabled` seam of §5; and `ConsoleCheckbox()`, a plain `{ label, tooltip, get, set }` table a settings page renders itself (options-ui). None of that is an addon's code to write, and an audit **MUST NOT** ask for it in the addon's own source.
+
+**The library's windows resize, for the session (from `LibKa0s v1.64.0`).** The same guarantee covers the console's copy window (§6) and every copy window `LibKa0s-Widgets-1.0` draws (the shared copy window a host opens for an export): each resizes on **both axes** from its bottom-right grip, opens at the size its descriptor gives, and keeps its own size for the session. The perf step panel resizes on **width only** (performance-§4). One helper draws the grip for all three, so the grip, the minimum and the session-only rule cannot drift between them, and a vendor older than the helper keeps today's fixed windows.
+
+- An addon **MUST NOT** save the size of any of these windows — not in SavedVariables, not through the client's layout cache, not by reapplying a size of its own on show. The size is the **library's session state**, held on a frame that is built once and kept, so it survives a hide and a show and is gone at `/reload`. It is **not** named non-setting state the addon owns (architecture-§5): that class covers geometry of the addon's **own** frames, and a library window's size is neither the addon's to persist nor a row's to address.
 
 ### 2. Monospace font (from the shared media library)
 
@@ -112,6 +116,31 @@ what the addon did — not just that it loaded. At minimum:
   **recompute**, as a single summary line (see §9).
 - **Every settings change** — see §10.
 
+**Diagnosis** — what a support read of the log needs, beyond the flows above. The flows say what
+the addon *did*; a bug report is usually about why it did something else, and that answer lives in
+the state around the flow. Where the addon has them, the log **MUST** also carry:
+
+- **State edges** the addon reacts to — combat in and out, the addon-restriction / secret-value
+  state (`ADDON_RESTRICTION_STATE_CHANGED`), a loading screen or a zone or instance change, a group
+  roster change, a spec change, and the addon's own enable and stand-down transitions. **One line
+  per edge**, naming the state the addon took from it (`[Combat] entered: repaint held`,
+  `[State] restriction on: secret reads parked`). An edge the addon does not react to needs no
+  line.
+- **Deferred work** — when work is **held**, and why (combat, a secret value, a lockdown, a
+  dependency not loaded yet), and when it is **flushed**, and how much (`flushed 3 held rebuilds`).
+  A held-then-never-flushed state **MUST** be visible in the log: a hold line with no flush line
+  after it is the evidence.
+- **Refusals and no-ops, with the reason** — a command refused, a write rejected, an event ignored
+  because a guard said no. The line **names the guard** (`[Cmd] reset refused: in combat`): the
+  report is "nothing happened", and the guard is the answer.
+- **Dependencies** — an optional library or companion addon found or missing, logged **once, at
+  enable**, not on every call that consults it.
+- **Errors caught** by a `pcall` the addon owns — the site and the message, **once per distinct
+  error**, so an error a repeating path swallows on every pass is one line, not a wall of them.
+
+The checklist adds lines; it does not change their shape. Each is still **one gated line per
+event**, tagged (§3), with its string-building behind the gate (§4).
+
 Each flow event is **one gated line**, tagged (§3). Coverage is judged by *"could I reconstruct
 what happened from the log?"*, not by line count — which §9 then bounds from the other side.
 
@@ -131,6 +160,24 @@ build the id lists / counts / `table.concat` only when debug is on, never before
 line per bag item on every bag update was collapsed to a single tagged summary line per pass —
 the scanned + newly-discovered id lists in one line — with the per-item zero-match trace dropped
 and all list-building moved behind the gate.)*
+
+**Quiet steady state (MUST NOT).** One line per pass is still a line too many when the pass
+changed nothing. A repeating path — a timer, an `OnUpdate`, a ticker, an event that fires many
+times a second in combat — **MUST NOT** log when nothing it reports has changed. It logs **on
+change of its own summary**: build the summary behind the gate, compare it with the last one
+logged, and write it only when the two differ. A path that also needs to show it is alive **MAY**
+instead log at most **once per stated interval, with a count** (`render: 214 passes in 30 s, no
+change`). Change-gating is the default: a change-gated line carries every real change and nothing
+else, while a throttle can drop the one change that mattered inside its window.
+
+- The console's repeat folding (`(xN)`) **does not satisfy this.** It shortens runs of identical
+  lines; it does not stop them. A folded pair every few seconds for a whole dungeon is still a
+  steady stream, and it still **evicts** the lines that matter from the 3000-line buffer (§1)
+  before the reporter reaches Copy (anti-patterns #91).
+- A per-pass line **whose content changes on each pass** — a real recompute, with new counts — is
+  not steady state, and stays compliant under the rule above.
+- The comparison is part of the summary's cost, so it sits **behind the gate** too: with logging
+  off, the path neither builds nor compares anything (§4).
 
 ### 10. Settings changes — log once, at the single write seam (MUST)
 
