@@ -83,14 +83,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    (`line-endings` — record the pin verbatim, or record that the file is absent), the root doc set
    — `README.md`, the `CLAUDE.md` stub and `DEPENDENCIES.md` (documentation-§1/§2/§7) — and `docs/`)
    and record what it does now, citing files.
-   - **Four cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
+   - **Five cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
      and each is invisible to every suite: the standard badge is the **bare** `![Standard](…)` and
      not wrapped in a link (documentation-§1 #2); the README shows **no logo image** under its title or
      badge row — no `![…](media/logos/…)` line and no `<img>` (documentation-§1, anti-pattern #79); the
      README carries **no bundled-library inventory**
      — no `## Libraries` / `## Bundled libraries` / `## Libraries and credits` /
      `## Credits and libraries` heading and no library roll-call in the intro prose, with any
-     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); and
+     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); the
+     README carries **no numbered list** — `grep -nE '^[[:space:]]*[0-9]+[.)][[:space:]]' README.md`
+     is empty outside a fenced code block, because CurseForge's description page does not render one
+     and every list there is a `- ` bullet list (v2.72.0; a hit is a documentation-§1 **MUST**
+     failure); and
      the **LibKa0s provenance line is in root `CLAUDE.md`**, not `README.md` (documentation-§2 item 6,
      anti-pattern #59 — see the step-6 `diff -r` evidence).
    - **Look in the right place for the shared subsystems.** The debug console, the options toolkit,
@@ -683,8 +687,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      6. The DebugLog stub answers `RunDiagnostics` with the library-absent line (debug-logging-§7);
         the degradation-stub check below covers the member's presence.
      7. `README.md` carries `## Reporting a bug` between `## Troubleshooting` and
-        `## Issues and feature requests`, with the three steps and the closing note verbatim for
-        this addon's slash (documentation-§1).
+        `## Issues and feature requests`, with the three bullets and the closing note verbatim for
+        this addon's slash (documentation-§1). The v2.68.0–v2.71.0 numbered form (`1.` `2.` `3.`) is
+        the documentation-§1 numbered-list finding, not a missing section.
 
      **Grading.** A missing form, an alias, a gated sink, a `Clear()` before the report, a report
      refused while disabled, a run that turns logging off, a host `SetEnabled` around the run, a

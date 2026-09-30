@@ -268,9 +268,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
    Screenshots → Usage (prose, no tables) → How it works → FAQ →
    Troubleshooting → Reporting a bug → Issues and feature requests → Version History → optional `## Credits`, last — there is
    **no** `## Testing` section; verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
-   `## Reporting a bug` is **MUST**, and its three steps and closing line are documentation-§1 item 9's
+   `## Reporting a bug` is **MUST**, and its three bullets and closing line are documentation-§1 item 9's
    text, copied verbatim with the addon's real slash in place of `/<slash>`. It names no destination
-   and carries no GitHub link.
+   and carries no GitHub link. Every list in the README is a `- ` bullet list, never a numbered one:
+   CurseForge's description page does not render numbered lists (documentation-§1).
    The README carries **no logo image** (the logo is the in-game landing page's, options-ui-§5;
    anti-pattern #79) and **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
    `## Libraries and credits` section and no library list in the intro prose; that fact lives in

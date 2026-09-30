@@ -26,7 +26,7 @@ Write it in **plain language**. Prose **MUST** be short, direct, and free of int
 
 The README renders on **two** surfaces, and they are not the same renderer. GitHub is where it is
 written and reviewed; **CurseForge is where players read it**, and CurseForge's renderer is stricter
-about HTML and looser about escapes. Two consequences are normative, because both fail *silently on
+about HTML and looser about escapes. Three consequences are normative, because each fails *silently on
 the surface a maintainer never checks*:
 
 - **Angle-bracket placeholders MUST NOT appear in shipped README content.** CurseForge strips
@@ -36,6 +36,14 @@ the surface a maintainer never checks*:
   keep `[…]` for genuinely optional arguments, which survives both renderers. This applies to the
   README only — placeholders in *this* standard, in `docs/`, and in code comments are fine.
 - **Percent-escapes MUST NOT be used for spaces in badge URLs** — see the badge table below.
+- **Numbered lists MUST NOT appear in `README.md`; it uses bullets.** CurseForge's description page
+  does not render a Markdown numbered list (`1.`, `2.`, …) as one, so a list of steps that reads
+  cleanly on GitHub reaches players broken. Every list in the README is a `- ` bullet list, written
+  in the order it is done where the order matters, so the words carry the sequence rather than a
+  number. Converting a list changes its markers only: no item is reordered, merged or split, and none
+  is reworded unless it cites another by number ("step 2"), which then names it in words.
+  This applies to the README only — numbered lists in *this* standard, in `docs/`, and in code
+  comments are fine.
 
 Real HTML a README uses deliberately (`<br>` in a table cell, `<code>`, `<strong>`) is unaffected and
 **MUST NOT** be stripped by a sweep for the above.
@@ -66,7 +74,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
    - **Close with one line pointing at configuration**, and nothing more: the addon's page under the game's own **Settings → AddOns**, and the slash verb that prints the command list (both the short and long forms). One sentence. It is a signpost, not a summary.
    - **It MUST NOT carry a slash-command table or a settings-page table.** Both were mandated here until v2.41.0 and both were the wrong content for the audience. A generated `Command | What it does` table tells a player what exists without telling them what to do, and it is a second copy of a list `/<slash> help` already prints from `NS.COMMANDS` — the authority slash-commands-§4 names. A `Tab | Covers` table is a contents page for a panel the player can simply open. Neither is deleted from the collection: the command list stays generated from `NS.COMMANDS` and reachable from `/<slash> help` and the settings landing page, and the settings table **moves to `docs/settings-panel.md`** (documentation-§3) as a **`Page | Covers`** table, one row per page, which is its canonical home and already carries the finer page → tab → row tree beneath it.
    - **Write it like a person.** This section is read by players, not by an auditor, and it is the section where machine-shaped prose shows most: uniform paragraph lengths, `**Bold lead.**` sentence openers, see-saw pairs ("That is the manual version. The automatic version is…"), and the same contrast made three times in three sections. A README that reads as generated is a README nobody finishes.
-6. **`## How <it> works`** — **MUST**. A short, player-facing narrative — a numbered pipeline or prose — of how the addon produces what the user sees, titled for the domain (e.g. `## How picking & ranking works`, `## How the bar works`). Center it on the addon's core mechanic (ranking, attribution, scheduling, pick-selection, the value it tracks, …) and describe what happens, not the code behind it. Required even when the mechanic is simple — give the reader the one-paragraph "what's going on" rather than omit the section.
+6. **`## How <it> works`** — **MUST**. A short, player-facing narrative — a bulleted pipeline or prose — of how the addon produces what the user sees, titled for the domain (e.g. `## How picking & ranking works`, `## How the bar works`). Center it on the addon's core mechanic (ranking, attribution, scheduling, pick-selection, the value it tracks, …) and describe what happens, not the code behind it. Required even when the mechanic is simple — give the reader the one-paragraph "what's going on" rather than omit the section.
 7. **`## FAQ`** — **SHOULD**; a **Question | Answer** table.
 8. **`## Troubleshooting`** — **SHOULD**; a **Symptom | Fix** table. It **SHOULD** carry the row `| Something looks wrong and I want to report it | Follow [Reporting a bug](#reporting-a-bug) below. |`, and a row that told players to paste logs some other way points at that section instead.
 9. **`## Reporting a bug`** — **MUST**, in every addon, because every addon ships the diagnostics dump (debug-logging-§14). Its body is **exactly** the following, with the addon's real slash command written in place of `/<slash>` (the README carries no angle-bracket placeholder, per the rule above):
@@ -74,9 +82,9 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
    ```markdown
    ## Reporting a bug
 
-   1. Type `/<slash> debug on` and reproduce the bug.
-   2. Type `/<slash> diagnostics`.
-   3. If the debug window isn't open, open it with `/<slash> debug`. Press **Copy**, copy the entire output, and include it with your bug report.
+   - Type `/<slash> debug on` and reproduce the bug.
+   - Type `/<slash> diagnostics`.
+   - If the debug window isn't open, open it with `/<slash> debug`. Press **Copy**, copy the entire output, and include it with your bug report.
 
    The report is added after the debug trace in the same window, so one copy carries both.
    ```
