@@ -83,14 +83,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    (`line-endings` — record the pin verbatim, or record that the file is absent), the root doc set
    — `README.md`, the `CLAUDE.md` stub and `DEPENDENCIES.md` (documentation-§1/§2/§7) — and `docs/`)
    and record what it does now, citing files.
-   - **Four cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
+   - **Five cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
      and each is invisible to every suite: the standard badge is the **bare** `![Standard](…)` and
      not wrapped in a link (documentation-§1 #2); the README shows **no logo image** under its title or
      badge row — no `![…](media/logos/…)` line and no `<img>` (documentation-§1, anti-pattern #79); the
      README carries **no bundled-library inventory**
      — no `## Libraries` / `## Bundled libraries` / `## Libraries and credits` /
      `## Credits and libraries` heading and no library roll-call in the intro prose, with any
-     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); and
+     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); the
+     README carries **no numbered list** — `grep -nE '^[[:space:]]*[0-9]+[.)][[:space:]]' README.md`
+     is empty outside a fenced code block, because CurseForge's description page does not render one
+     and every list there is a `- ` bullet list (v2.72.0; a hit is a documentation-§1 **MUST**
+     failure); and
      the **LibKa0s provenance line is in root `CLAUDE.md`**, not `README.md` (documentation-§2 item 6,
      anti-pattern #59 — see the step-6 `diff -r` evidence).
    - **Look in the right place for the shared subsystems.** The debug console, the options toolkit,
@@ -672,15 +676,26 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
         `diagnostics` is the finding. `tests/test_disabled.lua` dispatches **both** forms.
      4. Both forms reach `NS.DebugLog:RunDiagnostics`, and no `:Clear()` is reachable from the
         addon's sections module.
-     5. The DebugLog stub answers `RunDiagnostics` with the library-absent line (debug-logging-§7);
+     5. The run turns debug logging on for the session (v2.71.0; the library does it from
+        **v1.64.0**, and an older tag leaves the flag alone, which is a re-vendor item, not a
+        finding). `grep -n 'SetEnabled' settings/*.lua core/*.lua modules/*.lua` shows no host call
+        wrapped around `RunDiagnostics` in either form's handler, and no hit in the sections
+        module. `grep -n 'diagnosticsEnablesLogging' core/*.lua` is empty (the default) or sets it
+        to `false`, in which case `docs/debug.md` says the addon opts out. The kit's contract suite
+        asserts the enable, the opt-out and the already-on cases; a suite still asserting that the
+        flag stays off after a default run is the finding.
+     6. The DebugLog stub answers `RunDiagnostics` with the library-absent line (debug-logging-§7);
         the degradation-stub check below covers the member's presence.
-     6. `README.md` carries `## Reporting a bug` between `## Troubleshooting` and
-        `## Issues and feature requests`, with the three steps and the closing note verbatim for
-        this addon's slash (documentation-§1).
+     7. `README.md` carries `## Reporting a bug` between `## Troubleshooting` and
+        `## Issues and feature requests`, with the three bullets and the closing note verbatim for
+        this addon's slash (documentation-§1). The v2.68.0–v2.71.0 numbered form (`1.` `2.` `3.`) is
+        the documentation-§1 numbered-list finding, not a missing section.
 
      **Grading.** A missing form, an alias, a gated sink, a `Clear()` before the report, a report
-     refused while disabled, or a missing README section is a **MUST** failure and
-     **anti-pattern #90**. A host-written line buffer, marker set or per-section `pcall` on a vendor
+     refused while disabled, a run that turns logging off, a host `SetEnabled` around the run, a
+     section that touches the flag, or a missing README section is a **MUST** failure and
+     **anti-pattern #90**; an opt-out that `docs/debug.md` does not state is a debug-logging-§14
+     documentation finding. A host-written line buffer, marker set or per-section `pcall` on a vendor
      of v1.60.0 or later is **#47 and #90**. **Applicability:** the check runs in the addons only.
      A Ka0s-owned library repo is audited against library-stack-§7's list, and a
      documentation-and-tooling repo against documentation-§8's, which already exempts
@@ -723,9 +738,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      target's own value) do not; an entry the player authors is not learned data, and a set the
      player adds ids to is (b) or a value, never (e); the addon's own write into a library's table
      outside the load pass (a seed, a backfill) is the addon's; a whole-table write over a row path
-     is (a) **and** is listed as a writer of any (e) state it covers until it is fixed; a reset that
-     clears learned data, a per-entry delete and a prune driven by a retention row are the owner's
-     operation and belong in the naming;
+     is (a) **and** is listed as a writer of any (e) state it covers until it is fixed; geometry is
+     the addon's **own** frames only, so a saved size of a `LibKa0s` debug console, copy window or
+     perf step panel is never (e) and is a debug-logging-§1 MUST NOT finding however it is named; a
+     reset that clears learned data, a per-entry delete and a prune driven by a retention row are the
+     owner's operation and belong in the naming;
      (f) anything else — a preference the player sets that no row addresses, on a member or not (a
      position a control also sets included), a list over a fixed member set with no row — needs its
      `Documented deviations` row; a preference with neither a row nor a register row is a missing row.
