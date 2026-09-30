@@ -19,7 +19,7 @@ The console itself is **not addon code**. It is a **Ka0s-owned shared library**,
 - The descriptor's five **required** fields are `name` (seeds the frame globals and the `UISpecialFrames` entries), `title`, `font` (§2), and `isEnabled` / `setEnabled` (§5). The useful optional ones are `fontSize` (default `10`), `print`, `safeToString`, `initSummary`, `onVisibilityChanged`, `slash` (composes the console checkbox's tooltip), `L` (locale override) and `skin`.
 - **MUST** pass `print` and `safeToString` as **thin call-time forwarders** — `function(line) NS.Print(line) end`, not `NS.Print` — when the host's printer is established after this file loads. Capturing the reference freezes it to whatever happened to exist at load; an addon that reclaims its printer from AceConsole's embed later would then acknowledge through the wrong function forever (anti-patterns #36).
 
-**What the library guarantees** (so the standard describes the behavior, not the build): a `BackdropTemplate` window named `<name>DebugWindow`, **700 × 344 by default**, resizable from a bottom-right grip down to a minimum that keeps the title bar's controls clear, the size kept on the window **for the session only** (never saved; a `/reload` restores the default), on **`DIALOG`** strata so it sits above the addon's main window, draggable, clamped to screen, registered in `UISpecialFrames`, skinned from `LibKa0s-Core-1.0`'s shared `SKIN` — the flat 1px black edge with its gray inner highlight, the gold title and the gray divider specified normatively in standalone-windows, "The Ka0s window edge" — with **Core's** close glyph — which the addon **MUST NOT** replace with its main window's, even where the two differ by design (standalone-windows); a `ScrollingMessageFrame` capped at `lib.MAX_BUFFER` (**3000**) lines — raised from 500 to 1500 because the perf capture workflow pastes out of this buffer, and a long run's `perf dump` overflowed the old cap and lost its head with nothing saying so; then from 1500 to 3000 at DebugLog minor 14 (`LibKa0s v1.60.0`), so that the diagnostics report (§14) and the trace reproduced above it fit in one Copy. The figure is measured, not chosen: opening Copy on 5000 lines of width 120 took 378 ms against a 250 ms limit and felt sluggish by hand, while 3000 took 246 ms, so 3000 is the ceiling that passes. The compaction slack, `lib.BUFFER_SLACK`, scales with it to **128** — with the always-shown scrollbar and line counter of §11; the two formatters of §3; the Clear/Copy pair of §6; the title-bar state toggle and single `SetEnabled` seam of §5; and `ConsoleCheckbox()`, a plain `{ label, tooltip, get, set }` table a settings page renders itself (options-ui). None of that is an addon's code to write, and an audit **MUST NOT** ask for it in the addon's own source.
+**What the library guarantees** (so the standard describes the behavior, not the build): a `BackdropTemplate` window named `<name>DebugWindow`, **700 × 344 by default**, resizable from a bottom-right grip down to a minimum that keeps the title bar's controls clear, the size kept on the window **for the session only** (never saved; a `/reload` restores the default), on **`DIALOG`** strata so it sits above the addon's main window, draggable, clamped to screen, registered in `UISpecialFrames`, skinned from `LibKa0s-Core-1.0`'s shared `SKIN` — the flat 1px black edge with its gray inner highlight, the gold title and the gray divider specified normatively in standalone-windows, "The Ka0s window edge" — with **Core's** close glyph — which the addon **MUST NOT** replace with its main window's, even where the two differ by design (standalone-windows); a `ScrollingMessageFrame` capped at `lib.MAX_BUFFER` (**3000**) lines — raised from 500 to 1500 because the perf capture workflow pastes out of this buffer, and a long run's `perf dump` overflowed the old cap and lost its head with nothing saying so; then from 1500 to 3000 at DebugLog minor 14 (`LibKa0s v1.60.0`), so that the diagnostics report (§14) and the trace reproduced above it fit in one Copy. The figure is measured, not chosen: opening Copy on 5000 lines of width 120 took 378 ms against a 250 ms limit and felt sluggish by hand, while 3000 took 246 ms, so 3000 is the ceiling that passes. The compaction slack, `lib.BUFFER_SLACK`, scales with it to **128** — with the always-shown scrollbar and line counter of §11; the two formatters of §3; the Clear/Copy pair of §6; the title-bar state toggle and single `SetEnabled` seam of §5; the orange **Diagnostics** link in the title bar, a small gap after the Debug On/Off label, plain text rather than a button, which runs the diagnostics report exactly as `/<slash> diagnostics` does (§14; DebugLog minor 16, `LibKa0s v1.64.0`, drawn only when `DebugLogDiagnostics.lua` is loaded, and counted in the window's minimum width); and `ConsoleCheckbox()`, a plain `{ label, tooltip, get, set }` table a settings page renders itself (options-ui). None of that is an addon's code to write, and an audit **MUST NOT** ask for it in the addon's own source.
 
 **The library's windows resize, for the session (from `LibKa0s v1.64.0`).** The same guarantee covers the console's copy window (§6) and every copy window `LibKa0s-Widgets-1.0` draws (the shared copy window a host opens for an export): each resizes on **both axes** from its bottom-right grip, opens at the size its descriptor gives, and keeps its own size for the session. The perf step panel resizes on **width only** (performance-§4). One helper draws the grip for all three, so the grip, the minimum and the session-only rule cannot drift between them, and a vendor older than the helper keeps today's fixed windows.
 
@@ -69,7 +69,7 @@ NS.Debug("Loot", "%s x%d", name, qty)     -- NS.Debug = NS.DebugLog.Debug, bound
 - **MUST** be **session-only**: default **off**, held in `NS.State.debug` (**never** in SavedVariables), and **reset to off on every `/reload` and fresh login**. *(A persisted debug flag too easily gets left on; persisting it is the documented deviation, not the default.)*
 - Logging and the window are **independent** — capture runs even when the console is closed, so a bug can be reproduced first and the log opened after.
 - Slash (slash-commands): `/<slash> debug` **toggles the window only** (`NS.DebugLog:Toggle()`, state untouched); `/<slash> debug on` and `/<slash> debug off` route to `NS.DebugLog:SetEnabled(true|false)`; `/<slash> debug diagnostics` runs the diagnostics dump (`NS.DebugLog:RunDiagnostics()`, §14), and the handler tests that word **first**, before `on` / `off` and before the toggle or usage fallback. The verb dispatches through the addon's own ordered `NS.COMMANDS` table like every other verb (slash-commands-§3); the library registers **no** slash command of its own.
-- **MUST** route **every** state change through that one `SetEnabled` seam — the slash verb, the title-bar toggle, and anything else — so no two paths can diverge. The seam's single write path is: write the host's flag → refresh the header label → print the chat ack → append the console bracket line → on enable, append the `[Init]` summary.
+- **MUST** route **every** state change through that one `SetEnabled` seam — the slash verb, the title-bar toggle, the diagnostics run's enable (§14), and anything else — so no two paths can diverge. The seam's single write path is: write the host's flag → refresh the header label → print the chat ack → append the console bracket line → on enable, append the `[Init]` summary.
 - The **chat ack** is color-coded by the library — **`ON` green (`40ff40`)**, **`OFF` red (`ff4040`)** — e.g. `[XY] debug logging |cff40ff40ON|r`. The addon supplies the `NS.PREFIX`-tagged printer via the descriptor's `print` (slash-commands-§4, events-frames-taint-§8); the coloring of the state word is not the addon's to restyle. The colors mirror the title-bar toggle so the flag reads identically in chat and on the console header.
 - A **console line** lands at **both** transitions — `[Debug] logging enabled` / `[Debug] logging disabled`. The disable line is written through the raw append (§4), **not** the gated sink, because the flag has already flipped off by then and the sink would swallow it.
 - On **enable**, the library additionally emits the host's one-line **`[Init]` session summary**, immediately after the bracket, tagged `[Init]` and passed through `safeToString`. The addon supplies it as the descriptor's `initSummary` callback — addon **name + version**, **schema/DB version**, **active profile**, e.g. `[Init] KickCD v1.2.0, schema v1, profile 'Default'`. **Only the host can know what it says; only the library knows when it lands.** It rides enable rather than login because the flag is session-only and off at login, so a load-time summary would always be gated off and never render. This satisfies §8's lifecycle boot-summary requirement and makes a pasted log self-identifying without asking the reporter.
@@ -256,7 +256,7 @@ The performance harness ships its own guided step panel (performance-§4), and t
 - **The decoration hook builds its close control through the addon's own wrapper (MUST)** — the one-line `MakeCloseButton` passthrough of standalone-windows, which supplies `addonName` — and **MUST NOT** call any factory with two arguments, the console instance's re-export (`NS.DebugLog.MakeCloseButton`) included. That re-export is the same three-argument function; reaching it through the console does not supply the name. This is the measured failure: a perf panel calling `NS.DebugLog.MakeCloseButton(frame, api.Hide)` drew a multiplication sign for as long as it shipped, two inches from a console drawing the collection's mark, with lint clean and every suite green (anti-patterns #65). Prefer the wrapper (`NS.MakeCloseButton`) over the re-export in a hook for exactly this reason — it is the spelling that cannot drop the argument.
 - **A hook that exists only to draw a close button SHOULD be deleted.** From `PerfPanel.lua` minor 4 the library's own no-`decorate` path builds the control with the host's name and gets the identical button, so such a hook is a second copy of the library's behavior that can fall behind it — as this one did. Keep `decorate` for chrome the library does not draw.
 - The addon **MUST** route the shared module's log output through the **console sink** (§4) and its chat output through the shared printer (events-frames-taint-§8), so a capture's lifecycle lines land in the same timeline as `[Combat]` entered/left. Reconstructing which window a measurement happened in, from memory, afterwards, is guesswork.
-- Output from an explicit user-initiated diagnostic run **MUST NOT** be gated on the debug flag (§5) — route it through the ungated raw append (§4). The flag exists to keep the addon free when idle; a capture is an explicit action, and a run whose console stays empty because logging happened to be off reads as a broken feature.
+- Output from an explicit user-initiated diagnostic run **MUST NOT** depend on the debug flag (§5) — route it through the ungated raw append (§4), so it lands in full whatever the flag reads. The flag exists to keep the addon free when idle; a capture is an explicit action, and a run whose console stays empty because logging happened to be off reads as a broken feature. The run itself **MAY** turn logging on, through the one seam and never off; the diagnostics report does so by default (§14), so the player's next reproduction is traced too.
 - Revealing the console is the **host's** call, not the shared module's: the addon supplies a "show my log window" hook the module calls at the few moments that warrant it (a run starting, a report or dump being asked for). A shared module that opens a window on every line it writes will pop a console over the game mid-combat.
 
 ### 13. The console draws the collection's marks (MUST)
@@ -315,14 +315,34 @@ its adoption is blocked rather than overdue.
 
 - **MUST** work while the addon is **disabled or stood down** (slash-commands-§7). `diagnostics` is a
   reserved verb on the live list (slash-commands-§2), so the top-level form answers while disabled
-  as well as the `debug` form. The report **reads state only**: it **MUST NOT** take or release a
-  Lifecycle hold, register an event, arm a timer, or stand anything up. While stood down it still
-  runs **every** section; a section whose runtime state has been released prints that it is stood
-  down rather than printing empty data, and stored configuration prints as normal.
+  as well as the `debug` form. The report **reads state only**, its one write being the debug flag
+  the run turns on (below): it **MUST NOT** take or release a Lifecycle hold, register an event,
+  arm a timer, or stand anything up. While stood down it still runs **every** section; a section
+  whose runtime state has been released prints that it is stood down rather than printing empty
+  data, and stored configuration prints as normal.
 - **MUST** write through the **ungated** sink, `NS.DebugLog:RunDiagnostics()`, which appends through
-  the library's raw `Add` path (§4). The report **MUST NOT** read or change the debug flag (§5): it
-  lands in full with logging off, and the flag reads the same afterwards. This is §12's rule for an
-  explicit user-initiated run, applied to the report.
+  the library's raw `Add` path (§4), so the report lands in full whatever the flag reads. This is
+  §12's rule for an explicit user-initiated run, applied to the report.
+- **Running the report turns debug logging on for the session** (from `LibKa0s v1.64.0`). When the
+  flag is off, the run calls the flag's one seam, `SetEnabled(true)` (§5), **before** it writes, so
+  the `[Debug] logging enabled` bracket line and the `[Init]` summary land above the report's begin
+  marker and the chat ack prints as for `/<slash> debug on`. Both forms and the console's
+  **Diagnostics** link (§1) are the same run. The run **never** turns logging off: with the flag
+  already on it writes no second enable line, and nothing after the report turns the flag back off.
+  The flag stays session-only (§5), so a `/reload` turns it off again. The reason is the bug report's
+  own order: a player who ran the report without turning debug on first needs the next reproduction
+  traced, and asking them to type a second command is the round trip the report exists to save.
+  A vendor older than `LibKa0s v1.64.0` runs the report with the flag left as it was; that is a
+  re-vendor item, not a finding against the addon.
+- A host **MAY** opt out by passing `diagnosticsEnablesLogging = false` in the DebugLog descriptor;
+  the report then lands with logging off and leaves the flag off. Any other value, the field absent
+  included, keeps the default. An addon that opts out says so in `docs/debug.md` (below). The
+  enable is the **library's**: a host **MUST NOT** call `SetEnabled` around `RunDiagnostics` itself,
+  in either form's handler, since a second copy of the rule is one that can drift from the opt-out.
+- The report's **sections** read state only, and that includes the flag: a section **MUST NOT**
+  call `SetEnabled`, write `NS.State.debug`, or otherwise touch the flag. Only the run changes it,
+  and only as above. The identity header's debug-flag field therefore reads the flag as the report
+  writes, which is **on** by default.
 - **MUST** append and **MUST NOT** clear. Nothing reachable from the report calls `Clear()` (§6).
   The trace the player has just reproduced stays above the report, which is the point of running it
   second.
@@ -366,8 +386,9 @@ its adoption is blocked rather than overdue.
   lines (§3). The one chat line below is localized.
 - **Reveal, then one chat line.** If the console is hidden, the report shows it. It then prints
   **one** localized, tagged chat line through the addon's printer, giving the line count and naming
-  **Copy**. The README's bug-reporting steps (documentation-§1) still tell a player how to open the
-  console, for the player who closed it afterwards.
+  **Copy**. A run that turned logging on has printed the enable's own ack before it (§5); that is
+  the seam's line, not a second report line. The README's bug-reporting steps (documentation-§1)
+  still tell a player how to open the console, for the player who closed it afterwards.
 - **Capped below the buffer.** The report's total stays at or under `lib.DIAG_MAX_LINES`, which the
   library owns and clamps to `lib.MAX_BUFFER - 100`, so the report never evicts itself. Unbounded
   lists carry a per-list cap (40 ids by default; a host **MAY** set its own per list). A capped
@@ -397,7 +418,9 @@ its adoption is blocked rather than overdue.
 **Tested.**
 
 - Every addon's suite **MUST** assert: both markers present; console lines that existed before the
-  run survive it (append); with the debug flag off the lines land and the flag is unchanged; the
+  run survive it (append); with the debug flag off the lines land and the run turns the flag on
+  (with the descriptor's `diagnosticsEnablesLogging = false`, the lines land and the flag stays off;
+  with the flag already on, no second `[Debug] logging enabled` line is written); the
   report runs while disabled through **both** forms; a raising section costs exactly one line; an
   over-cap report ends with the `truncated` line and then the end marker; a secret mock does not
   raise; and `debug diag` (with the addon's own retired names) does not run the report.
@@ -409,6 +432,7 @@ its adoption is blocked rather than overdue.
 **Documented.**
 
 - The addon's `docs/debug.md` (documentation-§3) **MUST** document the report: both forms, append
-  semantics, the section list, the caps, and what the report deliberately does not read or call
-  (secret values, protected APIs). Each addon's sections differ, and a maintainer reading a pasted
-  report needs that page to read it.
+  semantics, that a run turns debug logging on for the session (or that the addon opts out), the
+  section list, the caps, and what the report deliberately does not read or call (secret values,
+  protected APIs). Each addon's sections differ, and a maintainer reading a pasted report needs that
+  page to read it.

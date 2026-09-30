@@ -672,15 +672,25 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
         `diagnostics` is the finding. `tests/test_disabled.lua` dispatches **both** forms.
      4. Both forms reach `NS.DebugLog:RunDiagnostics`, and no `:Clear()` is reachable from the
         addon's sections module.
-     5. The DebugLog stub answers `RunDiagnostics` with the library-absent line (debug-logging-§7);
+     5. The run turns debug logging on for the session (v2.71.0; the library does it from
+        **v1.64.0**, and an older tag leaves the flag alone, which is a re-vendor item, not a
+        finding). `grep -n 'SetEnabled' settings/*.lua core/*.lua modules/*.lua` shows no host call
+        wrapped around `RunDiagnostics` in either form's handler, and no hit in the sections
+        module. `grep -n 'diagnosticsEnablesLogging' core/*.lua` is empty (the default) or sets it
+        to `false`, in which case `docs/debug.md` says the addon opts out. The kit's contract suite
+        asserts the enable, the opt-out and the already-on cases; a suite still asserting that the
+        flag stays off after a default run is the finding.
+     6. The DebugLog stub answers `RunDiagnostics` with the library-absent line (debug-logging-§7);
         the degradation-stub check below covers the member's presence.
-     6. `README.md` carries `## Reporting a bug` between `## Troubleshooting` and
+     7. `README.md` carries `## Reporting a bug` between `## Troubleshooting` and
         `## Issues and feature requests`, with the three steps and the closing note verbatim for
         this addon's slash (documentation-§1).
 
      **Grading.** A missing form, an alias, a gated sink, a `Clear()` before the report, a report
-     refused while disabled, or a missing README section is a **MUST** failure and
-     **anti-pattern #90**. A host-written line buffer, marker set or per-section `pcall` on a vendor
+     refused while disabled, a run that turns logging off, a host `SetEnabled` around the run, a
+     section that touches the flag, or a missing README section is a **MUST** failure and
+     **anti-pattern #90**; an opt-out that `docs/debug.md` does not state is a debug-logging-§14
+     documentation finding. A host-written line buffer, marker set or per-section `pcall` on a vendor
      of v1.60.0 or later is **#47 and #90**. **Applicability:** the check runs in the addons only.
      A Ka0s-owned library repo is audited against library-stack-§7's list, and a
      documentation-and-tooling repo against documentation-§8's, which already exempts

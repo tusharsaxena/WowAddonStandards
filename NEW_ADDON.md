@@ -129,7 +129,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
      the first hands the library a path into nowhere. The descriptor also carries the **diagnostics
      dump** (debug-logging-§14, **MUST**): `brandName`, the full `Ka0s <Name>` brand for the report's
      markers, and `diagnostics`, a function read at run time that returns the sections written in
-     **`modules/Diagnostics.lua`**, the one file of the report the addon owns. The stub's
+     **`modules/Diagnostics.lua`**, the one file of the report the addon owns. It leaves out
+     `diagnosticsEnablesLogging`, so a run turns debug logging on for the session (the library does
+     the enable; the addon never calls `SetEnabled` around the run). The stub's
      `RunDiagnostics` prints the library-absent line and writes nothing. Needs LibKa0s **v1.60.0**
      or later.
    - the **slash descriptor** in `settings/Slash.lua` — `LibKa0s-Slash-1.0` (slash-commands): the
@@ -289,8 +291,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    Then evaluate each **Tier 2** trigger against the code you just wrote and either ship the doc or
    record it as a *Not applicable* row carrying the trigger. `docs/debug.md` is never *Not
    applicable*: the diagnostics dump is a debug surface, so its trigger has fired in every addon, and
-   the page documents the report — both forms, append semantics, the section list, the caps and what
-   the report does not read or call (debug-logging-§14). Finally write `ARCHITECTURE.md`'s
+   the page documents the report — both forms, append semantics, that a run turns debug logging on
+   for the session, the section list, the caps and what the report does not read or call
+   (debug-logging-§14). Finally write `ARCHITECTURE.md`'s
    `## Documentation map` listing every `docs/` page in exactly one of its four tables — Required,
    Conditional, **Verification and record** and Addon-specific, in that order — with the frozen and
    generated stores named once each as directories rather than enumerated bundle by bundle. **Which
