@@ -723,9 +723,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      target's own value) do not; an entry the player authors is not learned data, and a set the
      player adds ids to is (b) or a value, never (e); the addon's own write into a library's table
      outside the load pass (a seed, a backfill) is the addon's; a whole-table write over a row path
-     is (a) **and** is listed as a writer of any (e) state it covers until it is fixed; a reset that
-     clears learned data, a per-entry delete and a prune driven by a retention row are the owner's
-     operation and belong in the naming;
+     is (a) **and** is listed as a writer of any (e) state it covers until it is fixed; geometry is
+     the addon's **own** frames only, so a saved size of a `LibKa0s` debug console, copy window or
+     perf step panel is never (e) and is a debug-logging-§1 MUST NOT finding however it is named; a
+     reset that clears learned data, a per-entry delete and a prune driven by a retention row are the
+     owner's operation and belong in the naming;
      (f) anything else — a preference the player sets that no row addresses, on a member or not (a
      position a control also sets included), a list over a fixed member set with no row — needs its
      `Documented deviations` row; a preference with neither a row nor a register row is a missing row.
