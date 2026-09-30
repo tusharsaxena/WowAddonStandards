@@ -700,6 +700,39 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      A Ka0s-owned library repo is audited against library-stack-§7's list, and a
      documentation-and-tooling repo against documentation-§8's, which already exempts
      debug-logging.
+   - **Check the library's own debug lines: the sink passed, no duplicate, the console's gates**
+     (`debug-logging-§4`, *The library's own lines*, `debug-logging-§8`, `debug-logging-§9`; new in
+     v2.73.0). Read the addon's `LibKa0s` tag first: on a tag older than **v1.65.0** (Slash minor 18,
+     Options minor 27, Launcher minor 5, Lifecycle minor 3, DebugLog minor 18 with
+     `DebugLogGates.lua`) the fields and the gates do not exist, so every item below is a **blocked**
+     re-vendor item, and a host's own edge or refusal line is correct until then. On v1.65.0 or
+     later, check each of these:
+     1. `grep -rn 'LibKa0s-\(Slash\|Options\|Launcher\|Lifecycle\)-1.0' --include='*.lua' . | grep -v
+        '/libs/\|tests/_kit/'` finds the four setup sites. Each descriptor passes `debug` — the gated
+        sink or a forwarder onto it, never `NS.DebugLog:Add` and never the printer. A descriptor that
+        takes the field and is not given it is the finding.
+     2. The Launcher descriptor passes `debugAtEnable` onto the console's `DebugAtEnable`.
+     3. **No duplicate.** Read the host's Lifecycle `standDown` / `standUp` callbacks for an
+        `NS.Debug` line that restates the edge (the hold, the hold set) and nothing more; grep the
+        slash layer for a refusal the dispatcher already logs, including a match on the disabled
+        gate's chat line (`DISABLED_LINE_FORMAT`, a `DisabledLine` hook); read the setters the combat
+        lock guards for a host line restating `<what> refused (in combat)`. A host line adding what
+        the library's cannot know (which modules stood down, what a flush replayed) is not one.
+     4. **Change gates.** Grep the addon's own Lua for a hand-rolled *log once* or *log on change*
+        helper — a memo of the last summary compared before `NS.Debug`, a `DebugOnce`, `DebugSteady`
+        or `DebugQuiet` the addon defines itself. Each is noted against `DebugChanged` /
+        `DebugOnce`; one kept with no `onClear` in the DebugLog descriptor is noted the same way,
+        because a Clear leaves it silent over an empty console.
+     5. **State lines at enable.** A dependency or mode line written through `NS.Debug` from
+        `OnEnable` never lands (the flag is off at login); it is noted against `DebugAtEnable`.
+     6. A DebugLog stub under `Kit.assertSurfaceParity` carries `DebugOnce`, `DebugChanged`,
+        `DebugForget` and `DebugAtEnable` or names them in its `ignore` list; the degradation-stub
+        check below covers every member the addon calls.
+
+     **Grading.** Items 1 and 3 are debug-logging-§4 **MUST** failures; items 2, 4 and 5 are its
+     **SHOULD**s and the §8 / §9 SHOULDs, filed as such. Step 5's impact table sets the grade: a
+     missing library line is a diagnosis gap in a support read, not a player-facing defect.
+     **Applicability:** the check runs in the addons only, like the diagnostics check above.
    - **Check the write paths against `architecture-§5` by grep, then classify every hit.** Grep the
      addon's own Lua (never `libs/` or `tests/_kit/`) for assignments into the stored tree —
      `db.profile`, `db.global`, `db.char` and the local aliases the files bind them to — and for

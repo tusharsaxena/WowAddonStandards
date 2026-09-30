@@ -6,7 +6,7 @@ Every addon **MUST** ship a debug seam, and debug output **MUST** route to a **d
 
 The console itself is **not addon code**. It is a **Ka0s-owned shared library**, `LibKa0s-DebugLog-1.0`, that every addon in the collection vendors and instantiates. Seven hand-written consoles is what this section used to describe, and seven copies of a window, two formatters, a ring buffer and a scroll sync drifted in seven directions — the color codes agreed, the scrollbar behavior did not. What each addon still owns is the part only it can know: where its debug flag lives, what its session summary says, and which of its flows are worth tracing.
 
-**Adoption strength.** **MUST** for the **wiring** — vendor the lib, create one instance at load from a descriptor, stash it on the namespace, bind the gated sink, degrade to a stub. **SHOULD** only for **which functional flows** §8 traces — which flows matter is genuinely addon-specific, and coverage there is judged by *could I reconstruct what happened*. The rest of the content contract is **MUST**: §8's **Diagnosis** checklist, for each item the addon has; §9 in full, its one summary line per pass and its **Quiet steady state (MUST NOT)** alike; and §10's one settings line at the single write seam. MUST on the wiring is what makes *"turn on `/<slash> debug on`, reproduce it, run `/<slash> diagnostics`, hit Copy, paste it to me"* true of **any** Ka0s addon, in the same format, with the same line numbers on the same scrollbar. The diagnostics step is **MUST** in full, wiring and content contract alike (§14): the report is what makes the pasted trace readable without a round of follow-up questions.
+**Adoption strength.** **MUST** for the **wiring** — vendor the lib, create one instance at load from a descriptor, stash it on the namespace, bind the gated sink, degrade to a stub, and hand that sink to every other `LibKa0s` descriptor that takes one (§4, *The library's own lines*). **SHOULD** only for **which functional flows** §8 traces — which flows matter is genuinely addon-specific, and coverage there is judged by *could I reconstruct what happened*. The rest of the content contract is **MUST**: §8's **Diagnosis** checklist, for each item the addon has; §9 in full, its one summary line per pass and its **Quiet steady state (MUST NOT)** alike; and §10's one settings line at the single write seam. MUST on the wiring is what makes *"turn on `/<slash> debug on`, reproduce it, run `/<slash> diagnostics`, hit Copy, paste it to me"* true of **any** Ka0s addon, in the same format, with the same line numbers on the same scrollbar. The diagnostics step is **MUST** in full, wiring and content contract alike (§14): the report is what makes the pasted trace readable without a round of follow-up questions.
 
 ### 1. The console library
 
@@ -16,7 +16,7 @@ The console itself is **not addon code**. It is a **Ka0s-owned shared library**,
 - **MUST** bind the gated sink **bare** off the instance — `NS.Debug = NS.DebugLog.Debug` — so call sites stay `NS.Debug(tag, fmt, ...)` (§4). It is a plain function, not a method, precisely so it can be published under the addon's own name without a wrapper.
 - **MUST NOT** hold a lib-level console. One instance per host: a shared singleton would give two addons one window, one buffer, and — worse — one `UISpecialFrames` registration, so ESC would close the wrong addon's log.
 - **MUST** degrade rather than error when the lib is absent. `DebugLog.lua` returns **before** `LibStub:NewLibrary` when `LibKa0s-Core-1.0` is missing or older than its floor, so the major is simply **never registered** and the `LibStub(..., true)` lookup answers `nil` — absent, not half-wired. The setup file then falls back to a stub (§7).
-- The descriptor's five **required** fields are `name` (seeds the frame globals and the `UISpecialFrames` entries), `title`, `font` (§2), and `isEnabled` / `setEnabled` (§5). The useful optional ones are `fontSize` (default `10`), `print`, `safeToString`, `initSummary`, `onVisibilityChanged`, `slash` (composes the console checkbox's tooltip), `L` (locale override) and `skin`.
+- The descriptor's five **required** fields are `name` (seeds the frame globals and the `UISpecialFrames` entries), `title`, `font` (§2), and `isEnabled` / `setEnabled` (§5). The useful optional ones are `fontSize` (default `10`), `print`, `safeToString`, `initSummary`, `onVisibilityChanged`, `slash` (composes the console checkbox's tooltip), `L` (locale override), `skin`, and, from DebugLog minor 18 (`LibKa0s v1.65.0`), `onClear` (§6, §9).
 - **MUST** pass `print` and `safeToString` as **thin call-time forwarders** — `function(line) NS.Print(line) end`, not `NS.Print` — when the host's printer is established after this file loads. Capturing the reference freezes it to whatever happened to exist at load; an addon that reclaims its printer from AceConsole's embed later would then acknowledge through the wrong function forever (anti-patterns #36).
 
 **What the library guarantees** (so the standard describes the behavior, not the build): a `BackdropTemplate` window named `<name>DebugWindow`, **700 × 344 by default**, resizable from a bottom-right grip down to a minimum that keeps the title bar's controls clear, the size kept on the window **for the session only** (never saved; a `/reload` restores the default), on **`DIALOG`** strata so it sits above the addon's main window, draggable, clamped to screen, registered in `UISpecialFrames`, skinned from `LibKa0s-Core-1.0`'s shared `SKIN` — the flat 1px black edge with its gray inner highlight, the gold title and the gray divider specified normatively in standalone-windows, "The Ka0s window edge" — with **Core's** close glyph — which the addon **MUST NOT** replace with its main window's, even where the two differ by design (standalone-windows); a `ScrollingMessageFrame` capped at `lib.MAX_BUFFER` (**3000**) lines — raised from 500 to 1500 because the perf capture workflow pastes out of this buffer, and a long run's `perf dump` overflowed the old cap and lost its head with nothing saying so; then from 1500 to 3000 at DebugLog minor 14 (`LibKa0s v1.60.0`), so that the diagnostics report (§14) and the trace reproduced above it fit in one Copy. The figure is measured, not chosen: opening Copy on 5000 lines of width 120 took 378 ms against a 250 ms limit and felt sluggish by hand, while 3000 took 246 ms, so 3000 is the ceiling that passes. The compaction slack, `lib.BUFFER_SLACK`, scales with it to **128** — with the always-shown scrollbar and line counter of §11; the two formatters of §3; the Clear/Copy pair of §6; the title-bar state toggle and single `SetEnabled` seam of §5; the orange **Diagnostics** link in the title bar, a small gap after the Debug On/Off label, plain text rather than a button, which runs the diagnostics report exactly as `/<slash> diagnostics` does (§14; DebugLog minor 16, `LibKa0s v1.64.0`, drawn only when `DebugLogDiagnostics.lua` is loaded, and counted in the window's minimum width); and `ConsoleCheckbox()`, a plain `{ label, tooltip, get, set }` table a settings page renders itself (options-ui). None of that is an addon's code to write, and an audit **MUST NOT** ask for it in the addon's own source.
@@ -24,6 +24,15 @@ The console itself is **not addon code**. It is a **Ka0s-owned shared library**,
 **The library's windows resize, for the session (from `LibKa0s v1.64.0`).** The same guarantee covers the console's copy window (§6) and every copy window `LibKa0s-Widgets-1.0` draws (the shared copy window a host opens for an export): each resizes on **both axes** from its bottom-right grip, opens at the size its descriptor gives, and keeps its own size for the session. The perf step panel resizes on **width only** (performance-§4). One helper draws the grip for all three, so the grip, the minimum and the session-only rule cannot drift between them, and a vendor older than the helper keeps today's fixed windows.
 
 - An addon **MUST NOT** save the size of any of these windows — not in SavedVariables, not through the client's layout cache, not by reapplying a size of its own on show. The size is the **library's session state**, held on a frame that is built once and kept, so it survives a hide and a show and is gone at `/reload`. It is **not** named non-setting state the addon owns (architecture-§5): that class covers geometry of the addon's **own** frames, and a library window's size is neither the addon's to persist nor a row's to address.
+
+**The console's change gates and at-enable queue (from `LibKa0s v1.65.0`).** DebugLog minor 18 adds a secondary file, `DebugLogGates.lua`, and four plain functions on the instance, bound bare like `Debug` (`NS.DebugOnce = NS.DebugLog.DebugOnce`); the three that write are gated and formatted exactly as it is, the string built only when logging is on:
+
+- **`DebugOnce(key, tag, fmt, ...)`** writes the line the first time per `key` per arming and answers `true`; every later call with that key writes nothing and answers `false`.
+- **`DebugChanged(key, tag, fmt, ...)`** writes the line when it (tag and formatted text) differs from the last one written for `key`; an identical line is held back. Going back to an earlier value is a change.
+- **`DebugForget(key)`** re-arms one key in both gates.
+- **`DebugAtEnable(tag, fmt, ...)`** is for a **state** line written while logging may be off: with logging on it writes at once; with logging off it builds the line now and holds it, and the next `SetEnabled(true)` writes every held line after its bracket and the `[Init]` summary (§5). It is one-shot, an identical held line is held once, and it is bounded at `lib.AT_ENABLE_MAX` (**32**): later lines are dropped and counted in one `[Debug] at-enable queue full` line. Events do not go through it — an event written later lands out of time.
+
+Nothing is remembered while logging is off. `Clear()` and turning logging on **re-arm** both gates, and each gate is bounded at `lib.GATE_MAX_KEYS` (**256**) keys, past which it is wiped (the cost is a repeated line, never growth for a session). A copy missing `DebugLogGates.lua` builds a console with none of the four, which is one more reason the whole folder is vendored (§1). §8 and §9 say when a host reaches for them.
 
 ### 2. Monospace font (from the shared media library)
 
@@ -62,6 +71,19 @@ NS.Debug("Loot", "%s x%d", name, qty)     -- NS.Debug = NS.DebugLog.Debug, bound
 - The instance also exposes an **ungated raw append**, `NS.DebugLog:Add(tag, msg)`. It exists for the lines that **must** land regardless of the flag (§5's disable bracket) and for an explicit user-initiated diagnostic run (§12, §14). Ordinary tracing **MUST NOT** use it — an ungated trace on a hot path is a cost paid forever.
 - **MUST** ship the diagnostics dump (§14). **MAY** support further structured dump verbs (`/<slash> debug <topic>`) for large addons; `diagnostics` is the one topic that is reserved and mandatory.
 
+**The library's own lines go through the host's sink (MUST, from `LibKa0s v1.65.0`).** Several `LibKa0s` modules decide things a support read of the log needs — a verb refused, a write refused under the combat lock, a stand-down edge — and only the module knows it decided them. Each takes the host's gated sink the same way, as the descriptor field **`debug(tag, message)`**, and writes its own line through it; a descriptor without `debug` keeps that module silent, as before v1.65.0. Nothing printed to chat moves either way.
+
+| Module (from) | Tag | What it writes |
+|---|---|---|
+| `LibKa0s-Slash-1.0` (Slash minor 18) | `Cmd` | one line per refusal the dispatcher decides, after its chat line: `refused <verb>[ <arg>]: <guard>` — the disabled gate, an unknown verb, `get` / `set` / `reset` usage and not-found, a parse or write refusal, a reset with no default, and the `profile` verb's unavailable, already-current, in-combat and unknown-profile refusals |
+| `LibKa0s-Options-1.0` (Options minor 27) | `Cfg` | one line per act the combat lock refuses, `<what> refused (in combat)` — a write, a page's Defaults, *Reset all settings*, a toggle, a tab, the nav rail, a banner control, an id list change, a page shown under the lock — once per text per combat; and `register parked (in combat)` with its `register flushed (combat ended)` |
+| `LibKa0s-Launcher-1.0` (Launcher minor 5) | `Launcher` | its events on `debug` (shown, hidden, a menu refusal, a raising accessor); its four **state** lines — a broker library absent, no minimap table, `registered` — on the separate field **`debugAtEnable(tag, message)`**, so they land when logging is next turned on (§1) |
+| `LibKa0s-Lifecycle-1.0` (Lifecycle minor 3) | `Lifecycle` | one line per edge, before the host's callback runs: `stood down: added <key> (holds: <set>)`, `stood up: released <key> (holds: none)`; a call that fires no edge writes nothing |
+
+- The host **MUST** pass `debug` to **every** `LibKa0s` descriptor that takes it — today Slash, Options, Launcher and Lifecycle (the Perf harness's ungated `log` is §12's, not this field) — each the gated sink itself or a thin call-time forwarder onto it, `debug = function(tag, msg) NS.Debug(tag, msg) end` — never the ungated `Add` and never the chat printer — and **SHOULD** pass the Launcher's `debugAtEnable` onto the console's queue, `function(tag, msg) NS.DebugLog.DebugAtEnable(tag, "%s", msg) end`. The message arrives formatted, so the forwarder adds no format arguments to it. Without the field the library's line is not written, and a support read misses exactly the refusals and edges §8 asks for.
+- The host **MUST NOT** write a duplicate of a line the library writes. A host's own stand-down / stand-up line in its Lifecycle callbacks, a Slash refusal the host logs itself or recognizes by matching the chat line, a host `[Cfg]` line for a write the combat lock refused: each is one event logged twice, and the second copy is the host's to delete. A host line that adds what the library's cannot know — which of the addon's own modules stood down, how many rebuilds a flush replayed — is not a duplicate.
+- **On a vendor older than `LibKa0s v1.65.0`** the fields do not exist, a passed `debug` is read by nothing, and the host's own line is the only line there is: keeping it is correct until the re-vendor, and the re-vendor is the item, not a finding under this bullet.
+
 ### 5. Enabled-state — the addon's flag, the library's seam
 
 **The flag stays the addon's.** `isEnabled` and `setEnabled` are descriptor callbacks over the host's own `NS.State.debug`; the library never stores a copy, because a second copy is a second truth, and the flag is read by the addon's own show-decision ladder and settings panel as well as by the console.
@@ -80,14 +102,14 @@ NS.Debug("Loot", "%s x%d", name, qty)     -- NS.Debug = NS.DebugLog.Debug, bound
 
 The Clear and Copy controls are the library's; this is the behavior they guarantee and why it is shaped this way.
 
-- **Clear** wipes both the visible log and the Copy buffer, and resets the line counter (§11).
+- **Clear** wipes both the visible log and the Copy buffer, and resets the line counter (§11). From DebugLog minor 18 (`LibKa0s v1.65.0`) it also re-arms the change gates (§1) and then calls the descriptor's `onClear()` under `pcall`, for a host that keeps a gate of its own (§9); the at-enable queue is left alone.
 - **Copy** opens a read-through multiline `EditBox` pre-filled with the plain buffer and auto-highlighted for `Ctrl+C`, in the same monospace font. WoW exposes **no clipboard API** — the user's `Ctrl+C` inside an `EditBox` is the only copy path, so a button alone cannot write the OS clipboard. *(The color-vs-clean-copy split is deliberate: the `ScrollingMessageFrame` gives the colored live view, the `EditBox` gives code-free copies — one widget cannot do both, since selecting color-coded text copies its `|c…|r` escapes.)*
 
 ### 7. Fallback — the stub when the library is absent
 
 A missing vendored library **MUST NOT** error at load, and **MUST NOT** silently break the addon's own function.
 
-- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, `RunDiagnostics` (which answers with the library-absent line, §14), the raw `buffer`, and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
+- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, `RunDiagnostics` (which answers with the library-absent line, §14), the raw `buffer`, from `LibKa0s v1.65.0` the gates and queue the addon calls — `DebugOnce`, `DebugChanged`, `DebugForget`, `DebugAtEnable`, each answering `false` or nothing (a stub under the kit's `assertSurfaceParity` gains all four or names them in its `ignore` list, because the by-name form reads the live instance) — and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
 - The stub **MUST** still flip the flag and still print the ack. `NS.State.debug` is the addon's, not the library's, and a user who types `/<slash> debug on` must not be told nothing happened. What is lost is the **window**, and the stub **SHOULD** say so once, honestly, through the addon's printer — once, not per call.
 - The stub **MUST NOT** re-implement the formatters or the line format (§3).
 - **Utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
@@ -125,16 +147,24 @@ the state around the flow. Where the addon has them, the log **MUST** also carry
   roster change, a spec change, and the addon's own enable and stand-down transitions. **One line
   per edge**, naming the state the addon took from it (`[Combat] entered: repaint held`,
   `[State] restriction on: secret reads parked`). An edge the addon does not react to needs no
-  line.
+  line. The stand-down and stand-up edges of `LibKa0s-Lifecycle-1.0`'s latch are the library's
+  line (§4, *The library's own lines*); the host names only what it took from the edge that the
+  library's line does not.
 - **Deferred work** — when work is **held**, and why (combat, a secret value, a lockdown, a
   dependency not loaded yet), and when it is **flushed**, and how much (`flushed 3 held rebuilds`).
   A held-then-never-flushed state **MUST** be visible in the log: a hold line with no flush line
-  after it is the evidence.
+  after it is the evidence. A settings registration the combat lock parks, and its flush, are the
+  options library's lines (§4).
 - **Refusals and no-ops, with the reason** — a command refused, a write rejected, an event ignored
   because a guard said no. The line **names the guard** (`[Cmd] reset refused: in combat`): the
-  report is "nothing happened", and the guard is the answer.
+  report is "nothing happened", and the guard is the answer. A refusal a `LibKa0s` module decides
+  — the slash dispatcher's, the combat lock's — is the library's line, written through the sink the
+  host passes (§4); the host writes the refusals its own code decides.
 - **Dependencies** — an optional library or companion addon found or missing, logged **once, at
-  enable**, not on every call that consults it.
+  enable**, not on every call that consults it. The flag is off at login (§5), so a line written
+  through the gated sink at `OnEnable` never lands: such a state line **SHOULD** go through the
+  console's at-enable queue, `DebugAtEnable` (§1), which holds it until logging is turned on, as the
+  Launcher's state lines do through `debugAtEnable` (§4).
 - **Errors caught** by a `pcall` the addon owns — the site and the message, **once per distinct
   error**, so an error a repeating path swallows on every pass is one line, not a wall of them.
 
@@ -178,6 +208,12 @@ else, while a throttle can drop the one change that mattered inside its window.
   not steady state, and stays compliant under the rule above.
 - The comparison is part of the summary's cost, so it sits **behind the gate** too: with logging
   off, the path neither builds nor compares anything (§4).
+- **Use the console's gates (SHOULD, from `LibKa0s v1.65.0`).** A *log on change* line
+  **SHOULD** be `DebugChanged(key, tag, fmt, ...)` and a *log once* line `DebugOnce(key, tag, fmt,
+  ...)` (§1), not a hand-rolled memo: both keep the comparison behind the gate, and `Clear()` and
+  turning logging on re-arm them, so the first pass after a Clear writes its line where a host memo
+  would stay silent over an empty console. A host that keeps a gate of its own **SHOULD** re-arm it
+  from the DebugLog descriptor's `onClear` (§6).
 
 ### 10. Settings changes — log once, at the single write seam (MUST)
 

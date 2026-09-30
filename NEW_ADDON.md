@@ -133,13 +133,20 @@ disagreeing with the collection's intent while looking, in review, like it had b
      `diagnosticsEnablesLogging`, so a run turns debug logging on for the session (the library does
      the enable; the addon never calls `SetEnabled` around the run). The stub's
      `RunDiagnostics` prints the library-absent line and writes nothing. Needs LibKa0s **v1.60.0**
-     or later.
+     or later. Bind the console's gates bare beside the sink — `NS.DebugOnce`, `NS.DebugChanged`,
+     `NS.DebugAtEnable` off the instance (DebugLog minor 18, LibKa0s **v1.65.0**) — so a repeating
+     path logs on change, a one-time line logs once, and a state line written at `OnEnable` is held
+     until logging is turned on, with no memo of the addon's own (debug-logging-§1, §8, §9); the stub
+     answers all three with nothing.
    - the **slash descriptor** in `settings/Slash.lua` — `LibKa0s-Slash-1.0` (slash-commands): the
      addon keeps its ordered `NS.COMMANDS` table and its host verbs and passes them in; the library
      supplies the dispatcher, help renderer, formatters and the type-aware value parser. The stub
      carries no library string but `DISABLED_LINE_FORMAT`, pinned with `Kit.assertLibraryConstant`,
      and a composed-row verb on a library-absent load writes through `writeThrough` or prints the
-     library-absent line (slash-commands-§1, options-ui-§1). `NS.COMMANDS` carries the
+     library-absent line (slash-commands-§1, options-ui-§1). The descriptor passes
+     `debug = function(tag, msg) NS.Debug(tag, msg) end`, so the dispatcher's own refusals land in
+     the console as `[Cmd]` lines, and no host verb logs a refusal the dispatcher already wrote
+     (debug-logging-§4, *The library's own lines*; Slash minor 18). `NS.COMMANDS` carries the
      **`diagnostics`** row from day one, and the `debug` handler tests `diagnostics` **first**
      (`NS.DebugLog:DebugVerb(rest)`, then the window toggle), so `/<slash> diagnostics` and
      `/<slash> debug diagnostics` run the same report. No `diag`, `dump` or other alias
@@ -147,7 +154,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    - `settings/OptionsSetup.lua` — `LibKa0s-Options-1.0` (options-ui): the `get`/`set`/`applyDefault`
      seams, `rowsForPage`/`allRows`, the color codecs, and eager settings-category registration with a
      lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5). Loads before
-     every `settings/<page>.lua`. The stub's composers answer `{}` (options-ui-§1).
+     every `settings/<page>.lua`. The stub's composers answer `{}` (options-ui-§1). Pass `debug` onto
+     the gated sink as the Slash descriptor does: the combat lock's refusals are the library's
+     `[Cfg]` lines (debug-logging-§4; Options minor 27).
    Each stub **MUST** answer every member the addon actually calls — a stub missing one is a crash
    moved to a rarer code path, not a fallback.
 
@@ -215,7 +224,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
      minor 3, `LibKa0s v1.57.0`) draw the **status tooltip**, shown while disabled too: pass
      `isLocked` / `isTestMode` for the states the addon has and `version`, and keep any
      `onTooltipShow` to the addon's own lines, with no title, status line or click hint (launcher-§1,
-     anti-pattern #89). Then record the addon's menu entries in `standards/ADDONS.md`'s Launcher menu
+     anti-pattern #89). Pass `debug` onto the gated sink and `debugAtEnable` onto
+     `NS.DebugAtEnable` (Launcher minor 5, LibKa0s v1.65.0), so the registration's state lines land
+     the first time logging is turned on (debug-logging-§4, §8). Then record the addon's menu entries in `standards/ADDONS.md`'s Launcher menu
      entries column in the same pass.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
      128×128, **uncompressed 32-bit**, from the 2000×2000 `.png` source:
@@ -234,7 +245,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
      bare `/<slash>` open the panel, and the schema CLI reads and repairs settings, which is exactly
      when it is most needed — while a **feature** verb SHOULD answer one tagged line naming
      `/<slash> enable` (slash-commands-§2). Vendor LibKa0s **v1.42.0** or later, whose Slash minor 14
-     answers that surface and whose `LibKa0s-Lifecycle-1.0` is the latch. The launcher's left-click
+     answers that surface and whose `LibKa0s-Lifecycle-1.0` is the latch; pass the latch's descriptor
+     `debug` onto the gated sink (Lifecycle minor 3, LibKa0s v1.65.0), which logs every stand-down
+     and stand-up edge with its holds, and write no edge line of your own in the callbacks
+     (debug-logging-§4, §8). The launcher's left-click
      still opens the panel, and its right-click menu keeps *Enabled* live and grays the rest. Ship
      `tests/test_disabled.lua` with the addon. A greenfield addon is the one place this is cheap —
      retrofitting it is the collection's largest outstanding obligation.
