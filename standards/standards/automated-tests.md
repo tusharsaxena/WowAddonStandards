@@ -38,7 +38,7 @@ land, in what shape, and what may fail a run — that is what is specified here.
       tests.txt                   -- harness output
       test-cases.md               -- the generated inventory as it stood for this run
       perf.txt / perf.json        -- offline scenario output + its record
-      complexity.txt              -- raw lizard output
+      complexity.txt              -- lizard output, measured over the sighted shadow (§3)
   ```
 
 - **MUST** name suite files for the suite, not the tool, so a future tool swap does not rename the
@@ -104,7 +104,8 @@ This is the section's load-bearing rule, and it is a deliberate refusal to do th
 
 - **`lint`** (`luacheck .`) and **`tests`** (`lua tests/run.lua`) are **gating**. They answer
   *is it correct*, they are deterministic, and testing-§4 already makes them the green commit gate.
-- **`perf`** (`lua tests/perf.lua`) and **`complexity`** (`lizard`) are **recorded — they never fail a
+- **`perf`** (`lua tests/perf.lua`) and **`complexity`** (`lizard`, measured through the kit's
+  sanitized shadow: *The complexity gate is sighted* below) are **recorded — they never fail a
   run and never gate a commit**. They answer *what does it cost* and *where is it getting hard to
   change* — questions whose answers are read, compared and argued with, not thresholded. At the
   **release** they do gate, and that is a separate checkpoint evaluated by a separate actor: see *The
@@ -134,6 +135,72 @@ Verdicts: **`red`** — a gating suite failed. **`amber`** — a gating suite wa
 its own deterministic assertions. **`green`** — gating suites passed and nothing went unmeasured
 without saying so.
 
+#### The complexity gate is sighted (MUST)
+
+`lizard` reads Lua through a reader that is not a Lua reader, and where it loses its place it drops
+**the whole function** from its table without a word: the function is not listed, its CCN is never
+compared with 15, and the run reports *"no function above CCN 15"* over code it never measured.
+Measured with **`lizard` 1.24.0** on 2026-10-01, comparing each repo's `function` keyword tokens
+(strings and comments stripped) with the functions `lizard` listed, about **1,600 functions went
+unmeasured across the collection**, and **29** of them were above CCN 15 in six repos while every
+one of those repos' records said *"None"* (WowAddonStandards#6). A guard against one cause in one
+addon left it blind in eight files to the others. The blind spots, each measured against 1.24.0:
+
+| Hazard | What `lizard` 1.24.0 does | A line that loses its function |
+|---|---|---|
+| `#`, the length operator | reads it as a C **preprocessor** line, which swallows the rest of the line, `end` included | `local function len(t) return #t end` |
+| bare `it` | its Lua reader inherits a **Ruby-like** reader, and `it` enters that reader's RSpec state wherever it stands, field and method names included | `for _, it in ipairs(t) do`, `x.it`, `x:it()` |
+| bare `class`, `module`, `begin` | open a Ruby block that wants an `end`, bare or after `:`, never after `.` | `{ class = "?" }`, `local module = m`, `x:begin()` |
+| `unless` | opens a Ruby block wherever it stands, field names included | `{ unless = 1 }`, `u.unless` |
+| a function literal in a `for ... in` header | is not listed; inside a function its body folds into the enclosing function's CCN, so it is counted, but not as a function | `for _, p in ipairs({ function() end }) do` |
+
+None of these is a defect in the addon: `#t` and `{ class = ... }` are ordinary Lua, and rewriting
+some 2,800 hazard lines across the collection to suit one tool's reader would be churn that the next
+blind spot undoes. **The fix is in the measurement**, and it is the kit's (from **LibKa0s test-kit
+revision 35, LibKa0s v1.66.0**):
+
+- **MUST** measure complexity through the vendored runner's **sighted shadow**, never by running
+  `lizard` over the tree directly. The runner copies every file the fixed invocation would read
+  (performance-§10) through the kit's `lizard_sighted.lua` into a temporary directory — `#` becomes
+  a space, the Ruby-reader words are renamed (`it_`, `class_`, …), `function a:b(x)` becomes
+  `function a.b(self, x)` so a method is listed under its own name, and strings, comments and every
+  line break are copied byte for byte — and runs the same command there, so `complexity.txt`'s paths
+  and line numbers are the real files'. The command a reader would run by hand,
+  **`bash tests/_kit/run-automated-tests.sh --suite complexity`**, is the one every gate line, every
+  playbook and every `CLAUDE.md` quotes (with `--no-bundle` to check without writing a record);
+  the raw `lizard -l lua ...` line is the blind one.
+- **MUST** treat a **function-count parity mismatch** as complexity **not passing**. The sanitizer
+  is a heuristic and the next blind spot will not be on its list, so parity is what makes the shadow
+  safe: the runner counts the `function` tokens in every shadow file and compares them with the
+  `function_cnt` `lizard` reports for it, and a file where the two differ is a file whose functions
+  went unmeasured. The run then records `suites.complexity.status` as **`fail`** and
+  **`suites.complexity.blindFiles`** as the number of such files (0 on a sighted run), names them
+  on the console and opens `RESULTS.md`'s watch list with **Not sighted — complexity did not pass**.
+- That `fail` is **amber, never red**, and it **MUST NOT** block a commit: everything above about
+  perf and complexity holds unchanged. **At the release it blocks the way a `skip` does**, because a
+  CCN claim over files `lizard` could not read is the same unmeasured claim as one where `lizard`
+  never ran (*The release gate* below). The remedy is in the source, not the tool: a `blindFiles`
+  above 0 names the files, and hoisting a function literal out of a `for ... in` header into a local
+  is the usual one.
+- **MUST** record the suite as a **skip**, never a raw run, when the shadow cannot be built (no Lua
+  interpreter, no `lizard_sighted.lua` beside the runner, no `mktemp`): `lizard` alone is blind in
+  Lua, and a raw run would be a pass that measured less than it says.
+- **MUST** wire the kit's gate for the sanitizer, `{ name = "test_lizard_sighted", dir =
+  "tests/_kit/" }`, in `tests/run.lua`, as every kit suite is declared (testing-§9); from kit
+  revision 35 `Kit.assertSuiteInventory` fails the harness until it is wired.
+- A repo whose vendored kit predates revision 35 cannot meet this section: its complexity record is
+  **unsighted**, and the remedy is the re-vendor, never a local scanner. A per-addon hazard guard is
+  a twelfth local copy of what is now a kit gate — the drift testing-§9 names — and one built for
+  `#` alone is the one that left an addon blind in eight files to the rest (anti-patterns #92).
+- **Every function the sighted suite newly reports above CCN 15 was there before**, unseen. It is
+  not a regression to bisect; it is a release blocker to refactor (performance-§11) or rule on, and
+  the first sighted run's watch-list entries are recorded as *newly measured*, not *newly crossed*.
+  Method names change once, from `a` to `a.b`, and a carried disposition does not follow a renamed
+  entry: re-rule it.
+- `lizard` stays "any recent" (documentation-§7): parity, not a pinned version, is what notices a
+  reader change. The blind spots above are named against 1.24.0 so a reader can reproduce them; a
+  future version that loses a different construct shows up as a `blindFiles` count, not a quiet pass.
+
 #### The release gate: all four, and it is not the commit gate (MUST)
 
 Everything above is about **the run**, and about **commits**. A **release** is a different checkpoint
@@ -143,7 +210,8 @@ with a different failure mode, and there all four suites gate.
   `manifest.json` shows **all four** suites at `pass`, and `suites.complexity.warnings` at **0**.
   Concretely: `lint` pass (which already means **zero warnings and zero errors**, since `luacheck`
   exits non-zero on either), `tests` pass with zero failures, `perf` pass, and `complexity` pass with
-  **no function above CCN 15**.
+  **no function above CCN 15** and **`blindFiles` at 0** — a sighted run, since a parity mismatch is
+  itself a `fail` (*The complexity gate is sighted* above).
 - **MUST** treat a **skip** as a gate that did **not pass**. A release claiming zero CCN > 15 on a run
   where `lizard` never executed is an unmeasured claim, and automated-tests-§3's own rule — a skip is
   never a pass — is what makes it one. The remedy is to install the tool and re-run, not to read the
