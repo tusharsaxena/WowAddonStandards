@@ -156,7 +156,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
      lazily-built body **and a lazily-built header Defaults button** (options-ui-§1/§5). Loads before
      every `settings/<page>.lua`. The stub's composers answer `{}` (options-ui-§1). Pass `debug` onto
      the gated sink as the Slash descriptor does: the combat lock's refusals are the library's
-     `[Cfg]` lines (debug-logging-§4; Options minor 27).
+     `[Cfg]` lines (debug-logging-§4; Options minor 27). Pass `addonName = addonName`, the file's
+     first vararg and never a display label: it is the folder name the library's IdList help-mark art
+     is drawn from (options-ui-§1, library-stack-§8).
    Each stub **MUST** answer every member the addon actually calls — a stub missing one is a crash
    moved to a rarer code path, not a fallback.
 
