@@ -1049,14 +1049,16 @@ local LIB_FILES = {
   "libs/LibKa0s/WidgetsDragHandle.lua",
   "libs/LibKa0s/DebugLog.lua", "libs/LibKa0s/DebugLogDiagnostics.lua",   -- the second from v1.60.0
   "libs/LibKa0s/DebugLogGates.lua",                                        -- from v1.65.0
-  "libs/LibKa0s/Slash.lua", "libs/LibKa0s/Launcher.lua",
+  "libs/LibKa0s/Slash.lua", "libs/LibKa0s/SlashParse.lua",              -- the second from v1.66.0
+  "libs/LibKa0s/Launcher.lua",
   "libs/LibKa0s/Options.lua", "libs/LibKa0s/OptionsRegistry.lua",          -- the second from v1.62.0
   "libs/LibKa0s/OptionsWidgets.lua",
   "libs/LibKa0s/OptionsIds.lua", "libs/LibKa0s/OptionsIdList.lua",         -- from v1.62.0
   "libs/LibKa0s/OptionsTabs.lua", "libs/LibKa0s/OptionsCombat.lua",        -- the second from v1.62.0
   "libs/LibKa0s/OptionsCompose.lua", "libs/LibKa0s/OptionsScroll.lua",
   "libs/LibKa0s/OptionsNav.lua",   -- from v1.61.0
-  "libs/LibKa0s/Perf.lua", "libs/LibKa0s/PerfCommands.lua",              -- the second from v1.66.0
+  "libs/LibKa0s/Perf.lua", "libs/LibKa0s/PerfSampler.lua",               -- the second from v1.66.0
+  "libs/LibKa0s/PerfCommands.lua",                                         -- from v1.66.0
   "libs/LibKa0s/PerfPanel.lua",
 }
 -- The addon's own files come from the TOC rather than a copy of it, so this runner cannot drift

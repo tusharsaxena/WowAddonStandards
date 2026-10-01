@@ -201,6 +201,25 @@ revision 35, LibKa0s v1.66.0**):
   reader change. The blind spots above are named against 1.24.0 so a reader can reproduce them; a
   future version that loses a different construct shows up as a `blindFiles` count, not a quiet pass.
 
+#### What a complexity warning means: CCN above 15, and nothing else (MUST)
+
+`suites.complexity.warnings` counts **functions above CCN 15**, and no other `lizard` finding. From
+LibKa0s test-kit revision 35 the runner passes `lizard` **`-L 1500`**, so its function-length
+threshold is layout-§1's **1500-line file cap** rather than its default 1000. A function cannot be
+longer than the file that holds it, so in any file the cap binds a length warning cannot fire, and
+function length is governed by **layout-§1 alone** (its cap and its 1000–1500 on-notice band).
+`lizard`'s default parameter threshold of 100 is not a count a Lua function reaches.
+
+- **MUST NOT** read a length-only `lizard` warning as a complexity finding, or split a function to
+  clear one. The first sighted run over `LibKa0s` listed two closures that wrap their whole file
+  (`lib.__AttachIdList`, 1165 lines at CCN 1, and `lib.__AttachWidgets`, 1040 lines at CCN 6) and
+  refused the `v1.66.0` release on them under the default threshold; both files sit inside the cap,
+  so the finding duplicated layout-§1 and named nothing hard to change.
+- **MUST NOT** re-tune `-L` (or add any other flag) per repo: the flag is the kit's, and
+  performance-§10's *exact invocation* includes it.
+- A kit older than revision 35 runs without `-L 1500`; it is already unsighted and owes the re-vendor
+  (above), so a length warning on such a record is read the same way, as no complexity finding.
+
 #### The release gate: all four, and it is not the commit gate (MUST)
 
 Everything above is about **the run**, and about **commits**. A **release** is a different checkpoint
