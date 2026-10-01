@@ -93,12 +93,21 @@ size. Give every field of `lizard`'s footer — totals *and* averages — plus t
 | Warning rate (`Fun Rt` / `nloc Rt`) | |
 | Files in the 1000–1500 band | |
 | Files over the 1500 cap | |
+| Blind files (parity mismatch) | |
 
 The averages are the point. A **total** that rose because the addon grew is a different fact from an
 **average** that rose because it got denser, and only the second is a complexity signal — reporting
 totals alone makes a growing addon look like a degrading one, every release, until nobody reads the
 row. Every value comes from `manifest.json`'s `suites.complexity`, which records all eight footer
-fields.
+fields and, from kit revision 35, `blindFiles`.
+
+**A `blindFiles` above 0 is complexity not passing**, whatever the warnings count says: those files'
+functions went unmeasured, because `lizard` was still blind in them after the kit's sanitized shadow
+(automated-tests-§3, *The complexity gate is sighted*). Name every file the console listed and what
+the usual fix is (a function literal hoisted out of a `for ... in` header). A run on a kit older than
+revision 35 is **unsighted**: say so in the paragraph, since its figures undercount by however many
+functions `lizard` dropped. The first sighted run after the re-vendor reports functions above CCN 15
+that were always there: call them **newly measured**, not regressions.
 
 For each suite that is not a clean pass, one short paragraph: what the output says, and whether it is
 a regression, a pre-existing condition, or a skip.
@@ -264,6 +273,7 @@ Print, in chat:
   number never matters.
 - The verdict, and the bundle path.
 - Anything that newly crossed a threshold, with its disposition.
+- `blindFiles`, and every blind file the run named, when it is above 0: complexity did not pass.
 - Any suite that was **skipped**, with what is missing and its install hint. Never let a skip pass
   silently: the whole point of recording skips is that they are visible.
 

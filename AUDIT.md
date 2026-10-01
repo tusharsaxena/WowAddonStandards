@@ -1076,14 +1076,33 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      and **MUST NOT** sit in top-level `read_globals`, where it is a permission the addon's own
      shipped source can reach for. And a tree turned on behind a blanket `ignore` is worse than the
      exclusion it replaced: report the ignore list with the count it suppresses.
-   - **The complexity report is measured, not read.** Run the standard's exact invocation from the
-     repo root — **`lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`** — and compare the result
+   - **The complexity gate is sighted, and the kit that sights it is revision 35 or later
+     (automated-tests-§3, *The complexity gate is sighted*; v2.74.0).** Read `Kit.VERSION` at the top
+     of `tests/_kit/framework.lua`: below **35** the repo's complexity record is **unsighted** —
+     `lizard` alone drops whole functions over `#` and its Ruby-like reader's bare `it`, `class`,
+     `module`, `begin` and `unless`, so a recorded *"no function above CCN 15"* is an unmeasured claim
+     — and the finding is a **re-vendor item**, never a local fix. On 35 or later check four things:
+     `{ name = "test_lizard_sighted", dir = "tests/_kit/" }` is declared in `tests/run.lua`; the
+     newest bundle's `manifest.json` carries `suites.complexity.blindFiles` and it is **0** (above 0,
+     complexity did not pass, and a release cut on that run is a release-gate **MUST** failure); no
+     local hazard scanner (a `#`-on-a-keyword-line case in the repo's own lint-config or prose suite)
+     stands in for the kit's gate (anti-pattern #92, testing-§9); and no gate line in root
+     `CLAUDE.md`, `docs/testing.md` or `DEPENDENCIES.md` quotes the raw `lizard -l lua ...` command
+     where `bash tests/_kit/run-automated-tests.sh --suite complexity` belongs. A repo's first sighted
+     run reports functions above CCN 15 that were always there; they are release blockers owed a
+     refactor or a ruling, not regressions.
+   - **The complexity report is measured, not read.** Run the complexity suite from the repo root
+     through the vendored runner, writing nothing —
+     **`bash tests/_kit/run-automated-tests.sh --suite complexity --no-bundle`**, which runs the
+     standard's fixed invocation over the sighted shadow and prints the warnings, the maximum CCN, the
+     function count and any blind files — and compare the result
      against the **latest run bundle's `complexity.txt`** and the watch list in
      **`docs/automated-tests/RESULTS.md`** (automated-tests-§1/§4; `docs/complexity.md` was retired in
      v2.19.0 — an addon still carrying one is pre-adoption, and that is the finding). Record the
      **drift**: which functions crossed a `lizard` threshold or which files entered layout-§1's
-     1000–1500 LOC band since the latest bundle, and how stale that bundle's stamp dates it. Run the
-     invocation **verbatim** — a locally "improved" one produces numbers that cannot be compared with
+     1000–1500 LOC band since the latest bundle, and how stale that bundle's stamp dates it. Never run
+     `lizard` over the tree by hand: it is blind in Lua, and its numbers undercount what the runner
+     measures. Run the runner **verbatim** — a locally "improved" invocation produces numbers that cannot be compared with
      the recorded run, which is the whole point of the check. A record whose numbers no longer match
      the code is stale (anti-pattern #51); a hand-edited one is worse, because it reads as measured.
      **Staleness is only legible once a row names the commit it measured** (automated-tests-§4), so

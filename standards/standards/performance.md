@@ -218,10 +218,16 @@ The complexity report is the collection's standing answer to *"where is this add
 - **MUST** generate it with this exact invocation, run from the repo root:
 
   ```bash
-  lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .
+  lizard -l lua -L 1500 -x "./libs/*" -x "./tests/_kit/*" .
   ```
 
-  The two exclusions are the **vendored** trees — `libs/` and the shared harness at `tests/_kit/` are not this addon's surface (library-stack-§7, testing-§1), and including them swamps the addon's own numbers with library code that no consumer may edit. The addon's **own** `tests/` are measured: a test file that has become as tangled as the module it covers is exactly the signal this report is for. Do not add flags, do not re-tune thresholds per addon, and do not narrow the path to a subfolder — a locally "improved" invocation produces a report that cannot be diffed against the one before it, which costs more than any flag gains.
+  **It is run by the vendored runner over the kit's sighted shadow, never over the tree by hand**
+  (automated-tests-§3, *The complexity gate is sighted*, from LibKa0s test-kit revision 35): the
+  invocation's one addition is `-L 1500`, which sets `lizard`'s function-length threshold to
+  layout-§1's file cap (automated-tests-§3, *What a complexity warning means*), and `lizard` reads
+  Lua blind over `#` and a handful of Ruby keywords and drops whole functions without a word, so the command a gate line or a reader quotes is
+  `bash tests/_kit/run-automated-tests.sh --suite complexity`, which runs this line in the shadow
+  and fails the suite on any function-count parity mismatch. The two exclusions are the **vendored** trees — `libs/` and the shared harness at `tests/_kit/` are not this addon's surface (library-stack-§7, testing-§1), and including them swamps the addon's own numbers with library code that no consumer may edit. The addon's **own** `tests/` are measured: a test file that has become as tangled as the module it covers is exactly the signal this report is for. Do not add flags, do not re-tune thresholds per addon, and do not narrow the path to a subfolder — a locally "improved" invocation produces a report that cannot be diffed against the one before it, which costs more than any flag gains.
 - **MUST** carry a generated-file header naming the tool version, the date, the command and the standard version, so a reader can tell staleness from a glance and reproduce the run without guessing:
 
   ```markdown
@@ -231,10 +237,10 @@ The complexity report is the collection's standing answer to *"where is this add
 
   - **Generated:** <YYYY-MM-DD>
   - **Tool:** lizard <version>
-  - **Command:** `lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .`
+  - **Command:** `lizard -l lua -L 1500 -x "./libs/*" -x "./tests/_kit/*" .` (over the sighted shadow)
   - **Standard:** v<X.Y.Z>
   ```
-- **MUST** carry a **`## Watch list`** above the raw output, naming every function `lizard` warned on (its default thresholds: CCN > 15, length > 1000, parameters > 100) and every file in layout-§1's **1000–1500 LOC on-notice band**, each with a one-line disposition — *accepted and why*, *peel next*, or *already tracked as `<deviation-id>`*. The raw table alone gets skimmed; a short list with dispositions is what actually gets read, and it is what makes the next release's diff meaningful. An empty watch list is a **result** — write "None." rather than dropping the heading.
+- **MUST** carry a **`## Watch list`** above the raw output, naming every function `lizard` warned on (CCN > 15; the length threshold is `-L 1500`, layout-§1's file cap, so a length warning cannot fire, and `lizard`'s default parameter threshold of 100 is not a count a Lua function reaches) and every file in layout-§1's **1000–1500 LOC on-notice band**, each with a one-line disposition — *accepted and why*, *peel next*, or *already tracked as `<deviation-id>`*. The raw table alone gets skimmed; a short list with dispositions is what actually gets read, and it is what makes the next release's diff meaningful. An empty watch list is a **result** — write "None." rather than dropping the heading.
 
 #### Reading a Lua complexity number (the `and`/`or` tax)
 

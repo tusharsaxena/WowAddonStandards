@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.73.0, 2026-10-01)
+# New Ka0s Addon — Context Pack (v2.74.0, 2026-10-01)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -1036,8 +1036,8 @@ Loader.addonName = "<Addon>"
 --
 -- A module's FLOOR DEPENDENCIES are part of "all of them", and this is the half that gets dropped:
 -- a module whose floor is unmet resolves it, `return`s BEFORE `LibStub:NewLibrary`, and is simply
--- ABSENT — no error, no warning, nothing to see. DebugLog.lua floors on Widgets (Widgets.lua plus
--- WidgetsDragHandle.lua), Perf.lua floors on Lifecycle.lua, and OptionsWidgets.lua and
+-- ABSENT — no error, no warning, nothing to see. DebugLog.lua floors on Widgets (Widgets.lua,
+-- WidgetsReorder.lua and WidgetsDragHandle.lua), Perf.lua floors on Lifecycle.lua, and OptionsWidgets.lua and
 -- OptionsTabs.lua both floor on Pool.lua. Load a major without its floor and the suite tests a stub
 -- it cannot tell from the real thing. Whole-folder vendoring is mandatory for the same reason, so
 -- the whole folder is what this list names.
@@ -1045,17 +1045,21 @@ local LIB_FILES = {
   "libs/LibKa0s/Core.lua", "libs/LibKa0s/Env.lua", "libs/LibKa0s/Compat.lua",
   "libs/LibKa0s/Lifecycle.lua", "libs/LibKa0s/Bus.lua", "libs/LibKa0s/Schema.lua",
   "libs/LibKa0s/Pool.lua", "libs/LibKa0s/Item.lua", "libs/LibKa0s/Media.lua",
-  "libs/LibKa0s/Widgets.lua", "libs/LibKa0s/WidgetsDragHandle.lua",
+  "libs/LibKa0s/Widgets.lua", "libs/LibKa0s/WidgetsReorder.lua",          -- the second from v1.66.0
+  "libs/LibKa0s/WidgetsDragHandle.lua",
   "libs/LibKa0s/DebugLog.lua", "libs/LibKa0s/DebugLogDiagnostics.lua",   -- the second from v1.60.0
   "libs/LibKa0s/DebugLogGates.lua",                                        -- from v1.65.0
-  "libs/LibKa0s/Slash.lua", "libs/LibKa0s/Launcher.lua",
+  "libs/LibKa0s/Slash.lua", "libs/LibKa0s/SlashParse.lua",              -- the second from v1.66.0
+  "libs/LibKa0s/Launcher.lua",
   "libs/LibKa0s/Options.lua", "libs/LibKa0s/OptionsRegistry.lua",          -- the second from v1.62.0
   "libs/LibKa0s/OptionsWidgets.lua",
   "libs/LibKa0s/OptionsIds.lua", "libs/LibKa0s/OptionsIdList.lua",         -- from v1.62.0
   "libs/LibKa0s/OptionsTabs.lua", "libs/LibKa0s/OptionsCombat.lua",        -- the second from v1.62.0
   "libs/LibKa0s/OptionsCompose.lua", "libs/LibKa0s/OptionsScroll.lua",
   "libs/LibKa0s/OptionsNav.lua",   -- from v1.61.0
-  "libs/LibKa0s/Perf.lua", "libs/LibKa0s/PerfPanel.lua",
+  "libs/LibKa0s/Perf.lua", "libs/LibKa0s/PerfSampler.lua",               -- the second from v1.66.0
+  "libs/LibKa0s/PerfCommands.lua",                                         -- from v1.66.0
+  "libs/LibKa0s/PerfPanel.lua",
 }
 -- The addon's own files come from the TOC rather than a copy of it, so this runner cannot drift
 -- from what the client loads. A suite named here but missing from disk is SKIPPED, not failed.
@@ -1096,7 +1100,10 @@ The diagnostics dump's contract cases are not written here either: the kit's sha
 `test_diagnostics_contract.lua` runs them against **this** addon's dispatcher — both forms, while
 disabled, append, the run turning logging on (and the opt-out and already-on cases), the markers, `debug diag` not running the report — declared by
 its directory like every kit suite, `{ name = "test_diagnostics_contract", dir = "tests/_kit/" }`
-(debug-logging-§14). The addon's own suite adds its domain sections.
+(debug-logging-§14). The addon's own suite adds its domain sections. The same goes for the kit's
+gate over the complexity suite's sanitizer, `{ name = "test_lizard_sighted", dir = "tests/_kit/" }`
+(automated-tests-§3, from kit revision 35): it needs no facts about this addon, and the inventory
+check fails the run until it is declared.
 
 Local toolchain (the full list, with `lizard` and its `pipx` workaround, is the root
 `DEPENDENCIES.md` — see its starter snippet below):
@@ -1396,7 +1403,7 @@ marked as such rather than listed as a requirement.
 |---|---|---|---|
 | `lua5.1` (+ `luac`) | **5.1 exactly** | the headless suite, `lua tests/run.lua` | `tests/_kit/loader.lua` uses `setfenv` |
 | `luacheck` | any recent | `luacheck .`, the other half of the green gate | `.luacheckrc` at the repo root |
-| `lizard` | any recent | the `complexity` suite of `tests/_kit/run-automated-tests.sh` (automated-tests) | `lizard --version` |
+| `lizard` | any recent | the `complexity` suite of `tests/_kit/run-automated-tests.sh`, which runs it over a sanitized shadow and checks function-count parity, because `lizard` alone is blind in Lua (automated-tests-§3) | `lizard --version` |
 | `git` | any recent | vendoring, `diff -r` against the LibKa0s repo | library-stack-§7 |
 | POSIX shell | any | the commands in this file and in `docs/testing.md` | — |
 
@@ -1445,7 +1452,8 @@ lua tests/run.lua                                     # the suite — must be gr
 lua tests/run.lua -j auto                             # same, fanned across CPUs (testing-§14)
 # every run above is bounded by the vendored kit on load (testing-§15); KA0S_KIT_GUARD=off only under a debugger
 luacheck .                                            # must be 0 warnings / 0 errors
-lizard -l lua -x "./libs/*" -x "./tests/_kit/*" .     # the complexity report (release-time)
+bash tests/_kit/run-automated-tests.sh --suite complexity   # the sighted complexity report (release-time);
+                                                      # never raw `lizard`, which is blind in Lua (automated-tests-§3)
 ```
 
 See `docs/testing.md` for what those commands mean and when each is run.
@@ -1543,6 +1551,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - A fourth doc at root, or a missing one: root is `README.md` + `CLAUDE.md` + `DEPENDENCIES.md` + `LICENSE` (documentation-§7).
 - `pip install <tool>` as an install instruction (fails on Ubuntu 24.04's PEP 668 marker — use `pipx`), or any dependency listed without the evidence for it (anti-pattern #50).
 - A dated `docs/complexity/<date>.md` pile, a locally tuned `lizard` invocation, a hand-edited complexity report, or a regenerated one with no watch-list disposition for what newly crossed a threshold (anti-pattern #51).
+- Raw `lizard -l lua ...` quoted as a gate or believed as a measurement, a local hazard scanner in place of the kit's `test_lizard_sighted`, or a run with `blindFiles` above 0 read as a pass (anti-pattern #92, automated-tests-§3).
 - Gating **commits** on the complexity report — that checkpoint is lint + the harness only (performance-§10, testing-§4). The **release** is a different gate: all four suites plus zero functions above CCN 15, evaluated by the release command from the run's manifest before it edits anything, with a `skip` counting as NOT EVALUATED rather than a pass (automated-tests-§3).
 - Implementing the release gate by editing the vendored runner's exit code — the same script is the commit gate, so the threshold would fire on every commit (automated-tests-§3).
 - Bumping a version or cutting a tag on a run where a gate failed or a suite went unmeasured.
@@ -1605,7 +1614,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] `docs/performance.md` and `docs/perf-analysis/README.md` present (documentation-§3); `perf-analysis/` scoped to **in-game** captures (automated-tests-§7), one frozen `<YYYYMMDD-HHMMSS>/` bundle per capture carrying `report.md`, `dump.json` and `ANALYSIS.md` (performance-§8). A newly scaffolded addon's store is **empty** and its `README.md` says so — nobody has played it yet, and a fabricated first capture is worse than an absent one.
 - [ ] **`.gitattributes` present at the repo root and byte-identical to the client-bound canonical body** (`line-endings-§5`) — `* text=auto eol=crlf`, `*.sh text eol=lf`, binaries marked `binary` — **and the working tree agrees with it**, proven by `git add --renormalize .` staging nothing and emitting no `LF will be replaced by CRLF` warning. It is the repo's **first** file (step 0), and it appears in `.pkgmeta`'s `ignore:` block (`line-endings-§1/§2/§3/§4/§6`, `packaging`).
 - [ ] `tests/_kit/run-automated-tests.sh` vendored and executable, and `docs/automated-tests/{README.md,RESULTS.md}` exist (automated-tests-§2/§4). The runner's `*.sh` carve-out is covered by the line-endings checkbox above; this one covers the runner.
-- [ ] **A full automated-test bundle produced by the vendored runner** — `tests/_kit/run-automated-tests.sh`, never an addon-side copy — committed under `docs/automated-tests/<YYYYMMDD-HHMMSS>/` with one file per suite plus `manifest.json`, and its row prepended to `docs/automated-tests/RESULTS.md`. `RESULTS.md` carries the current watch list with a disposition for everything `lizard` warned on and every file in the 1000–1500 LOC band ("None." if empty). Produced at every **release**, before the tag; commits are **not** gated on it, and `perf`/`complexity` never fail a run (automated-tests-§3/§4/§6, anti-pattern #51).
+- [ ] **A full automated-test bundle produced by the vendored runner** — `tests/_kit/run-automated-tests.sh`, never an addon-side copy — committed under `docs/automated-tests/<YYYYMMDD-HHMMSS>/` with one file per suite plus `manifest.json`, and its row prepended to `docs/automated-tests/RESULTS.md`. `RESULTS.md` carries the current watch list with a disposition for everything `lizard` warned on and every file in the 1000–1500 LOC band ("None." if empty). The complexity suite is **sighted**: `suites.complexity.blindFiles` is 0 (automated-tests-§3). Produced at every **release**, before the tag; commits are **not** gated on it, and `perf`/`complexity` never fail a run (automated-tests-§3/§4/§6, anti-pattern #51).
 - [ ] Preview/test mode (preview-mode) if the addon has a positionable display.
 - [ ] Media in typed `media/` subfolders (`logos/`, `screenshots/`, …).
 - [ ] Root = the three docs plus `LICENSE`, and nothing else: full `README.md` (with `[wow]` badge + the **unlinked** standard badge), **stub** `CLAUDE.md`, `DEPENDENCIES.md`. Canonical `docs/` **trio** present (`ARCHITECTURE.md` — all **ten** mandated sections including `## Documentation map` and `## Documented deviations`, the latter written as "None." at v0.1.0 rather than omitted, plus the `Files over the 1500-line cap` census written as "Nothing is over the cap today" (layout-§1); `testing.md`; `smoke-tests.md`) plus the five verification-and-record docs (`test-cases.md`, `performance.md`, `perf-analysis/README.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md`) plus **all six Tier 1 topic-detail docs** under exactly those names (`scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`, `common-tasks.md` — documentation-§3), with every **Tier 2** trigger evaluated and each doc either shipped or carrying a *Not applicable* row in `## Documentation map`, and every `.md` under `docs/` appearing in that map exactly once, across its **four tables** — Required, Conditional, **Verification and record** (`testing.md`, `smoke-tests.md`, `test-cases.md`, `performance.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md` — six rows, always) and Addon-specific, in that order, with `perf-analysis/README.md` registered in Conditional against its trigger and the hub's own row optional; **no `docs/agent-context.md`**, **no `docs/complexity.md`** (retired v2.19.0), **no `docs/file-index.md`** and **no `docs/conventions.md`** (retired v2.23.0); passes the drift check.
