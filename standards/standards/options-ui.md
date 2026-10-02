@@ -31,6 +31,7 @@ NS.Helpers = lib:New(descriptor)          -- the instance IS the namespace membe
 | Field | Purpose |
 |---|---|
 | `parentTitle`, `mainPanelName` | brand string and the main canvas's frame name |
+| `addonName` | the host's own addon **FOLDER** name, its first vararg (library-stack-§8) — never the MasterControls display label, a frame-name prefix or an `## Title`. It is the route to the library's info art for IdList help marks; the library checks it against the loaded-addon list and, on a name the client does not report loaded, falls back to the client glyph with one `Cfg` debug line rather than a dead texture path |
 | `get(path)` / `set(path, value)` | the host's **single write seam** — see below |
 | `applyDefault(row)` | reset one schema row |
 | `rowsForPage(pageKey, filter)` / `allRows()` | the schema, per page and entire |
@@ -39,6 +40,7 @@ NS.Helpers = lib:New(descriptor)          -- the instance IS the namespace membe
 | `colorDecode` / `colorEncode` | the host's stored color shape (options-ui-§6) |
 | `getLSM`, `scheduleTimer`, `validate`, `onAceGUI`, `buildMain`, `print`, `debug` | optional seams |
 
+- **MUST** pass `addonName = addonName` — the file's own first vararg — on every descriptor. Nothing else the descriptor carries *is* the folder name: `mainPanelName` is a frame name and `parentTitle` a brand, and deriving the folder from either is the substitution library-stack-§8 forbids, so the library cannot default it. A host that omits it gets the client glyph on every IdList help mark, silently, which is how the collection's addons were born without the art (LibKa0s#42).
 - **MUST** route `get`/`set` through the addon's own **single write seam** (the same function `/<slash> set` calls), never a bare table write. A panel checkbox then takes exactly the path a slash `set` takes: the debug line, the row's `onChange`, the panel refresh. Two write paths is two behaviors, and only one of them gets tested.
 - **MUST** supply `colorDecode`/`colorEncode` when the addon stores colors in anything but the library's default `{r=,g=,b=,a=}` shape — and **SHOULD** write them out even when it matches, because the stored shape is a real contract with the rest of the addon and a silent default is a poor place for it to live.
 

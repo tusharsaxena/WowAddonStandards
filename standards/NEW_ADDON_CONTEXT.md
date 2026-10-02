@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.74.0, 2026-10-01)
+# New Ka0s Addon — Context Pack (v2.75.0, 2026-10-02)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -616,6 +616,10 @@ local lib = LibStub and LibStub("LibKa0s-Options-1.0", true)
 local descriptor = {
   parentTitle   = "Ka0s <Name>",
   mainPanelName = "<Addon>MainPanel",          -- the one field the library validates (it raises)
+  -- The FOLDER name, this file's first vararg (library-stack-§8, options-ui-§1) — never a display label,
+  -- a frame-name prefix or an ## Title. The route to the library's IdList help-mark art; checked
+  -- against the loaded-addon list, so a wrong name costs the art and one Cfg line, never an error.
+  addonName     = addonName,
 
   get          = function(path) return NS.GetSetting(path) end,
   set          = function(path, value) NS.SetByPath(path, value) end,   -- single write seam
@@ -1577,7 +1581,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`; the `ignore:` list names every root dot-entry the repo **actually has** and no entry it does not — `.claude/`, `.superpowers/` and `tools/` only once the folder exists (packaging).
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors** **with `tests/` in scope** — only `tests/_kit/` is excluded, and the harness global is declared in the `files["tests/"]` stanza rather than in top-level `read_globals` (lint).
 - [ ] **`libs/LibKa0s/` vendored WHOLE** from the library repo's ship folder — every module, byte-identical (`diff -r` empty, library-stack-§7) — and TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block after Ace3.
-- [ ] **The six setup files present**, each a descriptor plus a degradation stub and nothing more: `core/MediaSetup.lua`, `core/CoreSetup.lua`, `core/PerfSetup.lua`, `core/DebugLogSetup.lua`, `settings/Slash.lua`, `settings/OptionsSetup.lua`. No hand-rolled console, options toolkit, dispatcher, printer or harness anywhere in the addon's own source (anti-pattern #47). Each stub answers **every** member the addon actually calls. The Core stub carries `SafeRegisterEvent`, `SafeRegisterUnitEvent` and `SafeRegisterEvents` as one-rung `pcall` bodies; the Slash stub carries no library string but `DISABLED_LINE_FORMAT`, pinned with `Kit.assertLibraryConstant`; the Options stub's composers answer `{}`.
+- [ ] **The six setup files present**, each a descriptor plus a degradation stub and nothing more: `core/MediaSetup.lua`, `core/CoreSetup.lua`, `core/PerfSetup.lua`, `core/DebugLogSetup.lua`, `settings/Slash.lua`, `settings/OptionsSetup.lua`. No hand-rolled console, options toolkit, dispatcher, printer or harness anywhere in the addon's own source (anti-pattern #47). Each stub answers **every** member the addon actually calls. The Core stub carries `SafeRegisterEvent`, `SafeRegisterUnitEvent` and `SafeRegisterEvents` as one-rung `pcall` bodies; the Slash stub carries no library string but `DISABLED_LINE_FORMAT`, pinned with `Kit.assertLibraryConstant`; the Options stub's composers answer `{}`. The Options descriptor carries `addonName = addonName`, the folder name, so IdList help marks draw the library's art (options-ui-§1).
 - [ ] `tests/_kit/` vendored from the LibKa0s repo's root-level `testkit/` (**not** under `libs/`, not edited); `tests/wow_mock.lua` is a thin extender over `mock_base.lua`; `tests/run.lua` derives the addon's file list from the TOC and lists the vendored library files explicitly in XML order (testing-§1, testing-§9).
 - [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing). The rule-subject conformance suites are under exactly their mandated names — `tests/test_surface_parity.lua` (testing-§8), `tests/test_vendor_sync.lua` delegating to `tests/_kit/vendor_sync.lua` rather than reimplementing it (testing-§11), `tests/test_disabled.lua` (slash-commands-§7) — and **every kit suite is declared by its directory**, `{ name = "…", dir = "tests/_kit/" }`, never by bare basename beside a local file of the same name (testing-§9).
 - [ ] Generated `docs/test-cases.md` inventory present and in sync (`lua tests/run.lua --list`); README carries a static X/Y `[tests]` badge (testing-§5).
