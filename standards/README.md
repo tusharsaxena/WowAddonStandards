@@ -14,6 +14,7 @@ context pack for scaffolding new addons. Compliance auditing is **not** run from
 | [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md) | The scaffolding context pack — **fetched to a temp directory and read**, never copied into an addon (documentation-§3, anti-pattern #49). |
 | [`INDUSTRY_RESEARCH.md`](INDUSTRY_RESEARCH.md) | The research foundation: synthesized patterns from 10 reference addons that justify the rules. |
 | [`ADDONS.md`](ADDONS.md) | **The roster** — the editable list of in-scope Ka0s addons, in **three** tables, one per repo kind: the addons, the **Ka0s-owned library repos** (audited against library-stack-§7's applicability lists) and the **documentation-and-tooling repos** (audited against documentation-§8's); a standards-process input. |
+| [`standards/`](standards/) | The section files that hold the normative rules, one per topic, each listed in `STANDARDS.md`'s Sections map. |
 | [`_raw/_industry/`](_raw/_industry/) | Per-addon raw research reports — the evidence base behind `INDUSTRY_RESEARCH.md`. |
 
 The four **process playbooks** live at the repo root (predictable paths for the `wow-addon` plugin to
@@ -28,9 +29,9 @@ orchestrator that draws its substance from the docs above.
 ## Living, not frozen
 
 The standard **evolves in place**. Every substantive change bumps the version + date and adds a
-changelog entry at the top of `STANDARDS.md`; git history carries the rest. This is the opposite of
-an audit run, which is a frozen dated snapshot under an addon's own `docs/audits/YYYY-MM-DD/` and is never
-edited after the fact. Industry research lives here, with the standard, precisely because it is a
+changelog entry first in the `## Changelog` section of `STANDARDS.md` (after the Sections map);
+git history carries the rest. This is the opposite of an audit run, which is a frozen dated
+snapshot under an addon's own `docs/audits/YYYY-MM-DD/` and is never edited after the fact. Industry research lives here, with the standard, precisely because it is a
 *living input* to the rules — not a point-in-time compliance measurement.
 
 ## How to (re)build `STANDARDS.md`
@@ -54,12 +55,13 @@ The standard is a **synthesis** of two inputs:
    [`ADDONS.md`](ADDONS.md); in each addon's repo, pull its latest
    `docs/audits/<date>/01_CURRENT_STATE.md` (and `02_DEVIATIONS.md`) for what it does now and which
    decisions are still open. Run `/wow-addon:standards-audit` first if an addon has no recent run.
-3. **Synthesize / revise.** Fold both inputs into `STANDARDS.md` as prescriptive rules
-   (MUST / SHOULD / MAY), each with a rationale and, where possible, a **reference implementation**
-   from the collection or a cited industry source. Preserve each section's local numbering and the
+3. **Synthesize / revise.** Fold both inputs into the section files under `standards/` (listed in
+   `STANDARDS.md`'s Sections map) as prescriptive rules (MUST / SHOULD / MAY), each with a
+   rationale and, where possible, a **reference implementation** from the collection or a cited
+   industry source. Preserve each section's local numbering and the
    `filename-§N` cross-reference scheme — other documents reference it.
-4. **Bump the changelog.** Update the version + date and add a changelog entry at the top of
-   `STANDARDS.md` describing what changed and why.
+4. **Bump the changelog.** Update the version + date and add a changelog entry first in the
+   `## Changelog` section of `STANDARDS.md` (after the Sections map) describing what changed and why.
 5. **Ripple the change.** A rule change usually touches
    [`EXECUTIVE_SUMMARY.md`](EXECUTIVE_SUMMARY.md) and
    [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md), and sometimes this file, the repo root

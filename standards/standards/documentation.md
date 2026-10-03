@@ -115,7 +115,7 @@ What survives the removal is external credit and nothing else. If the deleted se
 There is **no** `## Testing` section in the README (removed in the standard's v2.1.0 — it was contributor-facing). How to verify the addon — the headless harness (`lua tests/run.lua`), lint (`luacheck .`), the generated case inventory (`docs/test-cases.md`, testing-§5), and the in-game smoke tests (`docs/smoke-tests.md`) — lives entirely under `docs/` (testing, audit-review-history). The README still carries the `[tests]` X/Y badge in its badge row (item 2); the badge is the only test-related thing that belongs in the README.
 
 - The optional sections (4, 7, 8) are **SHOULD** — omit one only when it would be empty — and `## Credits` (12) is **MAY**, omitted entirely when there is nothing external to credit. When present, their **relative order MUST** be preserved.
-- `wow-addon:sync-docs` keeps the README's slash-command and version-history tables in lockstep with code; `wow-addon:standards-audit` flags a README that departs from this canonical structure.
+- `wow-addon:sync-docs` keeps the README's version-history table and count claims in lockstep with code (the README carries no slash-command table, item 5); `wow-addon:standards-audit` flags a README that departs from this canonical structure.
 - The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `bump-version`).
 
 ### 2. Root `CLAUDE.md` — stub

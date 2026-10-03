@@ -74,9 +74,11 @@ This is how the living house rules get revised. The full, authoritative steps ar
 2. Read the collection's current state. For each in-scope addon in
    [`standards/ADDONS.md`](standards/ADDONS.md), pull that addon's most recent
    `docs/audits/<date>/01_CURRENT_STATE.md` from its own repo. It tells you what the addon does today.
-3. Fold both inputs into [`standards/STANDARDS.md`](standards/STANDARDS.md) as MUST/SHOULD/MAY
-   rules. Each rule gets a rationale and a reference implementation. Keep each section's local
-   numbering and the `filename-§N` cross-reference scheme intact.
+3. Fold both inputs into the section files under [`standards/standards/`](standards/standards/) as
+   MUST/SHOULD/MAY rules. Each rule gets a rationale and a reference implementation. Keep each
+   section's local numbering and the `filename-§N` cross-reference scheme intact. If you add, split
+   or reorder a section, update the Sections list in
+   [`standards/STANDARDS.md`](standards/STANDARDS.md) too.
 4. Bump the changelog: update the version and date at the top of `STANDARDS.md`.
 5. Ripple the change into [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md) and
    [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) so they stay in sync.
