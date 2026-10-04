@@ -58,7 +58,7 @@ against the client.
 
 The collection targets **Retail (Mainline) only**. Classic/other flavors are out of scope for the standard.
 
-- **MUST** ship a single TOC with a **single** `## Interface:` value = the **latest Retail patch** interface number. The standard deliberately carries no literal for it, because a number written here goes stale the next patch: the collection's current value is the one its addons ship (the roster, `ADDONS.md`, lists them), and `/wow-addon:bump-interface` determines the Live value and bumps it each patch.
+- **MUST** ship a single TOC with a **single** `## Interface:` value = the **latest Retail patch** interface number. The standard deliberately carries no literal for it, because a number written here goes stale the next patch: the collection's current value is the one its addons ship (the roster, `ADDONS.md`, lists them), and `/dev-copilot:wow-bump-interface` determines the Live value and bumps it each patch.
 - **MUST NOT** use a comma-separated multi-flavor Interface list, per-flavor TOC files, or `enable-toc-creation` flavor fan-out.
 - **MUST NOT** ship `_Mainline`/`_Classic` data splits. Data files are plain (`Spells.lua`, `Data*.lua`).
 - **MUST NOT** use `if WOW_PROJECT_ID == ...` ladders inline in feature code. Any genuine cross-patch version check is a Retail-patch check and is branched in `Compat.lua` behind a named flag (compat).

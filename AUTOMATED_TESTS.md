@@ -1,6 +1,6 @@
 # Automated test records — the playbook
 
-**The step-by-step spec for `/wow-addon:automated-tests`.** An addon records **itself**: the run and
+**The step-by-step spec for `/dev-copilot:wow-automated-tests`.** An addon records **itself**: the run and
 its bundle are written into the **addon's own** repo under `docs/automated-tests/`, never here.
 
 This file is a **thin orchestrator**. The normative rules — what a bundle contains, what gates, what
@@ -267,7 +267,7 @@ Print, in chat:
 - One line per suite: name — status — headline figure — **and the checkpoint, not the verdict alone**
   (automated-tests-§4). `lint` and `tests` gate **the run and the commit**; `perf` and `complexity`
   gate **neither**; the **tag** is gated on all four at pass plus zero functions above CCN 15,
-  evaluated by `/wow-addon:bump-version` from this run's `manifest.json`, where a `skip` is **NOT
+  evaluated by `/dev-copilot:bump-version` from this run's `manifest.json`, where a `skip` is **NOT
   EVALUATED** rather than a pass. A bare `(recorded, non-gating)` is the half-truth this replaces —
   it is true of the commit and false of the tag, and it is what teaches a reader that a complexity
   number never matters.
@@ -286,7 +286,7 @@ Print, in chat:
 - **Never make this run itself gate on perf or complexity**, and never report a run as failed because
   of them. They are measured and recorded (`automated-tests-§3`); a complexity warning count does not
   fail a run and must not be presented as one. The **release** is gated on all four plus zero CCN > 15,
-  but that gate belongs to `/wow-addon:bump-version`, which reads this run's `manifest.json` — never to
+  but that gate belongs to `/dev-copilot:bump-version`, which reads this run's `manifest.json` — never to
   the runner, whose exit code stays unchanged because the same script is the commit gate.
 - **Never commit a bundle artifact on the wrong line terminator.** `ANALYSIS.md` and the
   `RESULTS.md` rows you author are written after the runner's own normalization pass and are not

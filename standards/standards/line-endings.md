@@ -81,7 +81,7 @@ which trains its readers to ignore the one gate that exists to catch a real drif
   * text=auto eol=lf
   ```
 
-  That is `WowAddonStandards` and `wow-addon`. CRLF exists in this collection for exactly one reason
+  That is `WowAddonStandards` and `dev-copilot`. CRLF exists in this collection for exactly one reason
   — the client — and where the client is not involved the reason does not apply. These two are
   consumed by git, GitHub's renderer and shell tooling, all of which are LF-native.
 
@@ -115,7 +115,7 @@ which trains its readers to ignore the one gate that exists to catch a real drif
   reason, and the kernel's error names `python3\r` — a string nobody greps for. The files this
   protect in a client-bound repo are the vendored `tests/_kit/run-automated-tests.sh`
   (automated-tests-§2) and any generator under `tools/` (layout-§1), which since v2.61.0 the standard
-  expressly contemplates being written in Python; in `wow-addon` it is `scripts/normalize-eol.sh`,
+  expressly contemplates being written in Python; in `dev-copilot` it is `scripts/normalize-eol.sh`,
   the hook the plugin runs on every `Write`/`Edit`.
 - **`*.py` is listed because the rule that sanctioned the file and the rule that keeps it runnable
   landed in the same version.** `layout-§1` gave a committed generator a home, and a CRLF-pinned repo
@@ -249,7 +249,7 @@ sync.
 # for any binary, so it passes files it never examined (line-endings-§7).
 ```
 
-**Non-client repos** — `WowAddonStandards` and `wow-addon`:
+**Non-client repos** — `WowAddonStandards` and `dev-copilot`:
 
 ```gitattributes
 # =============================================================================

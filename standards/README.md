@@ -3,7 +3,7 @@
 The **living, canonical** core of this repo: the house rules for the Ka0s WoW addon collection,
 the research they are built on, the [roster](ADDONS.md) of in-scope addons, and a fetch-at-runtime
 context pack for scaffolding new addons. Compliance auditing is **not** run from here — each addon audits
-**itself**, in its own repo, via `/wow-addon:standards-audit` (playbook: [`../AUDIT.md`](../AUDIT.md)).
+**itself**, in its own repo, via `/dev-copilot:wow-standards-audit` (playbook: [`../AUDIT.md`](../AUDIT.md)).
 
 ## What's in here
 
@@ -17,11 +17,11 @@ context pack for scaffolding new addons. Compliance auditing is **not** run from
 | [`standards/`](standards/) | The section files that hold the normative rules, one per topic, each listed in `STANDARDS.md`'s Sections map. |
 | [`_raw/_industry/`](_raw/_industry/) | Per-addon raw research reports — the evidence base behind `INDUSTRY_RESEARCH.md`. |
 
-The four **process playbooks** live at the repo root (predictable paths for the `wow-addon` plugin to
-fetch): [`../AUDIT.md`](../AUDIT.md) (`/wow-addon:standards-audit`),
-[`../NEW_ADDON.md`](../NEW_ADDON.md) (`/wow-addon:new-addon`),
-[`../AUTOMATED_TESTS.md`](../AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`) and
-[`../PERF_ANALYSIS.md`](../PERF_ANALYSIS.md) (`/wow-addon:perf-analysis`). Each is a thin
+The four **process playbooks** live at the repo root (predictable paths for the `dev-copilot` plugin to
+fetch): [`../AUDIT.md`](../AUDIT.md) (`/dev-copilot:wow-standards-audit`),
+[`../NEW_ADDON.md`](../NEW_ADDON.md) (`/dev-copilot:wow-new-addon`),
+[`../AUTOMATED_TESTS.md`](../AUTOMATED_TESTS.md) (`/dev-copilot:wow-automated-tests`) and
+[`../PERF_ANALYSIS.md`](../PERF_ANALYSIS.md) (`/dev-copilot:wow-perf-analysis`). Each is a thin
 orchestrator that draws its substance from the docs above.
 
 `STANDARDS.md` is the source of truth. When any document here disagrees with it, it wins.
@@ -44,7 +44,7 @@ The standard is a **synthesis** of two inputs:
 2. **The collection's current state** — what the Ka0s addons actually do today, and which of those
    habits are worth codifying. *Which* addons make up "the collection" is defined by the roster,
    [`ADDONS.md`](ADDONS.md). Their current state is captured by each addon's own most-recent audit run
-   (`/wow-addon:standards-audit` in that addon's repo) — mine its `docs/audits/<date>/01_CURRENT_STATE.md`.
+   (`/dev-copilot:wow-standards-audit` in that addon's repo) — mine its `docs/audits/<date>/01_CURRENT_STATE.md`.
 
 ### Rebuild steps
 
@@ -54,7 +54,7 @@ The standard is a **synthesis** of two inputs:
 2. **Read the collection's current state.** The in-scope addons are those in
    [`ADDONS.md`](ADDONS.md); in each addon's repo, pull its latest
    `docs/audits/<date>/01_CURRENT_STATE.md` (and `02_DEVIATIONS.md`) for what it does now and which
-   decisions are still open. Run `/wow-addon:standards-audit` first if an addon has no recent run.
+   decisions are still open. Run `/dev-copilot:wow-standards-audit` first if an addon has no recent run.
 3. **Synthesize / revise.** Fold both inputs into the section files under `standards/` (listed in
    `STANDARDS.md`'s Sections map) as prescriptive rules (MUST / SHOULD / MAY), each with a
    rationale and, where possible, a **reference implementation** from the collection or a cited

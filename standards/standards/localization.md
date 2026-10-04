@@ -321,6 +321,6 @@ v1.55.0)**; a repository whose vendored kit predates that revision owes the re-v
 hand-written suite (testing-§9).
 
 Lint cannot catch any of this (`luacheck` does not read English), so enforcement is three-layered:
-the gate above for the mechanical part, `/wow-addon:standards-audit`, which flags a British spelling
+the gate above for the mechanical part, `/dev-copilot:wow-standards-audit`, which flags a British spelling
 in authored text as a deviation, and review for the rest — the locale-key ripple, the four exceptions,
 and the forms no substring can decide.

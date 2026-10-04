@@ -1,6 +1,6 @@
 # New Addon — Playbook
 
-**Invoked by `/wow-addon:new-addon`.** This is the step-by-step spec for scaffolding a new Ka0s WoW
+**Invoked by `/dev-copilot:wow-new-addon`.** This is the step-by-step spec for scaffolding a new Ka0s WoW
 addon that is **born compliant** with the Ka0s WoW Addon Standard. It runs **in the new addon's own
 repository**.
 
@@ -354,7 +354,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
    (performance-§8, documentation-§3). It does **not** get a first bundle: nobody has played the
    addon, there is no client paste, and `../PERF_ANALYSIS.md` forbids assembling one from the offline
    scenarios or the source. The first real capture is a later, separate run of
-   `/wow-addon:perf-analysis`. An addon holding the performance-§12 no-combat-path exemption ships
+   `/dev-copilot:wow-perf-analysis`. An addon holding the performance-§12 no-combat-path exemption ships
    **no** store at all — not an empty directory.
 9. **Check the Definition of Done.** Walk the DoD checklist at the bottom of the context pack before
    tagging `v0.1.0`. Its perf row expects `docs/performance.md` and `docs/perf-analysis/README.md`
@@ -377,6 +377,6 @@ disagreeing with the collection's intent while looking, in review, like it had b
   scaffold loosely and clean up later.
 - **The context pack is the source of detail.** Don't restate its snippets here — read them from
   `standards/NEW_ADDON_CONTEXT.md`. When the two disagree, the standard/context-pack wins.
-- **Keep it maintainable afterward** with the `wow-addon:` skills (`review`, `sync-docs`,
-  `bump-version`, `bump-interface`, `standards-audit`, `automated-tests`, `run-tests`,
-  `perf-analysis`).
+- **Keep it maintainable afterward** with the `dev-copilot:` skills (`review`, `sync-docs`,
+  `bump-version`, `wow-bump-interface`, `wow-standards-audit`, `wow-automated-tests`, `run-tests`,
+  `wow-perf-analysis`).

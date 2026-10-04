@@ -1,6 +1,6 @@
 # Perf analysis — the playbook
 
-**The step-by-step spec for `/wow-addon:perf-analysis`.** An addon records **its own** in-game
+**The step-by-step spec for `/dev-copilot:wow-perf-analysis`.** An addon records **its own** in-game
 captures, in its own repo, under `docs/perf-analysis/`. Nothing is ever recorded here.
 
 This file is a **thin orchestrator**. The normative rules — the harness, the bracket shapes, the

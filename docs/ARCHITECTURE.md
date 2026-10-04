@@ -15,7 +15,7 @@ Engineer context for **this** repository, and the hub of its doc set (documentat
 ## Overview
 
 The **house standard** for the Ka0s WoW addon collection, plus the four **process playbooks** the
-[`wow-addon`](https://github.com/tusharsaxena/wow-addon) Claude Code plugin fetches at runtime.
+[`dev-copilot`](https://github.com/tusharsaxena/dev-copilot) Claude Code plugin fetches at runtime.
 
 The critical property is that **this repo does no work**. It is read, never run. Each playbook is a
 thin orchestrator that says *how* a process runs and defers all substance to the canonical section
@@ -34,16 +34,16 @@ what this section carries is which paths exist, what reads each one, and which a
 
 | Path | What it is | Read by |
 |---|---|---|
-| `AUDIT.md` | Playbook: per-addon self-audit | `/wow-addon:standards-audit` |
-| `AUTOMATED_TESTS.md` | Playbook: per-addon test record | `/wow-addon:automated-tests` |
-| `NEW_ADDON.md` | Playbook: scaffold a born-compliant addon | `/wow-addon:new-addon` |
-| `PERF_ANALYSIS.md` | Playbook: per-addon in-game capture bundle | `/wow-addon:perf-analysis` |
+| `AUDIT.md` | Playbook: per-addon self-audit | `/dev-copilot:wow-standards-audit` |
+| `AUTOMATED_TESTS.md` | Playbook: per-addon test record | `/dev-copilot:wow-automated-tests` |
+| `NEW_ADDON.md` | Playbook: scaffold a born-compliant addon | `/dev-copilot:wow-new-addon` |
+| `PERF_ANALYSIS.md` | Playbook: per-addon in-game capture bundle | `/dev-copilot:wow-perf-analysis` |
 | `standards/STANDARDS.md` | **The index.** Its Sections list is what a consumer follows to find every section file. | every standards-reading command |
 | `standards/standards/*.md` | The 27 canonical section files — the substance of the standard | followed from the index |
 | `standards/ADDONS.md` | The roster: which repos the standard covers | the standards-refresh process |
-| `standards/NEW_ADDON_CONTEXT.md` | The context pack read at scaffold time, never written into the new addon | `/wow-addon:new-addon` |
+| `standards/NEW_ADDON_CONTEXT.md` | The context pack read at scaffold time, never written into the new addon | `/dev-copilot:wow-new-addon` |
 | `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/_raw/` | Background and the research the standard was drawn from | humans |
-| `harvests/<date>/` | Frozen bundles from `/wow-addon:harvest-standards` — what was proposed, what was accepted | humans |
+| `harvests/<date>/` | Frozen bundles from `/dev-copilot:wow-harvest-standards` — what was proposed, what was accepted | humans |
 | `media/logos/` | Collection logo art | humans |
 
 **Renaming any path in the first block is a breaking change** for every addon in the collection,

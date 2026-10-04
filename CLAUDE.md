@@ -5,26 +5,26 @@ Guidance for AI agents working in this repository.
 ## What this repo is
 
 The **house standard** for the Ka0s World of Warcraft addon collection, plus the four **process
-playbooks** the `wow-addon` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md` and
+playbooks** the `dev-copilot` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md` and
 `PERF_ANALYSIS.md`. It contains **documents only** — no addon source code lives here.
 
 This repo does **not** run audits. Compliance auditing and new-addon scaffolding happen **in each
 addon's own repo**, driven by a plugin skill that reads the playbook from here:
 
-- **`AUDIT.md`** (root) — the step-by-step spec for `/wow-addon:standards-audit`. An addon audits
+- **`AUDIT.md`** (root) — the step-by-step spec for `/dev-copilot:wow-standards-audit`. An addon audits
   **itself**, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle inside **its own** repo.
-- **`AUTOMATED_TESTS.md`** (root) — the step-by-step spec for `/wow-addon:automated-tests`. An addon
+- **`AUTOMATED_TESTS.md`** (root) — the step-by-step spec for `/dev-copilot:wow-automated-tests`. An addon
   records **itself**, writing a frozen `docs/automated-tests/<YYYYMMDD-HHMMSS>/` bundle inside
   **its own** repo.
-- **`NEW_ADDON.md`** (root) — the step-by-step spec for `/wow-addon:new-addon`. Scaffolds a new addon
+- **`NEW_ADDON.md`** (root) — the step-by-step spec for `/dev-copilot:wow-new-addon`. Scaffolds a new addon
   that is born compliant.
-- **`PERF_ANALYSIS.md`** (root) — the step-by-step spec for `/wow-addon:perf-analysis`. An addon
+- **`PERF_ANALYSIS.md`** (root) — the step-by-step spec for `/dev-copilot:wow-perf-analysis`. An addon
   records **its own** in-game captures, writing a frozen `docs/perf-analysis/<YYYYMMDD-HHMMSS>/`
   bundle inside **its own** repo.
 
 All four are **thin orchestrators**: they say *how* the process runs and defer all substance to the
 canonical docs under `standards/`. The plugin lives in a separate repo
-(<https://github.com/tusharsaxena/wow-addon>) and is updated there to consume these files.
+(<https://github.com/tusharsaxena/dev-copilot>) and is updated there to consume these files.
 
 The in-scope repos are listed in **`standards/ADDONS.md`** (the roster) and live in their own sibling
 repositories under `/mnt/d/Profile/Users/Tushar/Documents/GIT/`, in **three** tables, one per repo
@@ -35,10 +35,10 @@ in that third table.** **Do not modify those repos from here.**
 ## Layout
 
 ```
-AUDIT.md                          -- PLAYBOOK: /wow-addon:standards-audit (per-addon self-audit)
-AUTOMATED_TESTS.md                -- PLAYBOOK: /wow-addon:automated-tests (per-addon test record)
-NEW_ADDON.md                      -- PLAYBOOK: /wow-addon:new-addon (scaffold, born compliant)
-PERF_ANALYSIS.md                  -- PLAYBOOK: /wow-addon:perf-analysis (per-addon in-game capture bundle)
+AUDIT.md                          -- PLAYBOOK: /dev-copilot:wow-standards-audit (per-addon self-audit)
+AUTOMATED_TESTS.md                -- PLAYBOOK: /dev-copilot:wow-automated-tests (per-addon test record)
+NEW_ADDON.md                      -- PLAYBOOK: /dev-copilot:wow-new-addon (scaffold, born compliant)
+PERF_ANALYSIS.md                  -- PLAYBOOK: /dev-copilot:wow-perf-analysis (per-addon in-game capture bundle)
 README.md                         -- repo overview + what you can do here
 CLAUDE.md                         -- this file
 DEPENDENCIES.md                   -- toolchain contract (documentation-§7); git only, and why the rest is absent
@@ -87,7 +87,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   (`architecture`, `audit-review-history`); a subsection is **`filename-§N`** (`architecture-§5`,
   `options-ui-§10`), where `N` is that section's **local** number. The old global `§N.M` numbering is
   retired — do **not** reintroduce it. Preserve these refs when editing, in every doc and in the
-  `wow-addon` plugin.
+  `dev-copilot` plugin.
 - **Eleven section files have no numbered subsections and take the bare filename only
   (documentation-§6).** Measured by `grep -c '^### [0-9]' standards/standards/<file>` returning 0, they
   are: `anti-patterns`, `audit-review-history`, `compat`, `lint`, `naming-cheatsheet`,
@@ -104,7 +104,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 - **Industry research is a standards-process input, not an audit step.** The reference-addon research
   (`standards/INDUSTRY_RESEARCH.md` + `standards/_raw/_industry/`) is a living foundation for
   `STANDARDS.md`; see `standards/README.md` for the rebuild process.
-- **Audits are per-repo and frozen.** A `/wow-addon:standards-audit` run writes a frozen dated
+- **Audits are per-repo and frozen.** A `/dev-copilot:wow-standards-audit` run writes a frozen dated
   `docs/audits/<YYYY-MM-DD>/` bundle (`01_CURRENT_STATE` … `05_EXECUTION_PLAN`, with stable per-addon
   deviation-ID prefixes) into the **audited addon's** repo — never here, and never edited after the
   fact. See `AUDIT.md` for the structure.
@@ -121,7 +121,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 
 - **This repo ships nothing to the WoW client, so it pins LF (`line-endings-§2`).** Its root
   `.gitattributes` carries the **non-client** canonical body — `* text=auto eol=lf`, `*.sh text
-  eol=lf`, binaries marked `binary`. Write LF here. Do not reach for the `wow-addon` plugin's CRLF
+  eol=lf`, binaries marked `binary`. Write LF here. Do not reach for the `dev-copilot` plugin's CRLF
   behavior: the hook reads `git check-attr eol` and follows whatever the repo declares, and what this
   repo declares is LF. The standard it publishes binds it — a standards repo that does not follow its
   own rule is the one thing that discredits the rule. If a file arrives CRLF anyway, that is a
@@ -140,7 +140,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.75.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.76.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
@@ -166,7 +166,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   around with `--no-verify`, after which it protects nothing. The **tag** is gated on all four
   suites plus `suites.complexity.warnings == 0`, i.e. zero functions above CCN 15
   (automated-tests-§3, *The release gate*). The runner's exit code is unchanged, because the same
-  vendored script is the commit gate; the release gate is evaluated by `/wow-addon:bump-version`
+  vendored script is the commit gate; the release gate is evaluated by `/dev-copilot:bump-version`
   from the run's `manifest.json`, and a `skip` blocks as NOT EVALUATED rather than reading as a
   pass. Don't restate this as "perf and complexity never gate" without saying which checkpoint.
 - Don't invent compliance claims. Findings are evidence-backed (`file:line` citations); keep new
