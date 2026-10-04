@@ -1,6 +1,6 @@
 # Standards Audit — Playbook
 
-**Invoked by `/wow-addon:standards-audit`.** This is the step-by-step spec for auditing **one addon
+**Invoked by `/dev-copilot:wow-standards-audit`.** This is the step-by-step spec for auditing **one addon
 repo** against the Ka0s WoW Addon Standard. It runs **inside the addon's own repository** and writes
 its output there — this `WowAddonStandards` repo holds only the rules and this playbook, never an
 addon's audit results.
@@ -63,8 +63,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
 
      `standards/ADDONS.md` names which repos are which, in its three tables; it is the authority when
      the discriminator is ambiguous. **This used to say that a repo with no `.toc` IS a library repo,
-     which was false** for `WowAddonStandards` and `wow-addon` — both have no `.toc` and vendor
-     nothing, and both were consequently graded against a rule set written for a Lua payload.
+     which was false** for `WowAddonStandards` and the plugin repo (then `wow-addon`, now
+     `dev-copilot`) — both have no `.toc` and vendor nothing, and both were consequently graded
+     against a rule set written for a Lua payload.
 
      Measuring a **library** against the addon sections is noise (`documentation-§1`'s player
      README, `documentation-§3`'s `docs/` trio **and its whole topic-detail tier model**,

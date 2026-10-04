@@ -1,7 +1,7 @@
 # WoW Addon Standards — Ka0s Collection
 
 This repo holds the house standard for the Ka0s World of Warcraft addon collection. It also holds the
-four process playbooks that the `wow-addon` plugin consumes: `AUDIT.md`, `AUTOMATED_TESTS.md`,
+four process playbooks that the `dev-copilot` plugin consumes: `AUDIT.md`, `AUTOMATED_TESTS.md`,
 `NEW_ADDON.md` and `PERF_ANALYSIS.md`. So it has two jobs.
 
 1. Define the standard. The house standard draws on industry research and on the best patterns
@@ -9,10 +9,10 @@ four process playbooks that the `wow-addon` plugin consumes: `AUDIT.md`, `AUTOMA
    patterns: slash-command handling, how the settings panel looks and feels, debug-mode conventions,
    standalone windows, packaging, localization and more. → [`standards/`](standards/)
 2. Ship the process playbooks. There are four, each a thin orchestrator spec that the plugin fetches
-   and runs **inside each addon's own repo**: → [`AUDIT.md`](AUDIT.md) (`/wow-addon:standards-audit`),
-   [`NEW_ADDON.md`](NEW_ADDON.md) (`/wow-addon:new-addon`),
-   [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/wow-addon:automated-tests`) and
-   [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) (`/wow-addon:perf-analysis`).
+   and runs **inside each addon's own repo**: → [`AUDIT.md`](AUDIT.md) (`/dev-copilot:wow-standards-audit`),
+   [`NEW_ADDON.md`](NEW_ADDON.md) (`/dev-copilot:wow-new-addon`),
+   [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/dev-copilot:wow-automated-tests`) and
+   [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) (`/dev-copilot:wow-perf-analysis`).
 
 The standard is the source of truth, and it evolves in place. Auditing doesn't happen here any more.
 Each addon audits itself, in its own repo, and writes a dated `docs/audits/<YYYY-MM-DD>/` bundle
@@ -23,7 +23,7 @@ This repository is a research and analysis deliverable, and it contains only doc
 source code lives here. Nothing done here modifies the addons themselves.
 
 > The plugin that invokes these playbooks lives in a separate repo,
-> <https://github.com/tusharsaxena/wow-addon>. That repo, not this one, is where the plugin gets
+> <https://github.com/tusharsaxena/dev-copilot>. That repo, not this one, is where the plugin gets
 > updated to consume `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` and the
 > `standards/` docs from here.
 
@@ -36,7 +36,7 @@ source code lives here. Nothing done here modifies the addons themselves.
 | Start a new addon, born compliant | [`NEW_ADDON.md`](NEW_ADDON.md) | [C, below](#c-start-a-new-addon) |
 | Turn an in-game perf capture into evidence | [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) | [D, below](#d-analyze-an-in-game-perf-capture) |
 | Add/remove an addon from the roster | [`standards/ADDONS.md`](standards/ADDONS.md) | edit one table row |
-| Harvest learnings from the collection into the standard | [`harvests/`](harvests/) | run `/wow-addon:harvest-standards` |
+| Harvest learnings from the collection into the standard | [`harvests/`](harvests/) | run `/dev-copilot:wow-harvest-standards` |
 
 ## Scope
 
@@ -88,7 +88,7 @@ This is how the living house rules get revised. The full, authoritative steps ar
 An audit measures one addon against the current standard. You run it **in that addon's own repo**,
 and [`AUDIT.md`](AUDIT.md) has the full, authoritative steps. Roughly:
 
-1. Run `/wow-addon:standards-audit` in the addon's repo.
+1. Run `/dev-copilot:wow-standards-audit` in the addon's repo.
 2. The command resolves the current [`standards/STANDARDS.md`](standards/STANDARDS.md), snapshots the
    addon, and writes a frozen, dated bundle to that repo's `docs/audits/<today>/`. The bundle holds
    `01_CURRENT_STATE`, `02_DEVIATIONS` (with stable deviation IDs), `03_EVIDENCE`,
@@ -99,7 +99,7 @@ and [`AUDIT.md`](AUDIT.md) has the full, authoritative steps. Roughly:
 ## C. Start a new addon
 
 Use this to scaffold a new Ka0s addon that is compliant from day one. The full walkthrough is
-[`NEW_ADDON.md`](NEW_ADDON.md). In short, you run `/wow-addon:new-addon` to scaffold the Ace3
+[`NEW_ADDON.md`](NEW_ADDON.md). In short, you run `/dev-copilot:wow-new-addon` to scaffold the Ace3
 skeleton, then build against the standard, working from the
 [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) pack. That pack is fetched to a
 temp directory and **never** written into the addon (documentation-§3). You also add the addon's row
@@ -115,7 +115,7 @@ A player takes a capture in a live client, and this playbook turns it into commi
 also runs **in that addon's own repo**, and [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) is where the
 full, authoritative steps live.
 
-In short, run `/wow-addon:perf-analysis` with the paste of `/<slash> perf report` **and**
+In short, run `/dev-copilot:wow-perf-analysis` with the paste of `/<slash> perf report` **and**
 `/<slash> perf dump`. The command splits, validates and stamps them into a frozen
 `docs/perf-analysis/<YYYYMMDD-HHMMSS>/` bundle. That bundle holds `report.md`, a verbatim one-line
 `dump.json`, and an `ANALYSIS.md` written to the playbook's uniform prompt. The command also
@@ -128,10 +128,10 @@ a capture is never invented. No paste means no bundle.
 
 ```
 WowAddonStandards/
-  AUDIT.md                                -- PLAYBOOK: /wow-addon:standards-audit (per-addon self-audit)
-  AUTOMATED_TESTS.md                      -- PLAYBOOK: /wow-addon:automated-tests (per-addon test record)
-  NEW_ADDON.md                            -- PLAYBOOK: /wow-addon:new-addon (scaffold, born compliant)
-  PERF_ANALYSIS.md                        -- PLAYBOOK: /wow-addon:perf-analysis (per-addon in-game capture bundle)
+  AUDIT.md                                -- PLAYBOOK: /dev-copilot:wow-standards-audit (per-addon self-audit)
+  AUTOMATED_TESTS.md                      -- PLAYBOOK: /dev-copilot:wow-automated-tests (per-addon test record)
+  NEW_ADDON.md                            -- PLAYBOOK: /dev-copilot:wow-new-addon (scaffold, born compliant)
+  PERF_ANALYSIS.md                        -- PLAYBOOK: /dev-copilot:wow-perf-analysis (per-addon in-game capture bundle)
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
   DEPENDENCIES.md                         -- toolchain contract (documentation-§7): git only, and why the rest is absent
@@ -157,9 +157,9 @@ Audit and review runs are not stored here. Audits live under each addon's own
 
 ## Status
 
-The standard is at **v2.75.0** and is a living document. Compliance auditing has moved out of
+The standard is at **v2.76.0** and is a living document. Compliance auditing has moved out of
 this repo and into each addon's own repository. The `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`
-and `PERF_ANALYSIS.md` playbooks drive it, and the `wow-addon` plugin is what consumes them.
+and `PERF_ANALYSIS.md` playbooks drive it, and the `dev-copilot` plugin is what consumes them.
 
 ## License
 

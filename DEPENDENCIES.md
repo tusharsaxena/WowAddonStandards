@@ -48,7 +48,7 @@ are listed so a reader who arrived from an addon's `DEPENDENCIES.md` can tell "n
 
 ## Consumers, which is where the real toolchain lives
 
-This repo is **read at runtime** by the [`wow-addon`](https://github.com/tusharsaxena/wow-addon)
+This repo is **read at runtime** by the [`dev-copilot`](https://github.com/tusharsaxena/dev-copilot)
 Claude Code plugin. The four root playbooks — `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`,
 `PERF_ANALYSIS.md` — are fetched over HTTPS by the plugin's skills and executed **inside an addon's
 own repo**, never here. So:

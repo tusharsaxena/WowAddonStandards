@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.75.0, 2026-10-02)
+# New Ka0s Addon — Context Pack (v2.76.0, 2026-10-04)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -37,7 +37,7 @@ Authoritative reference: `WowAddonStandards/standards/STANDARDS.md`. This docume
 The ordered process for starting a new Ka0s addon that is **born compliant** with the current
 standard. Steps run in the **new addon's repo** unless marked *[standards repo]*.
 
-1. **Scaffold.** Run the `wow-addon:new-addon` skill (Ace3 stack, AceDB saved variables, modular
+1. **Scaffold.** Run the `dev-copilot:wow-new-addon` skill (Ace3 stack, AceDB saved variables, modular
    folder layout, MIT license, AceConsole slash command). This lays down the skeleton the rest of this
    pack fills in.
 2. **Work from this pack — never write it in.** Read it from your temp copy and build from it; it
@@ -75,7 +75,7 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
    `WowAddonStandards/standards/ADDONS.md`. This puts it in scope for the next standards refresh — it
    is the only edit needed to bring a new addon into the collection.
 
-Then keep it compliant over time with the `wow-addon:` skills listed at the end of this file
+Then keep it compliant over time with the `dev-copilot:` skills listed at the end of this file
 (`review`, `sync-docs`, `bump-version`, …) and re-audit it as part of the collection.
 
 ---
@@ -243,7 +243,7 @@ settings\<Page>.lua
 partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file
 (library-stack-§7). The library block never carries an addon-authored `embeds.xml` (anti-pattern #38).
 
-The `## Interface:` is a **single** latest-Retail number (Retail only, toc-file-§3); bump it each patch with `wow-addon:bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
+The `## Interface:` is a **single** latest-Retail number (Retail only, toc-file-§3); bump it each patch with `dev-copilot:wow-bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
 
 ### `<Addon>.lua` (entry)
 
@@ -1513,7 +1513,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 20b. **No `TODO.md`** in a released addon — backlog lives in **GitHub issues** (documentation-§4). Only an unreleased, in-development addon may keep a `docs/TODO.md`, deleted before first release.
 20c. **Standards reference in project memory & context** (documentation-§6): the reference to the standard MUST appear in **three** places — TOC `X-Standard`, README standard badge, and the root `CLAUDE.md` `## Standards compliance (read first)` section. There is no fourth place; the old one was a file the standard now forbids. STOP and flag any change that would deviate; the user classifies it as an accepted deviation (recorded here) or a change to the standard itself (made upstream, then adopted).
 21. Audits, reviews & re-vendors: archive every audit under `docs/audits/<YYYY-MM-DD>/`, every code review under `docs/reviews/<YYYY-MM-DD>/` and every LibKa0s re-vendor under `docs/revendor/<YYYY-MM-DD>-v<tag>/`, each a numbered-prefix bundle — five artifacts for the first two, `01_DELTA.md` and `05_SUMMARY.md` always for the third with the middle three written when there is something to write (audit-review-history). A re-vendor commit owes a bundle naming its tag, or a `## Documented deviations` row saying why; a lapsed span is recorded by one consolidated span bundle, `docs/revendor/<YYYY-MM-DD>-v<A>-v<B>/`, whose `01_DELTA.md` line 1 names every tag it covers. Kept, not deleted; none of the three carries a `README.md`.
-22. Versioning: semver. Bump TOC, code constants, README. `wow-addon:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
+22. Versioning: semver. Bump TOC, code constants, README. `dev-copilot:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: trunk-based. Commit to the default branch on a **green** unit of work; no feature branches unless the human asks. Never push unless asked.
 24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. **Every close control the addon builds — on any window, and inside any decoration hook it hands a shared module — goes through the single `NS.MakeCloseButton` wrapper defined in `core/CoreSetup.lua`, which supplies the folder name (MUST).** A bare two-argument call to the factory silently draws the fallback glyph instead of the shared mark: no path is built, so nothing draws and nothing raises, and no gate can see it (anti-patterns #64, #65). The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px gray highlight just inside it, plus a gold title and a gray divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See standalone-windows, "The Ka0s window edge".
 
@@ -1670,16 +1670,16 @@ of its **setup file**, never the machinery inside.
 
 ## Skills you should use while building
 
-(All under `wow-addon:` prefix in your local Claude Code plugin.)
+(All under the `dev-copilot:` prefix in your local Claude Code plugin.)
 
-- `wow-addon:new-addon` — scaffold a new addon (Ace3 stack, AceDB, modular folder layout, MIT license, slash command).
-- `wow-addon:standards-audit` — audit the current addon against the standard. Produces the `docs/audits/<DATE>/` deviation + remediation bundle (audit-review-history).
-- `wow-addon:review` — principal-engineer code review of the current addon. Produces a `docs/reviews/<DATE>/` findings bundle (audit-review-history).
-- `wow-addon:automated-tests` — run the four out-of-game suites through the vendored runner and record them as a frozen `docs/automated-tests/<run>/` bundle, rolling the row into `RESULTS.md` (automated-tests).
-- `wow-addon:run-tests` — run the test battery (luacheck, the headless harness, any `make test`) and report a combined pass/fail. No record is kept; that is `automated-tests`.
-- `wow-addon:perf-analysis` — record and interpret an in-game perf run into a frozen `docs/perf-analysis/<run>/` bundle (performance-§8).
-- `wow-addon:sync-docs` — eliminate doc drift across README, CLAUDE.md, ARCHITECTURE.md.
-- `wow-addon:bump-interface` — bump the single TOC Interface line to the latest Retail patch.
-- `wow-addon:bump-version` — bump version everywhere (TOC, code constants, README badges + Version History, CLAUDE/ARCHITECTURE, CHANGELOG).
-- `wow-addon:diff` — summarize uncommitted changes with risk assessment.
-- `wow-addon:commit` — generated-message commit.
+- `dev-copilot:wow-new-addon` — scaffold a new addon (Ace3 stack, AceDB, modular folder layout, MIT license, slash command).
+- `dev-copilot:wow-standards-audit` — audit the current addon against the standard. Produces the `docs/audits/<DATE>/` deviation + remediation bundle (audit-review-history).
+- `dev-copilot:review` — principal-engineer code review of the current addon. Produces a `docs/reviews/<DATE>/` findings bundle (audit-review-history).
+- `dev-copilot:wow-automated-tests` — run the four out-of-game suites through the vendored runner and record them as a frozen `docs/automated-tests/<run>/` bundle, rolling the row into `RESULTS.md` (automated-tests).
+- `dev-copilot:run-tests` — run the test battery (luacheck, the headless harness, any `make test`) and report a combined pass/fail. No record is kept; that is `automated-tests`.
+- `dev-copilot:wow-perf-analysis` — record and interpret an in-game perf run into a frozen `docs/perf-analysis/<run>/` bundle (performance-§8).
+- `dev-copilot:sync-docs` — eliminate doc drift across README, CLAUDE.md, ARCHITECTURE.md.
+- `dev-copilot:wow-bump-interface` — bump the single TOC Interface line to the latest Retail patch.
+- `dev-copilot:bump-version` — bump version everywhere (TOC, code constants, README badges + Version History, CLAUDE/ARCHITECTURE, CHANGELOG).
+- `dev-copilot:diff` — summarize uncommitted changes with risk assessment.
+- `dev-copilot:commit` — generated-message commit.

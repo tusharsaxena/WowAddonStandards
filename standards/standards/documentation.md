@@ -8,7 +8,7 @@ Documentation is a **first-class compliance surface**, not an afterthought. Ever
 
 - **In an addon repo, a root `CHANGELOG.md` is FORBIDDEN.** The player-facing history already has a
   home the standard mandates — `## Version History` in the README (documentation-§1, item 11) — and a second history is precisely the drift the never-a-fourth-doc
-  rule exists to prevent. `/wow-addon:bump-version` rolls those two README sections for an addon and
+  rule exists to prevent. `/dev-copilot:bump-version` rolls those two README sections for an addon and
   writes no `CHANGELOG.md`.
 - **In a Ka0s-owned library repo, a root `CHANGELOG.md` is REQUIRED** (library-stack-§7's applicability
   list). testing-§10's versioning suite **MUST** assert that the changelog accounts for the version
@@ -66,7 +66,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
    - Placeholders: `<Expansion>` is the current Retail expansion name and `<X.Y.Z>` the client patch the TOC `## Interface:` encodes (e.g. `Midnight_12.0.7`); `<projectId>` is the CurseForge project id; `<X>`/`<Y>` are the passed/total case counts from the generated `docs/test-cases.md` (testing-§5).
    - The **published-version** badge (#2) is a **live** shields.io endpoint that auto-updates from the distribution site — no manual upkeep; add it only after first publish (Wago's equivalent endpoint is acceptable in its place).
    - **Keep-in-sync rule (MUST DO).** Badges #1 (`[wow]`) and #5 (`[tests]`) render **static text** and therefore go stale silently unless updated with the data they mirror. They **MUST** be updated **in the same change** that moves their source of truth, never deferred to a follow-up:
-     - **`[wow]`** — whenever the TOC `## Interface:` is bumped (each Retail patch, `wow-addon:bump-interface`), update the badge to the same expansion/client version so the two always show one number (toc-file-§3, versioning-git).
+     - **`[wow]`** — whenever the TOC `## Interface:` is bumped (each Retail patch, `dev-copilot:wow-bump-interface`), update the badge to the same expansion/client version so the two always show one number (toc-file-§3, versioning-git).
      - **`[tests]`** — whenever the suite changes (a case added/removed/renamed, or the pass count moves — i.e. whenever a failing test is resolved), regenerate `docs/test-cases.md` and update the badge's `<X>/<Y>` together (testing-§5).
 3. **Description** — 1–2 paragraphs of what the addon does and why; **MAY** inline a short feature bullet list **or a summary table** (e.g. the addon's core objects/commands at a glance) and a closing line on how to configure it (Blizzard Settings panel + `/<slash>`). **MUST**.
 4. **`## Screenshots`** — captioned images of the addon and its settings sub-panels. **SHOULD** (**MUST** once published).
@@ -98,7 +98,7 @@ Every Ka0s `README.md` **MUST** follow one structure so all addons read identica
 artwork above or below the title: the page opens on the H1, the badge row and the description. The
 addon's logo belongs in game, on the settings landing page (options-ui-§5), and its art stays under
 `media/logos/` for that page, which this rule does not touch. The list above had a *Logo* section until
-v2.45.0; `wow-addon:standards-audit` now flags one (anti-pattern #79).
+v2.45.0; `dev-copilot:wow-standards-audit` now flags one (anti-pattern #79).
 
 **Every edit to `README.md` MUST go through a de-AI writing pass before it is committed** — the `/humanize` skill, or an equivalent audit against a published AI-writing pattern catalog. Fix what it finds, then commit.
 
@@ -115,8 +115,8 @@ What survives the removal is external credit and nothing else. If the deleted se
 There is **no** `## Testing` section in the README (removed in the standard's v2.1.0 — it was contributor-facing). How to verify the addon — the headless harness (`lua tests/run.lua`), lint (`luacheck .`), the generated case inventory (`docs/test-cases.md`, testing-§5), and the in-game smoke tests (`docs/smoke-tests.md`) — lives entirely under `docs/` (testing, audit-review-history). The README still carries the `[tests]` X/Y badge in its badge row (item 2); the badge is the only test-related thing that belongs in the README.
 
 - The optional sections (4, 7, 8) are **SHOULD** — omit one only when it would be empty — and `## Credits` (12) is **MAY**, omitted entirely when there is nothing external to credit. When present, their **relative order MUST** be preserved.
-- `wow-addon:sync-docs` keeps the README's version-history table and count claims in lockstep with code (the README carries no slash-command table, item 5); `wow-addon:standards-audit` flags a README that departs from this canonical structure.
-- The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`wow-addon:bump-interface` / `bump-version`).
+- `dev-copilot:sync-docs` keeps the README's version-history table and count claims in lockstep with code (the README carries no slash-command table, item 5); `dev-copilot:wow-standards-audit` flags a README that departs from this canonical structure.
+- The README `[wow]` badge and the TOC `## Interface:` **MUST** show the same single number and move together (`dev-copilot:wow-bump-interface` / `bump-version`).
 
 ### 2. Root `CLAUDE.md` — stub
 
@@ -467,8 +467,8 @@ is worth something and it is not worth a rule, so:
 | `artwork-spec.md` | Source dimensions and slice geometry for the panel frame art |
 ```
 
-`wow-addon:sync-docs` keeps the map in lockstep with what is on disk;
-`wow-addon:standards-audit` checks the required set, the conditional set's stated status, the
+`dev-copilot:sync-docs` keeps the map in lockstep with what is on disk;
+`dev-copilot:wow-standards-audit` checks the required set, the conditional set's stated status, the
 verification-and-record set, orphans, non-canonical filenames, and the hub's shape.
 
 ##### Retired topic-detail docs
@@ -524,7 +524,7 @@ deleted outright, never migrated.
 
 ### 5. Keeping docs in sync
 
-- **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `docs/audits/` run. The `wow-addon:sync-docs` skill exists exactly for this; run it before every release.
+- **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `docs/audits/` run. The `dev-copilot:sync-docs` skill exists exactly for this; run it before every release.
 
 ### 6. Standards reference (every addon)
 
@@ -537,7 +537,7 @@ The reference **MUST** appear in **all three** of these places (a Ka0s addon mis
 2. **README standard badge** — the standard badge in the README badge row (documentation-§1 #2). The user-facing **declaration**, and deliberately **not a link**: it tells a player the addon is built to a house standard, and the reader who needs the repo itself has it in items 1 and 3, which are the two places a contributor or an agent actually opens. Re-wrapping it in a link is a **MUST NOT** (documentation-§1 #2).
 3. **`CLAUDE.md` → `## Standards compliance (read first)`** — the agent-facing directive at the first doc every agent reads (documentation-§2 #3). **MUST** instruct the agent to **stop and flag** any change that would deviate rather than silently deviate or silently conform, and to let the user classify it as an accepted deviation (recorded as a row in the addon's `## Documented deviations` register — documentation-§3) or a change to the standard itself (made upstream here, then adopted).
 
-Items 1–2 already existed (toc-file-§1, documentation-§1); item 3 is the **memory-and-context** requirement: the standard reference lives inside the document an agent loads as working context, not only in shipping metadata. The `/wow-addon:standards-audit` playbook checks all three.
+Items 1–2 already existed (toc-file-§1, documentation-§1); item 3 is the **memory-and-context** requirement: the standard reference lives inside the document an agent loads as working context, not only in shipping metadata. The `/dev-copilot:wow-standards-audit` playbook checks all three.
 
 There is deliberately **no fourth place.** Until v2.17.0 the rule was also restated in `docs/agent-context.md`'s `## Hard rules`. That file no longer exists in a Ka0s addon (documentation-§3), and a rule whose fourth home is a file the standard forbids is a rule that audits itself into a permanent failure.
 
@@ -590,7 +590,7 @@ check.)*
 - **Retired global `§N.M` notation is a SHOULD.** The split standard replaced one document's global
   numbering with per-file local numbering, so a dotted global number no longer names anything. It is a **SHOULD**
   rather than a MUST because it is uniformly wrong in a way a reader decodes at a glance and a machine
-  sweeps mechanically — `/wow-addon:revendor-standards` does exactly that. Sweep it; do not hand-triage
+  sweeps mechanically — `/dev-copilot:wow-revendor-standards` does exactly that. Sweep it; do not hand-triage
   it.
 - **A malformed or out-of-range reference is a MUST fix.** Malformed means it does not parse as
   `filename-§N` at all (`slash-commands-§:`); out-of-range means the file exists but has no such
@@ -662,7 +662,7 @@ Why root, and why its own file. Before this rule the answer to *"what do I need 
 
 Everything above is written for an **addon**. `library-stack-§7` already carves out the second repo kind — a **Ka0s-owned library repo**, which has no TOC and is audited against its own applicability lists. This section carves out the **third**: a **documentation-and-tooling repo**, which ships no Lua to the WoW client and is not a library either.
 
-There are two today, both named in `ADDONS.md` → *Documentation-and-tooling repos*: **`WowAddonStandards`** (this repo — the standard and its four process playbooks) and **`wow-addon`** (the Claude Code plugin that consumes them). `line-endings-§2` has recognized this kind since it was written — it is the *"ships nothing to the client"* half of the two-pin rule, and it names *"the standards and plugin repos"* in as many words — but nothing said which of the **other** twenty-six sections reach such a repo. The cost of that silence was the predictable one: this repo carried three locally-argued deviation rows restating the same exemption the standard should have granted once, and `AUDIT.md` step 1 asserted that *a repo with no `.toc` is a Ka0s-owned library repo*, which is false for both repos named above.
+There are two today, both named in `ADDONS.md` → *Documentation-and-tooling repos*: **`WowAddonStandards`** (this repo — the standard and its four process playbooks) and **`dev-copilot`** (the Claude Code plugin that consumes them; it absorbed the retired `wow-addon` plugin in its v2.0.0). `line-endings-§2` has recognized this kind since it was written — it is the *"ships nothing to the client"* half of the two-pin rule, and it names *"the standards and plugin repos"* in as many words — but nothing said which of the **other** twenty-six sections reach such a repo. The cost of that silence was the predictable one: this repo carried three locally-argued deviation rows restating the same exemption the standard should have granted once, and `AUDIT.md` step 1 asserted that *a repo with no `.toc` is a Ka0s-owned library repo*, which is false for both repos named above.
 
 **How to tell the three kinds apart.** A repo with a `.toc` is an **addon**. A repo with no `.toc` that ships a **client-bound Lua payload** vendored into addons' `libs/` is a **Ka0s-owned library repo** (library-stack-§7). A repo with **neither** — no `.toc`, no payload any addon vendors into `libs/` — is a **documentation-and-tooling repo**, and takes the lists below. The discriminator is the same one `line-endings-§2` already uses to choose the pin, so an audit that has resolved the pin has resolved the kind.
 
@@ -697,7 +697,7 @@ There are two today, both named in `ADDONS.md` → *Documentation-and-tooling re
 |---|---|
 | `documentation-§3`'s `ARCHITECTURE.md` | **Binds, with a reduced section set.** Six of the ten mandated sections — Settings Schema, Message Bus, Slash Commands, Event Subscriptions, Taint Notes, and Module Map *as a Lua module map* — describe a runtime this repo kind does not have, and a file recording six "not applicable" headings is worse than one that never claimed them. The mandated set here is **five**: **Overview**, **Module Map** *read as the file-and-path map* (which paths exist, what reads each one, and which are addressed by URL and therefore breaking to rename), **Known Limitations**, **`## Documentation map`**, and **`## Documented deviations`**. The last two bind unchanged and for the same reasons they bind anywhere. Writing the other five as "not applicable" rows is **not** required and **SHOULD NOT** be done: this section is the exemption, and restating it per repo is the duplication it exists to end. |
 | `documentation-§7` | **Binds.** A new machine needs the toolchain list whatever the repo ships, and the reader must not have to infer "nothing" from an absent file. Where a repo genuinely requires almost nothing, the honest content is **a short required list and an explicit *not used here* list with reasons** — `git` alone is a complete answer. **MUST NOT** invent entries to fill the addon-shaped shape: §7's evidence-based MUST already forbids it, and a padded list here would be the first thing to go stale. §7's *Runtime (in-game)* group has no instance and is omitted rather than answered. |
-| `layout` | The **folder casing** rules bind. The `core/ defaults/ settings/ locales/ modules/` skeleton and the folder load order do not — there is no TOC to order. The **1500-line cap** (`layout-§1`) binds *authored `.lua`*, so it has no instance while the repo has none; it is not re-read onto Markdown, whose length is governed by nothing here. `layout-§1`'s **`tools/`** MUST binds if and when such a repo authors a **generator** — a script that writes a file the repo commits — and its `.pkgmeta` condition is simply void, since `packaging` does not apply here at all. It does **not** reach the scripts a tooling repo exists to ship: the `wow-addon` plugin's `scripts/` holds hooks and a bounded-run wrapper that its own `hooks/hooks.json` invokes by path, and a hook is a program the repo's consumers run, not a generator producing committed output. Moving those would break the manifest for no rule's benefit. The **over-cap census** and **its gate** follow the cap and have no instance here for the same reason it does not: a repo that tracks no authored `.lua` has no over-cap set to record, so it owes neither the `Files over the 1500-line cap` heading in its `ARCHITECTURE.md` nor the vendored `tests/_kit/test_layout_cap.lua` — and by *Does not apply* above it has no `tests/` harness to wire that gate into. Both arrive on the same trigger the three verification sections already state: **the first `.lua` file this repo tracks outside a frozen bundle**. An empty census is a result and an absent one is a gap, but only once there is a set to be empty of. |
+| `layout` | The **folder casing** rules bind. The `core/ defaults/ settings/ locales/ modules/` skeleton and the folder load order do not — there is no TOC to order. The **1500-line cap** (`layout-§1`) binds *authored `.lua`*, so it has no instance while the repo has none; it is not re-read onto Markdown, whose length is governed by nothing here. `layout-§1`'s **`tools/`** MUST binds if and when such a repo authors a **generator** — a script that writes a file the repo commits — and its `.pkgmeta` condition is simply void, since `packaging` does not apply here at all. It does **not** reach the scripts a tooling repo exists to ship: the `dev-copilot` plugin's `scripts/` holds hooks and a bounded-run wrapper that its own `hooks/hooks.json` invokes by path, plus the Python helpers they and its commands call and those helpers' tests, and a hook is a program the repo's consumers run, not a generator producing committed output. Moving those would break the manifest for no rule's benefit. The **over-cap census** and **its gate** follow the cap and have no instance here for the same reason it does not: a repo that tracks no authored `.lua` has no over-cap set to record, so it owes neither the `Files over the 1500-line cap` heading in its `ARCHITECTURE.md` nor the vendored `tests/_kit/test_layout_cap.lua` — and by *Does not apply* above it has no `tests/` harness to wire that gate into. Both arrive on the same trigger the three verification sections already state: **the first `.lua` file this repo tracks outside a frozen bundle**. An empty census is a result and an absent one is a gap, but only once there is a set to be empty of. |
 | `naming-cheatsheet` | Binds to whatever identifiers the repo authors — a shell script's functions, a JSON config's keys. With no Lua the surface is small, not absent. |
 | `anti-patterns` | Binds, whole and unchanged. Entries keyed to an addon artifact simply have no instance; nothing is exempted. |
 | `lint`, `testing`, `automated-tests` (**if executable content appears**) | Listed in *Does not apply* above **because there is no Lua today**, and that is a statement about the tree rather than a permanent grant. A repo of this kind that grows a Lua file, a test harness or a script complex enough to have a failure mode **MUST** re-read these three against what it actually has, and record the outcome. The trigger is stated so it cannot be missed: **the first `.lua` file this repo tracks outside a frozen bundle.** A shell script alone does not fire it — the standard mandates no shell linter — but it does oblige the script's own documentation under `documentation-§5`. |

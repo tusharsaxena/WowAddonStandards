@@ -3,7 +3,7 @@
 **The single, editable list of addons in the Ka0s collection.** This roster is a
 **standards-process input**: it defines *which* addons the standard codifies rules for, and whose
 current state feeds the [next standards refresh](README.md). Compliance auditing is no longer run from
-this repo — each addon audits **itself**, in its own repo, via `/wow-addon:standards-audit` (see
+this repo — each addon audits **itself**, in its own repo, via `/dev-copilot:wow-standards-audit` (see
 [`../AUDIT.md`](../AUDIT.md)).
 
 > **This is the one place to edit collection scope.** Add a row when you ship a new Ka0s addon so it
@@ -58,7 +58,7 @@ lists**, not the addon rule set and not `library-stack-§7`'s.
 | Repo | Folder | Repository |
 |---|---|---|
 | WowAddonStandards | [`../`](../) | https://github.com/tusharsaxena/WowAddonStandards |
-| wow-addon | [`../../wow-addon/`](../../wow-addon/) | https://github.com/tusharsaxena/wow-addon |
+| dev-copilot | [`../../dev-copilot/`](../../dev-copilot/) | https://github.com/tusharsaxena/dev-copilot |
 
 `WowAddonStandards` is this repo — listed because a roster that omits the repo it lives in is the
 one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind from this file.

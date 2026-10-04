@@ -4,9 +4,9 @@
 
 Audit, code-review and re-vendor runs are **frozen, dated snapshots** kept in the addon's **own** repo, under `docs/`. Each is a numbered-prefix bundle written to a new dated folder; a re-run is a **new** folder — **never** edit a prior run. The three commands write to **separate** locations:
 
-- **`/wow-addon:standards-audit`** → **`docs/audits/<YYYY-MM-DD>/`** — compliance against this standard: `01_CURRENT_STATE.md`, `02_DEVIATIONS.md` (stable per-addon deviation IDs), `03_EVIDENCE.md`, `04_TECHNICAL_DESIGN.md`, `05_EXECUTION_PLAN.md`. The step-by-step playbook is `AUDIT.md` at the root of the standards repo. This audit is **read-only** — it produces a remediation plan, it does not change code.
-- **`wow-addon:review`** → **`docs/reviews/<YYYY-MM-DD>/`** — principal-engineer code review: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`.
-- **`/wow-addon:revendor-libka0s`** → **`docs/revendor/<YYYY-MM-DD>-v<tag>/`** — what arrived with a LibKa0s re-vendor and what was done about it: `01_DELTA.md` (the payload delta), `02_CANDIDATES.md`, `03_DECISIONS.md`, `04_EXECUTION_PLAN.md`, `05_SUMMARY.md`. **`01_DELTA.md` and `05_SUMMARY.md` are the stable members** and are always written; the middle three are written when there is something to write. Of the sixty-eight bundles the collection has on disk, forty carry all five, nineteen have no `04_EXECUTION_PLAN.md` because nothing was adopted, and nine carry the two stable members alone — so an absent middle document records a decision rather than an unfinished bundle, and a MUST over all five would have declared twenty-eight compliant bundles broken.
+- **`/dev-copilot:wow-standards-audit`** → **`docs/audits/<YYYY-MM-DD>/`** — compliance against this standard: `01_CURRENT_STATE.md`, `02_DEVIATIONS.md` (stable per-addon deviation IDs), `03_EVIDENCE.md`, `04_TECHNICAL_DESIGN.md`, `05_EXECUTION_PLAN.md`. The step-by-step playbook is `AUDIT.md` at the root of the standards repo. This audit is **read-only** — it produces a remediation plan, it does not change code.
+- **`dev-copilot:review`** → **`docs/reviews/<YYYY-MM-DD>/`** — principal-engineer code review: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`.
+- **`/dev-copilot:wow-revendor-libka0s`** → **`docs/revendor/<YYYY-MM-DD>-v<tag>/`** — what arrived with a LibKa0s re-vendor and what was done about it: `01_DELTA.md` (the payload delta), `02_CANDIDATES.md`, `03_DECISIONS.md`, `04_EXECUTION_PLAN.md`, `05_SUMMARY.md`. **`01_DELTA.md` and `05_SUMMARY.md` are the stable members** and are always written; the middle three are written when there is something to write. Of the sixty-eight bundles the collection has on disk, forty carry all five, nineteen have no `04_EXECUTION_PLAN.md` because nothing was adopted, and nine carry the two stable members alone — so an absent middle document records a decision rather than an unfinished bundle, and a MUST over all five would have declared twenty-eight compliant bundles broken.
 
 **The re-vendor folder carries the tag, not the date alone (MUST).** Forty of the sixty-eight bundles on disk are `<date>-v<tag>` and twenty-eight are bare `<date>`. The tagged form is both the majority and the only one that answers the question a reader opens the store with — *which library release is this bundle about?* — which a date cannot, because a single day has carried two re-vendors more than once in this collection. Existing bare-dated folders are **not** renamed on sight: a frozen bundle's name is part of what it froze, so a rename is a decision taken deliberately and recorded, not a tidy-up.
 
@@ -122,10 +122,10 @@ Pending work is swept up, decided, and recorded as **GitHub issues on the addon'
 record used to be `docs/pending/LEDGER.md`, a tracked markdown table; it is **retired** and **MUST**
 be deleted where it still exists.
 
-**Discovery and triage are two commands, deliberately.** `/wow-addon:issue-audit` sweeps the addon —
+**Discovery and triage are two commands, deliberately.** `/dev-copilot:issue-audit` sweeps the addon —
 four discovery passes, stable item IDs, evidence hashes, severity — and files anything not already in
 the store as an open issue labeled `state:untriaged`. It never interviews and never changes code.
-`/wow-addon:issue-triage` takes those `state:untriaged` issues, **most severe first**, puts each to the
+`/dev-copilot:issue-triage` takes those `state:untriaged` issues, **most severe first**, puts each to the
 maintainer one at a time with its evidence, and records the decision by swapping the status label. It
 changes the store only.
 
@@ -170,7 +170,7 @@ chosen approach, not a code change. The work happens in an ordinary session agai
   | `severity:medium` | yellow `111100` | Maintainability: a stub callers depend on, code/doc drift, a dead path |
   | `severity:low` | green `001100` | Polish, naming, cosmetic, speculative-future notes |
 
-  Severity is **not decoration**: it is the order `/wow-addon:issue-triage` interviews in, so a wrong
+  Severity is **not decoration**: it is the order `/dev-copilot:issue-triage` interviews in, so a wrong
   severity does not merely mislabel an item, it puts it in front of or behind the wrong things when a
   human sits down to decide. `issue-audit` assigns one when it files, and the maintainer **MAY**
   overrule it during triage, which re-orders the remaining queue. The **level** lives in the label
