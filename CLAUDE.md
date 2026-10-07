@@ -135,8 +135,9 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 ## Editing rules
 
 - **This repo ships nothing to the WoW client, so it pins LF (`line-endings-§2`).** Its root
-  `.gitattributes` carries the **non-client** canonical body — `* text=auto eol=lf`, `*.sh text
-  eol=lf`, binaries marked `binary`. Write LF here. Do not reach for the `dev-copilot` plugin's CRLF
+  `.gitattributes` carries the **non-client** canonical body — `* text=auto eol=lf`, the `*.sh` and
+  `*.py` shebang carve-outs (`line-endings-§3`), binaries marked `binary` — byte-identical to
+  `line-endings-§5`'s non-client body. Write LF here. Do not reach for the `dev-copilot` plugin's CRLF
   behavior: the hook reads `git check-attr eol` and follows whatever the repo declares, and what this
   repo declares is LF. The standard it publishes binds it — a standards repo that does not follow its
   own rule is the one thing that discredits the rule. If a file arrives CRLF anyway, that is a

@@ -442,7 +442,9 @@ rolled-up finding carrying the command that produced the count, never a file-by-
 inflates the tally for what is a single `--renormalize` sweep (documentation-§6 applies the same
 rolled-up rule to citation sweeps).
 
-**Property (e) is a test before it is a finding.** Every repo **MUST** carry the vendored EOL gate —
+**Property (e) is a test before it is a finding.** Every repo that runs a suite — an addon, a Ka0s-owned
+library repo, or a documentation-and-tooling repo that has acquired one under documentation-§8 —
+**MUST** carry the vendored EOL gate —
 `tests/_kit/test_eol.lua`, LibKa0s test-kit revision 15 — loaded by `tests/run.lua` with the rest of
 the suite, and that suite **MUST** be green. The one-liner below asks the same question by hand, and
 the reason this section spent so long asking it by hand is the record: on 2026-09-07 this was the
@@ -481,12 +483,13 @@ under an `eol=crlf` pin for nine kit revisions with a green suite above them.
 test -f .gitattributes && grep -nE '^\* text=auto eol=(crlf|lf)$|^\*\.(sh|py) text eol=lf$|binary$' .gitattributes
 
 # (e) does the WORKING TREE agree with the declared pin? — one number, not a list
-git ls-files -z | xargs -0 -I{} sh -c '
-  set -- $(git check-attr text eol -- "{}" | sed "s/.*: //")
+# the path arrives as "$1" (positional), never spliced into the script text
+git ls-files -z | xargs -0 -n1 sh -c '
+  p=$1; set -- $(git check-attr text eol -- "$p" | sed "s/.*: //")
   [ "$1" = unset ] && exit                      # binary: git converts nothing here
-  cr=$(tr -dc "\r" < "{}" | wc -c); lf=$(tr -dc "\n" < "{}" | wc -c)
-  case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && echo "{}";;
-               lf)   [ "$cr" -gt 0 ] && echo "{}";; esac' 2>/dev/null | wc -l
+  cr=$(tr -dc "\r" < "$p" | wc -c); lf=$(tr -dc "\n" < "$p" | wc -c)
+  case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && printf "%s\n" "$p";;
+               lf)   [ "$cr" -gt 0 ] && printf "%s\n" "$p";; esac' _ 2>/dev/null | wc -l
 ```
 
 - **(e) asks git for `text` as well as `eol`, and it counts bytes rather than asking `file(1)`.**

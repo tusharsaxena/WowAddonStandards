@@ -181,12 +181,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      grep -c ' binary$' .gitattributes
 
      # (e) does the WORKING TREE actually agree with the declared pin? ONE number.
-     git ls-files -z | xargs -0 -I{} sh -c '
-       set -- $(git check-attr text eol -- "{}" | sed "s/.*: //")
+     # the path arrives as "$1" (positional), never spliced into the script text
+     git ls-files -z | xargs -0 -n1 sh -c '
+       p=$1; set -- $(git check-attr text eol -- "$p" | sed "s/.*: //")
        [ "$1" = unset ] && exit                      # binary: git converts nothing here
-       cr=$(tr -dc "\r" < "{}" | wc -c); lf=$(tr -dc "\n" < "{}" | wc -c)
-       case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && echo "{}";;
-                    lf)   [ "$cr" -gt 0 ] && echo "{}";; esac' 2>/dev/null | wc -l
+       cr=$(tr -dc "\r" < "$p" | wc -c); lf=$(tr -dc "\n" < "$p" | wc -c)
+       case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && printf "%s\n" "$p";;
+                    lf)   [ "$cr" -gt 0 ] && printf "%s\n" "$p";; esac' _ 2>/dev/null | wc -l
      ```
 
      A file carrying **only** the `*.sh` carve-out with no pin above it is **not** compliance — it is
@@ -211,9 +212,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the same repo**: the old command counted every binary and every JSON file as a stray. A frozen
      bundle is never edited, so say so in the finding rather than letting the two numbers sit
      unexplained side by side. **And check that (e) has an owner in the repo**: `line-endings-§7`
-     MUSTs the vendored gate `tests/_kit/test_eol.lua` (LibKa0s test-kit revision 15), which asks
+     MUSTs the vendored gate in every repo that runs a suite, `tests/_kit/test_eol.lua` (LibKa0s test-kit revision 15), which asks
      this same question over the whole tracked set on every run of the suite. A repo whose kit
-     predates 15 has no gate and (e) is the audit's alone; a repo that has the gate, reports green
+     predates 15 has no gate and (e) is the audit's alone, and so does a suite-less
+     documentation-and-tooling repo, which §7 scopes out of the gate; a repo that has the gate, reports green
      and still fails (e) here is a **gate** finding, not a file finding, and it outranks the strays
      it missed.
    - **Check the package ignore list by listing the repo's dot-entries, not by reading `.pkgmeta`

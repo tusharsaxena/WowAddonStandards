@@ -17,8 +17,8 @@ This playbook is the entry point; the substance lives in `standards/`:
 
 **Step 0 — before step 1, and before any other file exists: write `.gitattributes` (`line-endings`).**
 The repo's **first** commit carries a root `.gitattributes` holding the **client-bound** body verbatim
-from `line-endings-§5` — the `* text=auto eol=crlf` pin, the `*.sh text eol=lf` carve-out, and the
-`binary` markings. The text to copy is the context pack's `### .gitattributes` starter snippet; copy
+from `line-endings-§5` — the `* text=auto eol=crlf` pin, both of `line-endings-§3`'s shebang
+carve-outs (`*.sh text eol=lf`, `*.py text eol=lf`), and the `binary` markings. The text to copy is the context pack's `### .gitattributes` starter snippet; copy
 it rather than composing one, since eight hand-written 22-to-68-line variants of this policy exist
 today precisely because there was never one canonical text. **It goes first because it is the one file
 whose cost grows with everything already committed**: retrofitted later it needs
