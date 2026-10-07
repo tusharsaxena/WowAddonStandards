@@ -24,7 +24,7 @@ For quick reference, the rules above as a do-not list:
 18. Debug output to the chat frame when the addon has a main window — use the on-screen debug console (debug-logging).
 19. Cross-module direct table access — use the bus.
 20. User-supplied Lua execution — banned at the standard level (no Ka0s addon needs it).
-21. Creating a feature/topic branch without an explicit request — work trunk-based (versioning-git).
+21. Creating a feature/topic branch the owner did not direct, or one not shared by name across the repos of a multi-repo changeset — work on the default branch otherwise (versioning-git).
 22. Deferring settings-**category** registration until first `/config`/panel-open — register the category eagerly at load; only the body is lazy (options-ui-§1, options-ui-§9).
 23. Committing with red `lua tests/run.lua` or non-clean `luacheck .` — the commit gate is green tests + clean lint (testing).
 24. No `tests/` harness, or a logic change with no covering test — TDD is mandatory (testing).

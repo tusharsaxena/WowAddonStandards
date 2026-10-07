@@ -723,7 +723,7 @@ There are two today, both named in `ADDONS.md` → *Documentation-and-tooling re
 | Section | Why it binds a documentation-and-tooling repo |
 |---|---|
 | `line-endings` | The **LF** pin (`line-endings-§2`), both of `line-endings-§3`'s shebang carve-outs (`*.sh text eol=lf`, `*.py text eol=lf`), mandatory in both kinds, the binary marks and the `§5` canonical body. The `§7` EOL gate binds only once the repo runs a suite; until then it owes the hand check (e). This section already named this repo kind before this one existed. |
-| `versioning-git` | Semver and trunk-based git discipline. The standard's own version is the clearest case in the collection: every rule change bumps it, and consumers cite the version they were written against. |
+| `versioning-git` | Semver and the git workflow: default-branch work, owner-directed or multi-repo changesets on a same-named `feat/<YYYY-MM-DD>-<topic>` branch merged `--no-ff`. The standard's own version is the clearest case in the collection: every rule change bumps it, and consumers cite the version they were written against. |
 | `documentation-§4` | **No root `TODO.md`.** A backlog belongs in the issue store, not in a file that rots at the root — and a repo whose entire product is documents has the least excuse. |
 | `documentation-§5` | Keeping the docs in sync. Here this is nearly the whole job rather than a chore beside the code. |
 | `documentation-§6` | The `filename-§N` citation scheme and the citation rules. **Load-bearing here beyond any addon:** this is where the cited text lives, so a malformed or out-of-range reference in this repo is wrong at the source rather than in one copy of it. |

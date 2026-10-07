@@ -10,6 +10,6 @@
 
 **Git workflow**
 
-- **MUST** work trunk-based: commit directly to the addon's default branch. Do **NOT** create feature/topic branches for routine work — branch **only** when the human explicitly asks (e.g. a risky spike needing isolation).
-- **MUST NOT** push to a remote unless the human asks; the human pushes when ready.
+- **MUST** land work on the repo's default branch by default. Two cases go on a feature branch instead: a changeset the owner directs to be isolated (e.g. a risky spike), and a changeset that spans several repos. That branch **MUST** be named `feat/<YYYY-MM-DD>-<topic>`, with the **same** name in every repo the changeset touches, **MUST** be merged into the default branch with `--no-ff` so the changeset stays legible as one unit, and is then deleted, together with any worktree or stash the run created. Do **NOT** create a feature/topic branch for routine single-repo work the owner did not direct to be isolated. Merging, tagging, pushing and releasing keep their owner go-ahead gates below.
+- **MUST NOT** push to a remote unless the human asks; the human pushes when ready. The sanctioned case is pushing a feature branch at a checkpoint the owner authorized. **MUST NOT** merge a feature branch, push a tag or cut a release without the owner's go-ahead.
 - **MUST** commit only on a **green** unit of work — `lua tests/run.lua` passing and `luacheck .` clean (testing) — not at every checkpoint.

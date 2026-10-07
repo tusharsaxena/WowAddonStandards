@@ -129,8 +129,12 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 
 ## Git workflow
 
-- **Trunk-based.** Work directly on the current branch (usually `master`) by default; branch when a
-  changeset genuinely warrants isolation.
+- **Default-branch work by default** (versioning-git). Work lands on `master` unless the owner directs
+  a changeset to be isolated or it spans several repos; then it goes on `feat/<YYYY-MM-DD>-<topic>`,
+  the same name in every repo it touches, merged into `master` with `--no-ff` on the owner's go-ahead
+  and then deleted, with any worktree or stash the run created. Pushing a feature branch at an
+  owner-authorized checkpoint is the only push without a direct request; merging, tagging and
+  releasing wait for the owner.
 
 ## Editing rules
 
