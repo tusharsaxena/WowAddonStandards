@@ -239,6 +239,12 @@ settings\OptionsSetup.lua                -- before every settings\<Page>.lua
 settings\<Page>.lua
 ```
 
+The marks are not confined to `# Core`. The load-bearing denominator is **every listed file** that
+binds, reads or writes an `NS` member or a library major at file scope, so a `modules\` or
+`settings\` file that takes `NS.Something` as an upvalue when it loads carries a `LOAD-BEARING`
+comment too, naming what resolves; where any of several files satisfies the constraint, the comment
+names what resolves and which files satisfy it (toc-file-§5).
+
 `libs\LibKa0s\LibKa0s.xml` is a **single** entry — naming the module files individually is the same
 partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file
 (library-stack-§7). The library block never carries an addon-authored `embeds.xml` (anti-pattern #38).

@@ -53,7 +53,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    `defaults/*` → `modules/*` → `settings/*` (layout-§1), which is the same order the TOC's `#`
    section headers express (toc-file-§5). Inside `core/` there is **no fixed prefix**: order by what
    the files actually resolve at load — which for a new addon is decided by the setup-file list in
-   step 4 — and annotate each load-bearing position at its TOC line (toc-file-§5). Copy the vendored `libs/` set you actually
+   step 4 — and annotate each load-bearing position at its TOC line, in every group of the listing and not
+   only `# Core` (toc-file-§5). Copy the vendored `libs/` set you actually
    `LibStub()` from an existing Ka0s addon so versions stay consistent (library-stack-§3 — libraries are vendored
    and committed). Then vendor the two Ka0s-owned payloads (library-stack-§7) from the **`LibKa0s`
    repo's own ship folders**, byte-identical, rather than from a sibling addon's copy, which may

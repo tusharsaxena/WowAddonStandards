@@ -2,7 +2,7 @@
 
 The **living, canonical** core of this repo: the house rules for the Ka0s WoW addon collection,
 the research they are built on, the [roster](ADDONS.md) of in-scope addons, and a fetch-at-runtime
-context pack for scaffolding new addons. Compliance auditing is **not** run from here — each addon audits
+context pack for scaffolding new addons. Addon compliance auditing is **not** run from here — each addon audits
 **itself**, in its own repo, via `/dev-copilot:wow-standards-audit` (playbook: [`../AUDIT.md`](../AUDIT.md)).
 
 ## What's in here
@@ -72,6 +72,11 @@ The standard is a **synthesis** of two inputs:
    keep them in sync. A rule that changes the addon's **doc set** — the root docs, the `docs/` trio,
    the required topic-detail docs — ripples into all of them at once. Existing audit runs (in the
    addons' own repos) stay frozen — each addon's *next* audit re-measures it against the revised standard.
+6. **Gate it.** From the repo root, run `bash scripts/check-standard.sh`
+   ([`../scripts/check-standard.sh`](../scripts/check-standard.sh)) and fix whatever it reports; it
+   must exit `0`. It catches the mechanical drift (CR bytes, the `.gitattributes` body, citation
+   ranges, the Sections list, anti-pattern numbering, the version stamps, relative `.md` links) and
+   nothing else, so read the ripple for meaning as well.
 
 ### Where audits fit
 

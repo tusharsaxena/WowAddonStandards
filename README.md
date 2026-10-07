@@ -20,8 +20,9 @@ there. This repo is audited and reviewed too, as a documentation-and-tooling rep
 own frozen `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` stores. The list of addons that make up the collection lives in one editable place:
 [`standards/ADDONS.md`](standards/ADDONS.md).
 
-This repository is a research and analysis deliverable, and it contains only documents. No addon
-source code lives here. Nothing done here modifies the addons themselves.
+This repository is a research and analysis deliverable. It contains documents plus one on-demand
+check script, [`scripts/check-standard.sh`](scripts/check-standard.sh). No addon source code lives
+here. Nothing done here modifies the addons themselves.
 
 > The plugin that invokes these playbooks lives in a separate repo,
 > <https://github.com/tusharsaxena/dev-copilot>. That repo, not this one, is where the plugin gets
@@ -84,6 +85,10 @@ This is how the living house rules get revised. The full, authoritative steps ar
    `## Changelog`, which holds only the current one.
 5. Ripple the change into [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md) and
    [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) so they stay in sync.
+6. Run `bash scripts/check-standard.sh` and fix whatever it reports; it must exit `0`. It checks the
+   mechanical invariants (CR bytes, the `.gitattributes` body, citation ranges, the Sections list,
+   anti-pattern numbering, the version stamps and relative links), not whether the documents agree
+   in meaning.
 
 ## B. Audit an addon
 
