@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.76.0, 2026-10-04)
+# New Ka0s Addon — Context Pack (v2.76.1, 2026-10-07)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -1041,9 +1041,10 @@ Loader.addonName = "<Addon>"
 -- A module's FLOOR DEPENDENCIES are part of "all of them", and this is the half that gets dropped:
 -- a module whose floor is unmet resolves it, `return`s BEFORE `LibStub:NewLibrary`, and is simply
 -- ABSENT — no error, no warning, nothing to see. DebugLog.lua floors on Widgets (Widgets.lua,
--- WidgetsReorder.lua and WidgetsDragHandle.lua), Perf.lua floors on Lifecycle.lua, and OptionsWidgets.lua and
--- OptionsTabs.lua both floor on Pool.lua. Load a major without its floor and the suite tests a stub
--- it cannot tell from the real thing. Whole-folder vendoring is mandatory for the same reason, so
+-- WidgetsReorder.lua, WidgetsDragHandle.lua, WidgetsLineChart.lua and WidgetsAutocomplete.lua),
+-- Perf.lua floors on Lifecycle.lua, and OptionsWidgets.lua and OptionsTabs.lua both floor on
+-- Pool.lua. Load a major without its floor and the suite tests a stub it cannot tell from the real
+-- thing. Whole-folder vendoring is mandatory for the same reason, so
 -- the whole folder is what this list names.
 local LIB_FILES = {
   "libs/LibKa0s/Core.lua", "libs/LibKa0s/Env.lua", "libs/LibKa0s/Compat.lua",
@@ -1051,6 +1052,8 @@ local LIB_FILES = {
   "libs/LibKa0s/Pool.lua", "libs/LibKa0s/Item.lua", "libs/LibKa0s/Media.lua",
   "libs/LibKa0s/Widgets.lua", "libs/LibKa0s/WidgetsReorder.lua",          -- the second from v1.66.0
   "libs/LibKa0s/WidgetsDragHandle.lua",
+  "libs/LibKa0s/WidgetsLineChart.lua",                                     -- from v1.69.0
+  "libs/LibKa0s/WidgetsAutocomplete.lua",                                  -- from v1.70.0
   "libs/LibKa0s/DebugLog.lua", "libs/LibKa0s/DebugLogDiagnostics.lua",   -- the second from v1.60.0
   "libs/LibKa0s/DebugLogGates.lua",                                        -- from v1.65.0
   "libs/LibKa0s/Slash.lua", "libs/LibKa0s/SlashParse.lua",              -- the second from v1.66.0
