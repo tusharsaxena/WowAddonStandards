@@ -996,7 +996,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      exhaustive: a stub for a major no section rules on yet, such as the collection's
      `LibKa0s-Lifecycle-1.0` stubs, gets the member-coverage check above and nothing from (c).
 5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap, carrying five things: the **ID**;
-   the **section violated**, written as `filename-§N` (documentation-§5/§6 — and by **bare filename**
+   the **section violated**, written as `filename-§N` (documentation-§6 — and by **bare filename**
    for the eleven section files that carry no numbered subsections); the **impact grade**; a **one-line
    description**; and the **fix direction**.
 

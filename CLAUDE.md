@@ -169,7 +169,8 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   four; and **Tier 1** — `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`,
   `data-flow.md`, `common-tasks.md`, all six unconditional and under exactly those names, with Tier 2
   (`slash-dispatch.md`, `midnight-quirks.md`, `compat-layer.md`, `message-bus.md`, `profiles.md`,
-  `debug.md`) required per stated trigger and recorded as *Not applicable* in the map when the
+  `debug.md`; `perf-analysis/README.md` is a Tier 2 member too, its trigger stated under the
+  verification-and-record docs above) required per stated trigger and recorded as *Not applicable* in the map when the
   trigger has not fired, except that since v2.68.0 the `docs/debug.md` trigger has fired in every
   addon (the diagnostics dump is a debug surface beyond the default console), so `docs/debug.md` is
   never *Not applicable*, and Tier 3 free-form (documentation-§3).

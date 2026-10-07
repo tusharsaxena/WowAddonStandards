@@ -202,9 +202,11 @@ instead (`ADDONS.md` lists which repos those are); the *Substitutes* list that f
 different question — not whether a section binds, but what the library carries in place of the addon
 artifacts the *Does not apply* list removes — and is not one of the three.
 
-**The three lists are exhaustive, and the default is that a section applies.** Between them they
-classify **every** section in `STANDARDS.md`'s Sections list, and an audit of a library repo may check
-that mechanically. A section this standard gains later, and which nobody has thought about in a
+**The three lists are exhaustive at file granularity, and the default is that a section applies.**
+Between them they place **every** section file in `STANDARDS.md`'s Sections list, and an audit of a
+library repo may check that mechanically. The lists are file-granular: where a file is placed by some
+of its subsections only — `testing`, `localization` and `documentation` are — **any subsection not
+listed applies unchanged**. A section this standard gains later, and which nobody has thought about in a
 library's terms, **applies unchanged** until it is placed in one of the lists — the default runs
 toward the rule binding, because the failure mode of the other default is a section that governs
 nothing anywhere and nobody notices. *Does not apply* is the only list that is an exception to that
@@ -220,7 +222,8 @@ default; the other two record how a section that binds is read here.
 | `versioning-git` | Semver tags, branch and commit discipline. The repo's tag axis stays separate from any file minor (above). |
 | `line-endings` | The library ships Lua into every consumer's client-bound `libs/` folder, so it is **client-bound** and takes the CRLF pin (`line-endings-§2`) and the canonical body of `line-endings-§5` unchanged — plus the `*.sh text eol=lf` carve-out for its own `testkit/run-automated-tests.sh`, which is the file the addons then vendor. It is named here rather than left to inference because a library repo has no `.toc`, and `line-endings-§2`'s discriminator would otherwise read it as non-client — which is the exact ambiguity that section exists to end. |
 | localization-§5 | US English in authored comments, docstrings and strings — a British spelling vendored into eight consumers is eight findings. |
-| documentation-§5 | The `filename-§N` citation scheme and documentation-§6's citation rules. |
+| documentation-§5 | Keeping docs in sync. |
+| documentation-§6 | The `filename-§N` citation scheme and its citation rules. |
 | documentation-§7 | A root `DEPENDENCIES.md`: a new machine needs the toolchain list as much for a library as for an addon. |
 
 **Does not apply:**
