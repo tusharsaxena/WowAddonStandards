@@ -1069,7 +1069,7 @@ local LIB_FILES = {
   "libs/LibKa0s/PerfPanel.lua",
 }
 -- The addon's own files come from the TOC rather than a copy of it, so this runner cannot drift
--- from what the client loads. A suite named here but missing from disk is SKIPPED, not failed.
+-- from what the client loads.
 local ADDON_FILES = Loader.tocFiles("<Addon>.toc")
 
 Loader.loadAll(LIB_FILES, NS, mocks)
@@ -1079,6 +1079,8 @@ NS:InitDB()             -- mirror the in-game lifecycle …
 NS.CreateOptionsPanel() -- … so the schema → widget layer is exercised as the client exercises it
 
 _G.<ADDON>_TEST = Kit.expose{ NS = NS, mocks = mocks, loadedAddonFiles = ADDON_FILES }
+-- A suite named in suites but missing from disk RAISES (testing-§9); declare one still being
+-- written as { name = ..., pending = "why" }.
 Kit.run{ dir = "tests/", suites = { "test_loadorder", "test_schema", "test_database", ... } }
 ```
 

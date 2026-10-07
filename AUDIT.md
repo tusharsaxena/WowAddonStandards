@@ -543,9 +543,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **Not a deviation:** an addon on a LibKa0s tag older than v1.9.0 has no catalog to draw from.
        Say which tag it carries (root `CLAUDE.md`'s provenance line) and file the adoption as a
        re-vendor item rather than as a styling gap.
-   - **Check the launcher — one object, three behaviors, one row** (`launcher`). New in v2.52.0, and
-     **every addon in the collection is expected to be non-compliant until it adopts**; record the
-     gap once, as one finding per addon, not as five.
+   - **Check the launcher — one object, three behaviors, one row** (`launcher`). New in v2.52.0;
+     the 2026-09-16 pre-adoption sweep found no addon carrying it, and the collection has since
+     adopted it. Verify the one object below and file what you find; an addon that has not adopted
+     records the gap once, as one finding, not as five.
      - **One object.** Grep for `LibStub("LibDataBroker-1.1")` and `LibStub("LibDBIcon-1.0")` outside
        `libs/`, and read what the hits do: `:Register` **MUST** be handed the object `:NewDataObject`
        returned, so the button and the broker row are drawn from one object. Two objects, or a button
@@ -654,9 +655,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          asserting on the **registration set** rather than on a handler's return
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
          right (`testing-§12`).
-       As of the 2026-09-16 sweep, **eleven of eleven addons fail this** — 107 survivors across the
-       collection. Expect findings here in every audit until the adoption pass lands. Adoption is
-       **overdue**, not blocked: `LibKa0s-Lifecycle-1.0` ships from LibKa0s **v1.40.0**, and
+       History: the 2026-09-16 pre-adoption sweep found **eleven of eleven addons failing this** —
+       107 survivors across the collection — and the collection has since adopted the latch. Verify
+       the latch and the suite as above and file what the checks find; a clean addon owes no row.
+       Adoption is **overdue**, not blocked: `LibKa0s-Lifecycle-1.0` ships from LibKa0s **v1.40.0**, and
        **v1.42.0** (Slash minor 14) is the floor — an addon vendoring an older tag has not adopted,
        because its dispatcher refuses verbs slash-commands-§2 keeps live (`slash-commands-§7`,
        *Adopting it*).
