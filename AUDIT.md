@@ -142,8 +142,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      against the old three-table MUST is what gets deleted. **One exception, and it runs both ways:
      `ARCHITECTURE.md`'s own row.** Registering the hub in its own map is a **MAY**, and an audit
      **MUST NOT** file its presence *or* its absence — the two failure modes the register exists to
-     catch cannot exist for the file that carries the register, and the collection is split five to
-     four over a row that changes nothing.
+     catch cannot exist for the file that carries the register, and the collection is split over a
+     row that changes nothing (six addons carry it and five do not, as measured on 2026-10-07).
      (d) **Non-canonical filenames** — `data-model.md`, `saved-variables.md`, `pipeline.md`,
      `capture-pipeline.md`, `override-pipeline.md`, `settings-system.md`, `wow-quirks.md`,
      `slash-commands.md`, `debug-console.md` and the like are Tier 1/2 content under a per-repo name.
@@ -269,7 +269,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      rather than a check that failed to run. A **commented-out** line is not a hit and must not be
      read as one: `#   - tools` is an absent entry carrying its own explanation, which is the shape
      `packaging`'s template teaches.
-   - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. Known instance at ratification: Pretty Chat's `GlobalStrings/split_globalstrings.py`, named in the v2.61.0 changelog as owing the move — file it as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
+   - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. The one instance known at ratification, Pretty Chat's splitter, named in the v2.61.0 changelog as owing the move, has since moved to `tools/split_globalstrings.py` and is compliant; no known instance stands. A new one is filed as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
    - **Check the over-cap census and the gate that reads it (`layout-§1`).** The cap is not audited
      by counting lines any more — counting was what let four repos in one cycle each answer the
      scope question differently. Read the **census** instead: the engineer-context hub carries a
@@ -342,14 +342,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `grep` over subjects does not. **And
      the tag comes from root `CLAUDE.md`'s `Bundles [LibKa0s](…) vX.Y.Z` provenance line at that
      commit** (documentation-§2 item 6, library-stack-§7), which rolls in the same commit as the copy.
-     Measured across the ten stores, every in-scope commit resolves a tag this way and none is lost
-     to a subject that named no version.
+     Measured across the ten stores on disk on 2026-09-22, every in-scope commit resolved a tag this
+     way and none was lost to a subject that named no version.
 
      **On the recorded side, read a bare-dated bundle's tag out of the bundle.** `audit-review-history`
-     grandfathers the bare-dated folders rather than renaming them, and twenty-eight of the collection's
-     sixty-eight bundles are bare-dated, spread across all ten stores. Each names its tag in the first
-     line of its `01_DELTA.md`; a check that compared raw folder names would file every one of those
-     twenty-eight as an unrecorded tag — a finding against ten repos for records that exist, in the
+     grandfathers the bare-dated folders rather than renaming them, and most stores hold some (as
+     measured on 2026-10-07, twenty-eight of 225 bundles, across ten of the eleven stores). Each names its tag
+     in the first line of its `01_DELTA.md`; a check that compared raw folder names would file every
+     one of them as an unrecorded tag — a finding against nearly every repo for records that exist, in the
      very repos the no-rename rule promised not to disturb. Never file one without opening the
      bundle. **A consolidated span bundle** (`docs/revendor/<YYYY-MM-DD>-v<A>-v<B>/`, defined in
      `audit-review-history`) names two tags in its folder and every tag it covers on line 1 of its
@@ -525,7 +525,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        **missing register row** (`audit-review-history`), **not** a MUST breach against each
        title bar, and its cure is one row rather than a set of rewritten close controls a
        player would watch change for nothing. The measured case is BankLedger: three host title bars
-       behind `modules/Browser.lua:98`, and a fourth close control on a copy window the library
+       behind one factory, `B:MakeCloseButton` (BankLedger `modules/Browser.lua`), and a fourth close control on a copy window the library
        draws, which is the library's under condition 1 and not part of the decline.
 
        **File it on the grep, not on a screenshot.** The omission draws a perfectly good button and

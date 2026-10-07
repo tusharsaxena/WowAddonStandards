@@ -147,7 +147,7 @@ Every addon **MUST** ship this **canonical trio** under `docs/` (all three are u
 
 - **`docs/ARCHITECTURE.md`** — engineer context, and the **hub** of the doc set (documentation-§3's tier model). **Ten** mandated sections, all ten named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema** (which, for every structural registry the addon holds, names its storage keys, its one registry writer and its load pass, and for every piece of **named non-setting state** — geometry only a drag or a resize determines, a remembered view, learned or recorded data, a vendored library's own writes — its storage key, its one owner module and every function that writes it, wherever each lives; that sentence is the compliance and no register row is needed — architecture-§5), **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, **`## Documentation map`** — the per-addon doc register specified below — and **`## Documented deviations`** — the register specified immediately below.
 
-  **The count stays ten, and `layout-§1`'s over-cap census is why that has to be said.** That section mandates a heading named **`Files over the 1500-line cap`** in this same file, which makes it the first heading any repo owes here that this list does not name. It is **not** an eleventh mandated section: it is a **sub-heading of `## Documented deviations`**, and its level follows that register's own. The register is its host because the census's whole job is to say which of three terminal states an over-cap file sits in — the issue that names the seam, the ratifying deviation row, or the scheduled peel — and a reader asking whether a given breach was ratified is already reading the register that would hold the answer. Of the four repositories that carry the heading today, **two** nest it exactly there; a third keeps it under `## Layout`, and the library repo keeps it as a sibling `##` beside the register. That the collection has **not** converged is the argument for fixing the parent here rather than against it: `layout-§1` fixes the heading's name and level but not its parent, and a heading whose parent varies is one a doc-shape gate cannot find twice.
+  **The count stays ten, and `layout-§1`'s over-cap census is why that has to be said.** That section mandates a heading named **`Files over the 1500-line cap`** in this same file, which makes it the first heading any repo owes here that this list does not name. It is **not** an eleventh mandated section: it is a **sub-heading of `## Documented deviations`**, and its level follows that register's own. The register is its host because the census's whole job is to say which of three terminal states an over-cap file sits in — the issue that names the seam, the ratifying deviation row, or the scheduled peel — and a reader asking whether a given breach was ratified is already reading the register that would hold the answer. Of the four repositories that carried the heading when this was written (2026-09-22), **two** nested it exactly there; a third kept it under `## Layout`, and the library repo kept it as a sibling `##` beside the register. That the collection had **not** converged was the argument for fixing the parent here rather than against it (as measured on 2026-10-07, every addon nests it at `###` under `## Documented deviations`): `layout-§1` fixes the heading's name and level but not its parent, and a heading whose parent varies is one a doc-shape gate cannot find twice.
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page. Where it tabulates the four out-of-game suites, the table **MUST** carry the **checkpoint** per suite — run/commit versus the tag — and **MUST NOT** leave a `Gates? no — recorded only` cell unqualified, since that is true of a commit and false of a release (testing-§6, automated-tests-§3/§4).
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
@@ -294,14 +294,14 @@ to stop.
 **Why the number, and why it is three.** Until this rule carried one, `compat-layer.md` was the only
 Tier 2 trigger written as pure judgment — "carries addon-specific shims" — sitting between
 `slash-dispatch.md`'s *eight or more* and `message-bus.md`'s *more than ten*. Read as judgment it was
-read four ways, and the readings do not track size. `MultiMeters/core/Compat.lua` is 761 lines
-publishing 28 shims and the repo ships no `docs/compat-layer.md`; `BankLedger/core/Compat.lua` (175
-lines, 13 shims), `KickCD/core/Compat.lua` (496, 13) and `LootHistory/core/Compat.lua` (416, 23) each
-ship one. The cleanest evidence that the old wording decided nothing is the pair four lines apart:
-`BankLedger/core/Compat.lua` at 175 lines has the doc and `PanelMaster/core/Compat.lua` at 173 lines
-(8 shims) does not. The two the auditor was actually being asked to decide were the small ones —
-`ConsumableMaster/core/Compat.lua` (83 lines, 6 shims) and `WhatGroup/core/Compat.lua` (130 lines, 7
-shims, at `:24`, `:40`, `:52`, `:62`, `:83`, `:105`, `:125`) — and they were decided differently from
+read four ways, and the readings did not track size. When the rule was written (sizes as measured
+on 2026-09-07), `MultiMeters/core/Compat.lua` was 761 lines publishing 28 shims and the repo shipped no
+`docs/compat-layer.md`; `BankLedger/core/Compat.lua` (175 lines, 13 shims), `KickCD/core/Compat.lua`
+(496, 13) and `LootHistory/core/Compat.lua` (416, 23) each shipped one. The cleanest evidence that the
+old wording decided nothing was the pair four lines apart: `BankLedger/core/Compat.lua` at 175 lines had
+the doc and `PanelMaster/core/Compat.lua` at 173 lines (8 shims) did not. The two the auditor was
+actually being asked to decide were the small ones — `ConsumableMaster/core/Compat.lua` (83 lines, 6
+shims) and `WhatGroup/core/Compat.lua` (130 lines, 7 shims) — and they were decided differently from
 one cycle to the next, at the cost of the same argument every audit.
 
 Three sits deliberately below every `core/Compat.lua` the collection ships, because excluding somebody
@@ -356,9 +356,10 @@ Frozen and generated material is **out of scope** and **MUST NOT** be enumerated
 directories, once each. A register that grows a row per audit is a register nobody re-reads.
 
 `docs/revendor/` joined that list late, and what its absence cost is the reason the list is upstream
-rather than per-repo. Ten addons ship the re-vendor store (`audit-review-history`), and all ten had to
-register it before this sentence named it — whereupon ten independent edits produced **five** different
-answers. Nine wrote a prose out-of-scope sentence of their own, and those nine carry **four** different
+rather than per-repo. Every addon ships the re-vendor store (`audit-review-history`), and the ten that
+shipped it on 2026-09-22 all had to register it before this sentence named it — whereupon ten
+independent edits produced **five** different answers. Nine wrote a prose out-of-scope sentence of their
+own, and those nine carried **four** different
 directory lists: five name the store beside audits, reviews, automated-tests and superpowers; two add
 perf-analysis; one adds perf-analysis and an investigations store; one adds perf-analysis and a store
 of its own and spells the dated ones `<run>`/`<date>`. The tenth took a different reading altogether
@@ -388,10 +389,10 @@ section deliberately places outside the tiers, cannot be complied with; and fili
 anyway would misstate where their requirement comes from, which is the one fact the register exists to
 carry.
 
-**Nine of nine addons wrote the missing table before the standard named it**, independently and under
-the same heading: AbsorbTracker `docs/ARCHITECTURE.md:332`, BankLedger `:199`, ConsumableMaster `:287`,
-KickCD `:204`, LootHistory `:360`, MultiMeters `:660`, PanelMaster `:148`, PrettyChat `:190`, WhatGroup
-`:320`. Two audits filed it — `PRETTYCHAT-A-09` and `WHATGROUP-A-15` — as a gap in the rule rather than
+**Nine of nine addons — the whole roster on 2026-09-07 — wrote the missing table before the standard
+named it**, independently and under the same heading, `### Verification and record` under
+`## Documentation map` in `docs/ARCHITECTURE.md`: AbsorbTracker, BankLedger, ConsumableMaster, KickCD,
+LootHistory, MultiMeters, PanelMaster, PrettyChat and WhatGroup. Two audits filed it — `PRETTYCHAT-A-09` and `WHATGROUP-A-15` — as a gap in the rule rather than
 a defect in the repo, and both were right. This amendment ratifies what the collection already ships.
 **No addon moves a table on account of it**, and any repo carrying a note that justifies the extra
 table against the old three-table MUST deletes that note: the table is now the rule.
@@ -406,17 +407,17 @@ table against the old three-table MUST deletes that note: the table is now the r
   is the one member of the five that is also a **Tier 2** doc with a stated trigger (the performance
   harness is wired, performance-§12), and only the conditional table has the Status and Trigger columns
   that answer it; a `| Doc | Covers |` row cannot express *not applicable*, which is the state five of
-  the nine addons are in. Registering it in both tables is the "exactly one" MUST broken by the
+  the nine addons were in on 2026-09-07. Registering it in both tables is the "exactly one" MUST broken by the
   standard's own two-way classification, so this settles it: **the trigger decides the table**.
 
 ###### Does `ARCHITECTURE.md` register itself? — **MAY**, and an audit files neither state (MUST NOT)
 
 The hub is itself a `.md` under `docs/`, so the scope sentence above reads as covering it, and the
-collection split five to four on whether to write the row. Five open their first table with a
-`| ARCHITECTURE.md | This file — the hub: … |` row — BankLedger `docs/ARCHITECTURE.md:179`,
-ConsumableMaster `:267`, KickCD `:185`, LootHistory `:340`, MultiMeters `:656` — and four do not:
-AbsorbTracker, PanelMaster, PrettyChat and WhatGroup. Left unsettled that is four findings or five,
-cycle after cycle, over a row that changes nothing.
+collection split on whether to write the row: on 2026-09-07 it was five to four. Five opened their
+first table with a `| ARCHITECTURE.md | This file — the hub: … |` row (BankLedger, ConsumableMaster,
+KickCD, LootHistory and MultiMeters, each in `docs/ARCHITECTURE.md` under `### Required`) and four did
+not: AbsorbTracker, PanelMaster, PrettyChat and WhatGroup. Left unsettled that is a finding per repo on
+one side or the other, cycle after cycle, over a row that changes nothing.
 
 It is settled as a **MAY**, deliberately, because neither of the register's two failure modes exists
 for the file that carries the register. A missing required doc is caught by a table row with no file
@@ -663,6 +664,32 @@ frozen record.
 collection got wrong, in both directions, on the same rule; the command is reproducible and the list is
 not. Out-of-range and malformed references, being the MUST half, are enumerated individually — there are
 few of them and each needs a decision.
+
+**Citing another repo's code (SHOULD).** The scheme above covers citations of *this standard*. A
+citation of **another repo's** files — a worked example in the standard, a playbook, a command spec, or
+one repo's docs pointing into a sibling — **SHOULD** take one of two forms, chosen by the tense of the
+claim:
+
+- **A present-tense claim** ("BankLedger declines the factory", "the floor lives in the attach file")
+  cites `Repo path` plus a **symbol or heading**: BankLedger `modules/Browser.lua`, `B:MakeCloseButton`;
+  AbsorbTracker `AbsorbTracker.toc`, the `# Core (the LibKa0s-Env seam loads first)` block. It **never**
+  carries a bare line number. A symbol survives every edit that does not rename it; a line number
+  survives none, and goes on reading as current while it points somewhere else.
+- **A historical claim** ("the file used to ship", "the range read X when this was ratified") pins the
+  commit: `Repo@<sha>:path:line`. The line number is then exact for good, and
+  `git -C ../<Repo> cat-file -e <sha>:<path>` proves the citation resolves.
+
+A **present-tense count or inventory** of the collection ("ten addons ship", "the eight addons pin")
+is written as a **rule** ("every addon ships …", "every addon in `ADDONS.md`") or **dated** ("as
+measured on 2026-10-07"). An undated count is a claim about today that quietly becomes a claim about
+the day it was written. History files (the changelogs, dated census paragraphs) take a date stamp and
+are otherwise left as written, and citations into a **frozen** bundle are exempt exactly as the notation
+sweep is: a frozen file's line numbers never move.
+
+*Why.* The 2026-10-07 self-audit re-read 61 cross-repo `path:line` citations in this standard: 12 still
+matched, 43 pointed somewhere else and 6 named files or ranges that no longer existed
+(`docs/audits/2026-10-07/03_EVIDENCE.md`, E5). Renumbering them would rot again with the next release
+of every cited repo; the form is what makes the fix stick.
 
 ### 7. Root `DEPENDENCIES.md` — the toolchain contract
 

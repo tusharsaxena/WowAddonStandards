@@ -23,8 +23,8 @@ ignore:
   - tests
   # - tools          # ONLY in a repo that HAS a tools/ (layout-§1: the home for a generator the
   #                    repo authors and commits). Copied in when the folder appears, and left out
-  #                    until then — PanelMaster/.pkgmeta:10-15 records the collection's own call
-  #                    on this, that "a list padded with absent entries goes stale in the other
+  #                    until then — PanelMaster's .pkgmeta (the comment above its `docs`
+  #                    entry) records the collection's own call on this, that "a list padded with absent entries goes stale in the other
   #                    direction". The audit check gates on `[ -d tools ]` for the same reason.
   - media/logos/*.png   # the editable logo source (layout-§4): committed, never loadable, never shipped
   - media/logos/*.jpg   # a .jpg render of the logo, for the project page; same reason

@@ -169,8 +169,9 @@ graded separately, once per group, and files a SHOULD row.
 **This is stated because an audit got it wrong.** The 2026-09-07 collection audit read the MUST
 against every line of nine TOC files — 23 to 81 lines each — and on that arithmetic concluded the
 rule was unsatisfiable and had to be rewritten. Measured against its own denominator the same nine
-files were **eight** unannotated load-bearing positions in three of them: `KickCD.toc:55` and `:73`,
-`PrettyChat.toc:40` and `:57`, and four in `WhatGroup.toc` at `:44`, `:47` and `:53-56`. No per-repo
+files were **eight** unannotated load-bearing positions in three of them, at the commits that audit
+read: `KickCD@2373b215a5:KickCD.toc:55` and `:73`, `PrettyChat@fb03c21f83:PrettyChat.toc:40` and `:57`,
+and four in `WhatGroup@509a36d6af:WhatGroup.toc` at `:44`, `:47` and `:53-56`. No per-repo
 audit filed a per-line MUST row against the remaining six. The rule did not change; the denominator
 did, and a rule counted against the wrong denominator looks unworkable long before it is.
 

@@ -68,7 +68,7 @@ Items recorded for future versions of this standard:
 - **The options surface and the shared icon catalog.** library-stack-§8 deliberately stops at the
   addon's own user-facing windows and leaves the settings panel alone. The reason is ownership rather
   than taste: those widgets are `LibKa0s-Options-1.0`'s, so a mark on a Defaults button or a page
-  header is a **library** change that lands in nine addons at once, and doing it per addon would mean
+  header is a **library** change that lands in every addon at once, and doing it per addon would mean
   nine hosts reaching into the panel a library builds — exactly what options-ui exists to prevent.
   What to settle before it moves: which controls genuinely benefit (a reset, a copy-from, a page
   header's category mark) versus which are labels that should stay labels; whether the descriptor
@@ -101,23 +101,26 @@ Items recorded for future versions of this standard:
   twice and two ways. architecture-§5 reads *"one helper: `NS.Schema:Set(path, value)`"* — a colon
   method on `NS.Schema`; slash-commands-§3's descriptor example reads `set = function(path, v)
   NS.SetByPath(path, v) end` and calls that *the single write seam* — a free function. The
-  collection holds both, and three more. Measured as the function each of the eleven addons' Options
+  collection held both, and three more, when this was recorded. Measured on 2026-09-23 (each citation
+  below is pinned to the commit read that day) as the function each of the eleven addons' Options
   and Slash descriptors bind as `set` (`git -C <repo> grep -nE -A3 '^\s*set\s*=' --
   settings/OptionsSetup.lua settings/Slash.lua`), the seam is spelled five ways, one of them
   colon-called: **`NS.Schema:Set`** in BankLedger, LootHistory and PanelMaster (`git -C <repo> grep
   -oE 'NS\.Schema:Set\b' -- '*.lua' ':!libs' | wc -l`: 63, 103 and 41); **`NS.SetByPath`** in
   AbsorbTracker, AuraMaster, MultiMeters and PartyFrameEnhanced; a dot-called **`NS.Schema.Set`** in
-  PrettyChat (defined `settings/Schema.lua:636`); a dot-called **`Helpers.Set(path, value, opts)`**
-  in WhatGroup (defined `settings/Schema.lua:451`, bound `settings/OptionsSetup.lua:195` and
-  `settings/Slash.lua:233`; 55 call sites, `git -C WhatGroup grep -hoE 'Helpers\.Set\(' -- '*.lua'
+  PrettyChat (defined `PrettyChat@bc9669c0b1:settings/Schema.lua:636`); a dot-called
+  **`Helpers.Set(path, value, opts)`** in WhatGroup (defined `WhatGroup@d7f95edead:settings/Schema.lua:451`,
+  bound `WhatGroup@d7f95edead:settings/OptionsSetup.lua:195` and
+  `WhatGroup@d7f95edead:settings/Slash.lua:233`; 55 call sites, `git -C WhatGroup grep -hoE 'Helpers\.Set\(' -- '*.lua'
   ':!libs' | wc -l`); and a dot-called **`Helpers.SetAndRefresh(path, value)`** in ConsumableMaster
-  and KickCD (bound at ConsumableMaster `settings/OptionsSetup.lua:260` and `settings/Slash.lua:524`,
-  KickCD `settings/OptionsSetup.lua:162` and `settings/Slash.lua:378`; defined KickCD
-  `settings/Panel_Render.lua:273`). Two of those hosts carry a second name beside the bound one.
-  ConsumableMaster also publishes a colon `KCM.Schema:Set` (`settings/Panel.lua:1069`) that
-  forwards to `Helpers.SetAndRefresh`. KickCD's `Helpers.Set(path, section, value)`
-  (`settings/Panel.lua:380`) is the store writer beneath its seam, called from
-  `settings/Panel_Render.lua:263`, and is bound by neither descriptor. `LibKa0s-Schema-1.0`'s member is **`inst.Set(path, value,
+  and KickCD (bound at `ConsumableMaster@189e2e5f3f:settings/OptionsSetup.lua:260` and
+  `ConsumableMaster@189e2e5f3f:settings/Slash.lua:524`, `KickCD@b7c9223280:settings/OptionsSetup.lua:162`
+  and `KickCD@b7c9223280:settings/Slash.lua:378`; defined `KickCD@b7c9223280:settings/Panel_Render.lua:273`). Two of those
+  hosts carried a second name beside the bound one. ConsumableMaster also published a colon
+  `KCM.Schema:Set` (`ConsumableMaster@189e2e5f3f:settings/Panel.lua:1069`) that forwards to
+  `Helpers.SetAndRefresh`. KickCD's `Helpers.Set(path, section, value)`
+  (`KickCD@b7c9223280:settings/Panel.lua:380`) was the store writer beneath its seam, called from
+  `KickCD@b7c9223280:settings/Panel_Render.lua:263`, and was bound by neither descriptor. `LibKa0s-Schema-1.0`'s member is **`inst.Set(path, value,
   instanceId)`, dot-called**, and it can be nothing else: the Options and Slash descriptors take their
   seam **as a value** and call `d.set(row.path, value)`, and a colon member cannot be handed over as
   one. The library therefore picks neither name, and a host binds whichever it has — `NS.SetByPath =
@@ -128,17 +131,21 @@ Items recorded for future versions of this standard:
 - **Whether the settings panel's live-refresh subscription is setup or feature (recorded, not
   ruled).** slash-commands-§7 lists *"the settings-category registration and the panel body"* among
   what survives a stand-down, and *"every event, message and bucket registration"* among what goes.
-  A panel's subscription to its own refresh message sits between the two, and the collection reads
-  it both ways. **Kept live, as part of the panel body:** BankLedger names *"the panel body with its
-  own live-refresh target"* as setup (`core/BankLedger.lua:137`; the target at
-  `settings/Panel.lua:165`), and LootHistory (`settings/Panel.lua:154`), AuraMaster
-  (`settings/OptionsSetup.lua:395`) and PanelMaster (`settings/PanelEditor.lua:1441-1444`, pinned as
-  the panel body at `tests/test_disabled.lua:49`) build theirs on an untracked factory the stand-down
+  A panel's subscription to its own refresh message sits between the two, and the collection read
+  it both ways when this was recorded (each citation below is pinned to the commit read on
+  2026-09-23). **Kept live, as part of the panel body:** BankLedger names *"the panel body with its
+  own live-refresh target"* as setup (`BankLedger@0aae6b6221:core/BankLedger.lua:137`; the target at
+  `BankLedger@0aae6b6221:settings/Panel.lua:165`), and LootHistory (`LootHistory@dbcde6180b:settings/Panel.lua:154`),
+  AuraMaster (`AuraMaster@e93bf279b1:settings/OptionsSetup.lua:395`) and PanelMaster
+  (`PanelMaster@eb4b4a8423:settings/PanelEditor.lua:1441-1444`, pinned as the panel body at
+  `PanelMaster@eb4b4a8423:tests/test_disabled.lua:49`) built theirs on an untracked factory the stand-down
   does not reach. **Taken down, as feature:** ConsumableMaster argues that every publisher of its three panel
   messages is itself a stood-down path, so a live subscription would listen for messages that can no
-  longer be sent (`settings/OptionsShim.lua:252-261`), and MultiMeters builds its profile-refresh
-  receiver on its tracked factory (`settings/Profiles.lua:121`), and KickCD unregisters its Spells
-  page's messages in `Spells.StandDown` and re-arms them on stand-up (`settings/Spells.lua:1422-1437`). `LibKa0s-Bus-1.0` does not decide
+  longer be sent (`ConsumableMaster@189e2e5f3f:settings/OptionsShim.lua:252-261`), and MultiMeters
+  built its profile-refresh receiver on its tracked factory
+  (`MultiMeters@d17a8f83ba:settings/Profiles.lua:121`), and KickCD unregistered its Spells page's
+  messages in `Spells.StandDown` and re-armed them on stand-up
+  (`KickCD@b7c9223280:settings/Spells.lua:1422-1437`). `LibKa0s-Bus-1.0` does not decide
   it: a host picks by building the receiver on the tracked `bus:NewTarget()` or on its own untracked
   factory (architecture-§4). The natural home for a ruling is slash-commands-§7's survivor list.
   Until it is ruled, each host keeps the reading it has, and neither reading is a finding against it:
@@ -150,9 +157,10 @@ Items recorded for future versions of this standard:
   `LibKa0s-Schema-1.0` is one of the ten, and so is `LibKa0s-Compat-1.0`, and the feature runtime
   reaches both while neither calls a Core member (`grep -l 'local NEEDS_CORE' LibKa0s/*.lua` in
   the library; no Core read in `Compat.lua` or `Schema.lua` beyond the floor). Schema's seam is read
-  on a repaint pass; Compat's readers and guards are built for hot paths, and KickCD already calls
-  its own `NS.Compat.GetSpellCooldown` (`modules/IconGrid_Render.lua:381`) from a 0.1 s
-  `C_Timer.NewTicker` (`:961`), the call an adopter routes through the major. Without the floor, a
+  on a repaint pass; Compat's readers and guards are built for hot paths, and KickCD called
+  its own `NS.Compat.GetSpellCooldown` (`KickCD@b7c9223280:modules/IconGrid_Render.lua:381`) from a
+  0.1 s `C_Timer.NewTicker` (`KickCD@b7c9223280:modules/IconGrid_Render.lua:961`) when this was
+  recorded (2026-09-23), the call an adopter routes through the major. Without the floor, a
   payload missing `Core.lua` would lose the panel and the CLI and keep settings and spell reads. The
   question is for every runtime-critical major, not for Schema alone.
   **Reading A, keep the floor:** the fall-together property (the whole payload loads or none of it
