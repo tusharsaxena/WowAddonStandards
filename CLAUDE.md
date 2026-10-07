@@ -48,7 +48,8 @@ LICENSE
 standards/                        -- THE STANDARD (living, canonical). Everything supports STANDARDS.md.
   README.md                       -- what's in standards/ + how to rebuild the standard
   EXECUTIVE_SUMMARY.md            -- one-page TL;DR of the standard
-  STANDARDS.md                    -- THE STANDARD: index/entry point + the Sections map (canonical)
+  STANDARDS.md                    -- THE STANDARD: index/entry point + the Sections map + the current changelog entry (canonical)
+  CHANGELOG.md                    -- every earlier changelog entry, newest first (history, not normative; not in Sections)
   standards/                      -- the standard's sections, one unnumbered file each (layout.md, ...)
   NEW_ADDON_CONTEXT.md            -- new-addon scaffolding pack (NEW_ADDON.md's detail); fetched, never stored
   INDUSTRY_RESEARCH.md            -- research foundation: patterns from 10 reference addons
@@ -79,10 +80,14 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 - **`standards/STANDARDS.md` is canonical.** When docs conflict, it wins. It is the **index/entry
   point**: the normative rules are split into one file per section under `standards/standards/`
   (unnumbered topic names — `layout.md`, `architecture.md`, …), and `STANDARDS.md` carries the
-  front matter, the reading guide, the **Sections** map, and the changelog. It is **living**: every
-  substantive change bumps the version + date and adds a changelog entry first in its
-  `## Changelog` section, which follows the Sections map (git history carries the rest). When you
-  add, split, or reorder a section, update the Sections list in `STANDARDS.md`.
+  front matter, the reading guide, the **Sections** map, **Related documents** and the **current**
+  changelog entry only. It is **living**: every substantive change bumps the version + date in its
+  header and writes that release's entry in its `## Changelog` section, which follows Related
+  documents; on the next release the previous entry moves verbatim to the top of
+  `standards/CHANGELOG.md`, which holds every earlier entry newest first and is listed under Related
+  documents, never under Sections. `standards/CHANGELOG.md` is not at a repo root, so
+  documentation-§1/§3's root `CHANGELOG.md` ban does not reach it. When you add, split, or reorder a
+  section, update the Sections list in `STANDARDS.md`.
 - **Reference sections by `filename-§N` — always.** A whole section is its **bare filename**
   (`architecture`, `audit-review-history`); a subsection is **`filename-§N`** (`architecture-§5`,
   `options-ui-§10`), where `N` is that section's **local** number. The old global `§N.M` numbering is
@@ -132,7 +137,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 - Keep documents internally consistent. A change to the standard usually ripples into
   `standards/EXECUTIVE_SUMMARY.md` and `standards/NEW_ADDON_CONTEXT.md`, and sometimes the root
   `README.md` / the playbooks. Update all affected docs together, and bump the standard's version +
-  changelog.
+  changelog (the new entry in `STANDARDS.md`, the previous one moved to `standards/CHANGELOG.md`).
 - **Write in US English.** The standard mandates it for addons (`localization-§5`), and these documents
   follow their own rule: `color`, `gray`, `behavior`, `center`, `canceled`, `-ize`/`-ization` — never
   `colour`, `grey`, `behaviour`, `centre`, `cancelled`, `-ise`/`-isation`. Two exemptions: Blizzard /
@@ -140,7 +145,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.76.1 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.77.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,

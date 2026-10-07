@@ -79,7 +79,10 @@ This is how the living house rules get revised. The full, authoritative steps ar
    section's local numbering and the `filename-§N` cross-reference scheme intact. If you add, split
    or reorder a section, update the Sections list in
    [`standards/STANDARDS.md`](standards/STANDARDS.md) too.
-4. Bump the changelog: update the version and date at the top of `STANDARDS.md`.
+4. Bump the changelog: update the version and date at the top of `STANDARDS.md`, move the previous
+   changelog entry verbatim to the top of
+   [`standards/CHANGELOG.md`](standards/CHANGELOG.md), and write the new entry in the index's
+   `## Changelog`, which holds only the current one.
 5. Ripple the change into [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md) and
    [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) so they stay in sync.
 
@@ -141,7 +144,8 @@ WowAddonStandards/
   standards/                              -- THE STANDARD (living, canonical)
     README.md                             -- what's here + how to refresh the standard
     EXECUTIVE_SUMMARY.md                  -- one-page TL;DR of the standard
-    STANDARDS.md                          -- the Ka0s WoW Addon Standard: index/entry point + Sections map (canonical)
+    STANDARDS.md                          -- the Ka0s WoW Addon Standard: index/entry point + Sections map + current changelog entry (canonical)
+    CHANGELOG.md                          -- every earlier changelog entry of the standard, newest first (history, not normative)
     standards/                            -- the standard's sections, one unnumbered file each (layout.md, ...)
     NEW_ADDON_CONTEXT.md                  -- new-addon kickstart pack; fetched at runtime, never stored in an addon
     INDUSTRY_RESEARCH.md                  -- research foundation: 10 reference addons synthesized
@@ -157,7 +161,7 @@ Audit and review runs are not stored here. Audits live under each addon's own
 
 ## Status
 
-The standard is at **v2.76.1** and is a living document. Compliance auditing has moved out of
+The standard is at **v2.77.0** and is a living document. Compliance auditing has moved out of
 this repo and into each addon's own repository. The `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`
 and `PERF_ANALYSIS.md` playbooks drive it, and the `dev-copilot` plugin is what consumes them.
 

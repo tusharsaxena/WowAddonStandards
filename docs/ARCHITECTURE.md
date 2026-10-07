@@ -38,7 +38,8 @@ what this section carries is which paths exist, what reads each one, and which a
 | `AUTOMATED_TESTS.md` | Playbook: per-addon test record | `/dev-copilot:wow-automated-tests` |
 | `NEW_ADDON.md` | Playbook: scaffold a born-compliant addon | `/dev-copilot:wow-new-addon` |
 | `PERF_ANALYSIS.md` | Playbook: per-addon in-game capture bundle | `/dev-copilot:wow-perf-analysis` |
-| `standards/STANDARDS.md` | **The index.** Its Sections list is what a consumer follows to find every section file. | every standards-reading command |
+| `standards/STANDARDS.md` | **The index.** Its Sections list is what a consumer follows to find every section file. Its `## Changelog` holds only the current entry. | every standards-reading command |
+| `standards/CHANGELOG.md` | Every earlier changelog entry, newest first; listed under the index's Related documents, not its Sections, because history is not normative | `/dev-copilot:wow-harvest-standards`, and any run that needs history |
 | `standards/standards/*.md` | The 27 canonical section files — the substance of the standard | followed from the index |
 | `standards/ADDONS.md` | The roster: which repos the standard covers | the standards-refresh process |
 | `standards/NEW_ADDON_CONTEXT.md` | The context pack read at scaffold time, never written into the new addon | `/dev-copilot:wow-new-addon` |
@@ -75,7 +76,8 @@ Every `.md` in this repo appears in exactly one row below.
 | `DEPENDENCIES.md` | The toolchain contract (documentation-§7, read per §8) — git only, and why the rest is absent |
 | `docs/ARCHITECTURE.md` | This file — the hub |
 | `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` | The four process playbooks |
-| `standards/STANDARDS.md` | The standard's index |
+| `standards/STANDARDS.md` | The standard's index, with the current changelog entry |
+| `standards/CHANGELOG.md` | The standard's changelog history: every earlier entry, newest first |
 | `standards/standards/*.md` (27 files) | The canonical section files |
 | `standards/ADDONS.md` | The roster |
 | `standards/README.md`, `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/NEW_ADDON_CONTEXT.md` | Process entry point, summary, research, scaffold context pack |
