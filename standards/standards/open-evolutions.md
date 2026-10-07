@@ -174,12 +174,13 @@ Items recorded for future versions of this standard:
 - **Whether an adopted major needs a full library-absent stub (recorded, not ruled).** library-stack's
   *Ship payload vs adoption* has each setup file degrade to a stub when its major is absent;
   slash-commands-§1 requires the Slash stub to carry every member the addon calls, and testing-§8's
-  stub-surface parity case pins each adopted module's stub against the live surface. Every addon
-  vendors the whole `LibKa0s/` folder and packages with `enable-nolib-creation: no`, so packaging never
-  produces a library-less install. A major still goes absent through a **load or floor failure**: a
-  module that misses its `LibKa0s-Core-1.0` floor, or raises at load against a drifted client API, does
-  not register, and its stub is what answers. The cost is not small. PrettyChat's 2026-10-07 review
-  (`PrettyChat docs/reviews/2026-10-07/01_FINDINGS.md`, F-008) counted about 758 lines of stubs across
+  stub-surface parity case pins each adopted module's stub against the live surface. Libraries are
+  vendored and committed, and `.pkgmeta` declares no `externals:` block (library-stack-§3, packaging), so
+  a no-lib package has no external to strip and packaging never produces a library-less install; some
+  addons, PrettyChat among them, also set `enable-nolib-creation: no`. A major still goes absent
+  through a **load or floor failure**: a module that misses its `LibKa0s-Core-1.0` floor, or raises at
+  load against a drifted client API, does not register, and its stub is what answers. The cost is not
+  small. PrettyChat's 2026-10-07 review (`PrettyChat docs/reviews/2026-10-07/01_FINDINGS.md`, F-008) counted about 758 lines of stubs across
   its setup files, `settings/Slash.lua` and `settings/Schema.lua`, the last re-implementing
   `Set`, `SetMany` and `BulkRun`, plus the parity suite that keeps them honest. The question: given that
   a major goes absent only through such a failure, should an adopted major still need a full
