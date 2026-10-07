@@ -632,11 +632,12 @@ evidence to satisfy a cosmetic rule. Two readings of that list matter here:
 - **`docs/automated-tests/` is exempt only below `<run>/`.** Its `README.md` and `RESULTS.md` are
   live documents — the second is regenerated in place — and a citation in either is swept like any
   other.
-- **A repo's own frozen stores are exempt too.** A store a repo keeps outside `docs/` and freezes by
-  its own rule takes the same carve-out: in `WowAddonStandards` that is `harvests/` and
-  `standards/_raw/`, and a library repo's equivalents are whatever its own `CLAUDE.md` declares frozen.
-  The exemption is whole: neither the sweep nor a malformed-reference fix reaches inside a frozen
-  store, and both grades bind every live document beside it.
+- **A repo's own frozen stores are exempt too.** A store a repo freezes by its own rule and
+  documentation-§3 does not name takes the same carve-out, wherever it sits — inside `docs/` or
+  outside it: in `WowAddonStandards` that is `harvests/` and `standards/_raw/`, and a library repo's
+  equivalents are whatever its own `CLAUDE.md` declares frozen (in `LibKa0s`, `docs/adoption/`). The
+  exemption is whole: neither the sweep nor a malformed-reference fix reaches inside a frozen store,
+  and both grades bind every live document beside it.
 
 **Reporting shape (MUST).** An audit records the notation sweep as **one** rolled-up finding carrying
 the **command that produces the current count**, e.g.
@@ -653,7 +654,10 @@ git ls-files -z -- '*.md' \
 It walks the tracked tree rather than the working directory, so an untracked scratch file cannot move
 the count, and its exclusions are documentation-§3's frozen stores, the vendored payloads and the
 repo-own frozen stores above — each a pathspec, so `docs/automated-tests/README.md` and `RESULTS.md`
-stay in the count while every `<run>/` bundle beneath them is out.
+stay in the count while every `<run>/` bundle beneath them is out. The last line of exclusions is
+this repo's own stores; in any other repo, replace it with one `':!:<store>/**'` pathspec per store
+that repo declares frozen — in `LibKa0s`, `':!:docs/adoption/**'` — so the count never includes a
+frozen record.
 
 — never a per-site enumeration. Hand-counted enumerations are what two separate audits of this
 collection got wrong, in both directions, on the same rule; the command is reproducible and the list is
