@@ -20,7 +20,8 @@ The **house standard** for the Ka0s WoW addon collection, plus the four **proces
 The critical property is that **this repo does no work**. It is read, never run. Each playbook is a
 thin orchestrator that says *how* a process runs and defers all substance to the canonical section
 files under `standards/standards/`; the plugin fetches it over HTTPS and executes it **inside an
-addon's own repo**, writing every artifact there. Nothing here reaches into a sibling repo, and no
+addon's own repo**, writing every artifact there. The one executable file, `scripts/check-standard.sh`,
+checks the repo's own consistency on demand and touches nothing outside it. Nothing here reaches into a sibling repo, and no
 addon's audit, test record or scaffold output is ever written here. The one kind of run that does
 write here is this repo's **own** audit and review: it is a documentation-and-tooling repo, audited
 like the others, so it keeps its own frozen `docs/audits/<date>/` and `docs/reviews/<date>/` stores
@@ -49,19 +50,27 @@ what this section carries is which paths exist, what reads each one, and which a
 | `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/_raw/` | Background and the research the standard was drawn from | humans |
 | `harvests/<date>/` | Frozen bundles from `/dev-copilot:wow-harvest-standards` — what was proposed, what was accepted | humans |
 | `media/logos/` | Collection logo art | humans |
+| `scripts/check-standard.sh` | The on-demand mechanical gate for the standard's own invariants: CR bytes, the `.gitattributes` body, `filename-§N` citation ranges, the Sections list, anti-pattern numbering, the version stamps and relative `.md` links. Exits non-zero on any failure. Not a commit hook. | a human or agent before committing a change to the standard; `/dev-copilot:sync-docs` |
 
 **Renaming any path in the first block is a breaking change** for every addon in the collection,
 because the plugin resolves it by URL at runtime and a 404 is the failure mode.
 
 ## Known Limitations
 
-- **No mechanical gate.** There is no suite that can catch a contradiction between two section files,
-  a broken internal link, or a playbook step that names a path that has since moved. Every such
-  defect is found by a human or by an agent reading the file, usually while doing something else.
-  The one exception is line endings, which `git check-attr` and a `git grep` for CR will answer.
-- **Cross-references are unenforced.** A `filename-§N` citation that goes out of range when a section
-  is renumbered fails silently and keeps looking current. documentation-§6 makes this a MUST-fix when
-  found, but nothing here *finds* it.
+- **The mechanical gate covers only what is decidable.** `scripts/check-standard.sh` catches CR bytes,
+  a `.gitattributes` that drifts from line-endings-§5's LF body, a `filename-§N` citation that is
+  malformed, names a missing file, targets an unnumbered file or goes out of range, a Sections list
+  that disagrees with the tracked section files, a gap in the anti-pattern numbering or a stale
+  `(#1–#N)` blurb, a version or date stamp that was not rippled, and a relative `.md` link that does
+  not resolve. It cannot catch a contradiction between two section files, a citation that is in range
+  but names the wrong section, or a playbook step that names a path in an *addon* repo that has since
+  moved. Those are still found by a human or by an agent reading the file. It runs on demand and
+  from `/dev-copilot:sync-docs`, never as a commit hook, so a commit made without running it is not
+  stopped.
+- **Frozen stores are not checked.** `harvests/`, `standards/_raw/`, `docs/audits/`, `docs/reviews/`
+  and `standards/CHANGELOG.md` keep the citations and links that were right when they were written.
+  The script skips them on purpose, so a reader following an old citation there may land on a section
+  that has since been renumbered.
 - **The roster is hand-maintained.** `standards/ADDONS.md` is edited by a person. A new sibling addon
   repo that nobody adds a row for is simply invisible to the standards process — there is no
   discovery pass over the parent directory.
@@ -76,7 +85,7 @@ Every `.md` in this repo appears in exactly one row below.
 |---|---|
 | `README.md` | Repo overview and what you can do here |
 | `CLAUDE.md` | Agent guidance: what this repo is, its layout, how to change the standard |
-| `DEPENDENCIES.md` | The toolchain contract (documentation-§7, read per §8) — git only, and why the rest is absent |
+| `DEPENDENCIES.md` | The toolchain contract (documentation-§7, read per §8) — git, plus bash and the text tools for the check script, and why the rest is absent; how the script is verified |
 | `docs/ARCHITECTURE.md` | This file — the hub |
 | `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` | The four process playbooks |
 | `standards/STANDARDS.md` | The standard's index, with the current changelog entry |

@@ -136,7 +136,7 @@ WowAddonStandards/
   PERF_ANALYSIS.md                        -- PLAYBOOK: /dev-copilot:wow-perf-analysis (per-addon in-game capture bundle)
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
-  DEPENDENCIES.md                         -- toolchain contract (documentation-§7): git only, and why the rest is absent
+  DEPENDENCIES.md                         -- toolchain contract (documentation-§7): git, plus bash and the text tools for the check script; why the rest is absent
   docs/ARCHITECTURE.md                    -- how this repo is put together + the deviation register (documentation-§3, reduced by §8)
   LICENSE
   .gitattributes                          -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
@@ -154,6 +154,7 @@ WowAddonStandards/
   docs/audits/                            -- this repo's own frozen self-audit bundles, one <YYYY-MM-DD>/ per run
   docs/reviews/                           -- this repo's own frozen review bundles, one <YYYY-MM-DD>/ per run
   media/logos/                            -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
+  scripts/check-standard.sh               -- on-demand mechanical gate for the standard's own invariants (not a hook)
 ```
 
 An addon's audit and review runs are not stored here. Its audits live under its own

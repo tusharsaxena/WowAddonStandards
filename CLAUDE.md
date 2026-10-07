@@ -6,7 +6,8 @@ Guidance for AI agents working in this repository.
 
 The **house standard** for the Ka0s World of Warcraft addon collection, plus the four **process
 playbooks** the `dev-copilot` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md` and
-`PERF_ANALYSIS.md`. It contains **documents only** — no addon source code lives here.
+`PERF_ANALYSIS.md`. It contains **documents only**, plus one on-demand check script,
+`scripts/check-standard.sh`. No addon source code lives here.
 
 Addon audits do **not** run here. An addon's compliance auditing and new-addon scaffolding happen
 **in that addon's own repo**, driven by a plugin skill that reads the playbook from here. This repo is
@@ -44,7 +45,7 @@ NEW_ADDON.md                      -- PLAYBOOK: /dev-copilot:wow-new-addon (scaff
 PERF_ANALYSIS.md                  -- PLAYBOOK: /dev-copilot:wow-perf-analysis (per-addon in-game capture bundle)
 README.md                         -- repo overview + what you can do here
 CLAUDE.md                         -- this file
-DEPENDENCIES.md                   -- toolchain contract (documentation-§7); git only, and why the rest is absent
+DEPENDENCIES.md                   -- toolchain contract (documentation-§7); git, plus bash and the text tools for the check script; why the rest is absent
 docs/ARCHITECTURE.md              -- how this repo is put together + the deviation register (documentation-§3, reduced by §8)
 LICENSE
 .gitattributes                    -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
@@ -62,6 +63,7 @@ harvests/                         -- frozen collection-harvest bundles, one <YYY
 docs/audits/                      -- this repo's OWN frozen self-audit bundles, one <YYYY-MM-DD>/ per run (audit-review-history)
 docs/reviews/                     -- this repo's OWN frozen review bundles, one <YYYY-MM-DD>/ per run (audit-review-history)
 media/logos/                      -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
+scripts/check-standard.sh         -- on-demand mechanical gate for the standard's own invariants (LF, executable; not a hook)
 ```
 
 An addon's audit and review runs live under **that addon's** own `docs/audits/<date>/` and
@@ -149,6 +151,13 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   with `tr -dc '\r' < <path> | wc -c` — it must be `0` here. Not `file <path>`: it reports nothing
   about line terminators for JSON or for any binary, so it passes files it never examined
   (`line-endings-§7`).
+- **Run `bash scripts/check-standard.sh` before committing a change to the standard**, and fix
+  whatever it reports. It must exit `0`. It checks CR bytes, the `.gitattributes` body, `filename-§N`
+  citation ranges, the Sections list, anti-pattern numbering, the version stamps and relative `.md`
+  links; `DEPENDENCIES.md` lists the checks and how the script itself is verified. It is deliberately
+  **not** a commit hook (see *The two checkpoints*, below). A passing run does not prove the
+  documents agree in meaning, so read for that as well. If you change the script, rerun its
+  injected-defect checks from `DEPENDENCIES.md` in a throwaway clone.
 - Keep documents internally consistent. A change to the standard usually ripples into
   `standards/EXECUTIVE_SUMMARY.md` and `standards/NEW_ADDON_CONTEXT.md`, and sometimes the root
   `README.md` / the playbooks. Update all affected docs together, and bump the standard's version +
