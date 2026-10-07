@@ -69,7 +69,7 @@ Items recorded for future versions of this standard:
   addon's own user-facing windows and leaves the settings panel alone. The reason is ownership rather
   than taste: those widgets are `LibKa0s-Options-1.0`'s, so a mark on a Defaults button or a page
   header is a **library** change that lands in every addon at once, and doing it per addon would mean
-  nine hosts reaching into the panel a library builds — exactly what options-ui exists to prevent.
+  every host reaching into the panel a library builds — exactly what options-ui exists to prevent.
   What to settle before it moves: which controls genuinely benefit (a reset, a copy-from, a page
   header's category mark) versus which are labels that should stay labels; whether the descriptor
   gains a per-row `icon` field or the library picks marks by row type; and whether a host may override
