@@ -401,11 +401,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      neither is the finding. `C_EventUtils.IsEventValid` in front of the `pcall` is the SHOULD and
      never a substitute for it — grade its absence accordingly, and grade its presence **alone** as
      the MUST failure it is.
-   - **Check the TOC's position annotations (`toc-file-§5`).** In the `# Core` block, every line
-     whose position is **load-bearing** — a library major taken as an upvalue at file scope, a
-     constant resolved from an earlier seam at file load — **MUST** carry a comment at the line
-     naming what resolves. Read the seam files (`*Setup.lua`) and `core/Constants.lua` to establish
-     which positions actually are load-bearing rather than trusting the comments to be complete; an
+   - **Check the TOC's position annotations (`toc-file-§5`).** At every position in the listing
+     (`# Core`, `# Defaults`, `# Modules`, `# Settings` and any other group), every line whose
+     position is **load-bearing** — a library major taken as an upvalue at file scope, a constant
+     resolved from an earlier seam at file load, an `NS` member read or written at file scope —
+     **MUST** carry a comment at the line naming what resolves. Read every listed file for
+     file-scope reads and writes of `NS` members and library majors (the `modules/` and `settings/`
+     files as much as the seam files and `core/Constants.lua`) to establish which positions actually
+     are load-bearing rather than trusting the comments to be complete; an
      unannotated load-bearing line is the MUST failure, and a load-bearing line annotated only as
      *"order matters"* without naming what resolves is the same failure in weaker form. A TOC that
      annotates its load-bearing lines but never marks a **conventional** position fails the SHOULD,

@@ -154,7 +154,13 @@ default font instead. The comment is the only guard there is.
 
 **The denominator this MUST is measured against.** The MUST above binds **load-bearing positions**,
 and its denominator is the set of positions that actually are load-bearing — established by reading
-the seam files (`*Setup.lua`) and `core\Constants.lua`, not by counting lines in the TOC. An 81-line
+**every listed file** that binds, reads or writes an `NS` member or a library major **at file scope**,
+not by counting lines in the TOC. That covers **every position in the listing**: a `modules\` or
+`settings\` file that takes `NS.Something` as an upvalue when it loads is as load-bearing as a seam
+file (`*Setup.lua`) or `core\Constants.lua`, and a check that reads only the seams misses it. A
+constraint need not name a single file: when a line must sit **below at least one of** several files
+(any of `X`, `Y` or `Z` publishes what it reads), its comment names **what resolves** and which files
+satisfy it, rather than picking one of them as if it were the only one. An 81-line
 listing with two load-bearing positions has a denominator of **two**: annotate both and the file
 passes the MUST outright, and the seventy-nine other lines are not seventy-nine unmet MUSTs. An
 unannotated **conventional** line is never a MUST failure. At most it is the SHOULD above, which is
@@ -168,7 +174,8 @@ files were **eight** unannotated load-bearing positions in three of them: `KickC
 audit filed a per-line MUST row against the remaining six. The rule did not change; the denominator
 did, and a rule counted against the wrong denominator looks unworkable long before it is.
 
-**Worked example — both kinds, one file.** `AbsorbTracker.toc:35-42` carries one of each and is the
+**Worked example — both kinds, one file.** The `# Core (the LibKa0s-Env seam loads first)` block of
+`AbsorbTracker.toc` carries one of each and is the
 form to copy:
 
 ```
