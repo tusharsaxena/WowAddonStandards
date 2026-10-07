@@ -14,9 +14,10 @@ four process playbooks that the `dev-copilot` plugin consumes: `AUDIT.md`, `AUTO
    [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/dev-copilot:wow-automated-tests`) and
    [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) (`/dev-copilot:wow-perf-analysis`).
 
-The standard is the source of truth, and it evolves in place. Auditing doesn't happen here any more.
-Each addon audits itself, in its own repo, and writes a dated `docs/audits/<YYYY-MM-DD>/` bundle
-there. The list of addons that make up the collection lives in one editable place:
+The standard is the source of truth, and it evolves in place. Addon audits don't happen here any
+more. Each addon audits itself, in its own repo, and writes a dated `docs/audits/<YYYY-MM-DD>/` bundle
+there. This repo is audited and reviewed too, as a documentation-and-tooling repo, so it keeps its
+own frozen `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` stores. The list of addons that make up the collection lives in one editable place:
 [`standards/ADDONS.md`](standards/ADDONS.md).
 
 This repository is a research and analysis deliverable, and it contains only documents. No addon
@@ -44,9 +45,7 @@ source code lives here. Nothing done here modifies the addons themselves.
 the single editable roster, split into three tables by repo kind: addons, Ka0s-owned library repos,
 and documentation-and-tooling repos. To change the collection's scope, edit that one file.
 
-- In scope are the addons in [`standards/ADDONS.md`](standards/ADDONS.md), currently 11 Ka0s
-  addons: Absorb Tracker, Aura Master, Bank Ledger, Consumable Master, KickCD, Loot History,
-  Multi Meters, Panel Master, Party Frame Enhanced, Pretty Chat, WhatGroup.
+- In scope are the Ka0s addons listed in [`standards/ADDONS.md`](standards/ADDONS.md).
 - The Ka0s-owned library repos those addons vendor are in scope too. There is currently 1, LibKa0s.
   A library repo is in scope for the standards process and gets audited, but against library-stack-§7's
   applicability list rather than the addon rule set. It has no TOC, no player-facing README, no
@@ -152,16 +151,19 @@ WowAddonStandards/
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
     _raw/_industry/                       -- per-addon raw research reports (evidence)
   harvests/                               -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass
+  docs/audits/                            -- this repo's own frozen self-audit bundles, one <YYYY-MM-DD>/ per run
+  docs/reviews/                           -- this repo's own frozen review bundles, one <YYYY-MM-DD>/ per run
   media/logos/                            -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
 ```
 
-Audit and review runs are not stored here. Audits live under each addon's own
-`docs/audits/<YYYY-MM-DD>/`, and reviews under its `docs/reviews/<YYYY-MM-DD>/`
-(audit-review-history).
+An addon's audit and review runs are not stored here. Its audits live under its own
+`docs/audits/<YYYY-MM-DD>/`, and its reviews under its `docs/reviews/<YYYY-MM-DD>/`
+(audit-review-history). The `docs/audits/` and `docs/reviews/` stores in this repo hold only this
+repo's own audits and reviews, frozen once written (documentation-§8).
 
 ## Status
 
-The standard is at **v2.77.0** and is a living document. Compliance auditing has moved out of
+The standard is at **v2.77.0** and is a living document. Addon compliance auditing has moved out of
 this repo and into each addon's own repository. The `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`
 and `PERF_ANALYSIS.md` playbooks drive it, and the `dev-copilot` plugin is what consumes them.
 

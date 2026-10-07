@@ -69,10 +69,8 @@ which trains its readers to ignore the one gate that exists to catch a real drif
   * text=auto eol=crlf
   ```
 
-  That is the eleven addon repos — `AbsorbTracker`, `AuraMaster`, `BankLedger`,
-  `ConsumableMaster`, `KickCD`, `LootHistory`, `MultiMeters`, `PanelMaster`, `PartyFrameEnhanced`,
-  `PrettyChat`, `WhatGroup` — plus `LibKa0s`, whose ship folder lands in every one of their `libs/`
-  trees. The client expects CRLF in addon source, and a Linux or macOS
+  That is every addon in [`ADDONS.md`](../ADDONS.md), plus `LibKa0s`, whose ship folder lands in
+  every one of their `libs/` trees. The client expects CRLF in addon source, and a Linux or macOS
   contributor on `core.autocrlf=input` would otherwise check out LF without noticing.
 
 - A repo that **ships nothing to the WoW client** **MUST** pin LF:

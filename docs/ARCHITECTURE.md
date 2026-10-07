@@ -21,7 +21,10 @@ The critical property is that **this repo does no work**. It is read, never run.
 thin orchestrator that says *how* a process runs and defers all substance to the canonical section
 files under `standards/standards/`; the plugin fetches it over HTTPS and executes it **inside an
 addon's own repo**, writing every artifact there. Nothing here reaches into a sibling repo, and no
-audit, test record or scaffold output is ever written here.
+addon's audit, test record or scaffold output is ever written here. The one kind of run that does
+write here is this repo's **own** audit and review: it is a documentation-and-tooling repo, audited
+like the others, so it keeps its own frozen `docs/audits/<date>/` and `docs/reviews/<date>/` stores
+(documentation-§8, audit-review-history).
 
 That indirection is deliberate. It means the standard can change without a plugin release, and the
 plugin can change without a standards release, and an addon picks up both on its next command.
@@ -83,6 +86,8 @@ Every `.md` in this repo appears in exactly one row below.
 | `standards/README.md`, `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/NEW_ADDON_CONTEXT.md` | Process entry point, summary, research, scaffold context pack |
 | `standards/_raw/_industry/` | Frozen source material behind `INDUSTRY_RESEARCH.md` |
 | `harvests/<date>/` | Frozen harvest bundles, named once here rather than per file |
+| `docs/audits/<date>/` | Frozen bundles of this repo's own documentation-lane self-audits (audit-review-history), named once here rather than per file |
+| `docs/reviews/<date>/` | Frozen bundles of this repo's own reviews (audit-review-history), named once here rather than per file |
 
 `docs/testing.md` and `docs/smoke-tests.md` — the other two thirds of documentation-§3's canonical
 trio — are absent, and that is **compliance rather than deviation**: `documentation-§8` places both
