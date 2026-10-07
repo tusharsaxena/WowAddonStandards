@@ -112,7 +112,7 @@ if DB_AURA_ENABLED then ... end
 
 ### 8. Combat-protected "secret" values
 
-In combat, retail protects combat-sensitive return values — unit absorb/health totals, threat, some aura amounts — as **"secret" values**: an opaque token the addon cannot inspect. The trap is asymmetric and easy to get wrong:
+In combat, retail protects combat-sensitive return values — unit absorb/health totals, threat, some aura amounts, spell cooldown timings — as **"secret" values**: an opaque token the addon cannot inspect. The trap is asymmetric and easy to get wrong:
 
 - A secret **survives `tostring()`** (returns another secret string) **and survives the `..` operator** (which silently propagates secretness) — neither raises.
 - A secret **raises the instant it reaches `table.concat`** (and `string.format`): `invalid value (secret) at index N in table for 'concat'`.
@@ -169,6 +169,10 @@ derives from, a return value of:
 - the amount / `points` fields of an aura payload — `C_UnitAuras.GetAuraDataByIndex`,
   `GetAuraDataBySlot`, `GetAuraDataBySpellName`, `GetPlayerAuraBySpellID` — and the same fields as they
   arrive on `UNIT_AURA`
+- `C_Spell.GetSpellCooldown`'s `startTime` / `duration` / `modRate` fields, and
+  `C_Spell.GetSpellCooldownDuration`'s `:GetRemainingDuration()` (`LibKa0s-Compat-1.0`'s
+  `GetSpellCooldown` reader documents the first three as secret in combat, `KickCD docs/compat-layer.md`
+  the last)
 - **any other API a client build protects in combat**, and **anything derived from a protected value**:
   secretness propagates silently through `..` and `tostring`, so a local computed from one is still in
   scope, and so is a field stored on a table and read back later.
@@ -176,6 +180,9 @@ derives from, a return value of:
 This list is **the normative trigger set**. When a build protects a new API, extend the list here — that
 is an upstream edit, not a per-repo judgment call, because the whole value of naming the APIs is that
 every repo grades against the same set.
+
+The list scopes the pre-formatting rule only. The **MUST NOT** above, *never compare it with
+`<`/`>`*, already binds a comparison on any combat-protected value, whether or not its API is named here.
 
 **Outside the trigger set it is a SHOULD, and the reason is drift, not secrets.** A site that formats
 only values the addon owns — a setting name, a count it computed, a literal — cannot be handed a secret,

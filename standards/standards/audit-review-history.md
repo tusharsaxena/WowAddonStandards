@@ -6,9 +6,9 @@ Audit, code-review and re-vendor runs are **frozen, dated snapshots** kept in th
 
 - **`/dev-copilot:wow-standards-audit`** → **`docs/audits/<YYYY-MM-DD>/`** — compliance against this standard: `01_CURRENT_STATE.md`, `02_DEVIATIONS.md` (stable per-addon deviation IDs), `03_EVIDENCE.md`, `04_TECHNICAL_DESIGN.md`, `05_EXECUTION_PLAN.md`. The step-by-step playbook is `AUDIT.md` at the root of the standards repo. This audit is **read-only** — it produces a remediation plan, it does not change code.
 - **`dev-copilot:review`** → **`docs/reviews/<YYYY-MM-DD>/`** — principal-engineer code review: `01_FINDINGS.md`, `02_PROPOSED_CHANGES.md`, `03_SMOKE_TESTS.md`, `04_EXECUTION_PLAN.md`, `05_FINAL_SUMMARY.md`.
-- **`/dev-copilot:wow-revendor-libka0s`** → **`docs/revendor/<YYYY-MM-DD>-v<tag>/`** — what arrived with a LibKa0s re-vendor and what was done about it: `01_DELTA.md` (the payload delta), `02_CANDIDATES.md`, `03_DECISIONS.md`, `04_EXECUTION_PLAN.md`, `05_SUMMARY.md`. **`01_DELTA.md` and `05_SUMMARY.md` are the stable members** and are always written; the middle three are written when there is something to write. Of the sixty-eight bundles the collection has on disk, forty carry all five, nineteen have no `04_EXECUTION_PLAN.md` because nothing was adopted, and nine carry the two stable members alone — so an absent middle document records a decision rather than an unfinished bundle, and a MUST over all five would have declared twenty-eight compliant bundles broken.
+- **`/dev-copilot:wow-revendor-libka0s`** → **`docs/revendor/<YYYY-MM-DD>-v<tag>/`** — what arrived with a LibKa0s re-vendor and what was done about it: `01_DELTA.md` (the payload delta), `02_CANDIDATES.md`, `03_DECISIONS.md`, `04_EXECUTION_PLAN.md`, `05_SUMMARY.md`. **`01_DELTA.md` and `05_SUMMARY.md` are the stable members** and are always written; the middle three are written when there is something to write. Of the sixty-eight bundles the collection had on disk on 2026-09-22, forty carried all five, nineteen had no `04_EXECUTION_PLAN.md` because nothing was adopted, and nine carried the two stable members alone — so an absent middle document records a decision rather than an unfinished bundle, and a MUST over all five would have declared twenty-eight compliant bundles broken.
 
-**The re-vendor folder carries the tag, not the date alone (MUST).** Forty of the sixty-eight bundles on disk are `<date>-v<tag>` and twenty-eight are bare `<date>`. The tagged form is both the majority and the only one that answers the question a reader opens the store with — *which library release is this bundle about?* — which a date cannot, because a single day has carried two re-vendors more than once in this collection. Existing bare-dated folders are **not** renamed on sight: a frozen bundle's name is part of what it froze, so a rename is a decision taken deliberately and recorded, not a tidy-up.
+**The re-vendor folder carries the tag, not the date alone (MUST).** On 2026-09-22, forty of the sixty-eight bundles on disk were `<date>-v<tag>` and twenty-eight were bare `<date>`. The tagged form is both the majority and the only one that answers the question a reader opens the store with — *which library release is this bundle about?* — which a date cannot, because a single day has carried two re-vendors more than once in this collection. Existing bare-dated folders are **not** renamed on sight: a frozen bundle's name is part of what it froze, so a rename is a decision taken deliberately and recorded, not a tidy-up.
 
 **These three stores carry no `README.md`; `docs/automated-tests/` MUST carry one, and `docs/perf-analysis/` MUST carry one wherever that store exists (documentation-§3).** The second obligation is **conditional**, and documentation-§3 says so in as many words: `perf-analysis/README.md` is *“the one conditional member of the five”*, required while the performance harness is wired and **not shipped** by an addon holding a recorded performance-§12 exemption, which takes no in-game captures and therefore has no store to document. The obligation is on the **store**, not on every repo — a repo with no capture store owes no README over it, and an audit that files one has read the MUST without its condition. The line between the two groups is whether the store has a reading **across** bundles. The automated-test record and the in-game capture store are cumulative series measured the same way every time, so a trend exists and a `README.md` that indexes the series and says how to read a row does work no single bundle can. An audit, a review and a re-vendor are each about one moment and one question; the only fact that spans their bundles is the list of dates, which is the directory listing. A README over them would be a hand-maintained second copy of `ls`, stale on the first run nobody remembered it. The collection already drew this line before the standard stated it: no repo has written a `docs/revendor/README.md` in sixty-eight bundles, against six that ship `docs/perf-analysis/README.md` — which is **every** repo in the collection that has a `docs/perf-analysis/` store at all, so the conditional MUST is met wherever its condition holds and the repos without the store are not the exception to it.
 
@@ -22,10 +22,10 @@ Audit, code-review and re-vendor runs are **frozen, dated snapshots** kept in th
 
 *(This section carries no numbered subsections; cite it as `audit-review-history`.)*
 
-This convention was consensual, and it lapsed in every repo that held it inside a day. Ten addons ship
-the store, the command that writes it freezes it, and no repo argued with either. Then the newest
-bundle in nine stores stopped at LibKa0s v1.34.0 and the tenth at v1.35.0, against a library that has
-since reached **v1.54.2** — fifteen to twenty-four re-vendor commits per repo, carrying fifteen to
+This convention was consensual, and it lapsed in every repo that held it inside a day. Every addon ships
+the store (ten did on 2026-09-22), the command that writes it freezes it, and no repo argued with
+either. Then the newest bundle in nine stores stopped at LibKa0s v1.34.0 and the tenth at v1.35.0,
+against a library that had reached **v1.54.2** by 2026-09-22 — fifteen to twenty-four re-vendor commits per repo, carrying fifteen to
 nineteen distinct tags past that repo's own newest bundle, none of them recorded. Nothing went red,
 because the bundle was required by the command that writes it and by no rule anything checks, and
 every one of those releases was carried by a bulk sweep that never invoked the command. **Another
@@ -48,9 +48,9 @@ paragraph would not have held it**, which is why this one is written to be read 
   vendored-payload gate resolves (testing-§11); a subject naming no tag stays legible, and one naming
   a tag it did not vendor cannot mislead. On the recorded side a `<date>-v<tag>` folder names its tag,
   and a bare-dated folder — grandfathered above, so they are not going away — has its tag read from
-  the bundle's `01_DELTA.md` opening line instead. Twenty-eight of the sixty-eight bundles are
-  bare-dated and all twenty-eight name their tag there, so a check comparing folder names alone would
-  report every one of them as an unrecorded tag, in the same ten stores the no-rename rule above
+  the bundle's `01_DELTA.md` opening line instead. On 2026-09-22, twenty-eight of the sixty-eight
+  bundles were bare-dated and all twenty-eight named their tag there, so a check comparing folder names alone would
+  report every one of them as an unrecorded tag, in the very stores the no-rename rule above
   promised not to disturb. The check lives in `AUDIT.md`, the playbook named above.
 - **The horizon is the store's first bundle.** Re-vendor commits older than a repo's oldest bundle
   predate the convention and are out of scope; a check that files them reports a number nobody can act

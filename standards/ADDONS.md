@@ -16,17 +16,17 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 
 | Addon | Folder | Repository | Launcher menu entries (launcher-§2) |
 |---|---|---|---|
-| Ka0s Absorb Tracker | [`../../AbsorbTracker/`](../../AbsorbTracker/) | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked |
-| Ka0s Aura Master | [`../../AuraMaster/`](../../AuraMaster/) | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode |
-| Ka0s Bank Ledger | [`../../BankLedger/`](../../BankLedger/) | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Show window (the ledger browser) |
-| Ka0s Consumable Master | [`../../ConsumableMaster/`](../../ConsumableMaster/) | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) |
-| Ka0s KickCD | [`../../KickCD/`](../../KickCD/) | https://github.com/tusharsaxena/KickCD | Enabled · Locked |
-| Ka0s Loot History | [`../../LootHistory/`](../../LootHistory/) | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) |
-| Ka0s Multi Meters | [`../../MultiMeters/`](../../MultiMeters/) | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) |
-| Ka0s Panel Master | [`../../PanelMaster/`](../../PanelMaster/) | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked |
-| Ka0s Party Frame Enhanced | [`../../PartyFrameEnhanced/`](../../PartyFrameEnhanced/) | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked |
-| Ka0s Pretty Chat | [`../../PrettyChat/`](../../PrettyChat/) | https://github.com/tusharsaxena/PrettyChat | Enabled |
-| Ka0s WhatGroup | [`../../WhatGroup/`](../../WhatGroup/) | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) |
+| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked |
+| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode |
+| Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Show window (the ledger browser) |
+| Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) |
+| Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked |
+| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) |
+| Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) |
+| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked |
+| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked |
+| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled |
+| Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) |
 
 **The launcher column is normative input to an audit, not decoration.** Every addon ships one minimap button and one
 broker plugin, from one LibDataBroker-1.1 object (launcher). **Left-click opens the settings panel and right-click opens
@@ -46,7 +46,7 @@ player-facing README, no settings panel and no install, so the addon-shaped sect
 
 | Library repo | Folder | Repository |
 |---|---|---|
-| LibKa0s | [`../../LibKa0s/`](../../LibKa0s/) | https://github.com/tusharsaxena/LibKa0s |
+| LibKa0s | `../../LibKa0s/` | https://github.com/tusharsaxena/LibKa0s |
 
 ## Documentation-and-tooling repos
 
@@ -57,8 +57,8 @@ lists**, not the addon rule set and not `library-stack-§7`'s.
 
 | Repo | Folder | Repository |
 |---|---|---|
-| WowAddonStandards | [`../`](../) | https://github.com/tusharsaxena/WowAddonStandards |
-| dev-copilot | [`../../dev-copilot/`](../../dev-copilot/) | https://github.com/tusharsaxena/dev-copilot |
+| WowAddonStandards | `../` | https://github.com/tusharsaxena/WowAddonStandards |
+| dev-copilot | `../../dev-copilot/` | https://github.com/tusharsaxena/dev-copilot |
 
 `WowAddonStandards` is this repo — listed because a roster that omits the repo it lives in is the
 one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind from this file.
@@ -78,5 +78,6 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
 - **Do not modify the addons from this repo.** This repository holds the standard and the process
   playbooks only; each addon's code lives in its own repository and is changed there.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
-  `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here. Changing this roster
+  `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here; this repo's own
+  `docs/audits/` holds only its own documentation-lane audits. Changing this roster
   affects which addons feed the next standards refresh — nothing in another repo.

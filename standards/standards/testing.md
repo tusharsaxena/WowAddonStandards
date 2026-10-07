@@ -17,7 +17,7 @@ The harness is a **Ka0s-owned shared kit**, not per-addon code. Addons **MUST NO
 
 ```
 tests/
-  _kit/              -- vendored, never edited: framework.lua, loader.lua, mock_base.lua, README.md
+  _kit/              -- vendored whole from LibKa0s testkit/, never edited (the folder, not a file list)
   run.lua            -- this addon's runner: the load list, the lifecycle kick, the suite list
   wow_mock.lua       -- this addon's thin extender over mock_base
   test_<module>.lua  -- one suite per module (test_schema.lua, test_database.lua, ...)
@@ -38,7 +38,7 @@ tests/
 
 **A gate closes a class of deviation only when it reads the whole of its own denominator.** Every gate the kit ships — and every gate a section below mandates — **MUST** state its scope, and that scope **MUST** be the whole set the gate's own rule is about, **enumerated from the tree** rather than hand-listed in the suite, minus the carve-outs the rule itself names. What that set *is* varies by rule, and the MUST is about never typing it out. A gate asserting a property of **the repository's files** takes the whole `git ls-files` set — the EOL gate (line-endings-§7) and the prose gate (localization-§5) both do. A gate whose rule is about a **named payload folder** takes that folder, and reads it **whole**: §11's kit-sync gate compares the source `testkit/` against the vendored `tests/_kit/`, and its consumer-side half compares `libs/<Lib>/` against the sibling checkout's ship folder — each by listing both directories and comparing the **sets**, never the files someone remembered. A gate whose rule is about an **adopted surface** takes the surface: §8's stub-surface parity case is scoped to the LibKa0s modules this addon adopts, which is exactly why its member list **MUST** come from a named `grep` rather than from reading. Anything narrower than the rule's own denominator reports green on the part it read and says nothing about the rest, while the run's pass line and the repo's inventory both read as coverage.
 
-The collection has the controlled experiment: on 2026-09-08 the line-ending class went to zero in all ten repos that had strays the cycle before, three of them naming `tests/_kit/test_eol.lua` as the owner, because that gate asks `git check-attr` about every tracked path (line-endings-§7). On the same date, with the same kind of vendored gate, the British-spelling class did **not** close — the library repo's `tests/test_prose.lua:19` fixes its scope to two hand-written directory names and does not recurse, leaving 216 live hits invisible to a green suite, and a second repo's copy carried a private word list where the standard publishes a canonical one. The difference was not gate-versus-prose, and it was not `git ls-files` versus anything else: one gate derived its denominator from the tree and the other typed it in.
+The collection has the controlled experiment: on 2026-09-08 the line-ending class went to zero in all ten repos that had strays the cycle before, three of them naming `tests/_kit/test_eol.lua` as the owner, because that gate asks `git check-attr` about every tracked path (line-endings-§7). On the same date, with the same kind of vendored gate, the British-spelling class did **not** close — the library repo's `tests/test_prose.lua` fixed its scope to two hand-written directory names (its `SHIPPED` list) and did not recurse, leaving 216 live hits invisible to a green suite, and a second repo's copy carried a private word list where the standard publishes a canonical one. The difference was not gate-versus-prose, and it was not `git ls-files` versus anything else: one gate derived its denominator from the tree and the other typed it in.
 
 ### 2. Commands
 
@@ -200,9 +200,9 @@ one path that calls the missing member — anti-patterns #56.
   to be inferred.
 
 The class is not hypothetical and no green suite sees it, because no suite loads the addon degraded:
-`ConsumableMaster/settings/Panel.lua:571-572` and `:643`/`:833` reproduce as a session-long error loop
-with a settings write landing **before** the raise, and `PanelMaster/settings/Slash.lua:316` is a stub
-missing a `FormatKV` the host calls from five sites.
+`ConsumableMaster@7036911d3a:settings/Panel.lua:571-572` and `:643`/`:833` reproduced as a session-long
+error loop with a settings write landing **before** the raise, and the library-absent stub at
+`PanelMaster@1b5849b06f:settings/Slash.lua:285` was missing a `FormatKV` the host calls from five sites.
 
 ### 9. Load lists MUST be derived from the TOC
 
@@ -234,9 +234,9 @@ all of them are under the green gate.
   carries no declared list to pin; the rule binds a runner that **declares** one. The shape to write is
   a case in the repo's own harness suite that lists `tests/test_*.lua` off disk and compares it against
   the list the runner publishes — and this is not a rule nobody has written yet. Evidence that it is
-  already writable: `BankLedger/tests/test_harness.lua:22-32` lists the directory, and
-  `PanelMaster/tests/test_harness.lua:19-32` reads the runner's published list and asserts both
-  directions against it.
+  already writable: BankLedger `tests/test_harness.lua` lists the directory (`suiteFilesOnDisk`, over
+  `entryParts` and `OWN_DIR`), and PanelMaster `tests/test_harness.lua` reads the runner's published
+  list (`declaredSuites`) and asserts both directions against it.
 - **A declaration is the pair (basename, directory), and a suite the vendored kit ships MUST be
   declared with an entry naming the kit directory** — `{ name = "test_prose", dir = "tests/_kit/" }`,
   not the bare `"test_prose"`. The bare form wires the repo's own file of that name, and the inventory
@@ -289,7 +289,7 @@ all of them are under the green gate.
   registers as a **skip carrying that reason** (`Kit.skip`, §11) and says so in the run. Declaring it
   is what separates the two cases, which is why the marker cannot be left lying around either — a
   `pending` entry whose file **does** exist **MUST** raise as well, telling the author to drop the
-  field so the suite's cases actually run. This is what LibKa0s test-kit revision 24 ships today
+  field so the suite's cases actually run. LibKa0s test-kit revision 24 and later ship this
   (`testkit/framework.lua`, `loadSuites`), and the rule is written to it.
 
 The rule exists because these failure modes are **silent, and the first two happened during the LibKa0s

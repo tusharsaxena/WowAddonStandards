@@ -6,10 +6,14 @@ Guidance for AI agents working in this repository.
 
 The **house standard** for the Ka0s World of Warcraft addon collection, plus the four **process
 playbooks** the `dev-copilot` plugin consumes — `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md` and
-`PERF_ANALYSIS.md`. It contains **documents only** — no addon source code lives here.
+`PERF_ANALYSIS.md`. It contains **documents only**, plus one on-demand check script,
+`scripts/check-standard.sh`. No addon source code lives here.
 
-This repo does **not** run audits. Compliance auditing and new-addon scaffolding happen **in each
-addon's own repo**, driven by a plugin skill that reads the playbook from here:
+Addon audits do **not** run here. An addon's compliance auditing and new-addon scaffolding happen
+**in that addon's own repo**, driven by a plugin skill that reads the playbook from here. This repo is
+audited and reviewed too (it is in `standards/ADDONS.md`'s documentation-and-tooling table), and it
+keeps **its own** frozen `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` stores
+(documentation-§8, audit-review-history):
 
 - **`AUDIT.md`** (root) — the step-by-step spec for `/dev-copilot:wow-standards-audit`. An addon audits
   **itself**, writing a dated `docs/audits/<YYYY-MM-DD>/` bundle inside **its own** repo.
@@ -41,25 +45,32 @@ NEW_ADDON.md                      -- PLAYBOOK: /dev-copilot:wow-new-addon (scaff
 PERF_ANALYSIS.md                  -- PLAYBOOK: /dev-copilot:wow-perf-analysis (per-addon in-game capture bundle)
 README.md                         -- repo overview + what you can do here
 CLAUDE.md                         -- this file
-DEPENDENCIES.md                   -- toolchain contract (documentation-§7); git only, and why the rest is absent
+DEPENDENCIES.md                   -- toolchain contract (documentation-§7); git, plus bash and the text tools for the check script; why the rest is absent
 docs/ARCHITECTURE.md              -- how this repo is put together + the deviation register (documentation-§3, reduced by §8)
 LICENSE
 .gitattributes                    -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
 standards/                        -- THE STANDARD (living, canonical). Everything supports STANDARDS.md.
   README.md                       -- what's in standards/ + how to rebuild the standard
   EXECUTIVE_SUMMARY.md            -- one-page TL;DR of the standard
-  STANDARDS.md                    -- THE STANDARD: index/entry point + the Sections map (canonical)
+  STANDARDS.md                    -- THE STANDARD: index/entry point + the Sections map + the current changelog entry (canonical)
+  CHANGELOG.md                    -- every earlier changelog entry, newest first (history, not normative; not in Sections)
   standards/                      -- the standard's sections, one unnumbered file each (layout.md, ...)
   NEW_ADDON_CONTEXT.md            -- new-addon scaffolding pack (NEW_ADDON.md's detail); fetched, never stored
   INDUSTRY_RESEARCH.md            -- research foundation: patterns from 10 reference addons
   ADDONS.md                       -- THE ROSTER: editable list of in-scope addons (standards-process input)
   _raw/_industry/                 -- per-addon raw research reports (evidence for INDUSTRY_RESEARCH.md)
 harvests/                         -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass; never edited after the fact
+docs/audits/                      -- this repo's OWN frozen self-audit bundles, one <YYYY-MM-DD>/ per run (audit-review-history)
+docs/reviews/                     -- this repo's OWN frozen review bundles, one <YYYY-MM-DD>/ per run (audit-review-history)
 media/logos/                      -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
+scripts/check-standard.sh         -- on-demand mechanical gate for the standard's own invariants (LF, executable; not a hook)
 ```
 
-Audit and review runs are **not** in this repo — they live under each audited addon's own
-`docs/audits/<date>/` and `docs/reviews/<date>/` (see `AUDIT.md`, and audit-review-history of the standard).
+An addon's audit and review runs live under **that addon's** own `docs/audits/<date>/` and
+`docs/reviews/<date>/` (see `AUDIT.md`, and audit-review-history of the standard), not in this
+repo. The `docs/audits/` and `docs/reviews/` stores in **this** repo hold only this repo's own
+documentation-lane audits and reviews (documentation-§8 applies audit-review-history unchanged),
+frozen like any other.
 
 The addon-shaped rules that do **not** bind this repo are granted by the standard itself, in
 **`documentation-§8`** — this is a **documentation-and-tooling repo**, and §8 carries its three
@@ -79,10 +90,14 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
 - **`standards/STANDARDS.md` is canonical.** When docs conflict, it wins. It is the **index/entry
   point**: the normative rules are split into one file per section under `standards/standards/`
   (unnumbered topic names — `layout.md`, `architecture.md`, …), and `STANDARDS.md` carries the
-  front matter, the reading guide, the **Sections** map, and the changelog. It is **living**: every
-  substantive change bumps the version + date and adds a changelog entry first in its
-  `## Changelog` section, which follows the Sections map (git history carries the rest). When you
-  add, split, or reorder a section, update the Sections list in `STANDARDS.md`.
+  front matter, the reading guide, the **Sections** map, **Related documents** and the **current**
+  changelog entry only. It is **living**: every substantive change bumps the version + date in its
+  header and writes that release's entry in its `## Changelog` section, which follows Related
+  documents; on the next release the previous entry moves verbatim to the top of
+  `standards/CHANGELOG.md`, which holds every earlier entry newest first and is listed under Related
+  documents, never under Sections. `standards/CHANGELOG.md` is not at a repo root, so
+  documentation-§1/§3's root `CHANGELOG.md` ban does not reach it. When you add, split, or reorder a
+  section, update the Sections list in `STANDARDS.md`.
 - **Reference sections by `filename-§N` — always.** A whole section is its **bare filename**
   (`architecture`, `audit-review-history`); a subsection is **`filename-§N`** (`architecture-§5`,
   `options-ui-§10`), where `N` is that section's **local** number. The old global `§N.M` numbering is
@@ -105,23 +120,30 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   (`standards/INDUSTRY_RESEARCH.md` + `standards/_raw/_industry/`) is a living foundation for
   `STANDARDS.md`; see `standards/README.md` for the rebuild process.
 - **Audits are per-repo and frozen.** A `/dev-copilot:wow-standards-audit` run writes a frozen dated
-  `docs/audits/<YYYY-MM-DD>/` bundle (`01_CURRENT_STATE` … `05_EXECUTION_PLAN`, with stable per-addon
-  deviation-ID prefixes) into the **audited addon's** repo — never here, and never edited after the
-  fact. See `AUDIT.md` for the structure.
+  `docs/audits/<YYYY-MM-DD>/` bundle (`01_CURRENT_STATE` … `05_EXECUTION_PLAN`, with stable per-repo
+  deviation-ID prefixes) into the **audited repo**: an addon's audit goes in that addon's repo, and
+  this repo's own documentation-lane audit goes in this repo's `docs/audits/`. Reviews follow the
+  same rule under `docs/reviews/<YYYY-MM-DD>/`. No bundle is ever edited after the fact. See
+  `AUDIT.md` for the structure.
 - **Cross-references** use plain relative paths. From `standards/` to a root playbook: `../AUDIT.md`.
   From root to a standard doc: `standards/STANDARDS.md`. Within `standards/`, docs reference each
   other and `ADDONS.md` by bare name.
 
 ## Git workflow
 
-- **Trunk-based.** Work directly on the current branch (usually `master`) by default; branch when a
-  changeset genuinely warrants isolation.
+- **Default-branch work by default** (versioning-git). Work lands on `master` unless the owner directs
+  a changeset to be isolated or it spans several repos; then it goes on `feat/<YYYY-MM-DD>-<topic>`,
+  the same name in every repo it touches, merged into `master` with `--no-ff` on the owner's go-ahead
+  and then deleted, with any worktree or stash the run created. Pushing a feature branch at an
+  owner-authorized checkpoint is the only push without a direct request; merging, tagging and
+  releasing wait for the owner.
 
 ## Editing rules
 
 - **This repo ships nothing to the WoW client, so it pins LF (`line-endings-§2`).** Its root
-  `.gitattributes` carries the **non-client** canonical body — `* text=auto eol=lf`, `*.sh text
-  eol=lf`, binaries marked `binary`. Write LF here. Do not reach for the `dev-copilot` plugin's CRLF
+  `.gitattributes` carries the **non-client** canonical body — `* text=auto eol=lf`, the `*.sh` and
+  `*.py` shebang carve-outs (`line-endings-§3`), binaries marked `binary` — byte-identical to
+  `line-endings-§5`'s non-client body. Write LF here. Do not reach for the `dev-copilot` plugin's CRLF
   behavior: the hook reads `git check-attr eol` and follows whatever the repo declares, and what this
   repo declares is LF. The standard it publishes binds it — a standards repo that does not follow its
   own rule is the one thing that discredits the rule. If a file arrives CRLF anyway, that is a
@@ -129,10 +151,17 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   with `tr -dc '\r' < <path> | wc -c` — it must be `0` here. Not `file <path>`: it reports nothing
   about line terminators for JSON or for any binary, so it passes files it never examined
   (`line-endings-§7`).
+- **Run `bash scripts/check-standard.sh` before committing a change to the standard**, and fix
+  whatever it reports. It must exit `0`. It checks CR bytes, the `.gitattributes` body, `filename-§N`
+  citation ranges, the Sections list, anti-pattern numbering, the version stamps and relative `.md`
+  links; `DEPENDENCIES.md` lists the checks and how the script itself is verified. It is deliberately
+  **not** a commit hook (see *The two checkpoints*, below). A passing run does not prove the
+  documents agree in meaning, so read for that as well. If you change the script, rerun its
+  injected-defect checks from `DEPENDENCIES.md` in a throwaway clone.
 - Keep documents internally consistent. A change to the standard usually ripples into
   `standards/EXECUTIVE_SUMMARY.md` and `standards/NEW_ADDON_CONTEXT.md`, and sometimes the root
   `README.md` / the playbooks. Update all affected docs together, and bump the standard's version +
-  changelog.
+  changelog (the new entry in `STANDARDS.md`, the previous one moved to `standards/CHANGELOG.md`).
 - **Write in US English.** The standard mandates it for addons (`localization-§5`), and these documents
   follow their own rule: `color`, `gray`, `behavior`, `center`, `canceled`, `-ize`/`-ization` — never
   `colour`, `grey`, `behaviour`, `centre`, `cancelled`, `-ise`/`-isation`. Two exemptions: Blizzard /
@@ -140,7 +169,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.76.1 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.77.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
@@ -153,7 +182,8 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   four; and **Tier 1** — `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`,
   `data-flow.md`, `common-tasks.md`, all six unconditional and under exactly those names, with Tier 2
   (`slash-dispatch.md`, `midnight-quirks.md`, `compat-layer.md`, `message-bus.md`, `profiles.md`,
-  `debug.md`) required per stated trigger and recorded as *Not applicable* in the map when the
+  `debug.md`; `perf-analysis/README.md` is a Tier 2 member too, its trigger stated under the
+  verification-and-record docs above) required per stated trigger and recorded as *Not applicable* in the map when the
   trigger has not fired, except that since v2.68.0 the `docs/debug.md` trigger has fired in every
   addon (the diagnostics dump is a debug surface beyond the default console), so `docs/debug.md` is
   never *Not applicable*, and Tier 3 free-form (documentation-§3).

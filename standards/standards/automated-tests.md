@@ -363,11 +363,11 @@ the one authored cell in the file**, and nothing else in it is ever hand-edited 
 hand-edited" while this section **MUST**'d a per-entry disposition and a standing section per suite —
 narrative the vendored runner has never emitted. The result was not a compromise but a stall: nobody
 could produce the file correctly, and the record went stale in **ten of ten** repositories.
-`MultiMeters/docs/automated-tests/RESULTS.md:30` carries a hand-written watch list headed *"Current as
-of `20260809-195454`"* reporting **"None. `lizard` reports 0 warnings"** at `:34`, while the newest
-row of the table directly above it (`:23`, run `20260825-103437`) records **19**;
-`LibKa0s/docs/automated-tests/RESULTS.md:50` opens its test-suite section with **"499 cases"** against
-a suite that runs 764. Both are honest attempts at a rule that could not be satisfied. A rule that
+`MultiMeters@a34854537e:docs/automated-tests/RESULTS.md:30` carried a hand-written watch list headed
+*"Current as of `20260809-195454`"* reporting **"None. `lizard` reports 0 warnings"** at `:34`, while
+the newest row of the table directly above it (`:23`, run `20260825-103437`) recorded **19**;
+`LibKa0s@e1b9993109:docs/automated-tests/RESULTS.md:50` opened its test-suite section with **"499
+cases"** against a suite that ran 764. Both are honest attempts at a rule that could not be satisfied. A rule that
 mandates prose no tool produces, in a file no one is allowed to write, is not a rule — it is a stall,
 and what it costs is the trend line the whole section exists to keep.
 

@@ -2,7 +2,7 @@
 
 The **living, canonical** core of this repo: the house rules for the Ka0s WoW addon collection,
 the research they are built on, the [roster](ADDONS.md) of in-scope addons, and a fetch-at-runtime
-context pack for scaffolding new addons. Compliance auditing is **not** run from here — each addon audits
+context pack for scaffolding new addons. Addon compliance auditing is **not** run from here — each addon audits
 **itself**, in its own repo, via `/dev-copilot:wow-standards-audit` (playbook: [`../AUDIT.md`](../AUDIT.md)).
 
 ## What's in here
@@ -10,7 +10,8 @@ context pack for scaffolding new addons. Compliance auditing is **not** run from
 | File | Role |
 |---|---|
 | [`EXECUTIVE_SUMMARY.md`](EXECUTIVE_SUMMARY.md) | One-page TL;DR of the standard. |
-| [`STANDARDS.md`](STANDARDS.md) | **The standard** — canonical. Everything else supports this. Versioned via the changelog at its top. |
+| [`STANDARDS.md`](STANDARDS.md) | **The standard** — canonical. Everything else supports this. Versioned in its header; its `## Changelog` carries the current entry. |
+| [`CHANGELOG.md`](CHANGELOG.md) | Every earlier changelog entry, newest first. History, not normative: listed under the index's Related documents, not its Sections. |
 | [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md) | The scaffolding context pack — **fetched to a temp directory and read**, never copied into an addon (documentation-§3, anti-pattern #49). |
 | [`INDUSTRY_RESEARCH.md`](INDUSTRY_RESEARCH.md) | The research foundation: synthesized patterns from 10 reference addons that justify the rules. |
 | [`ADDONS.md`](ADDONS.md) | **The roster** — the editable list of in-scope Ka0s addons, in **three** tables, one per repo kind: the addons, the **Ka0s-owned library repos** (audited against library-stack-§7's applicability lists) and the **documentation-and-tooling repos** (audited against documentation-§8's); a standards-process input. |
@@ -28,9 +29,10 @@ orchestrator that draws its substance from the docs above.
 
 ## Living, not frozen
 
-The standard **evolves in place**. Every substantive change bumps the version + date and adds a
-changelog entry first in the `## Changelog` section of `STANDARDS.md` (after the Sections map);
-git history carries the rest. This is the opposite of an audit run, which is a frozen dated
+The standard **evolves in place**. Every substantive change bumps the version + date and writes the
+release's entry in the `## Changelog` section of `STANDARDS.md` (after Related documents), which
+holds only the current entry; the previous entry moves verbatim to the top of
+[`CHANGELOG.md`](CHANGELOG.md), which keeps every earlier one, newest first. This is the opposite of an audit run, which is a frozen dated
 snapshot under an addon's own `docs/audits/YYYY-MM-DD/` and is never edited after the fact. Industry research lives here, with the standard, precisely because it is a
 *living input* to the rules — not a point-in-time compliance measurement.
 
@@ -60,8 +62,9 @@ The standard is a **synthesis** of two inputs:
    rationale and, where possible, a **reference implementation** from the collection or a cited
    industry source. Preserve each section's local numbering and the
    `filename-§N` cross-reference scheme — other documents reference it.
-4. **Bump the changelog.** Update the version + date and add a changelog entry first in the
-   `## Changelog` section of `STANDARDS.md` (after the Sections map) describing what changed and why.
+4. **Bump the changelog.** Update the version + date at the top of `STANDARDS.md`, move the
+   previous entry in its `## Changelog` section (after Related documents) verbatim to the top of
+   [`CHANGELOG.md`](CHANGELOG.md), and write the new entry in its place describing what changed and why.
 5. **Ripple the change.** A rule change usually touches
    [`EXECUTIVE_SUMMARY.md`](EXECUTIVE_SUMMARY.md) and
    [`NEW_ADDON_CONTEXT.md`](NEW_ADDON_CONTEXT.md), and sometimes this file, the repo root
@@ -69,6 +72,11 @@ The standard is a **synthesis** of two inputs:
    keep them in sync. A rule that changes the addon's **doc set** — the root docs, the `docs/` trio,
    the required topic-detail docs — ripples into all of them at once. Existing audit runs (in the
    addons' own repos) stay frozen — each addon's *next* audit re-measures it against the revised standard.
+6. **Gate it.** From the repo root, run `bash scripts/check-standard.sh`
+   ([`../scripts/check-standard.sh`](../scripts/check-standard.sh)) and fix whatever it reports; it
+   must exit `0`. It catches the mechanical drift (CR bytes, the `.gitattributes` body, citation
+   ranges, the Sections list, anti-pattern numbering, the version stamps, relative `.md` links) and
+   nothing else, so read the ripple for meaning as well.
 
 ### Where audits fit
 

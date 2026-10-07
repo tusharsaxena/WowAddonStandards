@@ -89,11 +89,11 @@ One file is the addon's face in **three** places — the AddOns list (the TOC's 
 
 ### 5. Adopting it
 
-Every addon in the collection is **non-compliant with this section until it adopts**, which is normal and expected — the section is new.
+When the section landed (v2.52.0, 2026-09-16), every addon in the collection was non-compliant with it, which was normal and expected for a new section; the collection has since adopted it, and an audit verifies the one object and files what it finds. The paragraphs below record how adoption was sequenced and stay as the recipe for an addon that has not adopted.
 
 **The library minor lands FIRST, and no addon can adopt before it does.** options-ui-§15 and §16 require the Master-controls set to be **composed** by `LibKa0s-Options-1.0`'s `MasterControls` composer and never hand-written, and that composer has **no minimap seam**: there is no spec key for the row and nothing emits it (`OptionsCompose.lua`, compose minor 6, as shipped in LibKa0s v1.38.0). An addon that adopted today could satisfy this section only by hand-writing the row, which is the one thing §15/§16 forbid — so the standard's own rules would be in contradiction until the seam exists.
 
-The seam is **`LibKa0s v1.39.0` (compose minor 7)**: a **`minimapPath`** spec key on `MasterControls`, exactly parallel to the existing `testModePath`, emitting the unconditional **`Minimap button`** row; and *Test mode* moves **off** `startsLine` so the two pair on one line as `[Minimap button] [Test mode]`, which is the column order options-ui-§15 states. Until an addon carries that tag, its adoption is **blocked rather than overdue**, and an audit records it as blocked — the gap is upstream, not in the addon.
+The seam is **`LibKa0s v1.39.0` (compose minor 7)**: a **`minimapPath`** spec key on `MasterControls`, exactly parallel to the existing `testModePath`, emitting the unconditional **`Minimap button`** row; and *Test mode* moves **off** `startsLine` so the two pair on one line as `[Minimap button] [Test mode]`, which is the column order options-ui-§15 states. Until an addon carried that tag, its adoption was **blocked rather than overdue**, and an audit recorded it as blocked — the gap was upstream, not in the addon. The tag has shipped, so an addon that has not adopted is now overdue.
 
 Adoption is then one changeset per addon:
 

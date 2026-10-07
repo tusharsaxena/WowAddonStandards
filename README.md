@@ -14,13 +14,15 @@ four process playbooks that the `dev-copilot` plugin consumes: `AUDIT.md`, `AUTO
    [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) (`/dev-copilot:wow-automated-tests`) and
    [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) (`/dev-copilot:wow-perf-analysis`).
 
-The standard is the source of truth, and it evolves in place. Auditing doesn't happen here any more.
-Each addon audits itself, in its own repo, and writes a dated `docs/audits/<YYYY-MM-DD>/` bundle
-there. The list of addons that make up the collection lives in one editable place:
+The standard is the source of truth, and it evolves in place. Addon audits don't happen here any
+more. Each addon audits itself, in its own repo, and writes a dated `docs/audits/<YYYY-MM-DD>/` bundle
+there. This repo is audited and reviewed too, as a documentation-and-tooling repo, so it keeps its
+own frozen `docs/audits/<YYYY-MM-DD>/` and `docs/reviews/<YYYY-MM-DD>/` stores. The list of addons that make up the collection lives in one editable place:
 [`standards/ADDONS.md`](standards/ADDONS.md).
 
-This repository is a research and analysis deliverable, and it contains only documents. No addon
-source code lives here. Nothing done here modifies the addons themselves.
+This repository is a research and analysis deliverable. It contains documents plus one on-demand
+check script, [`scripts/check-standard.sh`](scripts/check-standard.sh). No addon source code lives
+here. Nothing done here modifies the addons themselves.
 
 > The plugin that invokes these playbooks lives in a separate repo,
 > <https://github.com/tusharsaxena/dev-copilot>. That repo, not this one, is where the plugin gets
@@ -44,9 +46,7 @@ source code lives here. Nothing done here modifies the addons themselves.
 the single editable roster, split into three tables by repo kind: addons, Ka0s-owned library repos,
 and documentation-and-tooling repos. To change the collection's scope, edit that one file.
 
-- In scope are the addons in [`standards/ADDONS.md`](standards/ADDONS.md), currently 11 Ka0s
-  addons: Absorb Tracker, Aura Master, Bank Ledger, Consumable Master, KickCD, Loot History,
-  Multi Meters, Panel Master, Party Frame Enhanced, Pretty Chat, WhatGroup.
+- In scope are the Ka0s addons listed in [`standards/ADDONS.md`](standards/ADDONS.md).
 - The Ka0s-owned library repos those addons vendor are in scope too. There is currently 1, LibKa0s.
   A library repo is in scope for the standards process and gets audited, but against library-stack-§7's
   applicability list rather than the addon rule set. It has no TOC, no player-facing README, no
@@ -79,9 +79,16 @@ This is how the living house rules get revised. The full, authoritative steps ar
    section's local numbering and the `filename-§N` cross-reference scheme intact. If you add, split
    or reorder a section, update the Sections list in
    [`standards/STANDARDS.md`](standards/STANDARDS.md) too.
-4. Bump the changelog: update the version and date at the top of `STANDARDS.md`.
+4. Bump the changelog: update the version and date at the top of `STANDARDS.md`, move the previous
+   changelog entry verbatim to the top of
+   [`standards/CHANGELOG.md`](standards/CHANGELOG.md), and write the new entry in the index's
+   `## Changelog`, which holds only the current one.
 5. Ripple the change into [`standards/EXECUTIVE_SUMMARY.md`](standards/EXECUTIVE_SUMMARY.md) and
    [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) so they stay in sync.
+6. Run `bash scripts/check-standard.sh` and fix whatever it reports; it must exit `0`. It checks the
+   mechanical invariants (CR bytes, the `.gitattributes` body, citation ranges, the Sections list,
+   anti-pattern numbering, the version stamps and relative links), not whether the documents agree
+   in meaning.
 
 ## B. Audit an addon
 
@@ -134,30 +141,35 @@ WowAddonStandards/
   PERF_ANALYSIS.md                        -- PLAYBOOK: /dev-copilot:wow-perf-analysis (per-addon in-game capture bundle)
   README.md                               -- this file
   CLAUDE.md                               -- guidance for AI agents
-  DEPENDENCIES.md                         -- toolchain contract (documentation-§7): git only, and why the rest is absent
+  DEPENDENCIES.md                         -- toolchain contract (documentation-§7): git, plus bash and the text tools for the check script; why the rest is absent
   docs/ARCHITECTURE.md                    -- how this repo is put together + the deviation register (documentation-§3, reduced by §8)
   LICENSE
   .gitattributes                          -- line-ending policy: the non-client canonical body, LF (line-endings-§2/§5)
   standards/                              -- THE STANDARD (living, canonical)
     README.md                             -- what's here + how to refresh the standard
     EXECUTIVE_SUMMARY.md                  -- one-page TL;DR of the standard
-    STANDARDS.md                          -- the Ka0s WoW Addon Standard: index/entry point + Sections map (canonical)
+    STANDARDS.md                          -- the Ka0s WoW Addon Standard: index/entry point + Sections map + current changelog entry (canonical)
+    CHANGELOG.md                          -- every earlier changelog entry of the standard, newest first (history, not normative)
     standards/                            -- the standard's sections, one unnumbered file each (layout.md, ...)
     NEW_ADDON_CONTEXT.md                  -- new-addon kickstart pack; fetched at runtime, never stored in an addon
     INDUSTRY_RESEARCH.md                  -- research foundation: 10 reference addons synthesized
     ADDONS.md                             -- THE ROSTER: editable list of in-scope addons
     _raw/_industry/                       -- per-addon raw research reports (evidence)
   harvests/                               -- frozen collection-harvest bundles, one <YYYY-MM-DD>/ per pass
+  docs/audits/                            -- this repo's own frozen self-audit bundles, one <YYYY-MM-DD>/ per run
+  docs/reviews/                           -- this repo's own frozen review bundles, one <YYYY-MM-DD>/ per run
   media/logos/                            -- the Ka0s collection logo art (an addon README displays no logo: documentation-§1)
+  scripts/check-standard.sh               -- on-demand mechanical gate for the standard's own invariants (not a hook)
 ```
 
-Audit and review runs are not stored here. Audits live under each addon's own
-`docs/audits/<YYYY-MM-DD>/`, and reviews under its `docs/reviews/<YYYY-MM-DD>/`
-(audit-review-history).
+An addon's audit and review runs are not stored here. Its audits live under its own
+`docs/audits/<YYYY-MM-DD>/`, and its reviews under its `docs/reviews/<YYYY-MM-DD>/`
+(audit-review-history). The `docs/audits/` and `docs/reviews/` stores in this repo hold only this
+repo's own audits and reviews, frozen once written (documentation-§8).
 
 ## Status
 
-The standard is at **v2.76.1** and is a living document. Compliance auditing has moved out of
+The standard is at **v2.77.0** and is a living document. Addon compliance auditing has moved out of
 this repo and into each addon's own repository. The `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`
 and `PERF_ANALYSIS.md` playbooks drive it, and the `dev-copilot` plugin is what consumes them.
 

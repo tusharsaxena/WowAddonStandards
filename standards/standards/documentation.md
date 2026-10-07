@@ -147,7 +147,7 @@ Every addon **MUST** ship this **canonical trio** under `docs/` (all three are u
 
 - **`docs/ARCHITECTURE.md`** — engineer context, and the **hub** of the doc set (documentation-§3's tier model). **Ten** mandated sections, all ten named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema** (which, for every structural registry the addon holds, names its storage keys, its one registry writer and its load pass, and for every piece of **named non-setting state** — geometry only a drag or a resize determines, a remembered view, learned or recorded data, a vendored library's own writes — its storage key, its one owner module and every function that writes it, wherever each lives; that sentence is the compliance and no register row is needed — architecture-§5), **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, **`## Documentation map`** — the per-addon doc register specified below — and **`## Documented deviations`** — the register specified immediately below.
 
-  **The count stays ten, and `layout-§1`'s over-cap census is why that has to be said.** That section mandates a heading named **`Files over the 1500-line cap`** in this same file, which makes it the first heading any repo owes here that this list does not name. It is **not** an eleventh mandated section: it is a **sub-heading of `## Documented deviations`**, and its level follows that register's own. The register is its host because the census's whole job is to say which of three terminal states an over-cap file sits in — the issue that names the seam, the ratifying deviation row, or the scheduled peel — and a reader asking whether a given breach was ratified is already reading the register that would hold the answer. Of the four repositories that carry the heading today, **two** nest it exactly there; a third keeps it under `## Layout`, and the library repo keeps it as a sibling `##` beside the register. That the collection has **not** converged is the argument for fixing the parent here rather than against it: `layout-§1` fixes the heading's name and level but not its parent, and a heading whose parent varies is one a doc-shape gate cannot find twice.
+  **The count stays ten, and `layout-§1`'s over-cap census is why that has to be said.** That section mandates a heading named **`Files over the 1500-line cap`** in this same file, which makes it the first heading any repo owes here that this list does not name. It is **not** an eleventh mandated section: it is a **sub-heading of `## Documented deviations`**, and its level follows that register's own. The register is its host because the census's whole job is to say which of three terminal states an over-cap file sits in — the issue that names the seam, the ratifying deviation row, or the scheduled peel — and a reader asking whether a given breach was ratified is already reading the register that would hold the answer. Of the four repositories that carried the heading when this was written (2026-09-22), **two** nested it exactly there; a third kept it under `## Layout`, and the library repo kept it as a sibling `##` beside the register. That the collection had **not** converged was the argument for fixing the parent here rather than against it (as measured on 2026-10-07, every addon nests it at `###` under `## Documented deviations`): `layout-§1` fixes the heading's name and level but not its parent, and a heading whose parent varies is one a doc-shape gate cannot find twice.
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page. Where it tabulates the four out-of-game suites, the table **MUST** carry the **checkpoint** per suite — run/commit versus the tag — and **MUST NOT** leave a `Gates? no — recorded only` cell unqualified, since that is true of a commit and false of a release (testing-§6, automated-tests-§3/§4).
 - **`docs/smoke-tests.md`** — the in-game smoke-test suite (audit-review-history), linked from `docs/testing.md`.
 
@@ -167,8 +167,8 @@ find a ratified decision **re-files it as an open MUST failure**, so the same ar
 cycle; and a register nobody re-reads goes stale in the dangerous direction, accumulating entries for
 behavior the standard has since mandated or permitted, which reads as deviation and is not.
 
-- **MUST** carry `## Documented deviations` in `docs/ARCHITECTURE.md` — the ninth mandated section,
-  present even when empty (write "None." rather than omitting the heading; an absent section is
+- **MUST** carry `## Documented deviations` in `docs/ARCHITECTURE.md` — one of the mandated sections
+  named above, present even when empty (write "None." rather than omitting the heading; an absent section is
   indistinguishable from an unwritten one).
 - **MUST** use this **exact row shape**:
 
@@ -256,7 +256,7 @@ Every addon **MUST** ship all six, under **exactly** these names:
 | `docs/module-map.md` | where does the code live? | every non-vendored file, its one-line responsibility, and **load order** (the TOC's file order and why it is that order) |
 | `docs/schema.md` | what is persisted? | the SavedVariables shape, every default, and the **migration** path for each schema version bump (savedvariables) |
 | `docs/settings-panel.md` | how is it configured? | **the `Page \| Covers` table** (one row per settings subcategory page, options-ui-§5; the column is the page because a page is what a subcategory is, and the tabs belong to the tree below) — moved here from the README at v2.41.0, because it is a contents page for a panel rather than something a player reads before opening it — then the panel/subcategory tree, per-option behavior, and how each control maps to its schema key (options-ui-§5). Since every page is a tab strip (options-ui-§13), the tree is **page → tab → row** and is written that way — one heading per page, the tabs in `group` declaration order, the rows under each. The table is **derived from the schema**, which is also where an audit reads it from, so a page → tab list here that the schema does not produce is the finding rather than the record |
-| `docs/data-flow.md` | how does it actually work? | the core mechanic as a pipeline — event or trigger in, processing, what the user ends up seeing. The engineer counterpart to the README's player-facing `## How <it> works` (documentation-§1 item 8); the two describe one pipeline at two levels and **MUST NOT** contradict each other |
+| `docs/data-flow.md` | how does it actually work? | the core mechanic as a pipeline — event or trigger in, processing, what the user ends up seeing. The engineer counterpart to the README's player-facing `## How <it> works` (documentation-§1 item 6); the two describe one pipeline at two levels and **MUST NOT** contradict each other |
 | `docs/common-tasks.md` | how do I change it? | recipes for the changes actually made most often in *this* addon — add a setting, add a slash command, add a tracked entity, add a locale string — each as concrete steps naming real files |
 
 Each is already the majority habit in the collection; this ratifies the shape the addons converged on
@@ -294,14 +294,14 @@ to stop.
 **Why the number, and why it is three.** Until this rule carried one, `compat-layer.md` was the only
 Tier 2 trigger written as pure judgment — "carries addon-specific shims" — sitting between
 `slash-dispatch.md`'s *eight or more* and `message-bus.md`'s *more than ten*. Read as judgment it was
-read four ways, and the readings do not track size. `MultiMeters/core/Compat.lua` is 761 lines
-publishing 28 shims and the repo ships no `docs/compat-layer.md`; `BankLedger/core/Compat.lua` (175
-lines, 13 shims), `KickCD/core/Compat.lua` (496, 13) and `LootHistory/core/Compat.lua` (416, 23) each
-ship one. The cleanest evidence that the old wording decided nothing is the pair four lines apart:
-`BankLedger/core/Compat.lua` at 175 lines has the doc and `PanelMaster/core/Compat.lua` at 173 lines
-(8 shims) does not. The two the auditor was actually being asked to decide were the small ones —
-`ConsumableMaster/core/Compat.lua` (83 lines, 6 shims) and `WhatGroup/core/Compat.lua` (130 lines, 7
-shims, at `:24`, `:40`, `:52`, `:62`, `:83`, `:105`, `:125`) — and they were decided differently from
+read four ways, and the readings did not track size. When the rule was written (sizes as measured
+on 2026-09-07), `MultiMeters/core/Compat.lua` was 761 lines publishing 28 shims and the repo shipped no
+`docs/compat-layer.md`; `BankLedger/core/Compat.lua` (175 lines, 13 shims), `KickCD/core/Compat.lua`
+(496, 13) and `LootHistory/core/Compat.lua` (416, 23) each shipped one. The cleanest evidence that the
+old wording decided nothing was the pair four lines apart: `BankLedger/core/Compat.lua` at 175 lines had
+the doc and `PanelMaster/core/Compat.lua` at 173 lines (8 shims) did not. The two the auditor was
+actually being asked to decide were the small ones — `ConsumableMaster/core/Compat.lua` (83 lines, 6
+shims) and `WhatGroup/core/Compat.lua` (130 lines, 7 shims) — and they were decided differently from
 one cycle to the next, at the cost of the same argument every audit.
 
 Three sits deliberately below every `core/Compat.lua` the collection ships, because excluding somebody
@@ -344,7 +344,7 @@ both stated as thresholds because "keep it short" demonstrably did not hold:
 Both numbers are approximate on purpose — the failure they catch is 1071 lines, not 412 — and an audit
 reports the shape, not the arithmetic.
 
-##### `## Documentation map` — the tenth `ARCHITECTURE.md` section (MUST)
+##### `## Documentation map` — a mandated `ARCHITECTURE.md` section (MUST)
 
 The register that makes the tiers checkable **in both directions**. Every `.md` under `docs/` appears
 in **exactly one** of its four tables, and every table row points at a file that exists — so a missing
@@ -356,9 +356,10 @@ Frozen and generated material is **out of scope** and **MUST NOT** be enumerated
 directories, once each. A register that grows a row per audit is a register nobody re-reads.
 
 `docs/revendor/` joined that list late, and what its absence cost is the reason the list is upstream
-rather than per-repo. Ten addons ship the re-vendor store (`audit-review-history`), and all ten had to
-register it before this sentence named it — whereupon ten independent edits produced **five** different
-answers. Nine wrote a prose out-of-scope sentence of their own, and those nine carry **four** different
+rather than per-repo. Every addon ships the re-vendor store (`audit-review-history`), and the ten that
+shipped it on 2026-09-22 all had to register it before this sentence named it — whereupon ten
+independent edits produced **five** different answers. Nine wrote a prose out-of-scope sentence of their
+own, and those nine carried **four** different
 directory lists: five name the store beside audits, reviews, automated-tests and superpowers; two add
 perf-analysis; one adds perf-analysis and an investigations store; one adds perf-analysis and a store
 of its own and spells the dated ones `<run>`/`<date>`. The tenth took a different reading altogether
@@ -388,10 +389,10 @@ section deliberately places outside the tiers, cannot be complied with; and fili
 anyway would misstate where their requirement comes from, which is the one fact the register exists to
 carry.
 
-**Nine of nine addons wrote the missing table before the standard named it**, independently and under
-the same heading: AbsorbTracker `docs/ARCHITECTURE.md:332`, BankLedger `:199`, ConsumableMaster `:287`,
-KickCD `:204`, LootHistory `:360`, MultiMeters `:660`, PanelMaster `:148`, PrettyChat `:190`, WhatGroup
-`:320`. Two audits filed it — `PRETTYCHAT-A-09` and `WHATGROUP-A-15` — as a gap in the rule rather than
+**Nine of nine addons — the whole roster on 2026-09-07 — wrote the missing table before the standard
+named it**, independently and under the same heading, `### Verification and record` under
+`## Documentation map` in `docs/ARCHITECTURE.md`: AbsorbTracker, BankLedger, ConsumableMaster, KickCD,
+LootHistory, MultiMeters, PanelMaster, PrettyChat and WhatGroup. Two audits filed it — `PRETTYCHAT-A-09` and `WHATGROUP-A-15` — as a gap in the rule rather than
 a defect in the repo, and both were right. This amendment ratifies what the collection already ships.
 **No addon moves a table on account of it**, and any repo carrying a note that justifies the extra
 table against the old three-table MUST deletes that note: the table is now the rule.
@@ -406,17 +407,17 @@ table against the old three-table MUST deletes that note: the table is now the r
   is the one member of the five that is also a **Tier 2** doc with a stated trigger (the performance
   harness is wired, performance-§12), and only the conditional table has the Status and Trigger columns
   that answer it; a `| Doc | Covers |` row cannot express *not applicable*, which is the state five of
-  the nine addons are in. Registering it in both tables is the "exactly one" MUST broken by the
+  the nine addons were in on 2026-09-07. Registering it in both tables is the "exactly one" MUST broken by the
   standard's own two-way classification, so this settles it: **the trigger decides the table**.
 
 ###### Does `ARCHITECTURE.md` register itself? — **MAY**, and an audit files neither state (MUST NOT)
 
 The hub is itself a `.md` under `docs/`, so the scope sentence above reads as covering it, and the
-collection split five to four on whether to write the row. Five open their first table with a
-`| ARCHITECTURE.md | This file — the hub: … |` row — BankLedger `docs/ARCHITECTURE.md:179`,
-ConsumableMaster `:267`, KickCD `:185`, LootHistory `:340`, MultiMeters `:656` — and four do not:
-AbsorbTracker, PanelMaster, PrettyChat and WhatGroup. Left unsettled that is four findings or five,
-cycle after cycle, over a row that changes nothing.
+collection split on whether to write the row: on 2026-09-07 it was five to four. Five opened their
+first table with a `| ARCHITECTURE.md | This file — the hub: … |` row (BankLedger, ConsumableMaster,
+KickCD, LootHistory and MultiMeters, each in `docs/ARCHITECTURE.md` under `### Required`) and four did
+not: AbsorbTracker, PanelMaster, PrettyChat and WhatGroup. Left unsettled that is a finding per repo on
+one side or the other, cycle after cycle, over a row that changes nothing.
 
 It is settled as a **MAY**, deliberately, because neither of the register's two failure modes exists
 for the file that carries the register. A missing required doc is caught by a table row with no file
@@ -622,24 +623,73 @@ mistake this list exists to stop: the count shifts the moment a heading is added
 citation silently comes to mean something else. If one of these files ever gains numbered subsections, it leaves this list in the
 same change.
 
-**Frozen bundles are exempt and MUST NOT be swept.** Anything under `docs/audits/`, `docs/reviews/`,
-`docs/automated-tests/` or `docs/revendor/` is a point-in-time record and its notation is part of
-what it recorded — the same carve-out `standards/_raw/_industry/` already has. Rewriting a citation
-inside a frozen bundle corrupts evidence to satisfy a cosmetic rule.
+**Frozen bundles are exempt and MUST NOT be swept.** The frozen and generated stores are the ones
+documentation-§3 names, under *`## Documentation map`*, as out of scope for the register; this section
+cites that list rather than keeping a copy of it, because a second copy is what drifted. Anything under
+one of those stores is a point-in-time record and its notation is part of what it recorded — the same
+carve-out `standards/_raw/_industry/` already has. Rewriting a citation inside a frozen bundle corrupts
+evidence to satisfy a cosmetic rule. Two readings of that list matter here:
+
+- **`docs/automated-tests/` is exempt only below `<run>/`.** Its `README.md` and `RESULTS.md` are
+  live documents — the second is regenerated in place — and a citation in either is swept like any
+  other.
+- **A repo's own frozen stores are exempt too.** A store a repo freezes by its own rule and
+  documentation-§3 does not name takes the same carve-out, wherever it sits — inside `docs/` or
+  outside it: in `WowAddonStandards` that is `harvests/` and `standards/_raw/`, and a library repo's
+  equivalents are whatever its own `CLAUDE.md` declares frozen (in `LibKa0s`, `docs/adoption/`). The
+  exemption is whole: neither the sweep nor a malformed-reference fix reaches inside a frozen store,
+  and both grades bind every live document beside it.
 
 **Reporting shape (MUST).** An audit records the notation sweep as **one** rolled-up finding carrying
 the **command that produces the current count**, e.g.
 
 ```sh
-grep -rEn '§[0-9]+\.[0-9]' . \
-  --exclude-dir=libs --exclude-dir=_kit \
-  --exclude-dir=audits --exclude-dir=reviews --exclude-dir=automated-tests --exclude-dir=revendor
+git ls-files -z -- '*.md' \
+  ':!:docs/audits/**' ':!:docs/reviews/**' ':!:docs/automated-tests/*/**' \
+  ':!:docs/perf-analysis/*/**' ':!:docs/revendor/*/**' ':!:docs/superpowers/**' \
+  ':!:docs/investigations/**' ':!:libs/**' ':!:tests/_kit/**' \
+  ':!:harvests/**' ':!:standards/_raw/**' \
+  | xargs -0 grep -nE '§[0-9]+\.[0-9]'
 ```
+
+It walks the tracked tree rather than the working directory, so an untracked scratch file cannot move
+the count, and its exclusions are documentation-§3's frozen stores, the vendored payloads and the
+repo-own frozen stores above — each a pathspec, so `docs/automated-tests/README.md` and `RESULTS.md`
+stay in the count while every `<run>/` bundle beneath them is out. The last line of exclusions is
+this repo's own stores; in any other repo, replace it with one `':!:<store>/**'` pathspec per store
+that repo declares frozen — in `LibKa0s`, `':!:docs/adoption/**'` — so the count never includes a
+frozen record.
 
 — never a per-site enumeration. Hand-counted enumerations are what two separate audits of this
 collection got wrong, in both directions, on the same rule; the command is reproducible and the list is
 not. Out-of-range and malformed references, being the MUST half, are enumerated individually — there are
 few of them and each needs a decision.
+
+**Citing another repo's code (SHOULD).** The scheme above covers citations of *this standard*. A
+citation of **another repo's** files — a worked example in the standard, a playbook, a command spec, or
+one repo's docs pointing into a sibling — **SHOULD** take one of two forms, chosen by the tense of the
+claim:
+
+- **A present-tense claim** ("BankLedger declines the factory", "the floor lives in the attach file")
+  cites `Repo path` plus a **symbol or heading**: BankLedger `modules/Browser.lua`, `B:MakeCloseButton`;
+  AbsorbTracker `AbsorbTracker.toc`, the `# Core (the LibKa0s-Env seam loads first)` block. It **never**
+  carries a bare line number. A symbol survives every edit that does not rename it; a line number
+  survives none, and goes on reading as current while it points somewhere else.
+- **A historical claim** ("the file used to ship", "the range read X when this was ratified") pins the
+  commit: `Repo@<sha>:path:line`. The line number is then exact for good, and
+  `git -C ../<Repo> cat-file -e <sha>:<path>` proves the citation resolves.
+
+A **present-tense count or inventory** of the collection ("ten addons ship", "the eight addons pin")
+is written as a **rule** ("every addon ships …", "every addon in `ADDONS.md`") or **dated** ("as
+measured on 2026-10-07"). An undated count is a claim about today that quietly becomes a claim about
+the day it was written. History files (the changelogs, dated census paragraphs) take a date stamp and
+are otherwise left as written, and citations into a **frozen** bundle are exempt exactly as the notation
+sweep is: a frozen file's line numbers never move.
+
+*Why.* The 2026-10-07 self-audit re-read 61 cross-repo `path:line` citations in this standard: 12 still
+matched, 43 pointed somewhere else and 6 named files or ranges that no longer existed
+(`docs/audits/2026-10-07/03_EVIDENCE.md`, E5). Renumbering them would rot again with the next release
+of every cited repo; the form is what makes the fix stick.
 
 ### 7. Root `DEPENDENCIES.md` — the toolchain contract
 
@@ -666,14 +716,14 @@ There are two today, both named in `ADDONS.md` → *Documentation-and-tooling re
 
 **How to tell the three kinds apart.** A repo with a `.toc` is an **addon**. A repo with no `.toc` that ships a **client-bound Lua payload** vendored into addons' `libs/` is a **Ka0s-owned library repo** (library-stack-§7). A repo with **neither** — no `.toc`, no payload any addon vendors into `libs/` — is a **documentation-and-tooling repo**, and takes the lists below. The discriminator is the same one `line-endings-§2` already uses to choose the pin, so an audit that has resolved the pin has resolved the kind.
 
-**The three lists are exhaustive, and the default is that a section applies.** Between them they classify **every** section in `STANDARDS.md`'s Sections list, and an audit of such a repo may check that mechanically. A section this standard gains later, which nobody has thought about in these terms, **applies unchanged** until it is placed in one of the lists. *Does not apply* is the only list that is an exception to that default.
+**The three lists are exhaustive at file granularity, and the default is that a section applies.** Between them they place **every** section file in `STANDARDS.md`'s Sections list, and an audit of such a repo may check that mechanically. Where a file is placed by some of its subsections only — `documentation` and `localization` are — **any subsection not listed applies unchanged**; documentation-§8 and documentation-§9, which no list names, are read that way. A section this standard gains later, which nobody has thought about in these terms, **applies unchanged** until it is placed in one of the lists. *Does not apply* is the only list that is an exception to that default.
 
 **Applies, unchanged:**
 
 | Section | Why it binds a documentation-and-tooling repo |
 |---|---|
-| `line-endings` | The **LF** pin (`line-endings-§2`), the `*.sh text eol=lf` carve-out mandatory in both kinds, the binary marks and the `§5` canonical body. This section already named this repo kind before this one existed. |
-| `versioning-git` | Semver and trunk-based git discipline. The standard's own version is the clearest case in the collection: every rule change bumps it, and consumers cite the version they were written against. |
+| `line-endings` | The **LF** pin (`line-endings-§2`), both of `line-endings-§3`'s shebang carve-outs (`*.sh text eol=lf`, `*.py text eol=lf`), mandatory in both kinds, the binary marks and the `§5` canonical body. The `§7` EOL gate binds only once the repo runs a suite; until then it owes the hand check (e). This section already named this repo kind before this one existed. |
+| `versioning-git` | Semver and the git workflow: default-branch work, owner-directed or multi-repo changesets on a same-named `feat/<YYYY-MM-DD>-<topic>` branch merged `--no-ff`. The standard's own version is the clearest case in the collection: every rule change bumps it, and consumers cite the version they were written against. |
 | `documentation-§4` | **No root `TODO.md`.** A backlog belongs in the issue store, not in a file that rots at the root — and a repo whose entire product is documents has the least excuse. |
 | `documentation-§5` | Keeping the docs in sync. Here this is nearly the whole job rather than a chore beside the code. |
 | `documentation-§6` | The `filename-§N` citation scheme and the citation rules. **Load-bearing here beyond any addon:** this is where the cited text lives, so a malformed or out-of-range reference in this repo is wrong at the source rather than in one copy of it. |
@@ -684,9 +734,10 @@ There are two today, both named in `ADDONS.md` → *Documentation-and-tooling re
 **Does not apply:**
 
 - **`toc-file`, `options-ui`, `slash-commands`, `preview-mode`, `launcher`, `savedvariables`, `standalone-windows`, `debug-logging`, `events-frames-taint`, `compat`, `public-api`, `packaging`.** There is no TOC, no settings canvas, no slash surface, no on-screen display, no minimap button or broker object, no SavedVariables file, no combat surface, no client API to shim, no exported Lua surface and no CurseForge package. Each binds an addon, and each is audited there.
+- **`localization-§1`–`§4`.** Locale module shape, source-of-truth keys, coverage and matching game data on IDs describe an addon's Lua locale tables and the client's game data, and this repo kind has neither. `localization-§5` binds (above).
 - **`architecture`.** Namespace bootstrap, AceAddon registration, the module pattern and the message bus all describe a Lua addon's runtime. There is none.
 - **`library-stack`.** The repo vendors nothing into a `libs/` and publishes no LibStub major. Its own consumers reach it over HTTPS at runtime, which is not vendoring and is governed by nothing in that section.
-- **`lint`, `testing`, `performance`, `automated-tests`.** All four presuppose Lua source to lint, load, measure and record. A repo with no `.lua` has no `.luacheckrc`, no `tests/` harness, no buckets and no four-suite battery, and a bundle recording four skips is a record of nothing. **This is a statement about Lua, not about verification**: if such a repo grows executable content, see *Read here*, below.
+- **`lint`, `testing`, `performance`, `automated-tests`.** All four presuppose Lua source to lint, load, measure and record. A repo with no `.lua` has no `.luacheckrc`, no `tests/` harness, no buckets and no four-suite battery, and a bundle recording four skips is a record of nothing. **This is a statement about Lua, not about verification**: if such a repo grows Lua, or executable content of any other kind, see *Read here*, below.
 - **`documentation-§1`'s player-facing README structure and badge row.** There are no players. The `README.md` is written for contributors and agents.
 - **`documentation-§2`'s addon `CLAUDE.md` stub as written.** The stub's shape assumes an addon; see the substitution below.
 - **`documentation-§3`'s `docs/` trio as written, its three-tier topic-detail model, and the five verification-and-record documents** (`test-cases.md`, `performance.md`, `perf-analysis/README.md`, `automated-tests/README.md`, `automated-tests/RESULTS.md`). `testing.md` and `smoke-tests.md` describe how to verify a Lua addon out of game and in the client, and both are inapplicable where neither exists. The five verification-and-record documents record what `testing`, `performance` and `automated-tests` produce, and those three sections do not apply here. Together with `testing.md` and `smoke-tests.md` they are the seven documents documentation-§3 places outside the tiers, and none of the seven binds this repo kind. Tier 1's `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md` and `common-tasks.md` describe an addon's runtime shape and settings canvas. **`ARCHITECTURE.md` itself still binds, in a reduced shape** — see *Read here*.
@@ -695,12 +746,12 @@ There are two today, both named in `ADDONS.md` → *Documentation-and-tooling re
 
 | Section | How it reads here |
 |---|---|
-| `documentation-§3`'s `ARCHITECTURE.md` | **Binds, with a reduced section set.** Six of the ten mandated sections — Settings Schema, Message Bus, Slash Commands, Event Subscriptions, Taint Notes, and Module Map *as a Lua module map* — describe a runtime this repo kind does not have, and a file recording six "not applicable" headings is worse than one that never claimed them. The mandated set here is **five**: **Overview**, **Module Map** *read as the file-and-path map* (which paths exist, what reads each one, and which are addressed by URL and therefore breaking to rename), **Known Limitations**, **`## Documentation map`**, and **`## Documented deviations`**. The last two bind unchanged and for the same reasons they bind anywhere. Writing the other five as "not applicable" rows is **not** required and **SHOULD NOT** be done: this section is the exemption, and restating it per repo is the duplication it exists to end. |
+| `documentation-§3`'s `ARCHITECTURE.md` | **Binds, with a reduced section set.** Five of the ten mandated sections — Settings Schema, Message Bus, Slash Commands, Event Subscriptions and Taint Notes — describe a runtime this repo kind does not have and are dropped, and a file recording five "not applicable" headings is worse than one that never claimed them. The other five are kept, and one of them, Module Map, is reinterpreted, since *as a Lua module map* it would describe the same missing runtime. The mandated set here is therefore **five**: **Overview**, **Module Map** *read as the file-and-path map* (which paths exist, what reads each one, and which are addressed by URL and therefore breaking to rename), **Known Limitations**, **`## Documentation map`**, and **`## Documented deviations`**. The last two bind unchanged and for the same reasons they bind anywhere. Writing the five dropped sections as "not applicable" rows is **not** required and **SHOULD NOT** be done: this section is the exemption, and restating it per repo is the duplication it exists to end. |
 | `documentation-§7` | **Binds.** A new machine needs the toolchain list whatever the repo ships, and the reader must not have to infer "nothing" from an absent file. Where a repo genuinely requires almost nothing, the honest content is **a short required list and an explicit *not used here* list with reasons** — `git` alone is a complete answer. **MUST NOT** invent entries to fill the addon-shaped shape: §7's evidence-based MUST already forbids it, and a padded list here would be the first thing to go stale. §7's *Runtime (in-game)* group has no instance and is omitted rather than answered. |
-| `layout` | The **folder casing** rules bind. The `core/ defaults/ settings/ locales/ modules/` skeleton and the folder load order do not — there is no TOC to order. The **1500-line cap** (`layout-§1`) binds *authored `.lua`*, so it has no instance while the repo has none; it is not re-read onto Markdown, whose length is governed by nothing here. `layout-§1`'s **`tools/`** MUST binds if and when such a repo authors a **generator** — a script that writes a file the repo commits — and its `.pkgmeta` condition is simply void, since `packaging` does not apply here at all. It does **not** reach the scripts a tooling repo exists to ship: the `dev-copilot` plugin's `scripts/` holds hooks and a bounded-run wrapper that its own `hooks/hooks.json` invokes by path, plus the Python helpers they and its commands call and those helpers' tests, and a hook is a program the repo's consumers run, not a generator producing committed output. Moving those would break the manifest for no rule's benefit. The **over-cap census** and **its gate** follow the cap and have no instance here for the same reason it does not: a repo that tracks no authored `.lua` has no over-cap set to record, so it owes neither the `Files over the 1500-line cap` heading in its `ARCHITECTURE.md` nor the vendored `tests/_kit/test_layout_cap.lua` — and by *Does not apply* above it has no `tests/` harness to wire that gate into. Both arrive on the same trigger the three verification sections already state: **the first `.lua` file this repo tracks outside a frozen bundle**. An empty census is a result and an absent one is a gap, but only once there is a set to be empty of. |
+| `layout` | The **folder casing** rules bind. The `core/ defaults/ settings/ locales/ modules/` skeleton and the folder load order do not — there is no TOC to order. The **1500-line cap** (`layout-§1`) binds *authored `.lua`*, so it has no instance while the repo has none; it is not re-read onto Markdown, whose length is governed by nothing here. `layout-§1`'s **`tools/`** MUST binds if and when such a repo authors a **generator** — a script that writes a file the repo commits — and its `.pkgmeta` condition is simply void, since `packaging` does not apply here at all. It does **not** reach the scripts a tooling repo exists to ship: the `dev-copilot` plugin's `scripts/` holds hooks and a bounded-run wrapper that its own `hooks/hooks.json` invokes by path, plus the Python helpers they and its commands call and those helpers' tests, and a hook is a program the repo's consumers run, not a generator producing committed output. Moving those would break the manifest for no rule's benefit. The **over-cap census** and **its gate** follow the cap and have no instance here for the same reason it does not: a repo that tracks no authored `.lua` has no over-cap set to record, so it owes neither the `Files over the 1500-line cap` heading in its `ARCHITECTURE.md` nor the vendored `tests/_kit/test_layout_cap.lua` — and by *Does not apply* above it has no `tests/` harness to wire that gate into. Both arrive on the single trigger the executable-content row below states for the three verification sections. An empty census is a result and an absent one is a gap, but only once there is a set to be empty of. |
 | `naming-cheatsheet` | Binds to whatever identifiers the repo authors — a shell script's functions, a JSON config's keys. With no Lua the surface is small, not absent. |
 | `anti-patterns` | Binds, whole and unchanged. Entries keyed to an addon artifact simply have no instance; nothing is exempted. |
-| `lint`, `testing`, `automated-tests` (**if executable content appears**) | Listed in *Does not apply* above **because there is no Lua today**, and that is a statement about the tree rather than a permanent grant. A repo of this kind that grows a Lua file, a test harness or a script complex enough to have a failure mode **MUST** re-read these three against what it actually has, and record the outcome. The trigger is stated so it cannot be missed: **the first `.lua` file this repo tracks outside a frozen bundle.** A shell script alone does not fire it — the standard mandates no shell linter — but it does oblige the script's own documentation under `documentation-§5`. |
+| `lint`, `testing`, `automated-tests` (**if executable content appears**) | Listed in *Does not apply* above **because there is no Lua today**, and that is a statement about the tree rather than a permanent grant. There is **one** trigger, and it is stated so it cannot be missed: these three are re-read when the repo tracks **the first `.lua` file outside a frozen bundle**, and the outcome is recorded. All three presuppose Lua, so nothing else fires it. Any **other** executable content — a shell or Python script, a non-Lua test harness — **MUST** instead record in the repo's `DEPENDENCIES.md` how it is verified (the command, or the plain statement that it is checked by hand and how), and its own documentation stays bound by `documentation-§5`. The standard mandates no shell or Python linter, so that record is the whole obligation; it is not a back door into the Lua suites. |
 
 **Substitutes — a documentation-and-tooling repo MUST carry these instead:**
 

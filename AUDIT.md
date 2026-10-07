@@ -142,8 +142,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      against the old three-table MUST is what gets deleted. **One exception, and it runs both ways:
      `ARCHITECTURE.md`'s own row.** Registering the hub in its own map is a **MAY**, and an audit
      **MUST NOT** file its presence *or* its absence — the two failure modes the register exists to
-     catch cannot exist for the file that carries the register, and the collection is split five to
-     four over a row that changes nothing.
+     catch cannot exist for the file that carries the register, and the collection is split over a
+     row that changes nothing (six addons carry it and five do not, as measured on 2026-10-07).
      (d) **Non-canonical filenames** — `data-model.md`, `saved-variables.md`, `pipeline.md`,
      `capture-pipeline.md`, `override-pipeline.md`, `settings-system.md`, `wow-quirks.md`,
      `slash-commands.md`, `debug-console.md` and the like are Tier 1/2 content under a per-repo name.
@@ -181,12 +181,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      grep -c ' binary$' .gitattributes
 
      # (e) does the WORKING TREE actually agree with the declared pin? ONE number.
-     git ls-files -z | xargs -0 -I{} sh -c '
-       set -- $(git check-attr text eol -- "{}" | sed "s/.*: //")
+     # the path arrives as "$1" (positional), never spliced into the script text
+     git ls-files -z | xargs -0 -n1 sh -c '
+       p=$1; set -- $(git check-attr text eol -- "$p" | sed "s/.*: //")
        [ "$1" = unset ] && exit                      # binary: git converts nothing here
-       cr=$(tr -dc "\r" < "{}" | wc -c); lf=$(tr -dc "\n" < "{}" | wc -c)
-       case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && echo "{}";;
-                    lf)   [ "$cr" -gt 0 ] && echo "{}";; esac' 2>/dev/null | wc -l
+       cr=$(tr -dc "\r" < "$p" | wc -c); lf=$(tr -dc "\n" < "$p" | wc -c)
+       case "$2" in crlf) [ "$lf" -gt 0 ] && [ "$cr" -ne "$lf" ] && printf "%s\n" "$p";;
+                    lf)   [ "$cr" -gt 0 ] && printf "%s\n" "$p";; esac' _ 2>/dev/null | wc -l
      ```
 
      A file carrying **only** the `*.sh` carve-out with no pin above it is **not** compliance — it is
@@ -211,9 +212,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the same repo**: the old command counted every binary and every JSON file as a stray. A frozen
      bundle is never edited, so say so in the finding rather than letting the two numbers sit
      unexplained side by side. **And check that (e) has an owner in the repo**: `line-endings-§7`
-     MUSTs the vendored gate `tests/_kit/test_eol.lua` (LibKa0s test-kit revision 15), which asks
+     MUSTs the vendored gate in every repo that runs a suite, `tests/_kit/test_eol.lua` (LibKa0s test-kit revision 15), which asks
      this same question over the whole tracked set on every run of the suite. A repo whose kit
-     predates 15 has no gate and (e) is the audit's alone; a repo that has the gate, reports green
+     predates 15 has no gate and (e) is the audit's alone, and so does a suite-less
+     documentation-and-tooling repo, which §7 scopes out of the gate; a repo that has the gate, reports green
      and still fails (e) here is a **gate** finding, not a file finding, and it outranks the strays
      it missed.
    - **Check the package ignore list by listing the repo's dot-entries, not by reading `.pkgmeta`
@@ -267,7 +269,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      rather than a check that failed to run. A **commented-out** line is not a hit and must not be
      read as one: `#   - tools` is an absent entry carrying its own explanation, which is the shape
      `packaging`'s template teaches.
-   - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. Known instance at ratification: Pretty Chat's `GlobalStrings/split_globalstrings.py`, named in the v2.61.0 changelog as owing the move — file it as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
+   - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. The one instance known at ratification, Pretty Chat's splitter, named in the v2.61.0 changelog as owing the move, has since moved to `tools/split_globalstrings.py` and is compliant; no known instance stands. A new one is filed as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
    - **Check the over-cap census and the gate that reads it (`layout-§1`).** The cap is not audited
      by counting lines any more — counting was what let four repos in one cycle each answer the
      scope question differently. Read the **census** instead: the engineer-context hub carries a
@@ -340,14 +342,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `grep` over subjects does not. **And
      the tag comes from root `CLAUDE.md`'s `Bundles [LibKa0s](…) vX.Y.Z` provenance line at that
      commit** (documentation-§2 item 6, library-stack-§7), which rolls in the same commit as the copy.
-     Measured across the ten stores, every in-scope commit resolves a tag this way and none is lost
-     to a subject that named no version.
+     Measured across the ten stores on disk on 2026-09-22, every in-scope commit resolved a tag this
+     way and none was lost to a subject that named no version.
 
      **On the recorded side, read a bare-dated bundle's tag out of the bundle.** `audit-review-history`
-     grandfathers the bare-dated folders rather than renaming them, and twenty-eight of the collection's
-     sixty-eight bundles are bare-dated, spread across all ten stores. Each names its tag in the first
-     line of its `01_DELTA.md`; a check that compared raw folder names would file every one of those
-     twenty-eight as an unrecorded tag — a finding against ten repos for records that exist, in the
+     grandfathers the bare-dated folders rather than renaming them, and most stores hold some (as
+     measured on 2026-10-07, twenty-eight of 225 bundles, across ten of the eleven stores). Each names its tag
+     in the first line of its `01_DELTA.md`; a check that compared raw folder names would file every
+     one of them as an unrecorded tag — a finding against nearly every repo for records that exist, in the
      very repos the no-rename rule promised not to disturb. Never file one without opening the
      bundle. **A consolidated span bundle** (`docs/revendor/<YYYY-MM-DD>-v<A>-v<B>/`, defined in
      `audit-review-history`) names two tags in its folder and every tag it covers on line 1 of its
@@ -399,11 +401,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      neither is the finding. `C_EventUtils.IsEventValid` in front of the `pcall` is the SHOULD and
      never a substitute for it — grade its absence accordingly, and grade its presence **alone** as
      the MUST failure it is.
-   - **Check the TOC's position annotations (`toc-file-§5`).** In the `# Core` block, every line
-     whose position is **load-bearing** — a library major taken as an upvalue at file scope, a
-     constant resolved from an earlier seam at file load — **MUST** carry a comment at the line
-     naming what resolves. Read the seam files (`*Setup.lua`) and `core/Constants.lua` to establish
-     which positions actually are load-bearing rather than trusting the comments to be complete; an
+   - **Check the TOC's position annotations (`toc-file-§5`).** At every position in the listing
+     (`# Core`, `# Defaults`, `# Modules`, `# Settings` and any other group), every line whose
+     position is **load-bearing** — a library major taken as an upvalue at file scope, a constant
+     resolved from an earlier seam at file load, an `NS` member read or written at file scope —
+     **MUST** carry a comment at the line naming what resolves. Read every listed file for
+     file-scope reads and writes of `NS` members and library majors (the `modules/` and `settings/`
+     files as much as the seam files and `core/Constants.lua`) to establish which positions actually
+     are load-bearing rather than trusting the comments to be complete; an
      unannotated load-bearing line is the MUST failure, and a load-bearing line annotated only as
      *"order matters"* without naming what resolves is the same failure in weaker form. A TOC that
      annotates its load-bearing lines but never marks a **conventional** position fails the SHOULD,
@@ -520,7 +525,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        **missing register row** (`audit-review-history`), **not** a MUST breach against each
        title bar, and its cure is one row rather than a set of rewritten close controls a
        player would watch change for nothing. The measured case is BankLedger: three host title bars
-       behind `modules/Browser.lua:98`, and a fourth close control on a copy window the library
+       behind one factory, `B:MakeCloseButton` (BankLedger `modules/Browser.lua`), and a fourth close control on a copy window the library
        draws, which is the library's under condition 1 and not part of the decline.
 
        **File it on the grep, not on a screenshot.** The omission draws a perfectly good button and
@@ -538,9 +543,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **Not a deviation:** an addon on a LibKa0s tag older than v1.9.0 has no catalog to draw from.
        Say which tag it carries (root `CLAUDE.md`'s provenance line) and file the adoption as a
        re-vendor item rather than as a styling gap.
-   - **Check the launcher — one object, three behaviors, one row** (`launcher`). New in v2.52.0, and
-     **every addon in the collection is expected to be non-compliant until it adopts**; record the
-     gap once, as one finding per addon, not as five.
+   - **Check the launcher — one object, three behaviors, one row** (`launcher`). New in v2.52.0;
+     the 2026-09-16 pre-adoption sweep found no addon carrying it, and the collection has since
+     adopted it. Verify the one object below and file what you find; an addon that has not adopted
+     records the gap once, as one finding, not as five.
      - **One object.** Grep for `LibStub("LibDataBroker-1.1")` and `LibStub("LibDBIcon-1.0")` outside
        `libs/`, and read what the hits do: `:Register` **MUST** be handed the object `:NewDataObject`
        returned, so the button and the broker row are drawn from one object. Two objects, or a button
@@ -649,9 +655,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          asserting on the **registration set** rather than on a handler's return
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
          right (`testing-§12`).
-       As of the 2026-09-16 sweep, **eleven of eleven addons fail this** — 107 survivors across the
-       collection. Expect findings here in every audit until the adoption pass lands. Adoption is
-       **overdue**, not blocked: `LibKa0s-Lifecycle-1.0` ships from LibKa0s **v1.40.0**, and
+       History: the 2026-09-16 pre-adoption sweep found **eleven of eleven addons failing this** —
+       107 survivors across the collection — and the collection has since adopted the latch. Verify
+       the latch and the suite as above and file what the checks find; a clean addon owes no row.
+       Adoption is **overdue**, not blocked: `LibKa0s-Lifecycle-1.0` ships from LibKa0s **v1.40.0**, and
        **v1.42.0** (Slash minor 14) is the floor — an addon vendoring an older tag has not adopted,
        because its dispatcher refuses verbs slash-commands-§2 keeps live (`slash-commands-§7`,
        *Adopting it*).
@@ -991,7 +998,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      exhaustive: a stub for a major no section rules on yet, such as the collection's
      `LibKa0s-Lifecycle-1.0` stubs, gets the member-coverage check above and nothing from (c).
 5. **Catalog deviations** → `02_DEVIATIONS.md`. One row/entry per gap, carrying five things: the **ID**;
-   the **section violated**, written as `filename-§N` (documentation-§5/§6 — and by **bare filename**
+   the **section violated**, written as `filename-§N` (documentation-§6 — and by **bare filename**
    for the eleven section files that carry no numbered subsections); the **impact grade**; a **one-line
    description**; and the **fix direction**.
 

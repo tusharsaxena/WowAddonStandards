@@ -17,8 +17,8 @@ This playbook is the entry point; the substance lives in `standards/`:
 
 **Step 0 — before step 1, and before any other file exists: write `.gitattributes` (`line-endings`).**
 The repo's **first** commit carries a root `.gitattributes` holding the **client-bound** body verbatim
-from `line-endings-§5` — the `* text=auto eol=crlf` pin, the `*.sh text eol=lf` carve-out, and the
-`binary` markings. The text to copy is the context pack's `### .gitattributes` starter snippet; copy
+from `line-endings-§5` — the `* text=auto eol=crlf` pin, both of `line-endings-§3`'s shebang
+carve-outs (`*.sh text eol=lf`, `*.py text eol=lf`), and the `binary` markings. The text to copy is the context pack's `### .gitattributes` starter snippet; copy
 it rather than composing one, since eight hand-written 22-to-68-line variants of this policy exist
 today precisely because there was never one canonical text. **It goes first because it is the one file
 whose cost grows with everything already committed**: retrofitted later it needs
@@ -53,7 +53,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    `defaults/*` → `modules/*` → `settings/*` (layout-§1), which is the same order the TOC's `#`
    section headers express (toc-file-§5). Inside `core/` there is **no fixed prefix**: order by what
    the files actually resolve at load — which for a new addon is decided by the setup-file list in
-   step 4 — and annotate each load-bearing position at its TOC line (toc-file-§5). Copy the vendored `libs/` set you actually
+   step 4 — and annotate each load-bearing position at its TOC line, in every group of the listing and not
+   only `# Core` (toc-file-§5). Copy the vendored `libs/` set you actually
    `LibStub()` from an existing Ka0s addon so versions stay consistent (library-stack-§3 — libraries are vendored
    and committed). Then vendor the two Ka0s-owned payloads (library-stack-§7) from the **`LibKa0s`
    repo's own ship folders**, byte-identical, rather than from a sibling addon's copy, which may
