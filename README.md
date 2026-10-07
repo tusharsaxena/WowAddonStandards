@@ -157,7 +157,7 @@ Audit and review runs are not stored here. Audits live under each addon's own
 
 ## Status
 
-The standard is at **v2.76.0** and is a living document. Compliance auditing has moved out of
+The standard is at **v2.76.1** and is a living document. Compliance auditing has moved out of
 this repo and into each addon's own repository. The `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`
 and `PERF_ANALYSIS.md` playbooks drive it, and the `dev-copilot` plugin is what consumes them.
 
