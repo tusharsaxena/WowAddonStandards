@@ -183,9 +183,16 @@ disagreeing with the collection's intent while looking, in review, like it had b
      including a page with a single section — a one-tab strip is the correct rendering of a
      one-section page. The untabbed form is for the pages the host does not render through the flow
      engine, and today that is **two**: the AceConfig-drawn Profiles sub-page, and the **landing
-     page**, whose body is your own `buildMain` (options-ui-§5) — logo, tagline, *Slash Commands*
-     heading, one Label per `COMMANDS` row. Do **not** put a tab strip on the landing page
-     (options-ui-§13). Give **every** schema row a `group`; a row without one belongs to no tab.
+     page** — logo, tagline, *Slash Commands* heading, one Label per `COMMANDS` row. Do **not** put a
+     tab strip on the landing page (options-ui-§13). Give **every** schema row a `group`; a row
+     without one belongs to no tab.
+   - **The landing body is one library call:** `buildMain = function(ctx)
+     NS.Helpers.BuildLandingPage(ctx, NS.LANDING) end`, with the spec declaring the logo path, a
+     `notes` function and a `rows` function over `NS.Slash:LandingRows()` (options-ui-§5). Do **not**
+     write an `addLogo` or any landing body of your own, and never draw on an AceGUI widget's
+     `.frame` or `.content` without undoing it in that widget's `"OnRelease"` (options-ui-§19): AceGUI
+     pools the frames, and seven addons shipped a logo that could reappear under *Slash Commands* after a
+     re-render (anti-pattern #93).
    - **The General page's first tab is named exactly `Master controls`** and is built by the library's
      master-controls composer from **one** declaration — `Enable <Addon>` | `General visibility` /
      `Master scale` | `Master alpha` / `Lock frame` | `Debug console` / `Minimap button` | `Test mode` /
