@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.77.0, 2026-10-07)
+# New Ka0s Addon — Context Pack (v2.78.0, 2026-10-09)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -648,7 +648,10 @@ local descriptor = {
                             return c.r or 1, c.g or 1, c.b or 1, c.a or 1 end,
   colorEncode = function(r, g, b, a) return { r = r, g = g, b = b, a = a or 1 } end,
 
-  buildMain     = function(ctx) NS.BuildAboutPage(ctx) end,   -- the landing body IS the host's
+  -- The landing body is the LIBRARY's (options-ui-§5): never an addLogo or a host body of its own,
+  -- which leaks its logo into AceGUI's frame pool (options-ui-§19, anti-pattern #93). NS.LANDING is
+  -- the spec, declared in the first settings/<Page>.lua (below) and read at render time.
+  buildMain     = function(ctx) NS.Helpers.BuildLandingPage(ctx, NS.LANDING) end,
   getLSM        = function() return NS.GetLSM() end,
   scheduleTimer = function(fn, delay) return NS.addon:ScheduleTimer(fn, delay) end,
   validate      = function() NS.ValidateSchema() end,
@@ -701,6 +704,22 @@ NS.RegisterOptionsPage("general", "General", function(ctx)
   end)
   return ctx.subcategory
 end)
+```
+
+The landing page's spec sits beside it. The descriptor's `buildMain` hands it to the library's
+`BuildLandingPage`, which draws the logo, the tagline and the command list pool-safely; the host
+draws none of them (options-ui-§5, options-ui-§19):
+
+```lua
+NS.LANDING = {
+  logo     = ("Interface\\AddOns\\%s\\media\\logos\\%s.logo.tga"):format(addonName, addonName:lower()),
+  -- no logoSize: the library's default, LAYOUT.LANDING_LOGO (300), is the mandated size
+  notes    = function() return NS.Compat.GetAddOnMetadata(addonName, "Notes") or "" end,
+  sections = { {
+    heading = NS.L["Slash Commands"],
+    rows    = function() return NS.Slash:LandingRows() end,   -- from NS.COMMANDS (slash-commands-§4)
+  } },
+}
 ```
 
 The **category** registers eagerly at load (always visible in the options list) and the **body** and
@@ -1605,8 +1624,9 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] Any state written outside the write seam that no control sets and no row addresses — geometry only a drag or a resize determines, on the addon's own frames (never a `LibKa0s` debug or perf window's size), a remembered view, learned or recorded data, a vendored library's own writes — is named in `docs/ARCHITECTURE.md` → Settings Schema with its storage key, its one owner module and every function that writes it (a listed writer outside the owner module is compliant), and carries no register row; anything else outside the seam has a row or a register row (architecture-§5).
 - [ ] Slash dispatcher built from `LibKa0s-Slash-1.0` with the addon's own ordered `NS.COMMANDS` (positional triples) passed **in**; the reserved verbs answer identically, `reset` takes a **path**, and `perf` is registered by the addon, not the library.
 - [ ] AceConsole `:RegisterChatCommand` registered (primary 2–3 char verb + full-name alias); no `SLASH_*`.
-- [ ] Options panel built from `LibKa0s-Options-1.0` — `NS.Helpers` **is** the instance — using `Settings.RegisterCanvasLayoutCategory`, **category registered eagerly at load** (entry always visible), **body built lazily** on first `OnShow`, and a landing page whose command list is generated from `NS.COMMANDS`.
-- [ ] **Every settings page draws a tab strip** — one tab per `group`, including a one-section page; the untabbed form is for a page the host does not render through the flow engine, which today means **both** the AceConfig-drawn **Profiles** sub-page and the **landing page** (its `buildMain` body, options-ui-§5), and no renderer falls back to it on a tab count (options-ui-§13). **Every row carries a `group`.** A wrapped strip's row pitch and reserved band come from **one** measurement taken from a state no click can change, so the strip's height and the content panel do not move when the selection does. **Which suite pins that depends on who draws the strip:** a strip the library draws (`O.TabStrip`, `O.RenderTabbedSchema`) — which is every strip a new addon renders — is pinned by the library's suite, and this addon's suite **MUST NOT** duplicate the case (options-ui-§13, testing-§8); only a strip the host draws itself owes its own case asserting identical geometry for every selectable tab, against a harness that answers a **different** height for the selected-state art. A page folding one instance's sub-pages under a **nav rail** keeps the strip beside it and draws no secondary strip; the rail's selection and each entry's tab are never persisted (options-ui-§13).
+- [ ] Options panel built from `LibKa0s-Options-1.0` — `NS.Helpers` **is** the instance — using `Settings.RegisterCanvasLayoutCategory`, **category registered eagerly at load** (entry always visible), **body built lazily** on first `OnShow`, and a landing page rendered by the library's `BuildLandingPage` (no host `addLogo`, no `logoSize` other than 300) whose command list is generated from `NS.COMMANDS` (options-ui-§5).
+- [ ] **Nothing is drawn on, or scripted onto, an AceGUI widget's `.frame` / `.content`** unless that widget's single `"OnRelease"` undoes it; a widget's own API (`Label:SetImage`, `Icon`, `InteractiveLabel` callbacks) is preferred (options-ui-§19, anti-pattern #93).
+- [ ] **Every settings page draws a tab strip** — one tab per `group`, including a one-section page; the untabbed form is for a page the host does not render through the flow engine, which today means **both** the AceConfig-drawn **Profiles** sub-page and the **landing page** (the library's `BuildLandingPage`, handed in as `buildMain`, options-ui-§5), and no renderer falls back to it on a tab count (options-ui-§13). **Every row carries a `group`.** A wrapped strip's row pitch and reserved band come from **one** measurement taken from a state no click can change, so the strip's height and the content panel do not move when the selection does. **Which suite pins that depends on who draws the strip:** a strip the library draws (`O.TabStrip`, `O.RenderTabbedSchema`) — which is every strip a new addon renders — is pinned by the library's suite, and this addon's suite **MUST NOT** duplicate the case (options-ui-§13, testing-§8); only a strip the host draws itself owes its own case asserting identical geometry for every selectable tab, against a harness that answers a **different** height for the selected-state art. A page folding one instance's sub-pages under a **nav rail** keeps the strip beside it and draws no secondary strip; the rail's selection and each entry's tab are never persisted (options-ui-§13).
 - [ ] **At most one chrome block sits above the strip** (and above the nav rail, on a page that has one), carrying the page's instance picker and every control that applies to all of its tabs, and it is **not** wrapped in a second bounded box (options-ui-§14). The rail is not a picker.
 - [ ] **The General page's first tab is exactly `Master controls`**, holding the canonical rows in canonical order and only the ones this addon has the state for; no movable frame was invented to fill the tab, per-instance scale/alpha/lock stayed on the instance's own page, every addon with a positionable display ships a test mode, switched by the session-only `Test mode` checkbox below *Lock frame* / *Debug console* rather than a button or a chat-only verb, and ended by combat — or its unlocked view already shows the placeholders and Lock frame is the switch, with no row and no `test` verb (anti-pattern #80), `General visibility` is the four-value dropdown, and adopting the name moved a `group`, never a stored path (options-ui-§15). **Where a *show only in combat* boolean was replaced by that dropdown, the stored value changed type**, so the same change added the runner step and raised `NS.SCHEMA_VERSION` (the defaults value stays `0`), with the step `true` → `inCombat`, `false` → `always` (savedvariables) — a new addon that declares the dropdown from the start owes nothing here, and that is the reason to declare it from the start.
 - [ ] **One launcher object, registered twice** — a single LibDataBroker-1.1 `launcher` object named for the addon folder, registered with LibDBIcon-1.0, with **one** library-owned `OnClick`: left-click opens the settings panel and right-click opens the options menu, whose entries (Enabled, then Locked / Test mode / Show window where the addon has them) each call the addon's own handler and are recorded in `standards/ADDONS.md` (launcher-§2). No host click handler, no host menu, no broker enable setting, and no `minimap.show` or `minimap.shown` key beside LibDBIcon's `hide` (anti-pattern #81); the visibility row is declared at `global.minimap.shown`, its closures inverting onto `minimap.hide` (launcher-§3). Its `label` is **`Ka0s <Name>`** in plain text — not the TOC `## Title`, not the folder name (anti-pattern #84) — and **neither *Reset all settings* nor the page Defaults button reaches `minimap.hide`**, which is vetoed out of both (anti-pattern #83). Hovering it shows the library-drawn status tooltip, disabled or not, with the states the addon has passed in the descriptor and no title, status line or click hint drawn by the host (launcher-§1, anti-pattern #89).

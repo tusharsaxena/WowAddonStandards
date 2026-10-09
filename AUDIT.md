@@ -796,16 +796,17 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      state is **stale since v2.44.0** on the same footing: file the naming sentence as the fix and the
      row's retirement with it. A row that mixes (e) state with (f) state narrows to its (f) part.
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
-     screen.** Nine checks. Each is a read of the schema array or a grep, none needs judgment, and
-     all nine are invisible to lint and to the headless suite — which is how every one of them
+     screen.** Ten checks. Each is a read of the schema array or a grep, none needs judgment, and
+     all ten are invisible to lint and to the headless suite — which is how every one of them
      shipped. Do them in this order; the first changes what the rest are counting.
      - **(a) Every page draws a tab strip (options-ui-§13).** List the addon's settings pages and,
        per page, the distinct `group` values in declaration order. A page with **no** `group` values,
        or whose builder calls the untabbed renderer, is a MUST failure — **including** a page with
        exactly one section, which draws a one-tab strip. The exempt pages are those the host does
        not render through the flow engine, and today that is **two** of them, both exempt: the
-       AceConfig-drawn **Profiles** sub-page, and the **landing page**, whose body is the host's own
-       `buildMain` (options-ui-§5) — a logo, a tagline and one Label per `COMMANDS` row, declaring no
+       AceConfig-drawn **Profiles** sub-page, and the **landing page**, whose body is the library's
+       `BuildLandingPage` handed in as `buildMain` (options-ui-§5) — a logo, a tagline and one Label
+       per `COMMANDS` row, declaring no
        `group` at all. Neither is a finding, and the landing page in particular is **mandated** in
        that shape: do not file its missing strip. Read the renderer as well as the pages: a fallback
        to the untabbed form below some
@@ -932,6 +933,22 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        Then check no third level exists, in either of its two shapes: a strip nested inside a
        secondary tab, and a `subgroup` heading used to fake one, which is a finding against
        options-ui-§7's rule that a subsection wanting its own tab should be given one. Where a page draws a **nav rail**, count it as a level: a secondary strip on a railed page is a third level and the finding. Confirm the rail's selection and each entry's active tab are session state (a stored rail entry or per-entry tab is a finding against the same rule), that a rail click is refused in combat by the library with no host guard, and that the page's Defaults restores the active rail entry's rows and nothing wider or narrower.
+     - **(j) The landing body is the library's, and nothing is left on a pooled AceGUI frame
+       (options-ui-§5, options-ui-§19, anti-pattern #93).** Two greps over the addon's own code,
+       vendored `libs/` and `tests/_kit/` excluded. First, the descriptor's `buildMain`: it **MUST**
+       call `BuildLandingPage`, and a host function that draws its own logo, tagline or command list
+       — an `addLogo`, a `BuildMainContent` that creates a `SimpleGroup` or `Label` for the logo, a
+       `LOGO_SIZE` / `GAP_AFTER_*` constant — is a finding against options-ui-§5 (and #47), whether or
+       not it currently leaks; a `logoSize` other than 300 is a finding against the same section.
+       Second, `grep -nE '\.(frame|content)(:|\)|,)'` over the settings and module files, then read
+       every hit that is an AceGUI widget's `.frame` or `.content` passed to `CreateTexture`,
+       `CreateFontString`, `CreateLine`, `CreateMaskTexture`, `CreateFrame(…, parent)`, `SetScript` or
+       `HookScript`: each one **MUST** be undone in that widget's `"OnRelease"` callback, and there
+       **MUST** be exactly one `"OnRelease"` per widget (a second `SetCallback` replaces the first)
+       and none on a widget a library maker returned. Anchoring a Blizzard frame **to** a widget
+       frame, or reading its size, is not a hit. Report each hit as `file:line` with the widget type
+       and whether its release undoes it. A hand-rolled landing body is one root; a leak inside it is
+       its dependent, not a second finding.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a
