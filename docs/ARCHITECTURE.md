@@ -45,15 +45,16 @@ what this section carries is which paths exist, what reads each one, and which a
 | `standards/STANDARDS.md` | **The index.** Its Sections list is what a consumer follows to find every section file. Its `## Changelog` holds only the current entry. | every standards-reading command |
 | `standards/CHANGELOG.md` | Every earlier changelog entry, newest first; listed under the index's Related documents, not its Sections, because history is not normative | `/dev-copilot:wow-harvest-standards`, and any run that needs history |
 | `standards/standards/*.md` | The 27 canonical section files — the substance of the standard | followed from the index |
-| `standards/ADDONS.md` | The roster: which repos the standard covers | the standards-refresh process |
+| `standards/ADDONS.md` | The roster: which repos the standard covers | the standards-refresh process; `/dev-copilot:wow-harvest-standards` (the collection list); `/dev-copilot:wow-standards-audit` (repo kind and launcher entries, via `AUDIT.md`); `/dev-copilot:wow-new-addon` (adds the new addon's row); `/dev-copilot:wow-revendor-libka0s` and the `issue-*` commands' `all` scope (the roster tables) |
 | `standards/NEW_ADDON_CONTEXT.md` | The context pack read at scaffold time, never written into the new addon | `/dev-copilot:wow-new-addon` |
 | `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/_raw/` | Background and the research the standard was drawn from | humans |
 | `harvests/<date>/` | Frozen bundles from `/dev-copilot:wow-harvest-standards` — what was proposed, what was accepted | humans |
 | `media/logos/` | Collection logo art | humans |
 | `scripts/check-standard.sh` | The on-demand mechanical gate for the standard's own invariants: CR bytes, the `.gitattributes` body, `filename-§N` citation ranges, the Sections list, anti-pattern numbering, the version stamps and relative `.md` links. Exits non-zero on any failure. Not a commit hook. | a human or agent before committing a change to the standard; `/dev-copilot:sync-docs` |
 
-**Renaming any path in the first block is a breaking change** for every addon in the collection,
-because the plugin resolves it by URL at runtime and a 404 is the failure mode.
+**Renaming any path the plugin fetches — the four playbooks and the `standards/` index, section
+files, changelog history, roster and context pack — is a breaking change** for every addon in the
+collection, because the plugin resolves it by URL at runtime and a 404 is the failure mode.
 
 ## Known Limitations
 

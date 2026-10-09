@@ -37,6 +37,7 @@ here. Nothing done here modifies the addons themselves.
 | Audit an addon for compliance | [`AUDIT.md`](AUDIT.md) | [B, below](#b-audit-an-addon) |
 | Start a new addon, born compliant | [`NEW_ADDON.md`](NEW_ADDON.md) | [C, below](#c-start-a-new-addon) |
 | Turn an in-game perf capture into evidence | [`PERF_ANALYSIS.md`](PERF_ANALYSIS.md) | [D, below](#d-analyze-an-in-game-perf-capture) |
+| Record an addon's automated-test run | [`AUTOMATED_TESTS.md`](AUTOMATED_TESTS.md) | run `/dev-copilot:wow-automated-tests` in the addon's repo |
 | Add/remove an addon from the roster | [`standards/ADDONS.md`](standards/ADDONS.md) | edit one table row |
 | Harvest learnings from the collection into the standard | [`harvests/`](harvests/) | run `/dev-copilot:wow-harvest-standards` |
 
