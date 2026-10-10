@@ -372,7 +372,7 @@ names it in prose instead. Five answers to one question, none of them careless, 
 leaves ten repos writing its text produces.
 
 **The list is upstream because these stores are written by a command shared across every repo**, so
-one wrong answer about where a bundle lands is eleven wrong answers. That is the whole of the reason,
+one wrong answer about where a bundle lands is twelve wrong answers. That is the whole of the reason,
 and it takes nothing from Tier 3: a frozen store that is genuinely one addon's own still ships under any name
 that addon picks, with no upstream change needed to create it.
 

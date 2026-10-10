@@ -175,7 +175,7 @@ one path that calls the missing member — anti-patterns #56.
 
 - **MUST** live in **`tests/test_surface_parity.lua`**, declared in `tests/run.lua`'s suite list like
   any other suite (§1) and inside the green gate (§4). This is the rule-subject naming §1 states, and
-  the file is the collection's own: all eleven addons already carry it under exactly that name, as does
+  the file is the collection's own: all twelve addons already carry it under exactly that name, as does
   the library repo where the gate is asserted first.
 - **MUST** carry, **per adopted LibKa0s module**, a **stub-surface parity case**: a declared list of the
   members the addon reaches on that instance, asserted **present on both arms** — the live instance and
@@ -413,7 +413,7 @@ passing**. Both copies keep working when they drift, so both suites stayed green
   **MUST delegate** to the implementation inside the payload it checks — `tests/_kit/vendor_sync.lua` —
   rather than reimplement the comparison. Every copy in the collection is a registration of thirty-odd
   lines against the vendored implementation, and that is the shape to keep: two implementations of one
-  gate means the kit can be fixed and eleven repos keep failing the old way, which is the argument
+  gate means the kit can be fixed and twelve repos keep failing the old way, which is the argument
   library-stack-§7 already makes about the provenance line. The implementation shipping inside the
   payload it compares is deliberate — a local patch to it breaks the library-side gate's byte-identity
   assertion, which is the correct outcome.
