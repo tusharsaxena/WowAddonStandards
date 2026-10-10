@@ -275,7 +275,7 @@ Rendered, with the color codes stripped for legibility:
 - The command is **gold** (`|cFFFFFF00…|r`), the same color the row formatter gives a command in the help index (slash-commands-§4), and it carries the **leading slash**. The rest of the line is default-colored. **MUST NOT** substitute other colors.
 - **An em dash with a single space either side**, matching the row formatter. **No trailing colon** (slash-commands-§4's house style) and **no trailing period**.
 - **A library-absent Slash stub carries this format verbatim**, the one library string slash-commands-§1 lets it hold, pinned against the live `DISABLED_LINE_FORMAT` with `Kit.assertLibraryConstant`. The refusal therefore reads the same on a degraded load, and a stub that re-spells it fails its own suite.
-- **One line, and the wording is the collection's, not the addon's.** It **MUST NOT** be re-spelled per addon, per verb or per call site, and it **MUST NOT** gain a second line explaining what the addon does, what the verb would have done, or how to reach the panel. A paragraph is a lecture stapled to a command the player is about to re-run anyway, and twelve addons each wording it slightly differently is the drift the shared printer and the shared formatters exist to end.
+- **One line, and the wording is the collection's, not the addon's.** It **MUST NOT** be re-spelled per addon, per verb or per call site, and it **MUST NOT** gain a second line explaining what the addon does, what the verb would have done, or how to reach the panel. A paragraph is a lecture stapled to a command the player is about to re-run anyway, and every addon in the roster wording it slightly differently is the drift the shared printer and the shared formatters exist to end.
 
 #### Disabled and perf-suspended are two holds on ONE latch
 
@@ -292,7 +292,7 @@ Two holds, one latch:
 
 #### The conformance test every addon ships (MUST)
 
-A definition with no test is what produced eleven draw gates, so this one ships with a test. Every addon **MUST** carry a **`tests/test_disabled.lua`** suite, listed in `tests/run.lua`'s suite list like any other (testing-§1), inside the green gate (testing-§4). **It MUST be able to fail against all eleven addons as they stand today** — a suite that passes on a draw gate is not a conformance test, it is a second draw gate (testing-§12).
+A definition with no test is what produced eleven draw gates, so this one ships with a test. Every addon **MUST** carry a **`tests/test_disabled.lua`** suite, listed in `tests/run.lua`'s suite list like any other (testing-§1), inside the green gate (testing-§4). **It MUST be able to fail against every addon as it stood at the 2026-09-16 pre-adoption sweep** — a suite that passes on a draw gate is not a conformance test, it is a second draw gate (testing-§12).
 
 It asserts, in order, driving the addon through the kit's **recording** mocks (testing-§1's fidelity rules — a no-op `RegisterUnitEvent` makes this entire suite unfalsifiable):
 
@@ -316,7 +316,7 @@ When this section landed (v2.56.0, 2026-09-16), every addon in the collection wa
 
 ### 8. `lock` and `unlock` as verb aliases (MAY)
 
-Ten of the twelve addons in the collection have a lock — a *Lock frame* checkbox in General → Master controls (options-ui-§15) — and in **five of them** (Absorb Tracker, Consumable Master, KickCD, Panel Master, Party Frame Enhanced) **unlocking *is* the preview**: unticking *Lock frame* shows the display with its placeholder content, which is why those addons ship no separate *Test mode* row (options-ui-§15's exemption, preview-mode). Unlocking is therefore one of the two or three things a player actually does with those addons, and it is a checkbox three clicks deep in a settings panel. Seven of the ten already reach it from chat somehow, in **four different shapes**, because nothing said what the shape was.
+As measured on 2026-10-10, ten of the twelve addons in the collection have a lock — a *Lock frame* checkbox in General → Master controls (options-ui-§15) — and in **five of them** (Absorb Tracker, Consumable Master, KickCD, Panel Master, Party Frame Enhanced) **unlocking *is* the preview**: unticking *Lock frame* shows the display with its placeholder content, which is why those addons ship no separate *Test mode* row (options-ui-§15's exemption, preview-mode). Unlocking is therefore one of the two or three things a player actually does with those addons, and it is a checkbox three clicks deep in a settings panel. When this section was written (2026-09-16), seven of the ten then on the roster already reached it from chat somehow, in **four different shapes**, because nothing said what the shape was.
 
 - **An addon that has lock functionality at all MAY register `/<slash> lock` and `/<slash> unlock`** as verbs in its `COMMANDS` table (slash-commands-§3), each with a plain description in the help index.
 - **Both verbs MUST write the same stored path, through the same single write seam, as the *Lock frame* checkbox** (options-ui-§1, architecture-§5). They carry the **same no-second-state rule `enable` / `disable` already carry** (slash-commands-§2): no second key, no session flag, no `NS.locked` local. The checkbox and the verbs can never show the player two different answers, because there is only ever one value, and one `onChange` runs whichever surface was used.

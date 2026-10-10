@@ -14,7 +14,7 @@ Meanwhile eight repos — `LibKa0s`, `AbsorbTracker`, `BankLedger`, `ConsumableM
 tooling — `WowAddonStandards` and `wow-addon` — had **no `.gitattributes` at all**.
 
 **That census is the state this section was written against, and half of it has since been closed.**
-All fourteen repos in the collection carry an explicit root `.gitattributes` at its root, so §1 is
+Every repo in the roster (`ADDONS.md`, all three tables) carries an explicit root `.gitattributes`, so §1 is
 satisfied everywhere. §5 is not: measured on 2026-09-22, **one** of the fourteen diffs clean against
 the canonical body and the other **thirteen** carry the pre-v2.61.0 shell-scripts comment, because
 the edit that widened it never traveled past the two repos it was written in. That is the gap §7
@@ -158,7 +158,7 @@ Fixing the body is what makes this section **checkable**: an auditor diffs rathe
 eight hand-written 22-to-68-line variants that existed before it stop being eight things to keep in
 sync.
 
-**Client-bound repos** — the twelve addons and `LibKa0s`:
+**Client-bound repos** — every addon in `ADDONS.md`, and `LibKa0s`:
 
 ```gitattributes
 # =============================================================================
@@ -359,7 +359,7 @@ A repo holding such a file **MAY** carry an **appendix** below the canonical bod
   follow the appendix. That is what lets an auditor tell an appendix from an edited body without
   reading either.
 - It **MUST** hold only marks an extension rule cannot express — a `binary` mark keyed by **path**.
-  Anything reachable by extension belongs in §4's union list, upstream, where all fourteen repos get
+  Anything reachable by extension belongs in §4's union list, upstream, where every repo in the roster gets
   it; a private extension list in one repo's appendix is the eight-hand-written-files problem this
   section closed, restarted one repo at a time.
 - Each entry **MUST** name a **single path** rather than a glob. `tools/**` swallows the text file
@@ -561,11 +561,11 @@ by the pair (basename, kit directory) like any other kit suite, and it asserts:
 
 The two canonical bodies are **copied whole out of §5** into the kit rather than re-authored there, so
 this section stays the one place the body is written down: changing a comment in §5 is then one kit
-revision and one re-vendor, not fourteen hand edits that diverge the way the last one did. The case
+revision and one re-vendor, not one hand edit per repo that diverges the way the last one did. The case
 **MUST** fail rather than pass when it cannot look — no git, no file, no answer from `check-attr` — on
 the same bargain the working-tree case already strikes.
 
 A repo whose vendored kit **predates revision 25 owes the re-vendor, not a hand-written suite**: a
-fourteenth local copy of a gate the kit ships is the drift this paragraph exists to end. The two repos
+further local copy of a gate the kit ships is the drift this paragraph exists to end. The two repos
 with no `tests/` harness to wire it into — the documentation-and-tooling repos (documentation-§8) —
 keep the audit's one-liner above, and that is what it is still for.

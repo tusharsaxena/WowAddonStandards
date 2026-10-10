@@ -25,7 +25,7 @@ tests/
                      -- one suite per standard rule this repo gates (test_surface_parity.lua, ...)
 ```
 
-- **A suite whose subject is a rule rather than a module is named for the rule**, `test_<rule-subject>.lua`, and **the section that mandates it names the file**. The standard already does this at `tests/test_disabled.lua` (slash-commands-§7) and `tests/test_kitsync.lua` (§11); `tests/test_surface_parity.lua` (§8) and `tests/test_vendor_sync.lua` (§11) are named for the same reason. The filename is normative rather than habitual because an auditor grading one rule across eleven repos otherwise has to find the suite before grading it, and a repo that renames it fails nothing. Unanimous practice was already here — all eleven addons ship both files under exactly these names, and each opens with a header naming itself — so this writes down what the collection does rather than asking it to move.
+- **A suite whose subject is a rule rather than a module is named for the rule**, `test_<rule-subject>.lua`, and **the section that mandates it names the file**. The standard already does this at `tests/test_disabled.lua` (slash-commands-§7) and `tests/test_kitsync.lua` (§11); `tests/test_surface_parity.lua` (§8) and `tests/test_vendor_sync.lua` (§11) are named for the same reason. The filename is normative rather than habitual because an auditor grading one rule across every repo in the roster otherwise has to find the suite before grading it, and a repo that renames it fails nothing. Unanimous practice was already here — every addon in the roster ships both files under exactly these names, and each opens with a header naming itself — so this writes down what the collection does rather than asking it to move.
 - **`tests/run.lua`** **MUST** keep only what is genuinely this addon's. It `dofile`s the kit's `framework.lua` and `loader.lua`, builds the environment once by loading the vendored library files and then the addon's own files (§9), mirrors the in-game lifecycle (`NS:InitDB()`, and the settings-panel build if the addon has one, so the schema-to-widget layer is exercised as the client exercises it rather than through hand-called fictions), publishes the shared table via `Kit.expose`, and hands the ordered suite list to `Kit.run{ dir = "tests/", suites = { ... } }`. `Kit.run` exits **0** on success and **1** on any failure, so the green gate is a plain shell check.
 - **`Kit.expose`** merges `test` and the assertions (`fail`, `assertEqual`, `assertTrue`, `assertFalse`, `assertNil`, `assertNear`, `assertError`) into the table you pass, so each repo keeps its own global name — `AT_TEST`, `LK_TEST`, … — and its own extra keys. Adopting the kit therefore requires **no change to any existing suite file**, which is what made adoption one commit per repo rather than a rewrite.
 - **`loader.lua`** loads each source with `loadfile`, `setfenv`s it into an environment whose `__index` resolves WoW globals to the mock table first and falls back to `_G`, and calls the chunk as `chunk(addonName, NS)` when `Loader.addonName` is set — reproducing the client's `local addonName, NS = ...` header. Library chunks take no arguments, so a library-only repo leaves `addonName` nil. Its `__newindex` **writes through to `_G`**, deliberately: without that, a sandboxed write to a SavedVariables global or a `StaticPopupDialogs` registration is silently lost and the migration paths become untestable.
@@ -175,7 +175,7 @@ one path that calls the missing member — anti-patterns #56.
 
 - **MUST** live in **`tests/test_surface_parity.lua`**, declared in `tests/run.lua`'s suite list like
   any other suite (§1) and inside the green gate (§4). This is the rule-subject naming §1 states, and
-  the file is the collection's own: all twelve addons already carry it under exactly that name, as does
+  the file is the collection's own: every addon in the roster already carries it under exactly that name, as does
   the library repo where the gate is asserted first.
 - **MUST** carry, **per adopted LibKa0s module**, a **stub-surface parity case**: a declared list of the
   members the addon reaches on that instance, asserted **present on both arms** — the live instance and
@@ -264,12 +264,14 @@ all of them are under the green gate.
     landing as a file nothing loads.
   The reason is that a gate that silently does not run is **worse** than an absent one: an absent gate
   leaves a visible gap, while a shadowed one leaves the repo's own record — the runner's suite list,
-  `docs/test-cases.md`, the pass count — asserting the rule is covered. Six of the twelve repos are in
-  exactly that state today, each running a 262–443-line local copy of a gate the kit also ships, and
-  the divergence is already real: the kit's copy reads its waiver file from disk while two of the local
-  copies hardcode the waiver table. The published word lists those six shadow are byte-equal to the
-  kit's **today**, which is why this is worth closing before the next amendment rather than after — an
-  amendment arriving by re-vendor would reach six repos' dark copy and none of their live ones. This is
+  `docs/test-cases.md`, the pass count — asserting the rule is covered. Six of the twelve repos were in
+  exactly that state when this was written (2026-09-23), each running a 262–443-line local copy of a
+  gate the kit also ships, and the divergence was already real: the kit's copy reads its waiver file
+  from disk while two of the local copies hardcoded the waiver table. The published word lists those
+  six shadowed were byte-equal to the kit's **that day**, which is why this was worth closing before
+  the next amendment rather than after — an amendment arriving by re-vendor would have reached six
+  repos' dark copy and none of their live ones. As measured on 2026-10-10, none is left: every addon
+  in the roster wires `tests/_kit/test_prose.lua` by the pair, and `LibKa0s` declines it with a row. This is
   §1's own-denominator rule applied to the suite inventory itself: the inventory reads two
   directories, so its key has to carry which one.
   Both reporting MUSTs above bind the kit's inventory check **from LibKa0s test-kit revision 25
@@ -413,7 +415,7 @@ passing**. Both copies keep working when they drift, so both suites stayed green
   **MUST delegate** to the implementation inside the payload it checks — `tests/_kit/vendor_sync.lua` —
   rather than reimplement the comparison. Every copy in the collection is a registration of thirty-odd
   lines against the vendored implementation, and that is the shape to keep: two implementations of one
-  gate means the kit can be fixed and twelve repos keep failing the old way, which is the argument
+  gate means the kit can be fixed and every consumer repo keeps failing the old way, which is the argument
   library-stack-§7 already makes about the provenance line. The implementation shipping inside the
   payload it compares is deliberate — a local patch to it breaks the library-side gate's byte-identity
   assertion, which is the correct outcome.
