@@ -301,8 +301,8 @@ The kit implementation reads waivers from an optional `tests/prose_waivers.lua` 
 return a table is a **failure**, not an empty one: the alternative silently widens the gate.
 
 **The gate SHOULD be the one the test kit ships** (`tests/_kit/test_prose.lua`, kit revision 24),
-wired as one entry in the runner's suite list, rather than hand-written per repository. Eleven
-hand-written copies are eleven chances to carry a subset, and the collection proved it: by the time
+wired as one entry in the runner's suite list, rather than hand-written per repository. A
+hand-written copy in every repository is one chance per repository to carry a subset, and the collection proved it: by the time
 the kit shipped one, seven repositories had written their own under three different filenames and
 four had none at all. A repository that still carries its own copy wires one or the other, **never
 both** — two gates over one rule is two lists to keep whole.
@@ -314,9 +314,10 @@ reads the decline off. An unreferenced `tests/_kit/test_prose.lua` with a row be
 once as a **decline**; with no row it is a gate that silently does not run, which is a hole and a
 **failure** (testing-§9). The two rules therefore have one reading between them — wire the kit's copy,
 or wire your own **and** record why the kit's is unwired — and neither permits the third state, the
-kit's copy sitting unwired and unmentioned. Six of the twelve repositories are in exactly that state
-today: each declares a bare `test_prose` naming its own file, and not one of the six carries a row for
-it. That reporting lands with the kit's inventory check **from LibKa0s test-kit revision 25 (LibKa0s
+kit's copy sitting unwired and unmentioned. Six of the twelve repositories were in exactly that state
+when this was written (2026-09-23): each declared a bare `test_prose` naming its own file, and not one
+of the six carried a row for it. As measured on 2026-10-10, none is: every addon in the roster wires
+the kit's copy, and `LibKa0s` declines it with a row. That reporting lands with the kit's inventory check **from LibKa0s test-kit revision 25 (LibKa0s
 v1.55.0)**; a repository whose vendored kit predates that revision owes the re-vendor, not a
 hand-written suite (testing-§9).
 

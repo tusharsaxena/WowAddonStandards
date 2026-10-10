@@ -79,9 +79,9 @@ Items recorded for future versions of this standard:
 
 - **Whether an unlock anchor has to be the library's handle.** `LibKa0s-Widgets-1.0` ships two drag
   surfaces and the standard mandates one of them. options-ui-§18 requires `ReorderList` wherever the
-  **order** of a list is the setting, and four addons consume it. `DragHandle` — the labeled strip a
+  **order** of a list is the setting, and four addons consume it (as measured on 2026-10-10). `DragHandle` — the labeled strip a
   player drags to move a positionable frame, with its geometry published as `DRAG_HANDLE` — is
-  required nowhere, and three addons consume it while eight do not. The extraction bar was already
+  required nowhere, and four addons consume it while eight do not. The extraction bar was already
   met before the module existed: two addons had hand-built the same widget down to the same 18px
   strip, the same 2px gap and the same centered gold label, which is library-stack-§7's bar 1 — two
   consumers with the same semantics — stated in the library's own voice. So the open question is not

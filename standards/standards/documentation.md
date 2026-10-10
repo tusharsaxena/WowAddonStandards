@@ -228,7 +228,8 @@ has to explain them*, and leaving both to the addon produced two failures with o
 
 - **The doc set collapsed into `ARCHITECTURE.md`, or it didn't, and nothing decided which.** Two
   addons in the collection wrote every subject into the hub and reached **669 and 1071 lines**; six
-  split the same material across nine to twelve topic docs and hold their hub between **210 and 472**.
+  split the same material across nine to twelve topic docs and held their hub between **210 and 472**
+  (measured 2026-08-06).
   Same rule, opposite shapes, and the monolith is the one that loses: a reader looking for the settings
   schema in a thousand-line file has no landmark, and an agent editing it rewrites sections it never
   needed to open.
@@ -372,7 +373,7 @@ names it in prose instead. Five answers to one question, none of them careless, 
 leaves ten repos writing its text produces.
 
 **The list is upstream because these stores are written by a command shared across every repo**, so
-one wrong answer about where a bundle lands is twelve wrong answers. That is the whole of the reason,
+one wrong answer about where a bundle lands is a wrong answer in every repo in the roster. That is the whole of the reason,
 and it takes nothing from Tier 3: a frozen store that is genuinely one addon's own still ships under any name
 that addon picks, with no upstream change needed to create it.
 
@@ -778,7 +779,7 @@ particular.
 The path has a **second job the collection has already leaned on**: it is what survives the file being
 pasted somewhere else. Lua quoted into a review bundle, a GitHub issue or an agent transcript arrives
 with no directory around it, and the first line is then the only thing that says where it came from.
-Six addons' review and issue history is written on top of that fact.
+Six addons' review and issue history was written on top of that fact when this was ratified (2026-09-23).
 
 - **Placement is settled: immediately after the namespace bootstrap** (`architecture-§1`), not above
   it. The bootstrap stays line 1 of every authored file, which is where every reader and every tool
@@ -788,11 +789,14 @@ Six addons' review and issue history is written on top of that fact.
   upstream's header and are not the addon's to rewrite, and a generated file's header belongs to its
   generator. In a documentation-and-tooling repo (documentation-§8) it binds unchanged and has no
   instance until that repo authors Lua, the way `layout-§1`'s cap does.
-- **Why a SHOULD and not a MUST.** Six of eleven addons already keep the convention, and once a repo
-  has chosen it the convention runs at 87–100% of that repo's authored files — so it holds without
-  enforcement, which is exactly what a SHOULD is for. Written as a MUST it would land 99 files of
-  retroactive header-writing on the five repos that have not chosen it, for a rule whose value is in
-  code not yet written. Those five adopt it going forward, and **an existing header is
+- **Why a SHOULD and not a MUST.** Six of eleven addons kept the convention when this was ratified
+  (2026-09-23), and once a repo has chosen it the convention runs at 87–100% of that repo's authored
+  files — so it holds without enforcement, which is exactly what a SHOULD is for. Written as a MUST it
+  would have landed 99 files of retroactive header-writing on the five repos that had not chosen it,
+  for a rule whose value is in code not yet written. As measured on 2026-10-10 it is eight of the
+  twelve, at 95–100% of their source-folder files (ConsumableMaster's headers name the bare filename
+  rather than the path), and the four that have not chosen it — AbsorbTracker, BankLedger,
+  LootHistory, PanelMaster — sit at 6–37%, 122 files without one. Those repos adopt it going forward, and **an existing header is
   grandfathered where it sits**: the placement bullet above binds files authored from here, not a
   retroactive sweep. That carve-out is not a courtesy — the collection's majority practice runs the
   other way, with most existing headers sitting above the bootstrap rather than beneath it, so a
