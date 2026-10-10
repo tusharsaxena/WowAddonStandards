@@ -158,7 +158,7 @@ Fixing the body is what makes this section **checkable**: an auditor diffs rathe
 eight hand-written 22-to-68-line variants that existed before it stop being eight things to keep in
 sync.
 
-**Client-bound repos** — the eleven addons and `LibKa0s`:
+**Client-bound repos** — the twelve addons and `LibKa0s`:
 
 ```gitattributes
 # =============================================================================

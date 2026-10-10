@@ -25,6 +25,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) |
 | Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked |
 | Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked |
+| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled |
 | Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) |
 
