@@ -10,7 +10,8 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
 <AddonName>/
   <AddonName>.toc          -- single file, single Interface line (latest Retail), lists all .lua in dependency order
   core/
-    Compat.lua             -- deprecated-API shims (only when the addon owns one: compat)
+    Compat.lua             -- deprecated-API shims (only when the addon owns one: compat); the compat family's root
+    Compat<Topic>.lua      -- optional split of the compat family, one topic each, once Compat.lua would pass 1000 lines (compat)
     Constants.lua          -- numeric constants, enum-like tables
     Namespace.lua          -- bootstrap: local addonName, NS = ...; sets up shared upvalues
     State.lua              -- mutable runtime state, message bus

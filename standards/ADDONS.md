@@ -20,6 +20,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode |
 | Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Show window (the ledger browser) |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) |
+| Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Enabled · Locked · Test mode · Show window (the drop feed) |
 | Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked |
 | Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) |
 | Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) |
