@@ -67,6 +67,7 @@ The collection targets **Retail (Mainline) only**. Classic/other flavors are out
 ### 4. File listing
 
 - **MUST** list `.lua` files in dependency-correct order. **MUST NOT** rely on alphabetical loading.
+- **MUST NOT** list `Bindings.xml`. The client reads an addon's key bindings from that file by its name and place at the root, never through the TOC (layout-§1).
 - **MUST** list every vendored library **directly** in the `# Libraries` section (toc-file-§5) — one entry per library (its `.lua`, or the library's own packaged `.xml` such as `AceGUI-3.0.xml`), in dependency order. **MUST NOT** delegate library loading to an addon-authored `embeds.xml` (or any other aggregate `.xml` the TOC loads as a single line): the wrapper hides the load order from the TOC that every Ka0s addon otherwise reads identically, and splits "what loads first" across two files for no benefit at Ka0s file counts. The TOC is the single, self-documenting load-order source of truth (anti-patterns #38).
 
 ### 5. File-listing structure (after the metadata block)

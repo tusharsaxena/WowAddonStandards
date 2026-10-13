@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.79.2, 2026-10-13)
+# New Ka0s Addon — Context Pack (v2.80.0, 2026-10-13)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -103,6 +103,8 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
 ```
 <Addon>/
   <Addon>.toc            -- single Interface line (latest Retail)
+  Bindings.xml           -- ONLY if the addon ships key bindings: exactly this name, at the root, never
+                         -- in the TOC; no Lua beyond what the client requires, labels set from a module (layout-§1)
   core/                  -- dependency-correct order, NOT a fixed prefix (layout-§1); the
                          -- LOAD-BEARING positions are marked, and the TOC repeats the marks
     Namespace.lua        -- NS.PREFIX, the mandatory cyan chat tag (slash-commands-§4)
