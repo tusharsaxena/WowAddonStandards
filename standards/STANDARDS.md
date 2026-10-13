@@ -1,4 +1,4 @@
-# Ka0s WoW Addon Standard (v2.79.1, 2026-10-13)
+# Ka0s WoW Addon Standard (v2.79.2, 2026-10-13)
 
 **Status:** Source of truth. All audit deviation reports and `NEW_ADDON_CONTEXT.md` template content derive from this standard. When the standard changes, bump the date and version at the top of this file.
 
@@ -97,7 +97,7 @@ Discovered by following the links here — not part of the normative standard, b
 
 ## Changelog
 
-- **v2.79.1 (2026-10-13):** **The roster gains Ka0s Quick Comms.** **The finding.** A new Ka0s addon, Ka0s Quick Comms (`../../QuickComms/`, https://github.com/tusharsaxena/QuickComms), is being built to the standard, scaffolded from `NEW_ADDON.md`, and `standards/ADDONS.md` had no row for it. **The row.** `ADDONS.md` gains `| Ka0s Quick Comms | ../../QuickComms/ | … | Enabled |`, alphabetical by folder between Pretty Chat and WhatGroup. The launcher column is read from that addon's `core/LauncherSetup.lua`: its descriptor supplies the enable pair only at v0.1.0, with no lock, test-mode or window seam yet (the file notes that Locked and Test mode join it with the Comms Pad), so the menu lists **Enabled** alone, as Pretty Chat's does. **The counts.** None move. A count that means every addon is written against the roster, so it picks the new row up unedited, and every subset count is dated to the day it was measured, which a later roster change does not falsify. Clearly historical counts, the changelogs and every frozen bundle are left as written. Version rippled to `CLAUDE.md`, `README.md`, `EXECUTIVE_SUMMARY.md` and `NEW_ADDON_CONTEXT.md`. Patch: no rule changes, a roster row only.
+- **v2.79.2 (2026-10-13):** **Ka0s Quick Comms' launcher row lists Locked and Test mode.** **The finding.** Quick Comms' phase 2 built the Comms Pad, which brings a lock and a test mode, and its `core/LauncherSetup.lua` descriptor now supplies `isLocked`/`toggleLock` and `isTestMode`/`toggleTestMode`, so its menu draws three entries while `ADDONS.md` listed Enabled alone. **The row.** `ADDONS.md`'s Quick Comms row reads `Enabled · Locked · Test mode`, as Aura Master's does. **The counts.** None move: the dated subset counts are not re-measured by a row edit. Version rippled to `CLAUDE.md`, `README.md`, `EXECUTIVE_SUMMARY.md` and `NEW_ADDON_CONTEXT.md`. Patch: no rule changes, a roster cell only.
 
 Full history: [CHANGELOG.md](CHANGELOG.md).
 
