@@ -169,7 +169,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.80.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.81.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
@@ -182,7 +182,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   four; and **Tier 1** — `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`,
   `data-flow.md`, `common-tasks.md`, all six unconditional and under exactly those names, with Tier 2
   (`slash-dispatch.md`, `midnight-quirks.md`, `compat-layer.md`, `message-bus.md`, `profiles.md`,
-  `debug.md`; `perf-analysis/README.md` is a Tier 2 member too, its trigger stated under the
+  `debug.md`, `known-limitations.md`, `taint.md`; `perf-analysis/README.md` is a Tier 2 member too, its trigger stated under the
   verification-and-record docs above) required per stated trigger and recorded as *Not applicable* in the map when the
   trigger has not fired, except that since v2.68.0 the `docs/debug.md` trigger has fired in every
   addon (the diagnostics dump is a debug surface beyond the default console), so `docs/debug.md` is

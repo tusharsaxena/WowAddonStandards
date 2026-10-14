@@ -131,11 +131,28 @@ as a load-time upvalue (performance-§1, performance-§2) — and nothing more.
 - With that comment present the ordering is **compliant** and needs no deviation-register row: a
   register row records a departure from a rule, and there is no rule here to depart from.
 
-**Every position in the listing is one of two things, and the TOC says which.** A position is
-**load-bearing** when something resolves *at file scope* as the file loads — a library major taken
-as an upvalue, a constant computed from a seam that loaded earlier — so moving the line changes
-behavior. A position is **conventional** when everything the file needs is reached through a closure
-at call time, so the line is free to move and only reads oddly out of place.
+**Every position in the listing is one of two things, and the TOC says which.** The test is
+**positional**: a position is **load-bearing** when moving the line to any other place the
+section-header **MUST** above still allows would change behavior. That happens in exactly two ways:
+
+- **(a) A file-scope read the section order does not already fix.** The file reads, as it loads,
+  something published by an earlier file **in the same `#` section** — a library major taken as an
+  upvalue from a seam above it, a constant computed from a seam that loaded earlier, a member
+  another `settings\` file published one line up — or by a file whose position relative to it the
+  section order does not pin.
+- **(b) An append to an ordered table.** The file appends to a table or list whose order **is** TOC
+  order and that is read in that order: a row appended to a dispatch table such as
+  `NS.FEATURE_EVENTS` for an event another file also handles, so the line decides **which handler
+  runs first on a shared event**; a schema row appended to a runtime row list; a sink, listener or
+  cleanup step added to a list that is walked in insertion order. Nothing here resolves at load,
+  and the position is load-bearing all the same.
+
+A position is **conventional** when neither holds: everything the file needs is reached through a
+closure at call time, **or** its only file-scope reads are of members the mandated section order
+already places above it — a `modules\` file reading `NS.Constants` (`core\`) at load, a `settings\`
+file reading `NS.C` (`defaults\`) at load. Such a line is free to move within its group and only
+reads oddly out of place. Its comment **MAY** note the cross-section dependency; it is not the
+load-bearing kind, because no move the header **MUST** permits can break it.
 
 The distinction is worth a rule rather than a habit because of how the load-bearing kind fails:
 silently, and only in the client. A media seam that publishes `NS.MediaFont` sits above
@@ -144,8 +161,10 @@ the seam below and nothing errors, no test goes red, and every consumer quietly 
 default font instead. The comment is the only guard there is.
 
 - A line whose position is **load-bearing MUST** carry a comment saying so, at the line, naming
-  **what resolves at load** — not merely that the order matters. `core\PerfSetup.lua` in the block
-  above is the form: the constraint and its reason on one line.
+  **what resolves at load** for an (a) position, or **which ordered table and what must come
+  first** for a (b) position — the event and whose handler runs before it — not merely that the
+  order matters. `core\PerfSetup.lua` in the block above is the form: the constraint and its
+  reason on one line.
 - A position that is merely **conventional SHOULD** say that too, once per group rather than per
   line, so the next author knows which lines are safe to move without re-deriving the whole
   dependency graph. A TOC that annotates only its load-bearing lines leaves every other line
@@ -154,12 +173,15 @@ default font instead. The comment is the only guard there is.
   that is about the reader rather than the writer, and it is the one the annotation exists for.
 
 **The denominator this MUST is measured against.** The MUST above binds **load-bearing positions**,
-and its denominator is the set of positions that actually are load-bearing — established by reading
-**every listed file** that binds, reads or writes an `NS` member or a library major **at file scope**,
-not by counting lines in the TOC. That covers **every position in the listing**: a `modules\` or
-`settings\` file that takes `NS.Something` as an upvalue when it loads is as load-bearing as a seam
-file (`*Setup.lua`) or `core\Constants.lua`, and a check that reads only the seams misses it. A
-constraint need not name a single file: when a line must sit **below at least one of** several files
+and its denominator is the set of positions that actually are load-bearing under (a) and (b) —
+established by reading **every listed file**, not by counting lines in the TOC and not by reading
+only the seam files. Every listed file must still be read, because a position in any group can be
+either kind: a `modules\` or `settings\` file is load-bearing when it reads a **same-section**
+producer at load (a `settings\` file calling into what the `settings\` line above it published), or
+when its row order on a **shared event** or in another **TOC-ordered table** matters — exactly as a
+seam file (`*Setup.lua`) or `core\Constants.lua` is. A file-scope dependency on `core\` alone is
+**not** enough: the header order already keeps `core\` above every `modules\` and `settings\` line,
+so no permitted move breaks it. A constraint need not name a single file: when a line must sit **below at least one of** several files
 (any of `X`, `Y` or `Z` publishes what it reads), its comment names **what resolves** and which files
 satisfy it, rather than picking one of them as if it were the only one. An 81-line
 listing with two load-bearing positions has a denominator of **two**: annotate both and the file
@@ -174,7 +196,10 @@ files were **eight** unannotated load-bearing positions in three of them, at the
 read: `KickCD@2373b215a5:KickCD.toc:55` and `:73`, `PrettyChat@fb03c21f83:PrettyChat.toc:40` and `:57`,
 and four in `WhatGroup@509a36d6af:WhatGroup.toc` at `:44`, `:47` and `:53-56`. No per-repo
 audit filed a per-line MUST row against the remaining six. The rule did not change; the denominator
-did, and a rule counted against the wrong denominator looks unworkable long before it is.
+did, and a rule counted against the wrong denominator looks unworkable long before it is. Those
+counts are historical: they were taken under the pre-v2.81.0 wording, which also counted a
+`modules\` or `defaults\` line whose only load-time read was in `core\`. Under the positional test
+above such a line is conventional, so re-counted today the figure can only fall, and the point stands.
 
 **Worked example — both kinds, one file.** The `# Core (the LibKa0s-Env seam loads first)` block of
 `AbsorbTracker.toc` carries one of each and is the
@@ -198,10 +223,49 @@ is free despite being a seam. `core\Constants.lua` carries nothing and is **comp
 position is already pinned by the annotated line above it, and a rule that made every line restate
 its neighbor's comment would be noise the next reader learns to skip.
 
+**Worked examples — the two kinds outside `# Core`, and a counter-example.** Both load-bearing
+shapes recur in `# Modules` and `# Settings`, modeled on `DropWatcher.toc`:
+
+```
+# Settings (last -- depend on everything else being initialized)
+# LOAD-BEARING: publishes Settings.SchemaLib, which settings\Schema.lua calls :New on at file scope.
+settings\SchemaSetup.lua
+settings\Schema.lua
+```
+
+- **(i) A same-group file-scope read — load-bearing, kind (a).** `settings\Schema.lua` calls
+  `Settings.SchemaLib:New` at file scope, and `settings\SchemaSetup.lua` — the line above, in the
+  same section — publishes it. The header **MUST** lets the two lines swap, and swapping them breaks
+  the load, so the producer's line carries the comment naming what resolves.
+
+```
+# LOAD-BEARING: appends its GROUP_ROSTER_UPDATE row to NS.FEATURE_EVENTS after
+# modules\Situations.lua's (above), so the situation handler runs first and the roster handler
+# second; a module declaring the event below it hears it after the roster is fresh.
+modules\Roster.lua
+```
+
+- **(ii) A shared-event row — load-bearing, kind (b).** Two modules append a row for the same event
+  to a dispatch table that is walked in TOC order. Nothing resolves at load, yet moving
+  `modules\Roster.lua` above `modules\Situations.lua` reverses which handler runs first, silently. The
+  comment names the **event**, the **table**, and **which handler must run first**.
+
+```
+# Conventional: publishes NS.Messaging; reads NS.Constants (core\, above) at load.
+modules\Messaging.lua
+```
+
+- **Counter-example — conventional.** A `modules\` file whose only file-scope read is
+  `NS.Constants` is **not** load-bearing: the header order already places every `core\` line above
+  every `modules\` line, so no move the **MUST** permits can break the read. Marking it
+  `Conventional` and naming the cross-section read is the **MAY** above, not a mislabel.
+
 **Grading, so two auditors reach the same row.**
 
 - A load-bearing position with no comment, or with a comment saying only *"order matters"* without
-  naming what resolves: one **MUST** row, one row per position.
+  naming what resolves: one **MUST** row, one row per position. This includes every **(b)**
+  position — a row on a shared event or in another TOC-ordered table — left unannotated or
+  labeled conventional: it is a **MUST** failure even though nothing resolves at load.
 - A file whose load-bearing positions are all annotated and whose conventional groups are not: one
   **SHOULD** row for the file — never one per line, and never a MUST row.
 - A file whose within-section sequence is unusual but dependency-correct and annotated: **no row**,

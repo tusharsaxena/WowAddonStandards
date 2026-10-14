@@ -114,8 +114,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (a) **Tier 1 present**, under exactly those names — `scope.md`, `module-map.md`, `schema.md`,
      `settings-panel.md`, `data-flow.md`, `common-tasks.md`; a missing one is a MUST failure.
      (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
-     `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`, evaluate
-     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the shims
+     `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`,
+     `known-limitations.md`, `taint.md`, evaluate
+     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the lines
+     of the hub's Known Limitations and Taint Notes sections, count the shims
      a **present** compat family (`core/Compat.lua` plus any `core/Compat<Topic>.lua`) publishes, summed
      across the family with documentation-§3's own grep — it is a count now, not a
      judgment; an absent `core/Compat.lua` counts zero, and is itself a finding only if the addon makes a
@@ -161,6 +163,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (f) **Hub shape** — a mandated `ARCHITECTURE.md` section past ~60 lines that has not spilled to
      its canonical topic doc, or a file past ~400 lines. Report the shape and the line count; do
      **not** argue the arithmetic, and do not file a 412-line hub whose sections have all spilled.
+     The spill target is documentation-§3's, one per content section (Event Subscriptions to
+     `data-flow.md`, Taint Notes to `taint.md`, Known Limitations to `known-limitations.md`, and the
+     four older ones); Overview and the two registers never spill. A spilled Settings Schema keeps
+     its naming obligations, now met in `docs/schema.md`: read the names there, and file a list
+     split between the hub and `schema.md` rather than complete in one of them.
    - **Check the line-ending policy by running the commands, not by reading the file
      (`line-endings`).** Five checks, all mechanical, and the last one is the one that fails in
      practice:
@@ -405,12 +412,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the MUST failure it is.
    - **Check the TOC's position annotations (`toc-file-§5`).** At every position in the listing
      (`# Core`, `# Defaults`, `# Modules`, `# Settings` and any other group), every line whose
-     position is **load-bearing** — a library major taken as an upvalue at file scope, a constant
-     resolved from an earlier seam at file load, an `NS` member read or written at file scope —
-     **MUST** carry a comment at the line naming what resolves. Read every listed file for
-     file-scope reads and writes of `NS` members and library majors (the `modules/` and `settings/`
-     files as much as the seam files and `core/Constants.lua`) to establish which positions actually
-     are load-bearing rather than trusting the comments to be complete; an
+     position is **load-bearing** under toc-file-§5's positional test — (a) a file-scope read of
+     something a file **in the same `#` section** (or one the section order does not pin) published,
+     or (b) a row appended to a **TOC-ordered table** whose order matters, such as a handler on a
+     **shared event** — **MUST** carry a comment at the line naming what resolves, or the table and
+     what must come first. Read every listed file for file-scope reads and for appends to ordered
+     tables (the `modules/` and `settings/` files as much as the seam files and `core/Constants.lua`)
+     to establish which positions actually are load-bearing rather than trusting the comments to be
+     complete; a `modules/` or `settings/` line whose only load-time reads are of `core/` members is
+     conventional, not load-bearing, and is not a MUST row; an unannotated or `Conventional`-labeled
+     (b) position **is** one; an
      unannotated load-bearing line is the MUST failure, and a load-bearing line annotated only as
      *"order matters"* without naming what resolves is the same failure in weaker form. A TOC that
      annotates its load-bearing lines but never marks a **conventional** position fails the SHOULD,
@@ -646,7 +657,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          or any schema-CLI verb fails slash-commands-§2's MUST — the v2.56.0 shape, and exactly what LibKa0s
          v1.40.0's Slash minor 12 shipped, so an addon still vendoring v1.40.0 fails it by
          construction. Where a feature verb is refused, it is refused on **one** line in
-         *The refusal line*'s shape and reaches no write seam. Unregistering the chat command,
+         *The refusal line*'s shape and reaches no write seam. Under the `perf` hold alone it
+         is refused with `Not available during a performance capture.` instead. A refusal that
+         picks the disabled line from a bare stood-down check, and so tells a player mid-capture
+         to run `/<slash> enable`, is a finding (*Which refusal, by hold*). Unregistering the chat command,
          dropping the `COMMANDS` table or the dispatcher remains a failure for the original reason:
          the verb that turns it back on goes with them.
        - **The launcher.** A left-click that no longer opens the panel while disabled; a right-click
@@ -656,7 +670,32 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        - **The conformance suite.** `tests/test_disabled.lua` present, listed in `tests/run.lua`, and
          asserting on the **registration set** rather than on a handler's return
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
-         right (`testing-§12`).
+         right (`testing-§12`). Then **walk the section's ten steps against the suite**, in order,
+         citing the `file:line` of the assertion that covers each; a step with no assertion, or one
+         only partly covered, is a finding. Presence and the registration-set assertion alone do not
+         pass the suite — the 2026-10-11 DropWatcher audit graded it on those two and missed step 10
+         outright and steps 6, 7 and 8 in part. The step numbers are slash-commands-§7's; read the
+         step text there rather than from this list, which only names what each step's evidence is:
+         1. **Baseline** — `R_on`, `T_on` and `F_on` captured from the recording mocks, and `R_on`
+            asserted non-empty.
+         2. **Disable** — through the single write seam, never a direct teardown call.
+         3. **Registration set empty** — by count **and** by name, carrying a `-- red under:` comment.
+         4. **No timer** — no timer, ticker or `OnUpdate` armed now or for the rest of the run.
+         5. **Frames hidden** — every frame in `F_on`.
+         6. **Unconditional fires** — every event in `R_on`, the combat-entry event by name, with zero
+            SavedVariables writes, zero printer calls and zero frame shows, **and** an assertion that
+            each fire reached a handler (`__fireUnconditional`'s returned count, at least 1 per
+            event), carrying a `-- red under:` comment. A step 6 that discards the return is a
+            `testing-§12` finding: it passes against a harness that dispatched nothing.
+         7. **The slash surface** — **every** `NS.COMMANDS` row dispatched through the real
+            dispatcher, not a sample; `diagnostics` in both forms (the diagnostics-dump check below).
+         8. **The launcher** — `LeftButton` opens the panel with zero writes and zero shows;
+            `RightButton` opens the menu with *Enabled* live and every other entry grayed, writing
+            nothing.
+         9. **Re-enable** — the registration set equals `R_on` again, plus the cycle with one setting
+            changed while disabled.
+         10. **The latch** — both hold orders (`perf` then `disabled`, and the reverse), carrying a
+             `-- red under:` comment.
        History: the 2026-09-16 pre-adoption sweep found **eleven of eleven addons failing this** —
        107 survivors across the collection — and the collection has since adopted the latch. Verify
        the latch and the suite as above and file what the checks find; a clean addon owes no row.
@@ -754,8 +793,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (b) a **structural registry write** — the collection passes all three of architecture-§5's tests,
      and the write is membership or an item on its closed identity-and-bookkeeping list (order, id
      counter, storage key, stamped id, frame name, a lookup-key name no row addresses, the seeding
-     sentinel) — is compliant only inside the one writer `docs/ARCHITECTURE.md` names for that
-     registry; a hit in a panel file or a slash handler is filed against the writer (anti-pattern #78),
+     sentinel) — is compliant only inside the one writer `docs/ARCHITECTURE.md` → Settings Schema
+     names for that registry, or `docs/schema.md` names when that section has spilled and links
+     there (documentation-§3); a hit in a panel file or a slash handler is filed against the writer (anti-pattern #78),
      never as a demand that membership route through the helper. A collection the helper already takes
      whole at one normalized path fails test (3); it is a value, its writes are helper writes, and it
      files nothing;
@@ -770,7 +810,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      on a registry member included; a drag's write to a row path is (a)), a remembered view, learned
      or recorded data the addon builds itself, and a vendored library's own writes into a table the
      addon hands it — is **compliant when named** and files nothing: `docs/ARCHITECTURE.md` →
-     Settings Schema gives its storage key, its one owner module and every function that writes it,
+     Settings Schema, or the `docs/schema.md` it has spilled to and links, gives its storage key, its one owner module and every function that writes it,
      wherever each lives. A named writer outside the owner module is compliant and is **not** a
      finding. **Unnamed, it is a doc-only MUST failure, Low**, and so is a writer the naming leaves
      out; the remedy is the naming sentence, never a register row. The load pass, and an accessor
@@ -945,11 +985,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        Second, `grep -nE '\.(frame|content)(:|\)|,)'` over the settings and module files, then read
        every hit that is an AceGUI widget's `.frame` or `.content` passed to `CreateTexture`,
        `CreateFontString`, `CreateLine`, `CreateMaskTexture`, `CreateFrame(…, parent)`, `SetScript` or
-       `HookScript`: each one **MUST** be undone in that widget's `"OnRelease"` callback, and there
-       **MUST** be exactly one `"OnRelease"` per widget (a second `SetCallback` replaces the first)
-       and none on a widget a library maker returned. Anchoring a Blizzard frame **to** a widget
-       frame, or reading its size, is not a hit. Report each hit as `file:line` with the widget type
-       and whether its release undoes it. A hand-rolled landing body is one root; a leak inside it is
+       `HookScript`, or passed to `SetParent` by an addon-owned frame (`x:SetParent(widget.frame)`):
+       each one **MUST** be undone in that widget's `"OnRelease"` callback (a reparented frame
+       re-homed to an addon-owned park frame, `ClearAllPoints`, `Hide`), and a park done only by the
+       page renderer before `ClearScroll` is a finding, belt-and-braces beside the `"OnRelease"` is
+       not. There **MUST** be exactly one `"OnRelease"` per widget (a second `SetCallback` replaces
+       the first) and none on a widget a library maker returned. Anchoring a Blizzard frame **to** a
+       widget frame, or reading its size, is not a hit, and neither is the opposite direction,
+       `widget.frame:SetParent(addonFrame)`, which AceGUI's own `Release` resets. Report each hit as
+       `file:line` with the widget type and whether its release undoes it. A hand-rolled landing body is one root; a leak inside it is
        its dependent, not a second finding.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
