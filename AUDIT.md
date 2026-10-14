@@ -656,7 +656,32 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        - **The conformance suite.** `tests/test_disabled.lua` present, listed in `tests/run.lua`, and
          asserting on the **registration set** rather than on a handler's return
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
-         right (`testing-§12`).
+         right (`testing-§12`). Then **walk the section's ten steps against the suite**, in order,
+         citing the `file:line` of the assertion that covers each; a step with no assertion, or one
+         only partly covered, is a finding. Presence and the registration-set assertion alone do not
+         pass the suite — the 2026-10-11 DropWatcher audit graded it on those two and missed step 10
+         outright and steps 6, 7 and 8 in part. The step numbers are slash-commands-§7's; read the
+         step text there rather than from this list, which only names what each step's evidence is:
+         1. **Baseline** — `R_on`, `T_on` and `F_on` captured from the recording mocks, and `R_on`
+            asserted non-empty.
+         2. **Disable** — through the single write seam, never a direct teardown call.
+         3. **Registration set empty** — by count **and** by name, carrying a `-- red under:` comment.
+         4. **No timer** — no timer, ticker or `OnUpdate` armed now or for the rest of the run.
+         5. **Frames hidden** — every frame in `F_on`.
+         6. **Unconditional fires** — every event in `R_on`, the combat-entry event by name, with zero
+            SavedVariables writes, zero printer calls and zero frame shows, **and** an assertion that
+            each fire reached a handler (`__fireUnconditional`'s returned count, at least 1 per
+            event), carrying a `-- red under:` comment. A step 6 that discards the return is a
+            `testing-§12` finding: it passes against a harness that dispatched nothing.
+         7. **The slash surface** — **every** `NS.COMMANDS` row dispatched through the real
+            dispatcher, not a sample; `diagnostics` in both forms (the diagnostics-dump check below).
+         8. **The launcher** — `LeftButton` opens the panel with zero writes and zero shows;
+            `RightButton` opens the menu with *Enabled* live and every other entry grayed, writing
+            nothing.
+         9. **Re-enable** — the registration set equals `R_on` again, plus the cycle with one setting
+            changed while disabled.
+         10. **The latch** — both hold orders (`perf` then `disabled`, and the reverse), carrying a
+             `-- red under:` comment.
        History: the 2026-09-16 pre-adoption sweep found **eleven of eleven addons failing this** —
        107 survivors across the collection — and the collection has since adopted the latch. Verify
        the latch and the suite as above and file what the checks find; a clean addon owes no row.
