@@ -145,7 +145,7 @@ Reference implementation (in the collection): the absorb-shield tracker's root `
 
 Every addon **MUST** ship this **canonical trio** under `docs/` (all three are universal across the collection):
 
-- **`docs/ARCHITECTURE.md`** — engineer context, and the **hub** of the doc set (documentation-§3's tier model). **Ten** mandated sections, all ten named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema** (which, for every structural registry the addon holds, names its storage keys, its one registry writer and its load pass, and for every piece of **named non-setting state** — geometry only a drag or a resize determines, a remembered view, learned or recorded data, a vendored library's own writes — its storage key, its one owner module and every function that writes it, wherever each lives; that sentence is the compliance and no register row is needed — architecture-§5), **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, **`## Documentation map`** — the per-addon doc register specified below — and **`## Documented deviations`** — the register specified immediately below.
+- **`docs/ARCHITECTURE.md`** — engineer context, and the **hub** of the doc set (documentation-§3's tier model). **Ten** mandated sections, all ten named because a bare count goes stale silently: **Overview**, **Module Map**, **Settings Schema** (which, for every structural registry the addon holds, names its storage keys, its one registry writer and its load pass, and for every piece of **named non-setting state** — geometry only a drag or a resize determines, a remembered view, learned or recorded data, a vendored library's own writes — its storage key, its one owner module and every function that writes it, wherever each lives; that sentence is the compliance and no register row is needed — architecture-§5; once the section spills, the names live in `schema.md` instead, under the spill rule below), **Message Bus** (named messages with sender/payload/consumers), **Slash Commands** (table from `NS.COMMANDS`), **Event Subscriptions**, **Taint Notes**, **Known Limitations**, **`## Documentation map`** — the per-addon doc register specified below — and **`## Documented deviations`** — the register specified immediately below.
 
   **The count stays ten, and `layout-§1`'s over-cap census is why that has to be said.** That section mandates a heading named **`Files over the 1500-line cap`** in this same file, which makes it the first heading any repo owes here that this list does not name. It is **not** an eleventh mandated section: it is a **sub-heading of `## Documented deviations`**, and its level follows that register's own. The register is its host because the census's whole job is to say which of three terminal states an over-cap file sits in — the issue that names the seam, the ratifying deviation row, or the scheduled peel — and a reader asking whether a given breach was ratified is already reading the register that would hold the answer. Of the four repositories that carried the heading when this was written (2026-09-22), **two** nested it exactly there; a third kept it under `## Layout`, and the library repo kept it as a sibling `##` beside the register. That the collection had **not** converged was the argument for fixing the parent here rather than against it (as measured on 2026-10-07, every addon nests it at `###` under `## Documented deviations`): `layout-§1` fixes the heading's name and level but not its parent, and a heading whose parent varies is one a doc-shape gate cannot find twice.
 - **`docs/testing.md`** — the **verify-how-to** doc: how to run the headless harness (`lua tests/run.lua`) and lint (`luacheck .`), the green commit gate and local toolchain, and pointers to `docs/test-cases.md` (the generated inventory / authoritative pass count) and `docs/smoke-tests.md` (the in-game suite). This is the contributor-facing "how to verify" material that **MUST NOT** live in the README (documentation-§1); the README carries only the `[tests]` badge. Consolidates testing-§2/§3/§4/§5 as a per-addon page. Where it tabulates the four out-of-game suites, the table **MUST** carry the **checkpoint** per suite — run/commit versus the tag — and **MUST NOT** leave a `Gates? no — recorded only` cell unqualified, since that is true of a commit and false of a release (testing-§6, automated-tests-§3/§4).
@@ -275,6 +275,8 @@ rather than inventing one.
 | `docs/compat-layer.md` | a **present** compat family (`core/Compat.lua` and any `core/Compat<Topic>.lua`, compat) publishes **three or more** addon-specific shims beyond what `LibKa0s` supplies, counted across every family file; an addon compat's applicability condition exempts ships no `core/Compat.lua` and the trigger has not fired |
 | `docs/message-bus.md` | the addon defines **more than ten** distinct messages |
 | `docs/profiles.md` | AceDB profiles are **user-visible** (a profile control ships in the options UI) |
+| `docs/known-limitations.md` | `ARCHITECTURE.md`'s **Known Limitations** section passes roughly **60 lines** (the spill rule below) |
+| `docs/taint.md` | `ARCHITECTURE.md`'s **Taint Notes** section passes roughly **60 lines** (the spill rule below) |
 | `docs/debug.md` | the addon ships debug surfaces **beyond** the `LibKa0s` default console. The diagnostics dump (debug-logging-§14) **is** such a surface, and every addon ships it, so this trigger has fired in **every** addon: `docs/debug.md` is never *Not applicable*, and it documents the report as debug-logging-§14 requires |
 
 **The `compat-layer.md` trigger counts, and this is what it counts.** A shim is one entry point
@@ -339,8 +341,24 @@ Two obligations, and only two:
 both stated as thresholds because "keep it short" demonstrably did not hold:
 
 - **A mandated section that exceeds roughly 60 lines MUST spill** into its canonical topic doc,
-  leaving behind a summary and exactly **one** link. *Module Map* spills to `module-map.md`, *Settings
-  Schema* to `schema.md`, *Slash Commands* to `slash-dispatch.md`, *Message Bus* to `message-bus.md`.
+  leaving behind a summary and exactly **one** link. Every content section has a named target:
+  *Module Map* spills to `module-map.md`, *Settings Schema* to `schema.md`, *Message Bus* to
+  `message-bus.md`, *Slash Commands* to `slash-dispatch.md`, *Event Subscriptions* to `data-flow.md`
+  (Tier 1, whose pipeline already starts at "event or trigger in"), *Taint Notes* to `taint.md` and
+  *Known Limitations* to `known-limitations.md` (both Tier 2, their trigger being this threshold).
+  *Overview*, `## Documentation map` and `## Documented deviations` **never** spill: the first is the
+  lead-in and the other two are registers that an audit reads in the hub. The spilled body lands in
+  the canonical doc, which **MAY** link a Tier 3 doc for material particular to the addon (a set of
+  design readings, say) under Tier 3's no-duplication rule; a Tier 3 doc is never the spill target
+  itself.
+- **A spill carries the section's naming obligations with it.** Where another section of the standard
+  requires a mandated section to *name* something, the names move with the body and **count as
+  named** in the canonical doc. For *Settings Schema* that is architecture-§5's registry storage
+  keys, registry writer and load-pass function(s), and its named non-setting state with each piece's
+  owner module and every writer: once the section spills, they are complete in `schema.md` and the
+  hub keeps the summary and the one link. The names have **one home**, the hub section or the doc it
+  spills to, and are never split across the two; a list half in each is a doc-only MUST failure, the
+  same as an unnamed writer.
 - **The whole file SHOULD stay under roughly 400 lines.** A hub past that has stopped being an index.
 
 Both numbers are approximate on purpose — the failure they catch is 1071 lines, not 412 — and an audit

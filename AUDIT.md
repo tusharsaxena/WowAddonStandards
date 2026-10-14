@@ -114,8 +114,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (a) **Tier 1 present**, under exactly those names — `scope.md`, `module-map.md`, `schema.md`,
      `settings-panel.md`, `data-flow.md`, `common-tasks.md`; a missing one is a MUST failure.
      (b) **Tier 2 accounted for** — for each of `slash-dispatch.md`, `midnight-quirks.md`,
-     `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`, evaluate
-     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the shims
+     `compat-layer.md`, `message-bus.md`, `profiles.md`, `debug.md`, `perf-analysis/README.md`,
+     `known-limitations.md`, `taint.md`, evaluate
+     the trigger **against the code** (count `NS.COMMANDS`, count distinct messages, count the lines
+     of the hub's Known Limitations and Taint Notes sections, count the shims
      a **present** compat family (`core/Compat.lua` plus any `core/Compat<Topic>.lua`) publishes, summed
      across the family with documentation-§3's own grep — it is a count now, not a
      judgment; an absent `core/Compat.lua` counts zero, and is itself a finding only if the addon makes a
@@ -161,6 +163,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (f) **Hub shape** — a mandated `ARCHITECTURE.md` section past ~60 lines that has not spilled to
      its canonical topic doc, or a file past ~400 lines. Report the shape and the line count; do
      **not** argue the arithmetic, and do not file a 412-line hub whose sections have all spilled.
+     The spill target is documentation-§3's, one per content section (Event Subscriptions to
+     `data-flow.md`, Taint Notes to `taint.md`, Known Limitations to `known-limitations.md`, and the
+     four older ones); Overview and the two registers never spill. A spilled Settings Schema keeps
+     its naming obligations, now met in `docs/schema.md`: read the names there, and file a list
+     split between the hub and `schema.md` rather than complete in one of them.
    - **Check the line-ending policy by running the commands, not by reading the file
      (`line-endings`).** Five checks, all mechanical, and the last one is the one that fails in
      practice:
@@ -783,8 +790,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (b) a **structural registry write** — the collection passes all three of architecture-§5's tests,
      and the write is membership or an item on its closed identity-and-bookkeeping list (order, id
      counter, storage key, stamped id, frame name, a lookup-key name no row addresses, the seeding
-     sentinel) — is compliant only inside the one writer `docs/ARCHITECTURE.md` names for that
-     registry; a hit in a panel file or a slash handler is filed against the writer (anti-pattern #78),
+     sentinel) — is compliant only inside the one writer `docs/ARCHITECTURE.md` → Settings Schema
+     names for that registry, or `docs/schema.md` names when that section has spilled and links
+     there (documentation-§3); a hit in a panel file or a slash handler is filed against the writer (anti-pattern #78),
      never as a demand that membership route through the helper. A collection the helper already takes
      whole at one normalized path fails test (3); it is a value, its writes are helper writes, and it
      files nothing;
@@ -799,7 +807,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      on a registry member included; a drag's write to a row path is (a)), a remembered view, learned
      or recorded data the addon builds itself, and a vendored library's own writes into a table the
      addon hands it — is **compliant when named** and files nothing: `docs/ARCHITECTURE.md` →
-     Settings Schema gives its storage key, its one owner module and every function that writes it,
+     Settings Schema, or the `docs/schema.md` it has spilled to and links, gives its storage key, its one owner module and every function that writes it,
      wherever each lives. A named writer outside the owner module is compliant and is **not** a
      finding. **Unnamed, it is a doc-only MUST failure, Low**, and so is a writer the naming leaves
      out; the remedy is the naming sentence, never a register row. The load pass, and an accessor
