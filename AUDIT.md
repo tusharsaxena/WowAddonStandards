@@ -657,7 +657,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          or any schema-CLI verb fails slash-commands-§2's MUST — the v2.56.0 shape, and exactly what LibKa0s
          v1.40.0's Slash minor 12 shipped, so an addon still vendoring v1.40.0 fails it by
          construction. Where a feature verb is refused, it is refused on **one** line in
-         *The refusal line*'s shape and reaches no write seam. Unregistering the chat command,
+         *The refusal line*'s shape and reaches no write seam. Under the `perf` hold alone it
+         is refused with `Not available during a performance capture.` instead. A refusal that
+         picks the disabled line from a bare stood-down check, and so tells a player mid-capture
+         to run `/<slash> enable`, is a finding (*Which refusal, by hold*). Unregistering the chat command,
          dropping the `COMMANDS` table or the dispatcher remains a failure for the original reason:
          the verb that turns it back on goes with them.
        - **The launcher.** A left-click that no longer opens the panel while disabled; a right-click

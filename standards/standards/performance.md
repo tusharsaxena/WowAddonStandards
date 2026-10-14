@@ -137,7 +137,7 @@ worse than no declaration, because a reader who trusts it subtracts the wrong pa
 
 ### 6. The suspend / resume host contract (MUST)
 
-The lib owns the state and the announcement; the **host** owns what "inert" means. Both halves of this contract have cost a real capture when broken.
+The lib owns the state and the announcement; the **host** owns what "inert" means. Both halves of this contract have cost a real capture when broken. A feature verb refused during the suspended arm says so with its own line, `Not available during a performance capture.`, and never with the disabled line's `/<slash> enable` (slash-commands-§7, *Which refusal, by hold*).
 
 **This contract is no longer perf's alone, and the machinery it describes is the collection's stand-down seam.** slash-commands-§7 makes the **disabled** state total and builds it on exactly this — the same unregistration, the same cancellation, the same show-decision gate — because every addon already ships it here and disable had simply declined to use it. Suspend and disable are therefore **two named holds on one latch** (`LibKa0s-Lifecycle-1.0`, library-stack-§7), not two teardown paths: the harness takes the `perf` hold rather than calling the host's inert routine directly, and **releasing one hold MUST NOT stand up an addon the other is still holding down**. Everything below is unchanged in force; what changes is that *resume* means **release this hold and re-evaluate**, never a bare stand-up. A player can disable the addon during a suspended arm, and re-enable it there too, so the trap is reachable rather than theoretical.
 
