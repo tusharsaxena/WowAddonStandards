@@ -261,7 +261,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
      and stand-up edge with its holds, and write no edge line of your own in the callbacks
      (debug-logging-§4, §8). The launcher's left-click
      still opens the panel, and its right-click menu keeps *Enabled* live and grays the rest. Ship
-     `tests/test_disabled.lua` with the addon. A greenfield addon is the one place this is cheap —
+     `tests/test_disabled.lua` with the addon, all ten steps of slash-commands-§7, its step 6
+     asserting per event that `__fireUnconditional` returned at least 1, so a fire that reached no
+     handler fails instead of passing. A greenfield addon is the one place this is cheap —
      retrofitting it is the collection's largest outstanding obligation.
    - **Font, border and bar controls come from the composers**, never typed out — one call each emits
      the canonical rows in the canonical order, and anything extra the surface needs is appended
