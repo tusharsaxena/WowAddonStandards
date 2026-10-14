@@ -189,8 +189,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    - **The landing body is one library call:** `buildMain = function(ctx)
      NS.Helpers.BuildLandingPage(ctx, NS.LANDING) end`, with the spec declaring the logo path, a
      `notes` function and a `rows` function over `NS.Slash:LandingRows()` (options-ui-§5). Do **not**
-     write an `addLogo` or any landing body of your own, and never draw on an AceGUI widget's
-     `.frame` or `.content` without undoing it in that widget's `"OnRelease"` (options-ui-§19): AceGUI
+     write an `addLogo` or any landing body of your own, and never draw on, or reparent a frame onto,
+     an AceGUI widget's `.frame` or `.content` without undoing it in that widget's `"OnRelease"`
+     (options-ui-§19): AceGUI
      pools the frames, and seven addons shipped a logo that could reappear under *Slash Commands* after a
      re-render (anti-pattern #93).
    - **The General page's first tab is named exactly `Master controls`** and is built by the library's

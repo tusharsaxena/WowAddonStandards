@@ -982,11 +982,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        Second, `grep -nE '\.(frame|content)(:|\)|,)'` over the settings and module files, then read
        every hit that is an AceGUI widget's `.frame` or `.content` passed to `CreateTexture`,
        `CreateFontString`, `CreateLine`, `CreateMaskTexture`, `CreateFrame(…, parent)`, `SetScript` or
-       `HookScript`: each one **MUST** be undone in that widget's `"OnRelease"` callback, and there
-       **MUST** be exactly one `"OnRelease"` per widget (a second `SetCallback` replaces the first)
-       and none on a widget a library maker returned. Anchoring a Blizzard frame **to** a widget
-       frame, or reading its size, is not a hit. Report each hit as `file:line` with the widget type
-       and whether its release undoes it. A hand-rolled landing body is one root; a leak inside it is
+       `HookScript`, or passed to `SetParent` by an addon-owned frame (`x:SetParent(widget.frame)`):
+       each one **MUST** be undone in that widget's `"OnRelease"` callback (a reparented frame
+       re-homed to an addon-owned park frame, `ClearAllPoints`, `Hide`), and a park done only by the
+       page renderer before `ClearScroll` is a finding, belt-and-braces beside the `"OnRelease"` is
+       not. There **MUST** be exactly one `"OnRelease"` per widget (a second `SetCallback` replaces
+       the first) and none on a widget a library maker returned. Anchoring a Blizzard frame **to** a
+       widget frame, or reading its size, is not a hit, and neither is the opposite direction,
+       `widget.frame:SetParent(addonFrame)`, which AceGUI's own `Release` resets. Report each hit as
+       `file:line` with the widget type and whether its release undoes it. A hand-rolled landing body is one root; a leak inside it is
        its dependent, not a second finding.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
