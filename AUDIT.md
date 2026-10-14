@@ -405,12 +405,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the MUST failure it is.
    - **Check the TOC's position annotations (`toc-file-§5`).** At every position in the listing
      (`# Core`, `# Defaults`, `# Modules`, `# Settings` and any other group), every line whose
-     position is **load-bearing** — a library major taken as an upvalue at file scope, a constant
-     resolved from an earlier seam at file load, an `NS` member read or written at file scope —
-     **MUST** carry a comment at the line naming what resolves. Read every listed file for
-     file-scope reads and writes of `NS` members and library majors (the `modules/` and `settings/`
-     files as much as the seam files and `core/Constants.lua`) to establish which positions actually
-     are load-bearing rather than trusting the comments to be complete; an
+     position is **load-bearing** under toc-file-§5's positional test — (a) a file-scope read of
+     something a file **in the same `#` section** (or one the section order does not pin) published,
+     or (b) a row appended to a **TOC-ordered table** whose order matters, such as a handler on a
+     **shared event** — **MUST** carry a comment at the line naming what resolves, or the table and
+     what must come first. Read every listed file for file-scope reads and for appends to ordered
+     tables (the `modules/` and `settings/` files as much as the seam files and `core/Constants.lua`)
+     to establish which positions actually are load-bearing rather than trusting the comments to be
+     complete; a `modules/` or `settings/` line whose only load-time reads are of `core/` members is
+     conventional, not load-bearing, and is not a MUST row; an unannotated or `Conventional`-labeled
+     (b) position **is** one; an
      unannotated load-bearing line is the MUST failure, and a load-bearing line annotated only as
      *"order matters"* without naming what resolves is the same failure in weaker form. A TOC that
      annotates its load-bearing lines but never marks a **conventional** position fails the SHOULD,

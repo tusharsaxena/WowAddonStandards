@@ -243,11 +243,14 @@ settings\OptionsSetup.lua                -- before every settings\<Page>.lua
 settings\<Page>.lua
 ```
 
-The marks are not confined to `# Core`. The load-bearing denominator is **every listed file** that
-binds, reads or writes an `NS` member or a library major at file scope, so a `modules\` or
-`settings\` file that takes `NS.Something` as an upvalue when it loads carries a `LOAD-BEARING`
-comment too, naming what resolves; where any of several files satisfies the constraint, the comment
-names what resolves and which files satisfy it (toc-file-§5).
+The marks are not confined to `# Core`. A position is load-bearing when a move the section headers
+still allow would change behavior, so a `modules\` or `settings\` file carries a `LOAD-BEARING`
+comment too when it reads a **same-section** producer at file scope (naming what resolves), or when
+it appends a row whose order matters to a **TOC-ordered table** — a handler on an event another
+module also handles, a schema row, a walked sink list — naming the table and what must come first.
+A file whose only load-time reads are of `core\` or `defaults\` members is conventional: the header
+order already fixes that. Where any of several files satisfies a constraint, the comment names what
+resolves and which files satisfy it (toc-file-§5).
 
 `libs\LibKa0s\LibKa0s.xml` is a **single** entry — naming the module files individually is the same
 partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file
