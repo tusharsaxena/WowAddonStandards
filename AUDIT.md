@@ -793,7 +793,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (b) a **structural registry write** — the collection passes all three of architecture-§5's tests,
      and the write is membership or an item on its closed identity-and-bookkeeping list (order, id
      counter, storage key, stamped id, frame name, a lookup-key name no row addresses, the seeding
-     sentinel) — is compliant only inside the one writer `docs/ARCHITECTURE.md` → Settings Schema
+     sentinel, the current-member pointer) — is compliant only inside the one writer `docs/ARCHITECTURE.md` → Settings Schema
      names for that registry, or `docs/schema.md` names when that section has spilled and links
      there (documentation-§3); a hit in a panel file or a slash handler is filed against the writer (anti-pattern #78),
      never as a demand that membership route through the helper. A collection the helper already takes
