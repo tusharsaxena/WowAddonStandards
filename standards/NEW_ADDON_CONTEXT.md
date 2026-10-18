@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.82.0, 2026-10-17)
+# New Ka0s Addon — Context Pack (v2.83.0, 2026-10-18)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -130,6 +130,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     Global.lua           -- only if needed
   locales/
     enUS.lua             -- canonical
+    enUS_<Topic>.lua     -- optional split, once enUS.lua would pass 1000 lines (localization-§6)
     PostLoad.lua         -- derived-key aliases
   settings/
     Schema.lua
@@ -211,6 +212,8 @@ libs\LibKa0s\LibKa0s.xml                 -- ONE line; the .xml is itself the fil
 
 # Locales
 locales\enUS.lua
+#   locales\enUS_<Topic>.lua             -- only if enUS.lua was split, past 1000 lines (localization-§6); directly after it,
+#                                        -- LOAD-BEARING: fills NS.L, which enUS.lua creates
 
 # Core — dependency-correct order (layout-§1). Every LOAD-BEARING position says what resolves at
 #        load; the unmarked lines are conventional and free to move (toc-file-§5).
@@ -1607,6 +1610,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - A numbered list in `README.md` — CurseForge's description page does not render one; use `- ` bullets and let the words carry the order (documentation-§1).
 - Missing the standards reference in project memory & context: no `## Standards compliance (read first)` section in `CLAUDE.md` (documentation-§6).
 - Shipping this pack in the repo as `docs/agent-context.md` or under any other name (documentation-§3, anti-pattern #49).
+- A locale topic file that creates its own `NS.L`, a key defined in two files of one locale, or a locale gate that reads `enUS.lua` alone once the locale is split (localization-§6, anti-pattern #94).
 - British spelling in authored English text — `colour`/`grey`/`behaviour`/`centre`/`cancelled`/`-ise`/`-isation` in a locale key or value, a player-visible string, a comment, an identifier, or docs (localization-§5, anti-pattern #46).
 - Creating a feature/topic branch the owner did not direct, or one not shared by name across the repos of a multi-repo changeset (versioning-git, anti-pattern #21).
 

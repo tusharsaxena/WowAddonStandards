@@ -7,6 +7,7 @@ into the player's language via `NS.L`. Section 4 governs the addon's **input** �
 arrives *already* in the player's language, so any logic that branches on a localized display string
 silently breaks on every client whose locale differs from the author's. Both directions are mandatory.
 Section 5 fixes the **source dialect** every English string in the collection is written in.
+Section 6 says how a locale file is **split** when it would pass layout-§1's 1500-line cap.
 
 ### 1. Module shape
 
@@ -65,8 +66,9 @@ is that place, and the re-check trigger is what stops "English-only" from silent
 decision: the moment a `deDE.lua` lands, the row's trigger has fired and the routing work is owed.
 
 **A recorded decision is not a license to leave the seam unused.** Strings the addon *does* route stay
-routed, and `enUS.lua` **MUST NOT** accumulate keys nothing reads — a dead key is a claim about
-coverage that is not true (documentation-§5). Delete it or wire it.
+routed, and `enUS.lua` **MUST NOT** accumulate keys nothing reads, measured over it and every topic
+file split from it (localization-§6) — a dead key is a claim about coverage that is not true
+(documentation-§5). Delete it or wire it.
 
 ### 4. Match game data on IDs, not localized strings
 
@@ -325,3 +327,103 @@ Lint cannot catch any of this (`luacheck` does not read English), so enforcement
 the gate above for the mechanical part, `/dev-copilot:wow-standards-audit`, which flags a British spelling
 in authored text as a deviation, and review for the rest — the locale-key ripple, the four exceptions,
 and the forms no substring can decide.
+
+### 6. Splitting a locale file at the cap
+
+A locale file is an authored `.lua` file, so layout-§1's 1500-line cap binds it like any other, and
+layout-§1's peel **MAY** is the way out. What layout-§1 does not say, because it is the same for every
+other file, is what makes a locale file different: every file of one locale writes **one** table,
+`NS.L`, and the gates that read it (localization-§3) measure that table, not a file. A peel that
+gets either half wrong fails silently. A topic file that builds its own table throws away every key
+loaded before it, and on enUS nobody notices, because the key-on-miss fallback answers each lost key
+with itself. A gate that reads only `enUS.lua` passes a dead key in the topic file for as long as
+the topic file exists. So the split has a fixed shape, and anti-patterns #94 names the ways it
+goes wrong.
+
+**The base file keeps its name and its job (MUST).** `locales/enUS.lua` stays, under that name, and
+it is the **only** file that creates `NS.L` and sets its metatable (localization-§1). It is not
+renamed to `enUS_Core.lua` the way layout-§1's example renames `settings/Schema.lua`, because
+localization-§3's coverage MUST and every audit look for `enUS.lua` by name.
+
+**A topic file fills the base file's table and nothing else (MUST).** It opens with
+`local _, NS = ...` and `local L = NS.L`, then assigns keys. It **MUST NOT** assign `NS.L`, call
+`setmetatable` on it, or keep a table of its own.
+
+**Naming (MUST).** `locales/enUS_<Topic>.lua`, where `<Topic>` is PascalCase and names the
+**consumer** whose strings the file holds: a source folder (`enUS_Settings.lua` for `settings/`) or
+a feature module (`enUS_Tooltips.lua`). That is the `_<Topic>` form layout-§1's peel example uses
+(`Schema_Core.lua`, `Schema_Display.lua`). A topic named for a size or a range (`enUS_2.lua`,
+`enUS_A-M.lua`) is forbidden: when a feature's strings change, its author has to know which file to
+open, and only a consumer's name says that.
+
+**Every key lives in exactly one file of its locale (MUST).** Keys are the English strings
+(localization-§2), so two consumers often share one. A key defined in two files is resolved by load
+order, last write wins, and the earlier definition becomes dead text that still looks live. That is
+a dead key (localization-§3) that no reader of either file can see. A shared key **SHOULD** sit in
+the file of its **first reader in TOC load order**. Because layout-§1 loads `settings/*` last, a
+string that a module and the settings panel both read stays in `enUS.lua`, and `enUS_Settings.lua`
+holds only what the panel alone reads. Inside each file, keys are grouped under one comment heading
+per first reader, in TOC load order, as in the base file.
+
+**Load order (MUST).** In the TOC's `# Locales` group, `enUS.lua` first, then its topic files,
+contiguous and directly after it, then every other locale's files, then `PostLoad.lua`, whose
+aliases read keys from all of them. Each topic file reads `NS.L` at file load from a file in the
+same `#` section, so its line is **load-bearing** under toc-file-§5 (a), and that line **MUST**
+carry the `LOAD-BEARING` comment saying so: what it reads at load (`NS.L`) and from which file
+(`enUS.lua`).
+
+**A translation mirrors the split (SHOULD).** A translation carries the same keys as enUS, so it
+reaches the cap about when enUS does. Split it the same way: `deDE.lua` plus `deDE_<Topic>.lua`, one
+per enUS topic, each key's translation in the file whose enUS counterpart holds the key. A
+translator then works one pair of files at a time, and a key moved between enUS files shows up as a
+change to the matching translation pair rather than as a translation nobody can find. Every file of
+a translation **MUST** carry its own `if GetLocale() ~= "<locale>" then return end` as its first
+statement (localization-§1). A gate on one file does not cover its siblings, and an ungated topic
+file overwrites enUS on every client. The translation's files load after all of enUS's, base first,
+topics contiguous after it, under the same naming and one-file-per-key rules as enUS. A translation
+far under the cap **MAY** stay one file.
+
+**The gates read the union (MUST).** Coverage (every routed key has an enUS entry) and the dead-key
+rule (no enUS key that nothing reads, localization-§3) are statements about the table, so they are
+measured over the **union** of every file of the locale. A key is missing only if no enUS file
+defines it, and dead if it sits in any enUS file and nothing reads it. A gate that does this:
+
+- **MUST** read every file of the locale. It **SHOULD** derive the list from the TOC: the
+  `locales\enUS.lua` line and every `locales\enUS_*.lua` line, in TOC order. A hand-written list is
+  allowed only when a test asserts it **equals** that TOC set. Asserting that two named files are
+  present is not enough, because it stays green when a third topic file arrives unread.
+- **MUST** load the files in TOC order into **one** namespace, so it reads the table the client
+  builds, and read that table raw so the fallback cannot answer for a missing key (localization-§1).
+- **MUST** fail on a key defined in more than one file of the same locale. The loaded table cannot
+  show this, because last write wins there too, so the check reads the files' text.
+
+**After the split.** Nothing is over the cap, so layout-§1's census owes no row for it. The new file
+is a source file like any other, so the module map lists it (documentation-§3, `docs/module-map.md`).
+The split **MAY** come earlier than the cap, in layout-§1's 1000–1500 band, on the same rules.
+
+**The case that set the shape.** Ka0s Drop Watcher's tooltip rework added 487 keys and removed 282,
+which took `locales/enUS.lua` from 1446 lines to 1598, over the cap. It moved its settings panel's
+strings into `locales/enUS_Settings.lua` (304 lines), loaded directly after `enUS.lua`, and the base
+file came down to 1323 (`DropWatcher@2bfef72`: `DropWatcher.toc`'s `# Locales` group,
+`locales/enUS.lua`, `locales/enUS_Settings.lua`). The topic file opens with `local L = NS.L` under a
+header naming the base file as the owner of the table, and groups its keys under one heading per
+reader in TOC order (`DropWatcher@2bfef72:locales/enUS_Settings.lua:1`). It was grouped by reader
+but not filed by **first** reader: four of its keys, `This instance`, `This session`, `Instance` and
+`the group`, were also read by modules that load before `settings/` (`modules/WindowFilterBar.lua`,
+`modules/WindowCells.lua`, `modules/MineCells.lua`), and conforming moved them back to `enUS.lua`
+(`DropWatcher@ef05ed0`). `tests/test_locale.lua` loaded both files from a hand-written
+`ENUS_FILES` list, in order, into one stub namespace, and read the table raw for coverage
+(`DropWatcher@2bfef72:tests/test_locale.lua`, `ENUS_FILES` and `enUS()`). The review that followed
+added the dead-key direction, which scans every listed file's key lines
+(`DropWatcher@86fac39:tests/test_locale.lua`, *every enUS key is still read by the addon's files*).
+No test asserted that list equal to the TOC's enUS set. `tests/test_harness.lua` pins the TOC's
+first three entries (the two locale files, then `core/Namespace.lua`;
+`DropWatcher@2bfef72:tests/test_harness.lua:33`), which reddens on a topic file added inside the
+block but never reads `ENUS_FILES`, so it is not that equality test; conforming replaced the list
+with one read from the TOC (`DropWatcher@ef05ed0:tests/test_locale.lua`, `enUSFiles()`). The rule
+above takes the case's base-file, naming, load-order, one-namespace and raw-read shape as found. Four
+things it adds were gaps in the case at `DropWatcher@86fac39`: the first-reader placement of a shared
+key, the file list read from the TOC or pinned equal to it, the duplicate-key failure, and the topic
+line's `LOAD-BEARING` comment. The translation mirror is new, because the addon ships no other locale.
+As measured on 2026-10-18 no other addon in the roster has split a locale file. The largest single
+`enUS.lua` outside Drop Watcher was MultiMeters' at 1062 lines, in the 1000–1500 band.
