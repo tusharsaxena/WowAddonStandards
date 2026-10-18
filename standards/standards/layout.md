@@ -32,7 +32,7 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
     Slash.lua              -- AceConsole binding; reads Schema for get/set/list/reset
   locales/
     enUS.lua               -- canonical
-    enUS_<Topic>.lua       -- only once enUS.lua would pass the cap; directly after it (localization-§6)
+    enUS_<Topic>.lua       -- optional split, once enUS.lua would pass 1000 lines; directly after it (localization-§6)
     deDE.lua, frFR.lua, ... -- gated with `if GetLocale() ~= "deDE" then return end`
     PostLoad.lua           -- derived-key aliases (L[2806] = L[2706])
   modules/

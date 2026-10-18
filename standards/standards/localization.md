@@ -402,21 +402,28 @@ is a source file like any other, so the module map lists it (documentation-§3, 
 The split **MAY** come earlier than the cap, in layout-§1's 1000–1500 band, on the same rules.
 
 **The case that set the shape.** Ka0s Drop Watcher's tooltip rework added 487 keys and removed 282,
-which took `locales/enUS.lua` from 1446 lines to 1598, over the cap. It moved the strings that only
-the settings panel reads into `locales/enUS_Settings.lua` (304 lines), loaded directly after
-`enUS.lua`, and the base file came down to 1323 (`DropWatcher@2bfef72`: `DropWatcher.toc`'s
-`# Locales` group, `locales/enUS.lua`, `locales/enUS_Settings.lua`). The topic file opens with
-`local L = NS.L` under a header naming the base file as the owner of the table, and groups its keys
-under one heading per first reader in TOC order (`DropWatcher@2bfef72:locales/enUS_Settings.lua:1`).
-`tests/test_locale.lua` loads both files from a hand-written list, in order, into one stub
-namespace, and reads the table raw for coverage (`DropWatcher@2bfef72:tests/test_locale.lua`,
-`ENUS_FILES` and `enUS()`). The review that followed added the dead-key direction, which scans
-every listed file's key lines (`DropWatcher@86fac39:tests/test_locale.lua`, *every enUS key is still
-read by the addon's files*). `tests/test_harness.lua` pins the two files as the TOC's first and
-second entries and `core/Namespace.lua` as its third, so the hand-written list and the TOC's enUS
-set cannot drift apart unnoticed while the addon ships no other locale
-(`DropWatcher@2bfef72:tests/test_harness.lua:33`). The rule above takes that shape as found and adds
-three things the case had no reason to meet yet: the duplicate-key failure, deriving the file list
-from the TOC, and the translation mirror. As measured on 2026-10-18 no other addon in the roster has
-split a locale file. The largest single `enUS.lua` outside Drop Watcher was MultiMeters' at 1062
-lines, in the 1000–1500 band.
+which took `locales/enUS.lua` from 1446 lines to 1598, over the cap. It moved its settings panel's
+strings into `locales/enUS_Settings.lua` (304 lines), loaded directly after `enUS.lua`, and the base
+file came down to 1323 (`DropWatcher@2bfef72`: `DropWatcher.toc`'s `# Locales` group,
+`locales/enUS.lua`, `locales/enUS_Settings.lua`). The topic file opens with `local L = NS.L` under a
+header naming the base file as the owner of the table, and groups its keys under one heading per
+reader in TOC order (`DropWatcher@2bfef72:locales/enUS_Settings.lua:1`). It was grouped by reader
+but not filed by **first** reader: four of its keys, `This instance`, `This session`, `Instance` and
+`the group`, were also read by modules that load before `settings/` (`modules/WindowFilterBar.lua`,
+`modules/WindowCells.lua`, `modules/MineCells.lua`), and conforming moved them back to `enUS.lua`
+(`DropWatcher@ef05ed0`). `tests/test_locale.lua` loaded both files from a hand-written
+`ENUS_FILES` list, in order, into one stub namespace, and read the table raw for coverage
+(`DropWatcher@2bfef72:tests/test_locale.lua`, `ENUS_FILES` and `enUS()`). The review that followed
+added the dead-key direction, which scans every listed file's key lines
+(`DropWatcher@86fac39:tests/test_locale.lua`, *every enUS key is still read by the addon's files*).
+No test asserted that list equal to the TOC's enUS set. `tests/test_harness.lua` pins the TOC's
+first three entries (the two locale files, then `core/Namespace.lua`;
+`DropWatcher@2bfef72:tests/test_harness.lua:33`), which reddens on a topic file added inside the
+block but never reads `ENUS_FILES`, so it is not that equality test; conforming replaced the list
+with one read from the TOC (`DropWatcher@ef05ed0:tests/test_locale.lua`, `enUSFiles()`). The rule
+above takes the case's base-file, naming, load-order, one-namespace and raw-read shape as found. Four
+things it adds were gaps in the case at `DropWatcher@86fac39`: the first-reader placement of a shared
+key, the file list read from the TOC or pinned equal to it, the duplicate-key failure, and the topic
+line's `LOAD-BEARING` comment. The translation mirror is new, because the addon ships no other locale.
+As measured on 2026-10-18 no other addon in the roster has split a locale file. The largest single
+`enUS.lua` outside Drop Watcher was MultiMeters' at 1062 lines, in the 1000–1500 band.

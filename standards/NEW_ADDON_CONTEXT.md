@@ -130,7 +130,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     Global.lua           -- only if needed
   locales/
     enUS.lua             -- canonical
-    enUS_<Topic>.lua     -- only once enUS.lua would pass the 1500-line cap (localization-§6)
+    enUS_<Topic>.lua     -- optional split, once enUS.lua would pass 1000 lines (localization-§6)
     PostLoad.lua         -- derived-key aliases
   settings/
     Schema.lua
@@ -212,7 +212,7 @@ libs\LibKa0s\LibKa0s.xml                 -- ONE line; the .xml is itself the fil
 
 # Locales
 locales\enUS.lua
-#   locales\enUS_<Topic>.lua             -- only if enUS.lua passed the cap (localization-§6); directly after it,
+#   locales\enUS_<Topic>.lua             -- only if enUS.lua was split, past 1000 lines (localization-§6); directly after it,
 #                                        -- LOAD-BEARING: fills NS.L, which enUS.lua creates
 
 # Core — dependency-correct order (layout-§1). Every LOAD-BEARING position says what resolves at
