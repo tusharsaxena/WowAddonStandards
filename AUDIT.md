@@ -511,8 +511,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      this check mechanical:
      - **A private copy is a deviation** (anti-pattern #63). List the addon's own `media/` tree: a
        `fonts/` or `textures/` entry that also exists under `libs/LibKa0s/media/`, or an `icons/`
-       entry the library's catalog (`MediaIcons.lua`, `Media.lua`) names, is a second copy, and the monospace face is the usual one because it predates the library payload.
-       What legitimately remains is the logo and the screenshots.
+       entry the library's catalog (`MediaIcons.lua`, `Media.lua`) names, is a second copy, and the
+       monospace face is the usual one because it predates the library payload. What legitimately
+       remains is the logo and the screenshots.
      - **A one-off mark where the catalog has one is the commoner deviation.** Grep the addon's own
        source for `SetText` on a control (`"X"`, `"\226\156\150"`, `"Copy"`, `"Clear"`), for
        `SetAtlas`, and for texture paths under `Interface\` that are not the shared payload; cross
@@ -1143,18 +1144,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `Only in <LibKa0sRepo>/…` for icons the addon did not declare, and the declared set is checked by
      step 4's icon-subset check — plus
      **`diff -r <LibKa0sRepo>/testkit <Addon>/tests/_kit`** for the vendored test harness — which
-     lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty, the first outside `media/icons/`. Diff
-     against the **tag the addon's root `CLAUDE.md` names** — the provenance line
-     `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6) — which is the same ref the repo's
-     own vendored-payload gate resolves. **The line missing from `CLAUDE.md`, or still sitting in
-     `README.md`, is itself a finding** (anti-pattern #59): since LibKa0s v1.8.1 / testkit revision 9
-     `tests/_kit/vendor_sync.lua` reads `CLAUDE.md` with no fallback, so that repo's gate is red. This check
-     exists because drift is otherwise **invisible**: the library's suite passes against the library,
-     the addon's suite passes against the stale copy, and **both repos stay green** while the two
-     diverge (anti-pattern #45). A non-empty diff is the evidence for a #45 deviation; a *missing*
-     file on the addon side is the evidence for **#48**. If the sibling library repo is not present on
-     the machine, mark the check **not run** and say so — never infer it from the code looking
-     reasonable, and never quietly skip it.
+     lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty, the first
+     outside `media/icons/`. Diff against the **tag the addon's root `CLAUDE.md` names** — the
+     provenance line `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6) — which is the
+     same ref the repo's own vendored-payload gate resolves. **The line missing from `CLAUDE.md`, or
+     still sitting in `README.md`, is itself a finding** (anti-pattern #59): since LibKa0s v1.8.1 /
+     testkit revision 9 `tests/_kit/vendor_sync.lua` reads `CLAUDE.md` with no fallback, so that
+     repo's gate is red. This check exists because drift is otherwise **invisible**: the library's
+     suite passes against the library, the addon's suite passes against the stale copy, and **both
+     repos stay green** while the two diverge (anti-pattern #45). A non-empty diff is the evidence
+     for a #45 deviation; a *missing* file on the addon side is the evidence for **#48**. If the
+     sibling library repo is not present on the machine, mark the check **not run** and say so —
+     never infer it from the code looking reasonable, and never quietly skip it.
    - **Read the `.luacheckrc` before you quote the `0/0`: since v2.39.0 the test tree is in scope
      (`lint`).** A `0 warnings / 0 errors` line says nothing until you know what it was run
      over. `exclude_files` **MUST** narrow to `tests/_kit/` — the vendored kit, linted in its own

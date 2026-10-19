@@ -368,8 +368,9 @@ addon is most likely to drop by mistake:
 
 - **Whole-folder vendoring of `libs/LibKa0s/`** (library-stack-§7, anti-patterns #48). The addon still
   consumes Core, DebugLog, Slash and Options out of the same ship folder; the folder is copied whole or
-  not at all, and dropping `Perf.lua` because this section no longer applies is the partial re-vendoring
-  the anti-pattern names.
+  not at all, save `media/icons/`, pruned to its declaration (library-stack-§7), and dropping
+  `Perf.lua` because this section no longer applies is the partial re-vendoring the anti-pattern
+  names.
 - **`perf` stays a reserved verb** (slash-commands-§2). It is reserved so it can never mean anything
   else in any Ka0s addon; an exempt addon simply does not register it.
 - **`docs/performance.md` stays required** (documentation-§3) and shrinks to a **one-screen page**

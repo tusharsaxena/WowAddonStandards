@@ -463,6 +463,27 @@ passing**. Both copies keep working when they drift, so both suites stayed green
   transition (library-stack-§7): nothing reddens the day the gate lands, and the line arrives with
   the addon's next re-vendor. The gate cannot see whether an `all` addon really offers the player a
   chooser; that half is the auditor's (anti-patterns #95).
+  - **MUST** parse the line by this published grammar, so the gate and an auditor reading by hand
+    reach the same verdict:
+    1. Read root `CLAUDE.md` line by line, stripping a trailing CR (the file is CRLF under the
+       `eol=crlf` pin) and then any trailing whitespace from each line.
+    2. **Placement.** The icons line is the **next non-blank line** after the line holding the
+       provenance match (`[Bb]undles %[LibKa0s%]%b() (v[%d%.]+)`, documentation-§2 item 6), whether
+       that phrasing is a standalone sentence or mid-sentence. It is its own line, never appended to
+       the provenance line. No line anywhere starting `LibKa0s icons:` is the transition (compared
+       whole); such a line present but not in that position is **malformed**, as is a second one.
+    3. **Shape.** The line **MUST** match `^LibKa0s icons: (.-)%.$` (no leading whitespace, one space
+       after the colon, ending in the period). The capture is the body.
+    4. **Forms.** A body of exactly `none` is `none`. A body matching `^all %((.+)%)$`, whose capture
+       is not blank, is `all` with its reason. Anything else is a list: split on `,`, trim
+       whitespace from both ends of each item. An empty body, an empty item (`a,,b`, a trailing
+       comma), `all` or `none` appearing as a list item, or a **duplicate** name is **malformed**.
+    5. **Case.** Everything is case-sensitive: `all`, `none`, the `ph:` and `gi:` prefixes and the
+       names are lowercase as written in the catalog. `PH:sword` or `All (icon picker)` is not
+       another spelling; it is an unknown name or a malformed line, because `Media.Icon` matches the
+       prefix with `^(%l+:)` and would not resolve it either.
+    6. Each list name **MUST** be a key of the catalog at the bundled tag, exactly as `Media.Icon`
+       takes it; a name that is not is a failure naming it.
 - **MUST** register as a **skip carrying its reason** when the precondition is absent — the sibling
   checkout is not there, or the ref cannot be resolved. It **MUST NOT** register as a pass, and it
   **MUST NOT** fail: a fresh clone with no sibling has not proven the payload is current and has not

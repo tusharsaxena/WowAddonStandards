@@ -137,14 +137,14 @@ Hand-rolling any of these inside an addon — a private debug console, a private
   - The line **MUST** move in the **same commit** as the bytes, in both directions. A payload re-vendored past its line leaves a document asserting the wrong version; a line bumped ahead of the payload reads as done and is not.
 
 **The icon subset (MUST).** The one carve-out from whole-folder vendoring, and it is a carve-out of
-**art**, never of code. `media/icons/` was about 18 MB of TGA across 5,836 files at `LibKa0s v1.74.0`
-(28 MB on disk once block overhead is counted, 5.6 MB zipped): Game-icons 15 MB in 4,180 files under
-`game-icons/`, Phosphor 2.7 MB in 1,435 under `phosphor/`, Open Iconic 0.4 MB in 225 flat at the
-folder's root. The whole folder was copied into every one of the twelve roster addons, and nearly all
-of them draw a dozen of those icons or fewer. The reasons the rest of the payload is whole-folder —
-a major refusing to register without its floor, a shell `:New`ing without its attach file
-(anti-patterns #48) — are reasons about **code**. No icon is anyone's floor and no module reads an
-icon file, so they do not reach the art, and nothing else argued for carrying it.
+**art**, never of code. `media/icons/` was about 18 MB of TGA across 5,836 icons at `LibKa0s v1.74.0`
+(28 MB on disk once block overhead is counted, 5.6 MB zipped): Game-icons 15 MB in 4,178 icons under
+`game-icons/`, Phosphor 2.7 MB in 1,434 under `phosphor/`, Open Iconic 0.4 MB in 224 flat at the
+folder's root, plus four attribution files. The whole folder was copied into every one of the twelve
+roster addons, and nearly all of them draw a dozen of those icons or fewer. The reasons the rest of the
+payload is whole-folder — a major refusing to register without its floor, a shell `:New`ing without its
+attach file (anti-patterns #48) — are reasons about **code**. No icon is anyone's floor and no module
+reads an icon file, so they do not reach the art, and nothing else argued for carrying it.
 
 - **The declaration.** A consumer's root `CLAUDE.md` **MUST** carry **one** `LibKa0s icons:` line
   directly under its `Bundles [LibKa0s](…) vX.Y.Z (MIT).` line (documentation-§2 item 6), in exactly
@@ -159,7 +159,9 @@ icon file, so they do not reach the art, and nothing else argued for carrying it
   A name is a `lib.ICONS` catalog name exactly as `Media.Icon` takes it: Open Iconic **unprefixed**,
   Phosphor as **`ph:<name>`**, Game-icons as **`gi:<name>`**. The list is comma-separated and ends
   in a period. A name that is not in the catalog **at the tag the `Bundles` line names** is an error,
-  not a no-op.
+  not a no-op. "Directly under" means the next non-blank line; the exact grammar the gate parses
+  (CR and trailing whitespace, spacing after commas, case, duplicates, an empty list) is published
+  in testing-§11, and a line it rejects is malformed.
 - **What ships is exactly what is declared (MUST).** The consumer's `libs/LibKa0s/media/icons/`
   **MUST** hold every declared icon, each **byte-identical** to the tag, and **MUST NOT** hold an icon
   it did not declare. An extra icon is the dead weight this rule exists to remove; a missing one is
@@ -169,8 +171,8 @@ icon file, so they do not reach the art, and nothing else argued for carrying it
   parenthesized reason naming the player-facing surface that offers the catalog — `all (icon
   picker).`, `all (icon browser).` — and **MUST** be used only by an addon whose UI lets the
   **player** choose among the catalog. An addon that would merely find listing its icons tedious
-  lists them. Ka0s Quick Comms, whose pads and dials let the player pick any icon in the catalog, is
-  the case `all` exists for.
+  lists them. Ka0s Quick Comms, whose icon browser lets the player pick any catalog icon, is the
+  case `all` exists for.
 - **The icons the library draws for you are yours to declare (MUST).** An icon the library resolves
   on the host's behalf, because the host passed it its addon folder name, is the host's use: the
   host's folder holds the file or the control is blank. At `LibKa0s v1.74.0` those are `close`
@@ -178,9 +180,11 @@ icon file, so they do not reach the art, and nothing else argued for carrying it
   console's and the perf panel's among them), `copy` and `clear` (the debug console's title bar,
   debug-logging-§13), and `info` (an `Options` id list's default help mark, when the host supplies no
   `helpIcon`). An addon wiring the debug console with its `addonName`, which debug-logging requires
-  of every addon, therefore declares at least `close, copy, clear`. The authoritative list is the
-  bundled tag's own documentation, not this paragraph: a library release that draws a new icon on a
-  host's behalf **MUST** say so in its changelog, as a re-vendor note.
+  of every addon, therefore declares at least `close, copy, clear`, and `none` suits only a consumer
+  that opens no library window at all (no debug console, no `MakeCloseButton` window, no id list),
+  which no roster addon is today. The authoritative list is the bundled tag's own documentation,
+  not this paragraph: a library release that draws a new icon on a host's behalf **MUST** say so in
+  its changelog, as a re-vendor note.
 - **Attribution travels with its set (MUST).** `media/icons/LICENSE-open-iconic.txt` ships when any
   Open Iconic icon ships; `phosphor/LICENSE-phosphor.txt` when any `ph:` icon ships;
   `game-icons/LICENSE-game-icons.txt` **and** `game-icons/AUTHORS.txt` when any `gi:` icon ships.
@@ -363,13 +367,13 @@ face, and a family of statusbar textures — inside the vendored payload, at `li
 Introduced in **LibKa0s v1.9.0**; the icon path spelling and the texture family settled at v1.9.1 and
 v1.9.2.
 
-**Every Ka0s addon ships it, and that is not a choice it makes.** The payload is whole-folder
-(library-stack-§7), so `media/` arrives with `Core.lua` in the same `cp -r`: the face, the textures
-and both catalogs whole, and of the icon art exactly the icons the addon declares in its root
-`CLAUDE.md` (library-stack-§7, *The icon subset*). The consequence is the rule: an addon that already
-carries the art has **no reason left** to ship its own, and every reason not to — two copies of a mark is two licenses to track, two provenance stories, and a collection
-whose addons stop reading as one author's work the first time one copy is regenerated and the other
-is not.
+**Every Ka0s addon ships it, and the only choice it makes is which icons.** The payload is
+whole-folder (library-stack-§7), so `media/` arrives with `Core.lua` in the same `cp -r`: the face,
+the textures and both catalogs whole, and of the icon art exactly the icons the addon declares in its
+root `CLAUDE.md` (library-stack-§7, *The icon subset*). The consequence is the rule: an addon that
+already carries the art has **no reason left** to ship its own, and every reason not to — two copies
+of a mark is two licenses to track, two provenance stories, and a collection whose addons stop
+reading as one author's work the first time one copy is regenerated and the other is not.
 
 **What the module answers.** Everything it returns is a **path**, and every path is **extensionless**
 (the client appends it; a path carrying `.tga` is one of the two spellings recorded as drawing
