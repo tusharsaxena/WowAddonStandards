@@ -43,7 +43,7 @@ Ka0s addons **MUST ship every library vendored in `libs/` and committed to git**
 - **MUST** vendor all Ace3 and third-party libs under `libs/` and commit them. **MUST NOT** use `.pkgmeta` `externals:` to fetch libraries.
 - **MUST** use the standard folder-per-lib layout (`libs/AceAddon-3.0/AceAddon-3.0.xml`, `libs/LibStub/LibStub.lua`, …) and load libs **first** in the TOC — the lib's `.xml` where it ships one (it pulls the lib's `.lua` + any sub-files), the `.lua` otherwise.
 - **SHOULD** copy the folder-per-lib set from an existing Ka0s addon's `libs/` so lib versions stay consistent across the suite. Pull libs the suite doesn't yet vendor (LibDataBroker-1.1, LibDBIcon-1.0, …) from a current retail install or the upstream release.
-- **MUST** vendor every lib the addon **reaches at runtime**, and only those — vendor what you use, nothing more. Prune dead weight (**except a Ka0s-owned umbrella such as `LibKa0s`, whose ship payload is the whole folder even where the addon wires up only some of its modules — library-stack-§7, anti-patterns #48**) (e.g. AceConfig where only Profiles needs it; AceLocale/AceBucket/AceComm/AceHook/AceSerializer/AceTab where unloaded). This rule is what qualifies library-stack-§1's table: a lib in it that nothing reaches is not vendored, and a lib outside it that something reaches is.
+- **MUST** vendor every lib the addon **reaches at runtime**, and only those — vendor what you use, nothing more. Prune dead weight (**except a Ka0s-owned umbrella such as `LibKa0s`, whose ship payload is the whole folder even where the addon wires up only some of its modules — library-stack-§7, anti-patterns #48 — save its icon art under `media/icons/`, which a consumer vendors to its own declaration and which therefore follows this rule rather than the umbrella's: library-stack-§7, *The icon subset*, anti-patterns #95**) (e.g. AceConfig where only Profiles needs it; AceLocale/AceBucket/AceComm/AceHook/AceSerializer/AceTab where unloaded). This rule is what qualifies library-stack-§1's table: a lib in it that nothing reaches is not vendored, and a lib outside it that something reaches is.
 - **"Reaches" is not "writes `LibStub("X")`" (MUST).** This rule's test used to be the addon's own `LibStub` call, and taken at its word it prunes libs every addon in the collection needs — which is how it ended up contradicting §1's table instead of governing it. There are **three** ways a vendored lib gets reached, and only the first is a `LibStub` call in the addon's own source. Clear all three before calling a lib dead:
   1. **The addon `LibStub`s it directly** — `LibStub("AceGUI-3.0")`, `LibStub("LibSharedMedia-3.0")`. The only case the old wording covered.
   2. **An Ace3 mixin name string**, which AceAddon resolves through `LibStub` on the addon's behalf and which greps as a bare quoted string, not as a call: `AceAddon:NewAddon(NS, addonName, "AceEvent-3.0", "AceTimer-3.0", "AceConsole-3.0")` (BankLedger `core/BankLedger.lua` and WhatGroup `core/WhatGroup.lua`, each at its `NewAddon` call) and `NS:NewModule("Castbar", "AceEvent-3.0")` (KickCD `modules/Castbar.lua`, the `local Castbar` binding). Neither BankLedger nor WhatGroup writes `LibStub("AceTimer-3.0")` anywhere, and both would break without AceTimer-3.0 vendored.
@@ -105,11 +105,11 @@ Hand-rolling any of these inside an addon — a private debug console, a private
 
 **Ship payload vs adoption (MUST).** These are two different questions and they get opposite answers. What you **copy** is all of it; what you **wire** is only what you use.
 
-- The **ship payload is the whole folder, always**. Re-vendoring **MUST** copy the source repo's entire inner `LibKa0s/` folder over `libs/LibKa0s/` — every file, every time. **MUST NOT** copy individual module files, or "just the one that changed" (anti-patterns #48). A partial copy is precisely how cross-major minor skew gets manufactured: the addon ends up carrying a new `Perf.lua` over an old `Core.lua`, or a `Core.lua` that never arrived at all — and fourteen of the fifteen majors refuse to register without Core, so a partial copy costs the addon modules it was not even touching.
+- The **ship payload is the whole folder, always**, with **one** carve-out: the icon art under `media/icons/`, which a consumer vendors to its own declaration (*The icon subset*, below). Everything else — every module, both icon catalogs (`Media.lua`, `MediaIcons.lua`), the fonts, the textures, `LibKa0s.xml`, `LICENSE` — stays whole-folder. Re-vendoring **MUST** copy the source repo's entire inner `LibKa0s/` folder over `libs/LibKa0s/` — every file, every time, then prune `media/icons/` to the declaration. **MUST NOT** copy individual module files, or "just the one that changed" (anti-patterns #48). A partial copy is precisely how cross-major minor skew gets manufactured: the addon ends up carrying a new `Perf.lua` over an old `Core.lua`, or a `Core.lua` that never arrived at all — and fourteen of the fifteen majors refuse to register without Core, so a partial copy costs the addon modules it was not even touching.
 - The TOC **MUST** list the single aggregate `libs\LibKa0s\LibKa0s.xml` (toc-file-§5), which is itself the file list. Naming module files individually in the TOC is the same partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file.
 - **Adoption is per module, on the addon's own schedule.** An addon wires only the modules it actually uses — one setup file per module, each resolving its major with `LibStub(major, true)` and degrading to a stub when it is absent (performance-§1 is the worked example). Carrying the source of a module the addon never wires costs a few kilobytes of never-executed file and buys the guarantee that no consumer ever has to reason about which half arrived.
 - **MUST NOT** list `LibKa0s` under `## Dependencies:` — a Ka0s addon works with no other addon installed (library-stack-§6).
-- **`media/` IS part of the ship payload**, and it is the first part of it that is not code. Every consumer therefore carries the icon set, the monospace face and the bar textures whether or not it wires `LibKa0s-Media-1.0` — the whole-folder rule already required this the day the folder appeared, and library-stack-§8 is about what follows from carrying it.
+- **`media/` IS part of the ship payload**, and it is the first part of it that is not code. Every consumer therefore carries the monospace face and the bar textures whether or not it wires `LibKa0s-Media-1.0` — the whole-folder rule already required this the day the folder appeared, and library-stack-§8 is about what follows from carrying it. The **icon art** is the exception: since v2.85.0 a consumer carries the icons it declares and no others (*The icon subset*, below), while the catalogs naming all of them still arrive whole.
 - The library repo's `testkit/` is **not** part of the ship payload. It is the headless test harness, vendored into a consumer's `tests/_kit/`, and **MUST NOT** be placed under `libs/`: everything under `libs/` is TOC-loadable and ships to the player's install, and a test harness has no business there (testing).
 
 - **MUST** use **one LibStub major per module**, not one for the whole umbrella. LibStub picks the highest **minor of a major**: under a single major, an addon vendoring a copy that predates a module would be served a lib missing that module, and every host would need presence guards. Per-module majors keep version skew narrow and make adding a module purely additive — each addon adopts on its own schedule instead of in a lockstep migration.
@@ -129,12 +129,85 @@ Hand-rolling any of these inside an addon — a private debug console, a private
 
 **Vendor sync (MUST).** Vendoring a third-party lib is a one-time copy that stays stable for months. Vendoring a lib you also author is an ongoing **sync**, and the drift window is a single afternoon.
 
-- The vendored copy **MUST** be **byte-identical** to the source repo's ship folder, whole-folder and file-for-file. `diff -r <LibRepo>/<Lib> <Addon>/libs/<Lib>` **MUST** be empty — which is also what catches a partial re-vendor, since a missing or stale file shows up in the same diff.
+- The vendored copy **MUST** be **byte-identical** to the source repo's ship folder, whole-folder and file-for-file. `diff -r <LibRepo>/<Lib> <Addon>/libs/<Lib>` **MUST** be empty — which is also what catches a partial re-vendor, since a missing or stale file shows up in the same diff. For `LibKa0s` the one exception is `media/icons/` (*The icon subset*, below): outside it the diff **MUST** be empty; inside it every file the consumer holds **MUST** be byte-identical to the tag, and the only lines the diff may print are `Only in <LibRepo>/…` for icons the consumer did not declare. A `differ` line, or an `Only in <Addon>/…` line, under `media/icons/` is drift like any other.
 - A change to a Ka0s-owned lib **MUST** be followed by a **re-vendor commit in every consumer** that depends on it, and that commit **SHOULD** be its own so the sync is legible in history rather than buried in a feature diff.
 - **This is the step that gets forgotten, and nothing about "the tests are green" will catch it**: the library's suite passes against the library, and the consumer's suite passes against a stale copy that still works. Both repos stay green while the copies diverge (anti-patterns #45). The `diff -r` check belongs in the audit's evidence set (`AUDIT.md`).
 - **The consumer names the tag it vendored, in root `CLAUDE.md`** — `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).` (documentation-§2 item 6). That line is not decoration: it is the **input** to the consumer-side vendored-payload gate (testing-§11), which resolves the named tag in the sibling checkout and compares both payloads against it. Without it the gate has no ref to compare to.
   - It lives in **`CLAUDE.md`, not `README.md`.** It answers *"which LibKa0s does this build carry?"* — a maintainer's question — and documentation-§1 forbids the player-facing README from carrying a vendored-library inventory at all, so a gate reading its input from the README would have been reading a file whose job is to stop mentioning it. `tests/_kit/vendor_sync.lua` has read `CLAUDE.md` since **LibKa0s v1.8.1 / testkit revision 9**, with **no fallback** to `README.md`: a repo that has not moved its line reads as having none and fails, naming `CLAUDE.md`.
   - The line **MUST** move in the **same commit** as the bytes, in both directions. A payload re-vendored past its line leaves a document asserting the wrong version; a line bumped ahead of the payload reads as done and is not.
+
+**The icon subset (MUST).** The one carve-out from whole-folder vendoring, and it is a carve-out of
+**art**, never of code. `media/icons/` was about 18 MB of TGA across 5,836 icons at `LibKa0s v1.74.0`
+(28 MB on disk once block overhead is counted, 5.6 MB zipped): Game-icons 15 MB in 4,178 icons under
+`game-icons/`, Phosphor 2.7 MB in 1,434 under `phosphor/`, Open Iconic 0.4 MB in 224 flat at the
+folder's root, plus four attribution files. The whole folder was copied into every one of the twelve
+roster addons, and nearly all of them draw a dozen of those icons or fewer. The reasons the rest of the
+payload is whole-folder — a major refusing to register without its floor, a shell `:New`ing without its
+attach file (anti-patterns #48) — are reasons about **code**. No icon is anyone's floor and no module
+reads an icon file, so they do not reach the art, and nothing else argued for carrying it.
+
+- **The declaration.** A consumer's root `CLAUDE.md` **MUST** carry **one** `LibKa0s icons:` line
+  directly under its `Bundles [LibKa0s](…) vX.Y.Z (MIT).` line (documentation-§2 item 6), in exactly
+  one of three forms:
+
+  ```markdown
+  LibKa0s icons: all (icon picker).
+  LibKa0s icons: none.
+  LibKa0s icons: settings, close, ph:sword, gi:skull.
+  ```
+
+  A name is a `lib.ICONS` catalog name exactly as `Media.Icon` takes it: Open Iconic **unprefixed**,
+  Phosphor as **`ph:<name>`**, Game-icons as **`gi:<name>`**. The list is comma-separated and ends
+  in a period. A name that is not in the catalog **at the tag the `Bundles` line names** is an error,
+  not a no-op. "Directly under" means the next non-blank line; the exact grammar the gate parses
+  (CR and trailing whitespace, spacing after commas, case, duplicates, an empty list) is published
+  in testing-§11, and a line it rejects is malformed.
+- **What ships is exactly what is declared (MUST).** The consumer's `libs/LibKa0s/media/icons/`
+  **MUST** hold every declared icon, each **byte-identical** to the tag, and **MUST NOT** hold an icon
+  it did not declare. An extra icon is the dead weight this rule exists to remove; a missing one is
+  worse, because `Media.Icon` answers a path for **any** catalog name whether or not the file
+  shipped (below), and a path to a file that is not there draws nothing and raises nothing.
+- **`all` is for a chooser, and only a chooser (MUST).** `all` **MUST** be followed by a
+  parenthesized reason naming the player-facing surface that offers the catalog — `all (icon
+  picker).`, `all (icon browser).` — and **MUST** be used only by an addon whose UI lets the
+  **player** choose among the catalog. An addon that would merely find listing its icons tedious
+  lists them. Ka0s Quick Comms, whose icon browser lets the player pick any catalog icon, is the
+  case `all` exists for.
+- **The icons the library draws for you are yours to declare (MUST).** An icon the library resolves
+  on the host's behalf, because the host passed it its addon folder name, is the host's use: the
+  host's folder holds the file or the control is blank. At `LibKa0s v1.74.0` those are `close`
+  (`Core.MakeCloseButton` with an `addonName`, so every Ka0s window's close control, the debug
+  console's and the perf panel's among them), `copy` and `clear` (the debug console's title bar,
+  debug-logging-§13), and `info` (an `Options` id list's default help mark, when the host supplies no
+  `helpIcon`). An addon wiring the debug console with its `addonName`, which debug-logging requires
+  of every addon, therefore declares at least `close, copy, clear`, and `none` suits only a consumer
+  that opens no library window at all (no debug console, no `MakeCloseButton` window, no id list),
+  which no roster addon is today. The authoritative list is the bundled tag's own documentation,
+  not this paragraph: a library release that draws a new icon on a host's behalf **MUST** say so in
+  its changelog, as a re-vendor note.
+- **Attribution travels with its set (MUST).** `media/icons/LICENSE-open-iconic.txt` ships when any
+  Open Iconic icon ships; `phosphor/LICENSE-phosphor.txt` when any `ph:` icon ships;
+  `game-icons/LICENSE-game-icons.txt` **and** `game-icons/AUTHORS.txt` when any `gi:` icon ships.
+  A set none of whose icons ships carries none of its license files. With `none`, no icon file and no
+  icon license file ships; an empty or absent `media/icons/` folder is the conforming state.
+- **The runtime is unchanged, and per-host (no library change).** `Media.Icon(addonName, name)`
+  still answers a path for any catalog name, declared or not; it does not look at the disk and
+  **MUST NOT** be taught to. A consumer **MUST** pass only names it declared: an undeclared name
+  draws nothing, silently, which is the failure a declaration exists to make visible at review time.
+  The catalogs stay whole, so enumerating `ICONS` is still correct — and is exactly what makes an
+  addon that offers the catalog an `all` addon. **A pruned copy cannot break another addon.** LibStub
+  serves one copy of each Media file to every host, but `Icon` builds the path from the **caller's**
+  folder name, so whichever copy wins the minor race, each host's paths point into its own
+  `libs/LibKa0s/media/icons/` and draw from what that host declared.
+- **The gate.** The consumer-side vendored-payload gate (testing-§11) reads the declaration beside
+  the `Bundles` line and compares `media/icons/` against it rather than against the whole folder.
+- **Transition.** A consumer whose `CLAUDE.md` carries **no** `LibKa0s icons:` line is gated as
+  today — whole folder, which is to say it is read as `all` — so nothing reddens on the day this
+  rule lands. The **MUST**s above bind from the first `LibKa0s` release whose testkit carries the
+  declaration-aware gate (a release after v1.74.0); from then on a consumer adds its line, and prunes
+  to it, at its next re-vendor, in the **same commit** as the bytes and the `Bundles` line. Every
+  roster addon owes that line, and re-vendoring each with its declaration is tracked in the
+  `LibKa0s` repository's issues.
 
 **Module versioning (MUST).** The other half of the same rule, and the reason a missed sync fails silently instead of loudly.
 
@@ -294,12 +367,13 @@ face, and a family of statusbar textures — inside the vendored payload, at `li
 Introduced in **LibKa0s v1.9.0**; the icon path spelling and the texture family settled at v1.9.1 and
 v1.9.2.
 
-**Every Ka0s addon ships it, and that is not a choice it makes.** The payload is whole-folder
-(library-stack-§7), so `media/` arrives with `Core.lua` in the same `cp -r`. The consequence is the
-rule: an addon that already carries the art has **no reason left** to ship its own, and every reason
-not to — two copies of a mark is two licenses to track, two provenance stories, and a collection
-whose addons stop reading as one author's work the first time one copy is regenerated and the other
-is not.
+**Every Ka0s addon ships it, and the only choice it makes is which icons.** The payload is
+whole-folder (library-stack-§7), so `media/` arrives with `Core.lua` in the same `cp -r`: the face,
+the textures and both catalogs whole, and of the icon art exactly the icons the addon declares in its
+root `CLAUDE.md` (library-stack-§7, *The icon subset*). The consequence is the rule: an addon that
+already carries the art has **no reason left** to ship its own, and every reason not to — two copies
+of a mark is two licenses to track, two provenance stories, and a collection whose addons stop
+reading as one author's work the first time one copy is regenerated and the other is not.
 
 **What the module answers.** Everything it returns is a **path**, and every path is **extensionless**
 (the client appends it; a path carrying `.tga` is one of the two spellings recorded as drawing
@@ -307,7 +381,7 @@ nothing at all — and a texture that does not load draws nothing and raises not
 
 | Member | Answers |
 |---|---|
-| `Icon(addonName, name)` | The icon path, or `nil` when `name` is not in `ICONS` |
+| `Icon(addonName, name)` | The icon path, or `nil` when `name` is not in `ICONS`. It answers for every catalog name whether or not this host shipped the file, so a host passes only names it declared (library-stack-§7, *The icon subset*) |
 | `Font(addonName, name)` | The face path, or `nil` when `name` is not in `FONTS` |
 | `Texture(addonName, name)` | The statusbar path, or `nil` when `name` is not in `TEXTURES` |
 | `RegisterLSM(addonName)` | Registers every face and texture with LibSharedMedia under its catalog name; answers `fonts, bars`, and `0, 0` where LSM is absent |
@@ -334,7 +408,9 @@ hand — because the failure is invisible: the wrong path draws nothing and rais
 
 - **MUST NOT** ship a private icon, face or bar texture that duplicates one the library already
   carries, and **MUST NOT** copy one out of `libs/LibKa0s/media/` into the addon's own `media/`
-  (layout-§3, anti-patterns #63).
+  (layout-§3, anti-patterns #63). A catalog icon the addon has not yet declared is **declared**: the
+  name joins its `LibKa0s icons:` line and the file arrives at `libs/LibKa0s/media/icons/` from the tag
+  (library-stack-§7, *The icon subset*).
 - **A mark the catalog lacks is added UPSTREAM**, in the same style, by the generator that produced
   the rest — never drawn one-off into an addon. The generators are the provenance record for the art:
   which upstream glyph each name draws, every transformation applied, and for the synthesized

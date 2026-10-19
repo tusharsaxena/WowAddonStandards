@@ -490,14 +490,30 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the TOC lists its packaged `libs\LibKa0s\LibKa0s.xml` once, in `# Libraries` after Ace3
      (toc-file-§4/§5). A TOC listing individual `LibKa0s` `.lua` files, or a folder missing files the
      ship folder has, is a deviation even when the addon currently works — the majors it does not use
-     today are not the ones that will break.
-   - **Check the shared media is used, not duplicated** (library-stack-§8, layout-§3). The payload is
-     whole-folder, so `libs/LibKa0s/media/` is present in **every** addon whether or not it wires
-     `LibKa0s-Media-1.0` — which makes both halves of this check mechanical:
+     today are not the ones that will break. The one exception is `media/icons/`, which holds the
+     addon's declared subset (next check).
+   - **Check the icon subset matches its declaration** (library-stack-§7, *The icon subset*;
+     anti-pattern #95). Read the `LibKa0s icons:` line under root `CLAUDE.md`'s `Bundles` line and
+     list `libs/LibKa0s/media/icons/` recursively. The files present **MUST** be exactly the declared
+     icons plus the attribution files of each set that has one (`LICENSE-open-iconic.txt`;
+     `phosphor/LICENSE-phosphor.txt`; `game-icons/LICENSE-game-icons.txt` and
+     `game-icons/AUTHORS.txt`). Then grep the addon's own source for every icon name it passes
+     `NS.Icon` / `Media.Icon`, add the icons the library draws on its behalf at the bundled tag
+     (`close`, `copy`, `clear` for an addon wiring the debug console with its `addonName`; `info` for
+     an `Options` id list with no `helpIcon`), and cite `file:line` for any name drawn but not
+     declared. An `all` declaration **MUST** name a player-facing chooser that exists: cite the file
+     that offers the player the catalog, or record `all` without one as #95. A repo with **no** line
+     is pre-adoption while it vendors a tag before the declaration-aware gate: record it as a
+     re-vendor item, not a deviation; from that gate's tag on, the missing line is #95.
+   - **Check the shared media is used, not duplicated** (library-stack-§8, layout-§3). The face and
+     the textures under `libs/LibKa0s/media/` are present in **every** addon whether or not it wires
+     `LibKa0s-Media-1.0`, and every catalog icon is one declaration away — which makes both halves of
+     this check mechanical:
      - **A private copy is a deviation** (anti-pattern #63). List the addon's own `media/` tree: a
-       `fonts/`, `icons/` or `textures/` entry that also exists under `libs/LibKa0s/media/` is a
-       second copy, and the monospace face is the usual one because it predates the library payload.
-       What legitimately remains is the logo and the screenshots.
+       `fonts/` or `textures/` entry that also exists under `libs/LibKa0s/media/`, or an `icons/`
+       entry the library's catalog (`MediaIcons.lua`, `Media.lua`) names, is a second copy, and the
+       monospace face is the usual one because it predates the library payload. What legitimately
+       remains is the logo and the screenshots.
      - **A one-off mark where the catalog has one is the commoner deviation.** Grep the addon's own
        source for `SetText` on a control (`"X"`, `"\226\156\150"`, `"Copy"`, `"Clear"`), for
        `SetAtlas`, and for texture paths under `Interface\` that are not the shared payload; cross
@@ -1124,20 +1140,22 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (library-stack-§7) — **`diff -r <LibRepo>/<Lib> <Addon>/libs/<Lib>`**, proving the vendored copy
      has not drifted from its source repo. For `LibKa0s` that is
      **`diff -r <LibKa0sRepo>/LibKa0s <Addon>/libs/LibKa0s`** over the **whole folder** (every module,
-     not just the ones the addon calls) plus
+     not just the ones the addon calls) — where under `media/icons/` the only lines allowed are
+     `Only in <LibKa0sRepo>/…` for icons the addon did not declare, and the declared set is checked by
+     step 4's icon-subset check — plus
      **`diff -r <LibKa0sRepo>/testkit <Addon>/tests/_kit`** for the vendored test harness — which
-     lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty. Diff
-     against the **tag the addon's root `CLAUDE.md` names** — the provenance line
-     `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6) — which is the same ref the repo's
-     own vendored-payload gate resolves. **The line missing from `CLAUDE.md`, or still sitting in
-     `README.md`, is itself a finding** (anti-pattern #59): since LibKa0s v1.8.1 / testkit revision 9
-     `tests/_kit/vendor_sync.lua` reads `CLAUDE.md` with no fallback, so that repo's gate is red. This check
-     exists because drift is otherwise **invisible**: the library's suite passes against the library,
-     the addon's suite passes against the stale copy, and **both repos stay green** while the two
-     diverge (anti-pattern #45). A non-empty diff is the evidence for a #45 deviation; a *missing*
-     file on the addon side is the evidence for **#48**. If the sibling library repo is not present on
-     the machine, mark the check **not run** and say so — never infer it from the code looking
-     reasonable, and never quietly skip it.
+     lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty, the first
+     outside `media/icons/`. Diff against the **tag the addon's root `CLAUDE.md` names** — the
+     provenance line `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6) — which is the
+     same ref the repo's own vendored-payload gate resolves. **The line missing from `CLAUDE.md`, or
+     still sitting in `README.md`, is itself a finding** (anti-pattern #59): since LibKa0s v1.8.1 /
+     testkit revision 9 `tests/_kit/vendor_sync.lua` reads `CLAUDE.md` with no fallback, so that
+     repo's gate is red. This check exists because drift is otherwise **invisible**: the library's
+     suite passes against the library, the addon's suite passes against the stale copy, and **both
+     repos stay green** while the two diverge (anti-pattern #45). A non-empty diff is the evidence
+     for a #45 deviation; a *missing* file on the addon side is the evidence for **#48**. If the
+     sibling library repo is not present on the machine, mark the check **not run** and say so —
+     never infer it from the code looking reasonable, and never quietly skip it.
    - **Read the `.luacheckrc` before you quote the `0/0`: since v2.39.0 the test tree is in scope
      (`lint`).** A `0 warnings / 0 errors` line says nothing until you know what it was run
      over. `exclude_files` **MUST** narrow to `tests/_kit/` — the vendored kit, linted in its own

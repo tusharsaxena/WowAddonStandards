@@ -36,7 +36,7 @@ tests/
 
 **Registration is not execution.** The kit **collects** every case and runs nothing until `Kit.run`. A runner that executes a case body at registration time and short-circuits it in list mode makes `--list` a second code path through the same file, and the inventory can then disagree with the run. An addon **MUST NOT** reintroduce that shape; `--list` is a pure filter over the registry and cannot drift from what actually runs.
 
-**A gate closes a class of deviation only when it reads the whole of its own denominator.** Every gate the kit ships — and every gate a section below mandates — **MUST** state its scope, and that scope **MUST** be the whole set the gate's own rule is about, **enumerated from the tree** rather than hand-listed in the suite, minus the carve-outs the rule itself names. What that set *is* varies by rule, and the MUST is about never typing it out. A gate asserting a property of **the repository's files** takes the whole `git ls-files` set — the EOL gate (line-endings-§7) and the prose gate (localization-§5) both do. A gate whose rule is about a **named payload folder** takes that folder, and reads it **whole**: §11's kit-sync gate compares the source `testkit/` against the vendored `tests/_kit/`, and its consumer-side half compares `libs/<Lib>/` against the sibling checkout's ship folder — each by listing both directories and comparing the **sets**, never the files someone remembered. A gate whose rule is about an **adopted surface** takes the surface: §8's stub-surface parity case is scoped to the LibKa0s modules this addon adopts, which is exactly why its member list **MUST** come from a named `grep` rather than from reading. Anything narrower than the rule's own denominator reports green on the part it read and says nothing about the rest, while the run's pass line and the repo's inventory both read as coverage.
+**A gate closes a class of deviation only when it reads the whole of its own denominator.** Every gate the kit ships — and every gate a section below mandates — **MUST** state its scope, and that scope **MUST** be the whole set the gate's own rule is about, **enumerated from the tree** rather than hand-listed in the suite, minus the carve-outs the rule itself names. What that set *is* varies by rule, and the MUST is about never typing it out. A gate asserting a property of **the repository's files** takes the whole `git ls-files` set — the EOL gate (line-endings-§7) and the prose gate (localization-§5) both do. A gate whose rule is about a **named payload folder** takes that folder, and reads it **whole**: §11's kit-sync gate compares the source `testkit/` against the vendored `tests/_kit/`, and its consumer-side half compares `libs/<Lib>/` against the sibling checkout's ship folder — each by listing both directories and comparing the **sets**, never the files someone remembered. The one carve-out the rule names is `LibKa0s`'s icon art, whose expected set under `media/icons/` is the consumer's **declaration** rather than the sibling's folder (library-stack-§7, *The icon subset*); that set is still enumerated, from the declaration and the tag's catalog, never hand-listed in the suite. A gate whose rule is about an **adopted surface** takes the surface: §8's stub-surface parity case is scoped to the LibKa0s modules this addon adopts, which is exactly why its member list **MUST** come from a named `grep` rather than from reading. Anything narrower than the rule's own denominator reports green on the part it read and says nothing about the rest, while the run's pass line and the repo's inventory both read as coverage.
 
 The collection has the controlled experiment: on 2026-09-08 the line-ending class went to zero in all ten repos that had strays the cycle before, three of them naming `tests/_kit/test_eol.lua` as the owner, because that gate asks `git check-attr` about every tracked path (line-endings-§7). On the same date, with the same kind of vendored gate, the British-spelling class did **not** close — the library repo's `tests/test_prose.lua` fixed its scope to two hand-written directory names (its `SHIPPED` list) and did not recurse, leaving 216 live hits invisible to a green suite, and a second repo's copy carried a private word list where the standard publishes a canonical one. The difference was not gate-versus-prose, and it was not `git ls-files` versus anything else: one gate derived its denominator from the tree and the other typed it in.
 
@@ -447,6 +447,43 @@ passing**. Both copies keep working when they drift, so both suites stayed green
   - **MUST** carry that reasoning in the case's own header comment. Without it the next author reads
     a lone `gsub("\r", "")` as sloppiness and deletes it, at which point the gate reddens on every
     checkout and gets deleted next.
+- **The icon subset is compared against the declaration, not the folder (MUST, from the first
+  `LibKa0s` release whose testkit carries the declaration-aware gate).** The gate reads root
+  `CLAUDE.md`'s `LibKa0s icons:` line beside the provenance line (documentation-§2 item 6) and
+  compares the consumer's `libs/LibKa0s/media/icons/` against the set it implies — every declared
+  icon, resolved to its file through the tag's catalog, plus the attribution files of each set
+  that has an icon in it (library-stack-§7, *The icon subset*). It **MUST** assert both
+  properties over that set, as everywhere else in this section: the same **set** of files on
+  both sides, so an undeclared icon present or a declared one missing fails, and
+  **byte-identical content** for every file present. Everything outside `media/icons/` is compared
+  whole, unchanged. `all` compares `media/icons/` whole, as before the carve-out. A **malformed**
+  line, a name not in the catalog at the tag, or `all` without its parenthesized reason is a
+  **failure** naming the line, not a skip: like a missing provenance line, the repo had everything
+  it needed to answer. **A repo with no `LibKa0s icons:` line is compared whole**, which is the
+  transition (library-stack-§7): nothing reddens the day the gate lands, and the line arrives with
+  the addon's next re-vendor. The gate cannot see whether an `all` addon really offers the player a
+  chooser; that half is the auditor's (anti-patterns #95).
+  - **MUST** parse the line by this published grammar, so the gate and an auditor reading by hand
+    reach the same verdict:
+    1. Read root `CLAUDE.md` line by line, stripping a trailing CR (the file is CRLF under the
+       `eol=crlf` pin) and then any trailing whitespace from each line.
+    2. **Placement.** The icons line is the **next non-blank line** after the line holding the
+       provenance match (`[Bb]undles %[LibKa0s%]%b() (v[%d%.]+)`, documentation-§2 item 6), whether
+       that phrasing is a standalone sentence or mid-sentence. It is its own line, never appended to
+       the provenance line. No line anywhere starting `LibKa0s icons:` is the transition (compared
+       whole); such a line present but not in that position is **malformed**, as is a second one.
+    3. **Shape.** The line **MUST** match `^LibKa0s icons: (.-)%.$` (no leading whitespace, one space
+       after the colon, ending in the period). The capture is the body.
+    4. **Forms.** A body of exactly `none` is `none`. A body matching `^all %((.+)%)$`, whose capture
+       is not blank, is `all` with its reason. Anything else is a list: split on `,`, trim
+       whitespace from both ends of each item. An empty body, an empty item (`a,,b`, a trailing
+       comma), `all` or `none` appearing as a list item, or a **duplicate** name is **malformed**.
+    5. **Case.** Everything is case-sensitive: `all`, `none`, the `ph:` and `gi:` prefixes and the
+       names are lowercase as written in the catalog. `PH:sword` or `All (icon picker)` is not
+       another spelling; it is an unknown name or a malformed line, because `Media.Icon` matches the
+       prefix with `^(%l+:)` and would not resolve it either.
+    6. Each list name **MUST** be a key of the catalog at the bundled tag, exactly as `Media.Icon`
+       takes it; a name that is not is a failure naming it.
 - **MUST** register as a **skip carrying its reason** when the precondition is absent — the sibling
   checkout is not there, or the ref cannot be resolved. It **MUST NOT** register as a pass, and it
   **MUST NOT** fail: a fresh clone with no sibling has not proven the payload is current and has not

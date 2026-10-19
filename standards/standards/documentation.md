@@ -139,6 +139,16 @@ There is **no** `## Testing` section in the README (removed in the standard's v2
 
    **The gate reads this file, and only this file.** `tests/_kit/vendor_sync.lua` greps root `CLAUDE.md` with the Lua pattern `[Bb]undles %[LibKa0s%]%b() (v[%d%.]+)`, so both a standalone sentence and a mid-sentence phrasing satisfy it, and the line **MAY** be written either way. A repo that leaves the line in `README.md` reads to the gate as having **no provenance line at all** and fails, naming `CLAUDE.md`. There is deliberately no fallback: a fallback would let a repo sit half-migrated with two lines that can disagree, and a gate silently preferring one of them is the same shape as the drift it exists to catch (testing-§11).
 
+   **Its companion: the icons line (MUST, from the first `LibKa0s` release whose testkit carries the declaration-aware gate).** Directly under the provenance line sits **one** line declaring which of the library's icons this addon vendors (library-stack-§7, *The icon subset*), in exactly one of three forms:
+
+   ```markdown
+   LibKa0s icons: all (icon picker).
+   LibKa0s icons: none.
+   LibKa0s icons: settings, close, ph:sword, gi:skull.
+   ```
+
+   Names are `lib.ICONS` catalog names — Open Iconic unprefixed, `ph:` Phosphor, `gi:` Game-icons — comma-separated, the list ending in a period, and they include the icons the library draws on the addon's behalf (`close`, `copy`, `clear` for any addon wiring the debug console). `all` **MUST** carry a parenthesized reason naming the player-facing chooser and is reserved for an addon whose UI lets the player choose among the catalog. Like the provenance line it moves in the **same commit** as the bytes, and the vendored-payload gate reads it from this file by a published grammar (testing-§11): the next non-blank line after the provenance line, CR and trailing whitespace stripped, matching `^LibKa0s icons: (.-)%.$`, case-sensitive, with a duplicate name or an empty list malformed. A repo without the line is gated as if it said `all` until it re-vendors (library-stack-§7, *The icon subset*).
+
 Reference implementation (in the collection): the absorb-shield tracker's root `CLAUDE.md`.
 
 ### 3. `docs/`
