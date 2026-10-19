@@ -64,7 +64,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
      `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block **after Ace3** (toc-file-§4/§5). Copying
      part of a multi-file major is anti-pattern #48: the dependent modules refuse to register without
      `Core.lua` and go silently **absent**, and a shell without its attach file `:New`s successfully
-     and fails at **call** time, a panel build later.
+     and fails at **call** time, a panel build later. Then prune **`libs/LibKa0s/media/icons/`** to
+     the icons the addon declares — the one carve-out from whole-folder vendoring (library-stack-§7,
+     *The icon subset*): keep each declared icon, the icons the library draws on the addon's behalf
+     (`close`, `copy`, `clear` for the debug console), and the attribution files of each set kept;
+     keep the whole folder only for an addon that offers the player a choice among the catalog.
    - the repo's **`testkit/` folder → `tests/_kit/`** — the shared headless harness (testing). It goes
      under `tests/`, **never** `libs/`, because it must not ship with the addon.
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
@@ -309,7 +313,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
    naming the **tag** `libs/LibKa0s/` and `tests/_kit/` were vendored from, moving in the same commit as
    the bytes. `tests/_kit/vendor_sync.lua` reads it out of `CLAUDE.md` — since LibKa0s v1.8.1 / testkit
    revision 9, with **no fallback** to `README.md` — so a line in the wrong file fails the gate
-   (documentation-§2 item 6, library-stack-§7, testing-§11).
+   (documentation-§2 item 6, library-stack-§7, testing-§11). Directly under it goes the **icons line**
+   matching step 3's prune — `LibKa0s icons: close, copy, clear, ….`, or `LibKa0s icons: all (icon
+   picker).` for an addon whose player chooses among the catalog — which the same gate reads
+   (library-stack-§7, *The icon subset*).
 6b. **Write the `docs/` set to documentation-§3's tier model.** The canonical trio
    (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus **all six Tier 1 docs, under exactly
    these names**: `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`,
