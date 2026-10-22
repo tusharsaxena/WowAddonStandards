@@ -185,16 +185,24 @@ reads an icon file, so they do not reach the art, and nothing else argued for ca
   case `all` exists for.
 - **The icons the library draws for you are yours to declare (MUST).** An icon the library resolves
   on the host's behalf, because the host passed it its addon folder name, is the host's use: the
-  host's folder holds the file or the control is blank. At `LibKa0s v1.74.0` those are `close`
+  host's folder holds the file or the control is blank. At `LibKa0s v1.75.0` those are `close`
   (`Core.MakeCloseButton` with an `addonName`, so every Ka0s window's close control, the debug
   console's and the perf panel's among them), `copy` and `clear` (the debug console's title bar,
   debug-logging-§13), and `info` (an `Options` id list's default help mark, when the host supplies no
-  `helpIcon`). An addon wiring the debug console with its `addonName`, which debug-logging requires
-  of every addon, therefore declares at least `close, copy, clear`, and `none` suits only a consumer
-  that opens no library window at all (no debug console, no `MakeCloseButton` window, no id list),
-  which no roster addon is today. The authoritative list is the bundled tag's own documentation,
-  not this paragraph: a library release that draws a new icon on a host's behalf **MUST** say so in
-  its changelog, as a re-vendor note.
+  `helpIcon`). Art a host passes to a library widget (`TestStrip`'s mark, the simulator panel's step
+  marks) is the host's own use like any `NS.Icon` call, and is declared as such. An addon wiring the
+  debug console with its `addonName`, which debug-logging requires of every addon, therefore
+  declares at least `close, copy, clear`, and `none` suits only a consumer that opens no library
+  window at all (no debug console, no `MakeCloseButton` window, no id list), which no roster addon
+  is today.
+- **The library-drawn set is closed (MUST).** The four names above are every catalog name the
+  library resolves from a host's folder, and a later library release **MUST NOT** resolve a further
+  one, on any surface. LibStub serves the newest copy of each file to every host, so a name a newer
+  library file started drawing would be drawn into the folder of a host still pruned at an older
+  tag, where the file is absent: blank, silent, and invisible to that host's gate. New library
+  chrome takes its art **from the host** instead, as a resolved path or texture argument (the
+  `helpIcon` pattern). The set closes at `LibKa0s v1.75.0`, the first tag at which any consumer
+  prunes.
 - **Attribution travels with its set (MUST).** `media/icons/LICENSE-open-iconic.txt` ships when any
   Open Iconic icon ships; `phosphor/LICENSE-phosphor.txt` when any `ph:` icon ships;
   `game-icons/LICENSE-game-icons.txt` **and** `game-icons/AUTHORS.txt` when any `gi:` icon ships.
@@ -207,10 +215,11 @@ reads an icon file, so they do not reach the art, and nothing else argued for ca
   **MUST NOT** be taught to. A consumer **MUST** pass only names it declared: an undeclared name
   draws nothing, silently, which is the failure a declaration exists to make visible at review time.
   The catalogs stay whole, so enumerating `ICONS` is still correct — and is exactly what makes an
-  addon that offers the catalog an `all` addon. **A pruned copy cannot break another addon.** LibStub
-  serves one copy of each Media file to every host, but `Icon` builds the path from the **caller's**
-  folder name, so whichever copy wins the minor race, each host's paths point into its own
-  `libs/LibKa0s/media/icons/` and draw from what that host declared.
+  addon that offers the catalog an `all` addon. **A pruned copy cannot break another addon** through
+  a name the **host** passes, since `Icon` builds the path from the caller's folder. LibStub serves
+  one copy of each Media file to every host, but whichever copy wins the minor race, each host's
+  paths point into its own `libs/LibKa0s/media/icons/` and draw from what that host declared. For
+  names the **library** resolves, the closed set above is what keeps that true.
 - **The gate.** The consumer-side vendored-payload gate (testing-§11) reads the declaration beside
   the `Bundles` line and compares `media/icons/` against it rather than against the whole folder.
 - **Transition.** A consumer whose `CLAUDE.md` carries **no** `LibKa0s icons:` line is gated as

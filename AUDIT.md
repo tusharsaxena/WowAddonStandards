@@ -514,7 +514,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `NS.Icon` / `Media.Icon`, add the icons the library draws on its behalf at the bundled tag
      (`close`, `copy`, `clear` for an addon wiring the debug console with its `addonName`; `info` for
      an `Options` id list with no `helpIcon`), and cite `file:line` for any name drawn but not
-     declared. An `all` declaration **MUST** name a player-facing chooser that exists: cite the file
+     declared. The declaration includes the library-drawn names the addon's wired surfaces use
+     (`close, copy, clear` with the debug console; `info` with an id list without `helpIcon`), plus
+     every name the host itself passes to a library widget (for example a `TestStrip` mark); the
+     library-drawn set is closed at those four (library-stack-§7, *The library-drawn set is closed*),
+     so a library-drawn name outside it is an upstream finding against the library, not the addon.
+     An `all` declaration **MUST** name a player-facing chooser that exists: cite the file
      that offers the player the catalog, or record `all` without one as #95. A repo with **no** line
      is pre-adoption while it vendors a tag before the declaration-aware gate: record it as a
      re-vendor item, not a deviation; from that gate's tag on, the missing line is #95.
