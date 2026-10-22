@@ -494,7 +494,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      from `LibKa0s v1.75.0` and required of none, library-stack-§7): a non-adopter is not a finding.
      An addon that **has** adopted `Glow` but keeps a host start/stop table beside it, or has adopted
      `Sim` and keeps a parallel host simulator, is #47; so is a hand-built `SearchBox`, `TestStrip`
-     or itemString bonus walk in an addon on `LibKa0s v1.75.0`+. Nor is a library-absent stub of a
+     or itemString bonus walk in an addon on `LibKa0s v1.75.0`+. A simulator first shipped on
+     `LibKa0s v1.75.0` or later and not on `LibKa0s-Sim-1.0`, or an adopted `Sim` beside a private
+     session, seam, timeline or step panel, is #47 (preview-mode, *The in-game simulator*). Nor is a library-absent stub of a
      shape options-ui-§1 names (the check below). Vendoring only part of the library — some files of a multi-file major, or a dependent
      module without `Core.lua` — is **anti-pattern #48**.
    - **Check the vendoring is whole.** `libs/LibKa0s/` is the library repo's whole ship folder and
@@ -938,6 +940,22 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
        host-built copy of the strip there is #47. A missing, hover-only or layout-hidden marker is
        #97. Behavior is confirmed only by the owner's in-client smoke, never by the auditor.
+       **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
+       addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
+       built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check
+       above); `NewSeam` called in a setup file loaded straight after the compat family, and no
+       module capturing a `Compat` member in a local
+       (`grep -nE 'local [A-Za-z_]+ *= *[A-Za-z_.]*Compat\.[A-Za-z]'`); the
+       descriptor's `refusal` refusing while stood down (by hold, slash-commands-§7), while test
+       mode is on, and in combat, an instance or a group; every outward member (chat, whisper,
+       addon message, trade) in `opts.guarded`; no write to the SavedVariables tables from a
+       simulated event's path, and no position store (`d.panel` carries no `store`); every module the
+       session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
+       the simulation a `sim:After`; the session marked on the display (the major's step panel
+       shown); a single `sim` feature-verb row and no launcher entry or key binding for it; host
+       fields on the host's own table, never on the library instance; and a suite that asserts
+       `seam:Unwrapped()` is empty. Each missing one is a **MUST** finding against preview-mode; an
+       unmarked session is #97 as well. Behavior is the owner's in-client smoke.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
        row whose type changed with **no** raised `NS.SCHEMA_VERSION` and **no** migration step in
