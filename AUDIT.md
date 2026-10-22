@@ -91,7 +91,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      README carries **no bundled-library inventory**
      — no `## Libraries` / `## Bundled libraries` / `## Libraries and credits` /
      `## Credits and libraries` heading and no library roll-call in the intro prose, with any
-     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); the
+     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58), and,
+     reading root `CLAUDE.md`'s `LibKa0s icons:` line for which icon sets ship: where it ships a `gi:`
+     icon (`all` included), a `## Credits` crediting Game-icons per documentation-§1 item 12 (the set's
+     name, CC BY 3.0, <https://game-icons.net>, the shipped marks' authors, a modified-marks
+     statement; missing is a **MUST** finding), each shipped MIT set (Open Iconic, Phosphor) named
+     with author, license and link (missing is a **SHOULD** finding), and no credit line for a set
+     the prune removed; the
      README carries **no numbered list** — `grep -nE '^[[:space:]]*[0-9]+[.)][[:space:]]' README.md`
      is empty outside a fenced code block, because CurseForge's description page does not render one
      and every list there is a `- ` bullet list (v2.72.0; a hit is a documentation-§1 **MUST**
@@ -278,7 +284,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      read as one: `#   - tools` is an absent entry carrying its own explanation, which is the shape
      `packaging`'s template teaches.
    - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. The one instance known at ratification, Pretty Chat's splitter, named in the v2.61.0 changelog as owing the move, has since moved to `tools/split_globalstrings.py` and is compliant; no known instance stands. A new one is filed as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
-   - **Check `Bindings.xml` if the addon has one (`layout-§1`, `toc-file-§4`, v2.80.0).** It **MUST** be named exactly `Bindings.xml` and sit at the addon root beside the TOC; it **MUST NOT** appear in the TOC (`grep -n 'Bindings' *.toc` returns nothing) or in `.pkgmeta`'s `ignore:` list; and its `<Binding>` elements **MUST** carry no Lua beyond what the client requires (a `CLICK` binding carries none), with the `BINDING_HEADER_*` / `BINDING_NAME_*` labels assigned in a module. A key-binding file anywhere else is never read by the client and is filed as a defect, not a layout choice. Any other loose file at the root remains a `layout-§1` finding as before.
+   - **Check `Bindings.xml` if the addon has one (`layout-§1`, `toc-file-§4`, v2.80.0).** It **MUST** be named exactly `Bindings.xml` and sit at the addon root beside the TOC; it **MUST NOT** appear in the TOC (`grep -n 'Bindings' *.toc` returns nothing) or in `.pkgmeta`'s `ignore:` list; and its `<Binding>` elements **MUST** carry no Lua beyond what the client requires (a `CLICK` binding, on a secure or a plain named button, carries none), with the `BINDING_HEADER_*` / `BINDING_NAME_*` labels assigned in a module. A key-binding file anywhere else is never read by the client and is filed as a defect, not a layout choice. Any other loose file at the root remains a `layout-§1` finding as before.
    - **Check the over-cap census and the gate that reads it (`layout-§1`).** The cap is not audited
      by counting lines any more — counting was what let four repos in one cycle each answer the
      scope question differently. Read the **census** instead: the engineer-context hub carries a
@@ -483,8 +489,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      from v2.64.0 and until a later version of this standard makes adopting them a requirement
      (library-stack-§7): a host's own spell ladder, secret guard, bus stand-down record or schema
      seam, the shapes `LibKa0s-Compat-1.0`, `LibKa0s-Bus-1.0` and `LibKa0s-Schema-1.0` carry from
-     `LibKa0s v1.55.0`. Nor is a library-absent stub of a shape options-ui-§1 names (the check
-     below). Vendoring only part of the library — some files of a multi-file major, or a dependent
+     `LibKa0s v1.55.0`. Nor, from v2.86.0, is a host's own LibCustomGlow-1.0 start/stop code or its
+     own simulator in an addon that has not adopted `LibKa0s-Glow-1.0` or `LibKa0s-Sim-1.0` (shipped
+     from `LibKa0s v1.75.0` and required of none, library-stack-§7): a non-adopter is not a finding.
+     An addon that **has** adopted `Glow` but keeps a host start/stop table beside it, or has adopted
+     `Sim` and keeps a parallel host simulator, is #47; so is a hand-built `SearchBox`, `TestStrip`
+     or itemString bonus walk in an addon on `LibKa0s v1.75.0`+. A simulator first shipped on
+     `LibKa0s v1.75.0` or later and not on `LibKa0s-Sim-1.0`, or an adopted `Sim` beside a private
+     session, seam, timeline or step panel, is #47 (preview-mode, *The in-game simulator*). Nor is a library-absent stub of a
+     shape options-ui-§1 names (the check below). Vendoring only part of the library — some files of a multi-file major, or a dependent
      module without `Core.lua` — is **anti-pattern #48**.
    - **Check the vendoring is whole.** `libs/LibKa0s/` is the library repo's whole ship folder and
      the TOC lists its packaged `libs\LibKa0s\LibKa0s.xml` once, in `# Libraries` after Ace3
@@ -501,10 +514,21 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `NS.Icon` / `Media.Icon`, add the icons the library draws on its behalf at the bundled tag
      (`close`, `copy`, `clear` for an addon wiring the debug console with its `addonName`; `info` for
      an `Options` id list with no `helpIcon`), and cite `file:line` for any name drawn but not
-     declared. An `all` declaration **MUST** name a player-facing chooser that exists: cite the file
+     declared. The declaration includes the library-drawn names the addon's wired surfaces use
+     (`close, copy, clear` with the debug console; `info` with an id list without `helpIcon`), plus
+     every name the host itself passes to a library widget (for example a `TestStrip` mark); the
+     library-drawn set is closed at those four (library-stack-§7, *The library-drawn set is closed*),
+     so a library-drawn name outside it is an upstream finding against the library, not the addon.
+     An `all` declaration **MUST** name a player-facing chooser that exists: cite the file
      that offers the player the catalog, or record `all` without one as #95. A repo with **no** line
      is pre-adoption while it vendors a tag before the declaration-aware gate: record it as a
      re-vendor item, not a deviation; from that gate's tag on, the missing line is #95.
+   - **Check no stub mirrors a removed `__` member** (library-stack-§7, *A documented-internal `__`
+     member with no consumer is not contract*). A library-absent stub that still mirrors a `__` member
+     the bundled tag removed (from `LibKa0s v1.75.0`, `O.__releaseChrome`) is a finding, cited
+     `file:line`: the member is dead and the stub line is removed at re-vendor. A consumer call to a
+     documented, live `__` member (`__PatchLSM30Border`, `__IsCombatLocked`, `__AttachCompose`,
+     `__panels`) is **not** a finding: those remain contract.
    - **Check the shared media is used, not duplicated** (library-stack-§8, layout-§3). The face and
      the textures under `libs/LibKa0s/media/` are present in **every** addon whether or not it wires
      `LibKa0s-Media-1.0`, and every catalog icon is one declaration away — which makes both halves of
@@ -636,6 +660,23 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `Left-click:` / `Right-click:` hint, is **anti-pattern #89**. Host lines that add nothing
        while the addon is disabled are fine; anything that hides the whole tooltip while disabled
        is #89.
+     - **The Show window key binding** (`launcher-§6`, new in v2.86.0). For a row whose `ADDONS.md`
+       column lists *Show window*, check:
+       1. A root `Bindings.xml` holds a `CLICK <button>:LeftButton` line, with no `default` attribute
+          and no Lua, and `header` only on the file's first `<Binding>`.
+       2. The button is created in a module as a plain `Button`, not a secure template, registered
+          `AnyDown`, and its `OnClick` reaches the same function the descriptor's `toggleWindow`
+          calls. Grep both and compare; a copy of the body is #81 and #96.
+       3. `BINDING_HEADER_<FOLDERUPPER>` and the `BINDING_NAME_…` label are assigned in that module,
+          the label through `L`.
+       4. The press reaches the toggle's handler and refuses as the `toggle` verb does (read the
+          handler or the helper): it toggles and writes nothing while stood down, and never prints the
+          disabled line under the `perf` hold alone (`slash-commands-§7`).
+       5. `tests/test_disabled.lua` step 8 covers the press, and the README's `## Usage` and
+          `docs/settings-panel.md`'s launcher row name the binding.
+
+       A missing binding is a MUST finding from the addon's first release after v2.86.0; any defect
+       above is anti-pattern #96.
    - **Check `/<slash> enable` and `/<slash> disable` exist and are aliases** (`slash-commands-§2`).
      Both **MUST** be entries in `NS.COMMANDS`, and both **MUST** write the Master-controls *Enable*
      row's stored path through the addon's single write seam. A handler setting a local, a module
@@ -683,6 +724,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          menu whose *Locked* / *Test mode* / *Show window* entries are live while disabled, or whose
          *Enabled* entry is not; any click that writes SavedVariables while disabled other than
          ticking *Enabled* (`launcher-§2`, `slash-commands-§7`).
+       - **The key binding.** A press that toggles, writes, or answers differently from the `toggle`
+         verb while stood down, or prints the disabled line under the `perf` hold alone
+         (`launcher-§6`, `slash-commands-§7`).
        - **The conformance suite.** `tests/test_disabled.lua` present, listed in `tests/run.lua`, and
          asserting on the **registration set** rather than on a handler's return
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
@@ -705,9 +749,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
             `testing-§12` finding: it passes against a harness that dispatched nothing.
          7. **The slash surface** — **every** `NS.COMMANDS` row dispatched through the real
             dispatcher, not a sample; `diagnostics` in both forms (the diagnostics-dump check below).
-         8. **The launcher** — `LeftButton` opens the panel with zero writes and zero shows;
-            `RightButton` opens the menu with *Enabled* live and every other entry grayed, writing
-            nothing.
+         8. **The launcher and the key binding** — `LeftButton` opens the panel with zero writes and
+            zero shows; `RightButton` opens the menu with *Enabled* live and every other entry grayed,
+            writing nothing; and, where launcher-§6's binding ships, the button's `OnClick` while
+            disabled (zero writes and shows, the refusal line where the addon refuses) and under the
+            `perf` hold alone (no toggle, the perf line where the addon refuses).
          9. **Re-enable** — the registration set equals `R_on` again, plus the cycle with one setting
             changed while disabled.
          10. **The latch** — both hold orders (`perf` then `disabled`, and the reverse), carrying a
@@ -889,6 +935,32 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        mode that is only a one-shot verb, its switch drawn as a button or hand-written, or a test
        mode that survives the start of combat or can be started during it, is anti-pattern #80. A
        frameless addon omits the row and is compliant.
+       **Then check the marker** (`preview-mode`, v2.86.0). With the explicit test mode on, every
+       display drawing sample data shows a visible, localized text marker, and it stays visible in
+       every layout option the display offers in which the sample data shows: header off, compact.
+       A display minimized with its header hidden shows no sample data and owes none. Read the code
+       path that hides the header or title and confirm the marker does not ride it. Placeholder
+       content whose visible text names the test is a marker. An addon whose test mode is the
+       unlocked view owes no marker under this rule. A filter-bar window not using
+       `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
+       host-built copy of the strip there is #47. A missing, hover-only or layout-hidden marker is
+       #97. Behavior is confirmed only by the owner's in-client smoke, never by the auditor.
+       **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
+       addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
+       built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check
+       above); `NewSeam` called in a setup file loaded straight after the compat family, and no
+       module capturing a `Compat` member in a local
+       (`grep -nE 'local [A-Za-z_]+ *= *[A-Za-z_.]*Compat\.[A-Za-z]'`); the
+       descriptor's `refusal` refusing while stood down (by hold, slash-commands-§7), while test
+       mode is on, and in combat, an instance or a group; every outward member (chat, whisper,
+       addon message, trade) in `opts.guarded`; no write to the SavedVariables tables from a
+       simulated event's path, and no position store (`d.panel` carries no `store`); every module the
+       session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
+       the simulation a `sim:After`; the session marked on the display (the major's step panel
+       shown); a single `sim` feature-verb row and no launcher entry or key binding for it; host
+       fields on the host's own table, never on the library instance; and a suite that asserts
+       `seam:Unwrapped()` is empty. Each missing one is a **MUST** finding against preview-mode; an
+       unmarked session is #97 as well. Behavior is the owner's in-client smoke.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
        row whose type changed with **no** raised `NS.SCHEMA_VERSION` and **no** migration step in
@@ -1173,7 +1245,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      — and the finding is a **re-vendor item**, never a local fix. On 35 or later check four things:
      `{ name = "test_lizard_sighted", dir = "tests/_kit/" }` is declared in `tests/run.lua`; the
      newest bundle's `manifest.json` carries `suites.complexity.blindFiles` and it is **0** (above 0,
-     complexity did not pass, and a release cut on that run is a release-gate **MUST** failure); no
+     complexity did not pass, and a release cut on that run is a release-gate **MUST** failure) and,
+     on kit 41 or later, `suites.complexity.crashedFiles` is **0** (above 0, `lizard` raised;
+     complexity did not pass, and the watch list's first line names the file); no
      local hazard scanner (a `#`-on-a-keyword-line case in the repo's own lint-config or prose suite)
      stands in for the kit's gate (anti-pattern #92, testing-§9); and no gate line in root
      `CLAUDE.md`, `docs/testing.md` or `DEPENDENCIES.md` quotes the raw `lizard -l lua ...` command

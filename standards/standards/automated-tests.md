@@ -152,7 +152,14 @@ addon left it blind in eight files to the others. The blind spots, each measured
 | bare `it` | its Lua reader inherits a **Ruby-like** reader, and `it` enters that reader's RSpec state wherever it stands, field and method names included | `for _, it in ipairs(t) do`, `x.it`, `x:it()` |
 | bare `class`, `module`, `begin` | open a Ruby block that wants an `end`, bare or after `:`, never after `.` | `{ class = "?" }`, `local module = m`, `x:begin()` |
 | `unless` | opens a Ruby block wherever it stands, field names included | `{ unless = 1 }`, `u.unless` |
-| a function literal in a `for ... in` header | is not listed; inside a function its body folds into the enclosing function's CCN, so it is counted, but not as a function | `for _, p in ipairs({ function() end }) do` |
+| a function literal in a `for`/`while` header's table, on one line or positional | is not listed. Inside a function its body folds into the enclosing function's CCN, so it is counted, but not as a function, and parity flags the file | `for _, p in ipairs({ function() end }) do` |
+| a **keyed** function literal (`K = function … end`) in a `for`/`while` header's table constructor that **spans lines** | **raises** (`TypeError`) and aborts the run. Nothing after it is measured, at file scope or inside a function (a **crashed** run, below) | `for name, fn in pairs({` ⏎ `  A = function() f() end,` ⏎ `}) do g(name, fn) end` |
+
+The second row is not a blind spot. The kit's sanitizer does not rewrite it, because renaming the
+header keyword would drop the loop's own decision point and under-count the enclosing function, which
+is the unsafe direction for a ceiling. The remedy for both rows is in the source: hoist the table to a
+named local. Ka0s Premade Groups Filter Extension's `RegionTags.lua` was the measured instance,
+hoisted in `10350bc`. What decides between the two rows is the **shape of the line**, not its scope.
 
 None of these is a defect in the addon: `#t` and `{ class = ... }` are ordinary Lua, and rewriting
 some 2,800 hazard lines across the collection to suit one tool's reader would be churn that the next
@@ -176,6 +183,32 @@ revision 35, LibKa0s v1.66.0**):
   went unmeasured. The run then records `suites.complexity.status` as **`fail`** and
   **`suites.complexity.blindFiles`** as the number of such files (0 on a sighted run), names them
   on the console and opens `RESULTS.md`'s watch list with **Not sighted — complexity did not pass**.
+- **MUST** treat a run in which `lizard` **raised**, or was stopped by the kit's bound, as complexity
+  **not passing**. This is what *complexity pass* already means, stated for the case that looked like
+  one: a run that measured nothing reliable is not a pass. A crashed run is not a blind file:
+  - **Blind:** `lizard` parsed the file and under-listed it. The remedy is a sanitizer rule or a hoist.
+  - **Crashed:** `lizard` refused a file and measured nothing reliable.
+
+  Function rows stream before the traceback, so a crashed run's `complexity.txt` can hold some `@`
+  rows. They are partial and in walk order, not a measurement.
+
+  From **LibKa0s test-kit revision 41 (LibKa0s v1.75.0)** the runner:
+  1. keeps `lizard`'s stderr out of the footer parse, and accepts the footer only in its exact shape
+     (a `Traceback` on stderr invalidates it even after a well-formed footer);
+  2. records `suites.complexity.status` as **`fail`**;
+  3. sets every CCN figure, the maximum included, to **0** in `manifest.json`, so no figure measured
+     over part of the tree enters the trend (`RESULTS.md` and the console print them as
+     `n/a (lizard raised)`);
+  4. skips parity, which a crash would otherwise report as "blind in every file";
+  5. before removing its shadow, retries each file singly with the same flags to **name** the file or
+     files `lizard` raised on. The count goes in **`suites.complexity.crashedFiles`** (0 on a measured
+     run; absent from a kit older than 41). The names go on the console and in `RESULTS.md`'s first
+     watch-list line, **Not measured — lizard raised**.
+
+  A bounded stop (timeout or memory cap) is the same `fail`, named as the bound, with no per-file
+  retry. An exit of 1 with a valid footer and an empty stderr is **not** a crash: `lizard` 1.24.0
+  exits 1 whenever it warns. Like a blind file, a crashed run is amber, never red: it blocks the
+  release and never a commit.
 - That `fail` is **amber, never red**, and it **MUST NOT** block a commit: everything above about
   perf and complexity holds unchanged. **At the release it blocks the way a `skip` does**, because a
   CCN claim over files `lizard` could not read is the same unmeasured claim as one where `lizard`
@@ -230,7 +263,8 @@ with a different failure mode, and there all four suites gate.
   Concretely: `lint` pass (which already means **zero warnings and zero errors**, since `luacheck`
   exits non-zero on either), `tests` pass with zero failures, `perf` pass, and `complexity` pass with
   **no function above CCN 15** and **`blindFiles` at 0** — a sighted run, since a parity mismatch is
-  itself a `fail` (*The complexity gate is sighted* above).
+  itself a `fail` (*The complexity gate is sighted* above) — and a run on which `lizard` did not raise
+  (`crashedFiles` at 0 where the field exists), since a crashed run is a `fail` too.
 - **MUST** treat a **skip** as a gate that did **not pass**. A release claiming zero CCN > 15 on a run
   where `lizard` never executed is an unmeasured claim, and automated-tests-§3's own rule — a skip is
   never a pass — is what makes it one. The remedy is to install the tool and re-run, not to read the
@@ -381,6 +415,11 @@ and what it costs is the trend line the whole section exists to keep.
   entry is new, so anything that **newly** crossed since the previous run arrives as an empty cell
   that names itself as owed. A watch list whose newly-crossed entries are still blank at the next
   release has performed the ritual and skipped the point.
+- **A run that did not measure says so in the watch list's first line.** A parity mismatch opens it
+  with **Not sighted — complexity did not pass** (§3); a run in which `lizard` raised opens it with
+  **Not measured — lizard raised**, naming the crashed files, from kit revision 41. A crashed run's
+  trend-row CCN cells read `n/a`, never a figure measured over part of the tree, and the watch list
+  below the line is the last measured one, carried rather than regenerated.
 - **MUST NOT** carry an entry as *accepted* indefinitely. A disposition is a decision with a shelf
   life (performance-§10): an entry accepted across **three consecutive release runs** is either fixed
   or converted into a tracked deviation with an ID and an owner, and the watch list then points at the

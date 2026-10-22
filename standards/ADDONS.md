@@ -40,6 +40,9 @@ test mode, and **Show window** where it has a primary window, a parenthesis nami
 it from the addon's shape. A new addon lists its entries with its row. The column replaced v2.66.0's left-click rung
 column when v2.67.0 retired the rungs.
 
+**Show window** also means the addon owes launcher-§6's key binding: a `CLICK` binding in a root `Bindings.xml` on the
+same toggle handler. The audit reads this column for that too. No new column.
+
 ## Ka0s-owned library repos
 
 Shared code authored inside the collection lives in its **own** repository and is vendored into the

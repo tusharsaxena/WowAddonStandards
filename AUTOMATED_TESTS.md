@@ -94,6 +94,7 @@ size. Give every field of `lizard`'s footer — totals *and* averages — plus t
 | Files in the 1000–1500 band | |
 | Files over the 1500 cap | |
 | Blind files (parity mismatch) | |
+| Crashed files (lizard raised) | |
 
 The averages are the point. A **total** that rose because the addon grew is a different fact from an
 **average** that rose because it got denser, and only the second is a complexity signal — reporting
@@ -108,6 +109,13 @@ the usual fix is (a function literal hoisted out of a `for ... in` header). A ru
 revision 35 is **unsighted**: say so in the paragraph, since its figures undercount by however many
 functions `lizard` dropped. The first sighted run after the re-vendor reports functions above CCN 15
 that were always there: call them **newly measured**, not regressions.
+
+**A `crashedFiles` above 0 is complexity not passing.** `lizard` raised on the files named, so the
+run's CCN figures are 0 in the manifest and `n/a` in the row. Partial `@` rows in `complexity.txt`
+that stream before the traceback are not a measurement. The usual fix is to hoist a keyed function
+literal out of a multi-line `for`/`while` header table into a named local. A manifest without the
+field came from a kit older than 41, where a crash read as "blind in every file"
+(automated-tests-§3, *The complexity gate is sighted*).
 
 For each suite that is not a clean pass, one short paragraph: what the output says, and whether it is
 a regression, a pre-existing condition, or a skip.
@@ -274,6 +282,7 @@ Print, in chat:
 - The verdict, and the bundle path.
 - Anything that newly crossed a threshold, with its disposition.
 - `blindFiles`, and every blind file the run named, when it is above 0: complexity did not pass.
+- `crashedFiles`, and every file named, when it is above 0: complexity did not pass.
 - Any suite that was **skipped**, with what is missing and its install hint. Never let a skip pass
   silently: the whole point of recording skips is that they are visible.
 

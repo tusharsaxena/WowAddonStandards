@@ -242,7 +242,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      anti-pattern #89). Pass `debug` onto the gated sink and `debugAtEnable` onto
      `NS.DebugAtEnable` (Launcher minor 5, LibKa0s v1.65.0), so the registration's state lines land
      the first time logging is turned on (debug-logging-§4, §8). Then record the addon's menu entries in `standards/ADDONS.md`'s Launcher menu
-     entries column in the same pass.
+     entries column in the same pass, and, where the addon has a primary window, the Show window key
+     binding (launcher-§6): a root `Bindings.xml` `CLICK` line and the button, from the context pack.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
      128×128, **uncompressed 32-bit**, from the 2000×2000 `.png` source:
      `Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")`. Point
@@ -307,8 +308,12 @@ disagreeing with the collection's intent while looking, in review, like it had b
    anti-pattern #79) and **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
    `## Libraries and credits` section and no library list in the intro prose; that fact lives in
    `DEPENDENCIES.md` and `docs/ARCHITECTURE.md`, and the LibKa0s provenance line lives in root
-   `CLAUDE.md` (step 6a). `## Credits` is optional and carries **only external** credit — artwork, a
-   font, a sound pack, another author's work.
+   `CLAUDE.md` (step 6a). `## Credits` carries only external credit — artwork, a font, a sound pack,
+   another author's work — and **must** credit Game-icons (and **should** credit each MIT icon set)
+   that the addon's `LibKa0s icons:` line ships (documentation-§1 item 12): the set's name, author,
+   license and link, and for Game-icons <https://game-icons.net>, CC BY 3.0, the shipped marks'
+   authors and a note that the marks were modified. A scaffold ships Open Iconic's `close`, `copy`
+   and `clear`, so it is born with an Open Iconic credit line.
 6a. **Put the LibKa0s provenance line in root `CLAUDE.md`.** `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).`
    naming the **tag** `libs/LibKa0s/` and `tests/_kit/` were vendored from, moving in the same commit as
    the bytes. `tests/_kit/vendor_sync.lua` reads it out of `CLAUDE.md` — since LibKa0s v1.8.1 / testkit
@@ -363,7 +368,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    **`docs/complexity.md` is retired** (automated-tests-§7) — do not create one; the `lizard` output,
    measured over the kit's sighted shadow, is the bundle's `complexity.txt` and the trend line is
    `RESULTS.md`. The **tag** is gated on all four suites passing plus zero functions above CCN 15 and
-   `blindFiles` at 0 (automated-tests-§3, *The complexity gate is sighted*); the **commit** gate stays
+   `blindFiles` at 0 and a run on which `lizard` did not raise (automated-tests-§3, *The complexity
+   gate is sighted*); the **commit** gate stays
    lint + the harness only (testing-§4).
    **The in-game capture store starts empty, and that is correct.** A scaffolded addon with the perf
    harness wired ships `docs/perf-analysis/README.md` — the bundle naming, the three artifacts, the
