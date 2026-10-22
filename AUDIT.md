@@ -1207,7 +1207,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      — and the finding is a **re-vendor item**, never a local fix. On 35 or later check four things:
      `{ name = "test_lizard_sighted", dir = "tests/_kit/" }` is declared in `tests/run.lua`; the
      newest bundle's `manifest.json` carries `suites.complexity.blindFiles` and it is **0** (above 0,
-     complexity did not pass, and a release cut on that run is a release-gate **MUST** failure); no
+     complexity did not pass, and a release cut on that run is a release-gate **MUST** failure) and,
+     on kit 41 or later, `suites.complexity.crashedFiles` is **0** (above 0, `lizard` raised;
+     complexity did not pass, and the watch list's first line names the file); no
      local hazard scanner (a `#`-on-a-keyword-line case in the repo's own lint-config or prose suite)
      stands in for the kit's gate (anti-pattern #92, testing-§9); and no gate line in root
      `CLAUDE.md`, `docs/testing.md` or `DEPENDENCIES.md` quotes the raw `lizard -l lua ...` command

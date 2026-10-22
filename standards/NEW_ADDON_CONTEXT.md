@@ -1671,7 +1671,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - A fourth doc at root, or a missing one: root is `README.md` + `CLAUDE.md` + `DEPENDENCIES.md` + `LICENSE` (documentation-§7).
 - `pip install <tool>` as an install instruction (fails on Ubuntu 24.04's PEP 668 marker — use `pipx`), or any dependency listed without the evidence for it (anti-pattern #50).
 - A dated `docs/complexity/<date>.md` pile, a locally tuned `lizard` invocation, a hand-edited complexity report, or a regenerated one with no watch-list disposition for what newly crossed a threshold (anti-pattern #51).
-- Raw `lizard -l lua ...` quoted as a gate or believed as a measurement, a local hazard scanner in place of the kit's `test_lizard_sighted`, or a run with `blindFiles` above 0 read as a pass (anti-pattern #92, automated-tests-§3).
+- Raw `lizard -l lua ...` quoted as a gate or believed as a measurement, a local hazard scanner in place of the kit's `test_lizard_sighted`, or a run with `blindFiles` above 0, or a crashed run, read as a pass (anti-pattern #92, automated-tests-§3).
 - Gating **commits** on the complexity report — that checkpoint is lint + the harness only (performance-§10, testing-§4). The **release** is a different gate: all four suites plus zero functions above CCN 15, evaluated by the release command from the run's manifest before it edits anything, with a `skip` counting as NOT EVALUATED rather than a pass (automated-tests-§3).
 - Implementing the release gate by editing the vendored runner's exit code — the same script is the commit gate, so the threshold would fire on every commit (automated-tests-§3).
 - Bumping a version or cutting a tag on a run where a gate failed or a suite went unmeasured.

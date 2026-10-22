@@ -368,7 +368,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    **`docs/complexity.md` is retired** (automated-tests-§7) — do not create one; the `lizard` output,
    measured over the kit's sighted shadow, is the bundle's `complexity.txt` and the trend line is
    `RESULTS.md`. The **tag** is gated on all four suites passing plus zero functions above CCN 15 and
-   `blindFiles` at 0 (automated-tests-§3, *The complexity gate is sighted*); the **commit** gate stays
+   `blindFiles` at 0 and a run on which `lizard` did not raise (automated-tests-§3, *The complexity
+   gate is sighted*); the **commit** gate stays
    lint + the harness only (testing-§4).
    **The in-game capture store starts empty, and that is correct.** A scaffolded addon with the perf
    harness wired ships `docs/perf-analysis/README.md` — the bundle naming, the three artifacts, the
