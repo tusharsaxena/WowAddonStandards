@@ -505,6 +505,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      that offers the player the catalog, or record `all` without one as #95. A repo with **no** line
      is pre-adoption while it vendors a tag before the declaration-aware gate: record it as a
      re-vendor item, not a deviation; from that gate's tag on, the missing line is #95.
+   - **Check no stub mirrors a removed `__` member** (library-stack-§7, *A documented-internal `__`
+     member with no consumer is not contract*). A library-absent stub that still mirrors a `__` member
+     the bundled tag removed (from `LibKa0s v1.75.0`, `O.__releaseChrome`) is a finding, cited
+     `file:line`: the member is dead and the stub line is removed at re-vendor. A consumer call to a
+     documented, live `__` member (`__PatchLSM30Border`, `__IsCombatLocked`, `__AttachCompose`,
+     `__panels`) is **not** a finding: those remain contract.
    - **Check the shared media is used, not duplicated** (library-stack-§8, layout-§3). The face and
      the textures under `libs/LibKa0s/media/` are present in **every** addon whether or not it wires
      `LibKa0s-Media-1.0`, and every catalog icon is one declaration away — which makes both halves of
