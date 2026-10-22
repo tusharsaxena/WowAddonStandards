@@ -91,13 +91,19 @@ Discovered by following the links here — not part of the normative standard, b
 - **[INDUSTRY_RESEARCH.md](INDUSTRY_RESEARCH.md)** — the research foundation the rules are synthesized from (a process input).
 - **[ADDONS.md](ADDONS.md)** — the roster, in **three** tables, one per repo kind: in-scope addons, Ka0s-owned library repos (audited against library-stack-§7's applicability lists) and documentation-and-tooling repos (audited against documentation-§8's).
 - **[CHANGELOG.md](CHANGELOG.md)** — every release entry before the current one, newest first. History, not normative: it is deliberately not under [Sections](#sections), so a tool following Sections never reads it. The current entry stays in this index under [Changelog](#changelog) until the next release moves it here.
-- Process playbooks (repo root): **[../AUDIT.md](../AUDIT.md)** (`/dev-copilot:wow-standards-audit`), **[../NEW_ADDON.md](../NEW_ADDON.md)** (`/dev-copilot:wow-new-addon`), **[../AUTOMATED_TESTS.md](../AUTOMATED_TESTS.md)** (`/dev-copilot:w- **v2.86.0 (2026-10-22):** **Rulings from the LibKa0s #45–#58 run.** The rulings below come from the collection run that addressed `LibKa0s` issues #45 through #58 (Ka0sAddonsCommonTasks `docs/2026-10-22-LIBKA0S_ISSUES_45_58/`); each paragraph is one ruling and names its ripple.
+- Process playbooks (repo root): **[../AUDIT.md](../AUDIT.md)** (`/dev-copilot:wow-standards-audit`), **[../NEW_ADDON.md](../NEW_ADDON.md)** (`/dev-copilot:wow-new-addon`), **[../AUTOMATED_TESTS.md](../AUTOMATED_TESTS.md)** (`/dev-copilot:wow-automated-tests`) and **[../PERF_ANALYSIS.md](../PERF_ANALYSIS.md)** (`/dev-copilot:wow-perf-analysis`).
+
+---
+
+## Changelog
+
+- **v2.86.0 (2026-10-22):** **Rulings from the LibKa0s #45–#58 run.** The rulings below come from the collection run that addressed `LibKa0s` issues #45 through #58 (Ka0sAddonsCommonTasks `docs/2026-10-22-LIBKA0S_ISSUES_45_58/`); each paragraph is one ruling and names its ripple.
 
   **library-stack-§7: a documented-internal `__` member with no consumer is not contract.** **The finding.** `LibKa0s#45` found test seams the library exports and nothing calls: `O.__releaseChrome` in `OptionsTabs.lua` has no caller in the payload, the library's suites, `tests/majors.lua` or the testkit, and the only roster hits (9 files) are library-absent stubs mirroring it for surface parity. Read literally, the additive-only **MUST** keeps such a member forever. A blanket rule the other way ("a consumer **MUST NOT** call a `__` member") is not true of the collection either: a roster grep outside `libs/` and `tests/_kit/` on 2026-10-22 found `__PatchLSM30Border` in 12 files, `__panels` in 26, `__AttachCompose` in 4 and `__IsCombatLocked` in 1. **The rule (library-stack-§7, a new bullet under the additive-only **MUST**).** A `__`-prefixed member the library documents as internal (an attach seam, a minor probe its own suites read) or as a test seam **MAY** be removed in a later minor once it has zero roster consumers and nothing in the payload, the library's suites, `tests/majors.lua` or the testkit reaches it; the file's minor moves and the library's `CHANGELOG` names the removal. A documented `__` member that consumers call remains contract under the additive-only **MUST**. A library-absent stub mirroring a removed member is dead (`Kit.assertSurfaceParity` reads live keys only, so it stays green) and is deleted in the consumer's next re-vendor commit. The testkit is not a LibStub major and the rule does not reach it: a kit member listed in a kit version document is the kit's contract to consumer suites whatever its name (`M.__fireUnconditional`, which slash-commands-§7 step 6 is built on). The first removal is `O.__releaseChrome` (`OptionsTabs` minor 9, `LibKa0s v1.75.0`); it is no precedent for removing a public member. **The ripple.** The library-stack index blurb. `AUDIT.md`'s LibKa0s vendoring checks gain a bullet: a stub still mirroring a removed `__` member is a finding, a consumer call to a documented, live `__` member is not.
 
   Version rippled to `CLAUDE.md`, `README.md`, `EXECUTIVE_SUMMARY.md` and `NEW_ADDON_CONTEXT.md`.
 
-  Minor.ked in the `LibKa0s` repository's issues. Minor: a carve-out and a new line, whose **MUST**s bind only from that gate's release.
+  Minor.
 
 Full history: [CHANGELOG.md](CHANGELOG.md).
 
