@@ -278,7 +278,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      read as one: `#   - tools` is an absent entry carrying its own explanation, which is the shape
      `packaging`'s template teaches.
    - **Check where an authored generator lives (`layout-§1`, v2.61.0).** A generator **this repo authors** and commits — a `.py`, a `.sh`, or a Lua script that writes a tracked file rather than being loaded — **MUST** sit under `tools/`, **MUST NOT** appear in the TOC or any test load list, and **MUST** be `.pkgmeta`-ignored; in a Ka0s-owned library repo with no `.pkgmeta` (library-stack-§7) read that last condition as *excluded from the vendored payload* and check the payload instead. Find the candidates rather than trusting the folder to be complete — `git ls-files '*.py' '*.sh'` plus any tracked Lua outside the load lists — because the failure mode this check exists for is a generator sitting beside the data it writes, which is where one naturally ends up and is exactly what the rule now forbids. **Then classify each hit before filing any of them, because most hits are not findings.** Drop anything under `libs/` or `tests/_kit/`: those arrive by whole-folder copy and are not authored here (`layout-§1`'s first carve-out), and the vendored test runner alone would otherwise return a hit in every repo that vendors the kit. Then drop anything that is not a **generator** — a git hook and a wrapper script write no tracked file at all, and a test runner writes only a dated *record* of a run under `docs/automated-tests/` — nothing resolves against it and a re-run adds a bundle rather than rewriting one. The rule binds the program that produces committed **content**, not every script in the tree. What is left is the candidate set, and it is normally empty. File the placement as the finding; the generated **output** is not moved and is still governed by §1's generated-data carve-out on its own three conditions. The one instance known at ratification, Pretty Chat's splitter, named in the v2.61.0 changelog as owing the move, has since moved to `tools/split_globalstrings.py` and is compliant; no known instance stands. A new one is filed as an ordinary `layout-§1` finding, not as a ratified deviation, until the repo either moves it or registers a row. The non-Lua generator's three habits (fail loudly and non-zero, write beside a source file rather than over it, name the interpreter in `DEPENDENCIES.md`) are a **SHOULD** — grade a miss accordingly and never as a MUST.
-   - **Check `Bindings.xml` if the addon has one (`layout-§1`, `toc-file-§4`, v2.80.0).** It **MUST** be named exactly `Bindings.xml` and sit at the addon root beside the TOC; it **MUST NOT** appear in the TOC (`grep -n 'Bindings' *.toc` returns nothing) or in `.pkgmeta`'s `ignore:` list; and its `<Binding>` elements **MUST** carry no Lua beyond what the client requires (a `CLICK` binding carries none), with the `BINDING_HEADER_*` / `BINDING_NAME_*` labels assigned in a module. A key-binding file anywhere else is never read by the client and is filed as a defect, not a layout choice. Any other loose file at the root remains a `layout-§1` finding as before.
+   - **Check `Bindings.xml` if the addon has one (`layout-§1`, `toc-file-§4`, v2.80.0).** It **MUST** be named exactly `Bindings.xml` and sit at the addon root beside the TOC; it **MUST NOT** appear in the TOC (`grep -n 'Bindings' *.toc` returns nothing) or in `.pkgmeta`'s `ignore:` list; and its `<Binding>` elements **MUST** carry no Lua beyond what the client requires (a `CLICK` binding, on a secure or a plain named button, carries none), with the `BINDING_HEADER_*` / `BINDING_NAME_*` labels assigned in a module. A key-binding file anywhere else is never read by the client and is filed as a defect, not a layout choice. Any other loose file at the root remains a `layout-§1` finding as before.
    - **Check the over-cap census and the gate that reads it (`layout-§1`).** The cap is not audited
      by counting lines any more — counting was what let four repos in one cycle each answer the
      scope question differently. Read the **census** instead: the engineer-context hub carries a
@@ -642,6 +642,23 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `Left-click:` / `Right-click:` hint, is **anti-pattern #89**. Host lines that add nothing
        while the addon is disabled are fine; anything that hides the whole tooltip while disabled
        is #89.
+     - **The Show window key binding** (`launcher-§6`, new in v2.86.0). For a row whose `ADDONS.md`
+       column lists *Show window*, check:
+       1. A root `Bindings.xml` holds a `CLICK <button>:LeftButton` line, with no `default` attribute
+          and no Lua, and `header` only on the file's first `<Binding>`.
+       2. The button is created in a module as a plain `Button`, not a secure template, registered
+          `AnyDown`, and its `OnClick` reaches the same function the descriptor's `toggleWindow`
+          calls. Grep both and compare; a copy of the body is #81 and #96.
+       3. `BINDING_HEADER_<FOLDERUPPER>` and the `BINDING_NAME_…` label are assigned in that module,
+          the label through `L`.
+       4. The press reaches the toggle's handler and refuses as the `toggle` verb does (read the
+          handler or the helper): it toggles and writes nothing while stood down, and never prints the
+          disabled line under the `perf` hold alone (`slash-commands-§7`).
+       5. `tests/test_disabled.lua` step 8 covers the press, and the README's `## Usage` and
+          `docs/settings-panel.md`'s launcher row name the binding.
+
+       A missing binding is a MUST finding from the addon's first release after v2.86.0; any defect
+       above is anti-pattern #96.
    - **Check `/<slash> enable` and `/<slash> disable` exist and are aliases** (`slash-commands-§2`).
      Both **MUST** be entries in `NS.COMMANDS`, and both **MUST** write the Master-controls *Enable*
      row's stored path through the addon's single write seam. A handler setting a local, a module
@@ -689,6 +706,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
          menu whose *Locked* / *Test mode* / *Show window* entries are live while disabled, or whose
          *Enabled* entry is not; any click that writes SavedVariables while disabled other than
          ticking *Enabled* (`launcher-§2`, `slash-commands-§7`).
+       - **The key binding.** A press that toggles, writes, or answers differently from the `toggle`
+         verb while stood down, or prints the disabled line under the `perf` hold alone
+         (`launcher-§6`, `slash-commands-§7`).
        - **The conformance suite.** `tests/test_disabled.lua` present, listed in `tests/run.lua`, and
          asserting on the **registration set** rather than on a handler's return
          (`slash-commands-§7`, *The conformance test every addon ships*). A suite that would pass against a draw gate is a finding in its own
@@ -711,9 +731,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
             `testing-§12` finding: it passes against a harness that dispatched nothing.
          7. **The slash surface** — **every** `NS.COMMANDS` row dispatched through the real
             dispatcher, not a sample; `diagnostics` in both forms (the diagnostics-dump check below).
-         8. **The launcher** — `LeftButton` opens the panel with zero writes and zero shows;
-            `RightButton` opens the menu with *Enabled* live and every other entry grayed, writing
-            nothing.
+         8. **The launcher and the key binding** — `LeftButton` opens the panel with zero writes and
+            zero shows; `RightButton` opens the menu with *Enabled* live and every other entry grayed,
+            writing nothing; and, where launcher-§6's binding ships, the button's `OnClick` while
+            disabled (zero writes and shows, the refusal line where the addon refuses) and under the
+            `perf` hold alone (no toggle, the perf line where the addon refuses).
          9. **Re-enable** — the registration set equals `R_on` again, plus the cycle with one setting
             changed while disabled.
          10. **The latch** — both hold orders (`perf` then `disabled`, and the reverse), carrying a

@@ -242,7 +242,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      anti-pattern #89). Pass `debug` onto the gated sink and `debugAtEnable` onto
      `NS.DebugAtEnable` (Launcher minor 5, LibKa0s v1.65.0), so the registration's state lines land
      the first time logging is turned on (debug-logging-§4, §8). Then record the addon's menu entries in `standards/ADDONS.md`'s Launcher menu
-     entries column in the same pass.
+     entries column in the same pass, and, where the addon has a primary window, the Show window key
+     binding (launcher-§6): a root `Bindings.xml` `CLICK` line and the button, from the context pack.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
      128×128, **uncompressed 32-bit**, from the 2000×2000 `.png` source:
      `Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")`. Point
