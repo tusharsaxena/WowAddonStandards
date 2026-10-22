@@ -923,6 +923,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        mode that is only a one-shot verb, its switch drawn as a button or hand-written, or a test
        mode that survives the start of combat or can be started during it, is anti-pattern #80. A
        frameless addon omits the row and is compliant.
+       **Then check the marker** (`preview-mode`, v2.86.0). With the explicit test mode on, every
+       display drawing sample data shows a visible, localized text marker, and it stays visible in
+       every layout option the display offers in which the sample data shows: header off, compact.
+       A display minimized with its header hidden shows no sample data and owes none. Read the code
+       path that hides the header or title and confirm the marker does not ride it. Placeholder
+       content whose visible text names the test is a marker. An addon whose test mode is the
+       unlocked view owes no marker under this rule. A filter-bar window not using
+       `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
+       host-built copy of the strip there is #47. A missing, hover-only or layout-hidden marker is
+       #97. Behavior is confirmed only by the owner's in-client smoke, never by the auditor.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
        row whose type changed with **no** raised `NS.SCHEMA_VERSION` and **no** migration step in
