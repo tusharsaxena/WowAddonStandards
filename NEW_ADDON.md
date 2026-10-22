@@ -308,8 +308,12 @@ disagreeing with the collection's intent while looking, in review, like it had b
    anti-pattern #79) and **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
    `## Libraries and credits` section and no library list in the intro prose; that fact lives in
    `DEPENDENCIES.md` and `docs/ARCHITECTURE.md`, and the LibKa0s provenance line lives in root
-   `CLAUDE.md` (step 6a). `## Credits` is optional and carries **only external** credit — artwork, a
-   font, a sound pack, another author's work.
+   `CLAUDE.md` (step 6a). `## Credits` carries only external credit — artwork, a font, a sound pack,
+   another author's work — and **must** credit Game-icons (and **should** credit each MIT icon set)
+   that the addon's `LibKa0s icons:` line ships (documentation-§1 item 12): the set's name, author,
+   license and link, and for Game-icons <https://game-icons.net>, CC BY 3.0, the shipped marks'
+   authors and a note that the marks were modified. A scaffold ships Open Iconic's `close`, `copy`
+   and `clear`, so it is born with an Open Iconic credit line.
 6a. **Put the LibKa0s provenance line in root `CLAUDE.md`.** `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).`
    naming the **tag** `libs/LibKa0s/` and `tests/_kit/` were vendored from, moving in the same commit as
    the bytes. `tests/_kit/vendor_sync.lua` reads it out of `CLAUDE.md` — since LibKa0s v1.8.1 / testkit

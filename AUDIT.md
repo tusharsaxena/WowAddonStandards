@@ -91,7 +91,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      README carries **no bundled-library inventory**
      — no `## Libraries` / `## Bundled libraries` / `## Libraries and credits` /
      `## Credits and libraries` heading and no library roll-call in the intro prose, with any
-     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58); the
+     surviving `## Credits` holding external credit only (documentation-§1, anti-pattern #58), and,
+     reading root `CLAUDE.md`'s `LibKa0s icons:` line for which icon sets ship: where it ships a `gi:`
+     icon (`all` included), a `## Credits` crediting Game-icons per documentation-§1 item 12 (the set's
+     name, CC BY 3.0, <https://game-icons.net>, the shipped marks' authors, a modified-marks
+     statement; missing is a **MUST** finding), each shipped MIT set (Open Iconic, Phosphor) named
+     with author, license and link (missing is a **SHOULD** finding), and no credit line for a set
+     the prune removed; the
      README carries **no numbered list** — `grep -nE '^[[:space:]]*[0-9]+[.)][[:space:]]' README.md`
      is empty outside a fenced code block, because CurseForge's description page does not render one
      and every list there is a `- ` bullet list (v2.72.0; a hit is a documentation-§1 **MUST**

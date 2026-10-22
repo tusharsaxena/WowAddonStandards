@@ -195,6 +195,8 @@ reads an icon file, so they do not reach the art, and nothing else argued for ca
   `game-icons/LICENSE-game-icons.txt` **and** `game-icons/AUTHORS.txt` when any `gi:` icon ships.
   A set none of whose icons ships carries none of its license files. With `none`, no icon file and no
   icon license file ships; an empty or absent `media/icons/` folder is the conforming state.
+  The README half, crediting the sets that ship, is documentation-§1 item 12: a **MUST** for
+  Game-icons, a **SHOULD** for the MIT sets.
 - **The runtime is unchanged, and per-host (no library change).** `Media.Icon(addonName, name)`
   still answers a path for any catalog name, declared or not; it does not look at the disk and
   **MUST NOT** be taught to. A consumer **MUST** pass only names it declared: an undeclared name
