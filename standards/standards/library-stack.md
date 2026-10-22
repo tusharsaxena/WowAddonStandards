@@ -279,7 +279,10 @@ And the rule that catches the most tempting mistake:
   neither strip nor mistake for current, and the runner alone advances the stamp.
 - **SHOULD** record a rejection with its reason where the next author will look, not just the
   acceptances. A candidate rejected once will be re-nominated — the shape really does look shared —
-  and the reason is the only thing that stops the second attempt from succeeding.
+  and the reason is the only thing that stops the second attempt from succeeding. The rejections of
+  the 2026-10-22 batch (LibKa0s#46–#58) are indexed in open-evolutions, *Further `LibKa0s` modules*,
+  each with the bar it failed and its re-check trigger; the full record of each is the issue's closing
+  comment or the API document of the major it would have joined.
 - **A promotion into `Core` is not free** even when it is right: the other majors declare a **minimum
   minor floor** on Core, and raising a floor is a breaking change to the vendoring (library-stack-§7,
   above). So a helper added to `Core` **MAY** ship for hosts immediately while the library's own
