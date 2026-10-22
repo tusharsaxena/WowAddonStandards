@@ -489,8 +489,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      from v2.64.0 and until a later version of this standard makes adopting them a requirement
      (library-stack-§7): a host's own spell ladder, secret guard, bus stand-down record or schema
      seam, the shapes `LibKa0s-Compat-1.0`, `LibKa0s-Bus-1.0` and `LibKa0s-Schema-1.0` carry from
-     `LibKa0s v1.55.0`. Nor is a library-absent stub of a shape options-ui-§1 names (the check
-     below). Vendoring only part of the library — some files of a multi-file major, or a dependent
+     `LibKa0s v1.55.0`. Nor, from v2.86.0, is a host's own LibCustomGlow-1.0 start/stop code or its
+     own simulator in an addon that has not adopted `LibKa0s-Glow-1.0` or `LibKa0s-Sim-1.0` (shipped
+     from `LibKa0s v1.75.0` and required of none, library-stack-§7): a non-adopter is not a finding.
+     An addon that **has** adopted `Glow` but keeps a host start/stop table beside it, or has adopted
+     `Sim` and keeps a parallel host simulator, is #47; so is a hand-built `SearchBox`, `TestStrip`
+     or itemString bonus walk in an addon on `LibKa0s v1.75.0`+. Nor is a library-absent stub of a
+     shape options-ui-§1 names (the check below). Vendoring only part of the library — some files of a multi-file major, or a dependent
      module without `Core.lua` — is **anti-pattern #48**.
    - **Check the vendoring is whole.** `libs/LibKa0s/` is the library repo's whole ship folder and
      the TOC lists its packaged `libs\LibKa0s\LibKa0s.xml` once, in `# Libraries` after Ace3
