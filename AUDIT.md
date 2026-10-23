@@ -663,20 +663,28 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **The Show window key binding** (`launcher-§6`, new in v2.86.0). For a row whose `ADDONS.md`
        column lists *Show window*, check:
        1. A root `Bindings.xml` holds a `CLICK <button>:LeftButton` line, with no `default` attribute
-          and no Lua, and `header` only on the file's first `<Binding>`.
+          and no Lua, `category="BINDING_HEADER_<FOLDERUPPER>"` on **every** `<Binding>` and no
+          `header` (from the addon's first release after v2.88.0; before it, `category="ADDONS"` with
+          `header` on the first line only was the shape), and the Show window line first.
        2. The button is created in a module as a plain `Button`, not a secure template, registered
           `AnyDown`, and its `OnClick` reaches the same function the descriptor's `toggleWindow`
           calls. Grep both and compare; a copy of the body is #81 and #96.
        3. `BINDING_HEADER_<FOLDERUPPER>` and the `BINDING_NAME_…` label are assigned in that module,
-          the label through `L`.
+          the label through `L`; the header at file scope from the brand constant, the labels per
+          `launcher-§6` (`Toggle <window>`, no brand), and `NS.BINDINGS` lists the file's binding
+          names in order.
        4. The press reaches the toggle's handler and refuses as the `toggle` verb does (read the
           handler or the helper): it toggles and writes nothing while stood down, and never prints the
           disabled line under the `perf` hold alone (`slash-commands-§7`).
-       5. `tests/test_disabled.lua` step 8 covers the press, and the README's `## Usage` and
-          `docs/settings-panel.md`'s launcher row name the binding.
+       5. `tests/test_disabled.lua` step 8 covers the press, the README's `## Usage` names the
+          binding and both places to set it (Options → Keybindings → `Ka0s <Name>`, and General →
+          Keybindings), and `docs/settings-panel.md`'s launcher row names the binding.
+       6. The binding test calls `Kit.assertBindingsXml` (from the addon's first re-vendor of
+          `LibKa0s v1.77.0`).
 
        A missing binding is a MUST finding from the addon's first release after v2.86.0; any defect
-       above is anti-pattern #96.
+       above is anti-pattern #96, and so is a category still `ADDONS` after the addon's first release
+       past v2.88.0.
    - **Check `/<slash> enable` and `/<slash> disable` exist and are aliases** (`slash-commands-§2`).
      Both **MUST** be entries in `NS.COMMANDS`, and both **MUST** write the Master-controls *Enable*
      row's stored path through the addon's single write seam. A handler setting a local, a module
