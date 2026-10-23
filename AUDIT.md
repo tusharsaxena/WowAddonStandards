@@ -900,8 +900,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      state is **stale since v2.44.0** on the same footing: file the naming sentence as the fix and the
      row's retirement with it. A row that mixes (e) state with (f) state narrows to its (f) part.
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
-     screen.** Ten checks. Each is a read of the schema array or a grep, none needs judgment, and
-     all ten are invisible to lint and to the headless suite — which is how every one of them
+     screen.** Eleven checks. Each is a read of the schema array or a grep, none needs judgment, and
+     all eleven are invisible to lint and to the headless suite — which is how every one of them
      shipped. Do them in this order; the first changes what the rest are counting.
      - **(a) Every page draws a tab strip (options-ui-§13).** List the addon's settings pages and,
        per page, the distinct `group` values in declaration order. A page with **no** `group` values,
@@ -1099,6 +1099,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `widget.frame:SetParent(addonFrame)`, which AceGUI's own `Release` resets. Report each hit as
        `file:line` with the widget type and whether its release undoes it. A hand-rolled landing body is one root; a leak inside it is
        its dependent, not a second finding.
+     - **(k) The Keybindings tab (options-ui-§20, v2.88.0).** For an addon with a root
+       `Bindings.xml`: the General page's last tab is `Keybindings`, drawn by `O.KeybindingsTab` /
+       `O.KeybindRows` and passed `NS.BINDINGS`; a missing tab, or one that is not the last, is the
+       finding. No `AceGUI:Create("Keybinding")`, `SetBinding(`, `SaveBindings` or `KeybindListener`
+       in the addon's own code:
+       `grep -rnE 'Create\("Keybinding"\)|SetBinding\(|SaveBindings|KeybindListener' --include='*.lua' . | grep -v -e /libs/ -e /tests/`.
+       A hit outside a documented secure override-binding path is anti-pattern #98; `SetBindingClick`
+       does not match. The General page's Defaults tooltip ends with `O.KEYBINDS_UNCHANGED`
+       (**SHOULD**). Owed from the addon's first release on `LibKa0s v1.77.0` or later; before that
+       tag it is a re-vendor item, not a panel deviation.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a
