@@ -52,3 +52,26 @@ An addon that ships one:
 - Asserts in its own suite that `seam:Unwrapped()` is empty after the whole addon loads: a `Compat` member added after the seam, or replaced by assignment, escapes it.
 
 These are the host's contract. The library guarantees only what it computes, the refusal order with its stood-down backstop and a guarded member that never reaches the client while a session runs, and never advertises the rest as enforced (`LibKa0s#54`). The full descriptor and its obligations are in the `LibKa0s-Sim-1.0` API document (`docs/api/Sim/` in the library repo).
+
+### Kept current at every release (MUST)
+
+This applies to every addon that ships a test mode, a preview drawn by unlocking, or a simulator. A frameless addon, with no positionable display and no simulator, owes only the *Not applicable* answer below.
+
+At every version bump (versioning-git) the addon **MUST** re-look at its placeholder data, its simulator scenarios and the suites that cover them, on three counts:
+
+- **Coverage.** Every display element and feature the release adds or changes that the preview draws appears in the placeholder data. Every event-driven feature added since the previous release that a scenario could exercise is in a scenario step, or the scenario list says why it is not.
+- **Currency.** Data naming game content (item, spell, encounter, instance, currency and affix ids or names, the season's dungeon list, level and item-level ranges) matches the season and patch the release targets, which the TOC `## Interface:` names (toc-file-§3).
+- **Fidelity.** The data and the scenarios still drive the current render path, verbs and UI: no field the display stopped reading, no removed option, and no step driving a control that is gone.
+
+The addon **MUST** record the outcome in that release run's `ANALYSIS.md`, under `## Preview and simulation data` (automated-tests-§5), with exactly one answer:
+
+- **Current**: nothing needed changing.
+- **Refreshed**: the data or scenarios were brought up to date, citing the commits.
+- **Deferred**: the re-look found work that did not land in this release, naming the reason; it **SHOULD** cite a GitHub issue.
+- **Not applicable**: the addon is frameless, as above.
+
+The section also lists the files reviewed. `/dev-copilot:bump-version` asks the question before its release gate and writes the section; a release recorded by hand asks the owner the same question.
+
+Why at release: data naming game content ages with every patch, and nothing else revisits it. The measured shape: the test-mode strip and the simulator arrived in v2.86.0, and their data and scenarios have no other checkpoint.
+
+The rule commences with each addon's first release after v2.87.0. Release bundles frozen earlier are not backfilled (automated-tests-§5). It carries no anti-pattern number: a missing section, or one without an answer, is a **MUST** finding against preview-mode.
