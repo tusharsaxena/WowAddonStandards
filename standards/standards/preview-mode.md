@@ -29,7 +29,7 @@ Reference implementation (in the collection): the modular tracker's cast bar sho
 
 An addon **MAY** ship an in-game simulator: a session that plays scripted events through the addon's real engine, so a player can watch it work without a group, an instance or a real event. It is not a test mode. A test mode draws placeholder data on a display; a simulator feeds the engine, and the displays draw whatever the engine makes of it.
 
-A described reference implementation: the simulator wraps the addon's `NS.Compat` table once, in a setup file loaded straight after the compat family (`Sim:NewSeam(compat, opts)`); binds one session to that seam with a descriptor of scenarios, a `deliver` into the addon's own event handlers and a `prepare` that builds its world (`Sim:New(d)`); and is driven by one feature-verb row, `/<slash> sim …`, whose words reach `sim:RunVerb`. The library's docked step panel shows the scenario's steps while it runs.
+A described reference implementation: the simulator wraps the addon's `NS.Compat` table once, in a setup file loaded straight after the compat family (`Sim:NewSeam(compat, opts)`); binds one session to that seam with a descriptor of scenarios, a `deliver` into the addon's own event handlers and a `prepare` that builds its world (`Sim:New(d)`); and is driven by one feature-verb row, `/<slash> sim …`, whose words reach `sim:RunVerb`. The library's docked step panel shows the scenario's steps while it runs. From `LibKa0s v1.76.0` a session started from the verb or the panel plays on its own at the host's step delay. Pause holds it, and a step typed or a row clicked while it plays holds it first and then plays by hand.
 
 An addon that ships one:
 
