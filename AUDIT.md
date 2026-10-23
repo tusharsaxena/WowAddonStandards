@@ -943,8 +943,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        content whose visible text names the test is a marker. An addon whose test mode is the
        unlocked view owes no marker under this rule. A filter-bar window not using
        `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
-       host-built copy of the strip there is #47. A missing, hover-only or layout-hidden marker is
-       #97. Behavior is confirmed only by the owner's in-client smoke, never by the auditor.
+       host-built copy of the strip there is #47. With the strip shown, confirm that the header
+       carries no word for the same mode, and that the word does come back when the window is
+       minimized or degraded (no Widgets library) where it has those states (`preview-mode`, *One
+       marker per mode on screen*, v2.87.0); the word said twice is #97. A simulator host whose
+       window carries a test strip and does not mark its session with a sim-flavor strip
+       (`kind = "sim"`, `LibKa0s v1.76.0`) is a **SHOULD** finding. A missing, hover-only or
+       layout-hidden marker is #97. Behavior is confirmed only by the owner's in-client smoke, never
+       by the auditor.
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check
@@ -961,6 +967,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        fields on the host's own table, never on the library instance; and a suite that asserts
        `seam:Unwrapped()` is empty. Each missing one is a **MUST** finding against preview-mode; an
        unmarked session is #97 as well. Behavior is the owner's in-client smoke.
+       **Then check the release re-look** (`preview-mode`, *Kept current at every release*,
+       v2.87.0). Find the newest release bundle: the newest `docs/automated-tests/*/manifest.json`
+       whose `release` is not null. If that release is the addon's first after v2.87.0 or a later
+       one, its `ANALYSIS.md` **MUST** carry `## Preview and simulation data` with one of the four
+       answers and a list of the files reviewed. A missing section, a missing answer, or *Not
+       applicable* in an addon that has a test mode or a simulator is a **MUST** finding against
+       preview-mode. *Deferred* with no reason is a finding; *Deferred* with a reason is compliant,
+       and two consecutive *Deferred* answers **SHOULD** be raised as a **low** finding. Releases
+       before v2.87.0 owe nothing and are never backfilled (automated-tests-§5). Whether the data
+       is actually current is the owner's judgement, and the auditor does not re-rule it.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
        row whose type changed with **no** raised `NS.SCHEMA_VERSION` and **no** migration step in

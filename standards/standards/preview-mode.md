@@ -15,6 +15,8 @@ Reference implementation (in the collection): the modular tracker's cast bar sho
 
   A display that is minimized with its header hidden shows no placeholder data, so it owes no marker in that state; the rule binds every layout in which placeholder data is visible. The measured failure: a meter window's test text rode its header and vanished with it when the header was turned off, while the sample bars stayed. The marker's form is the addon's: a title badge, inline title text, or a strip. For a standalone window with a filter bar, standalone-windows names the recommended form.
 
+  **One marker per mode on screen (SHOULD NOT, v2.87.0).** Where a display shows the strip (standalone-windows), it **SHOULD NOT** also draw the same mode's word in its header. The header word remains the marker in any state that hides the strip but still shows the display, a minimized window or a load with no Widgets library, and in any display that has no strip.
+
   What is not a marker:
   - The launcher tooltip's `Test mode: On` and the Master-controls `Test mode` checkbox, because neither is on the display.
   - Placeholder data that merely looks plausible. Placeholder content whose visible text names the test **is** a marker: a group popup whose placeholder content reads *Test Group — …* says so on the display and owes nothing more.
@@ -29,7 +31,7 @@ Reference implementation (in the collection): the modular tracker's cast bar sho
 
 An addon **MAY** ship an in-game simulator: a session that plays scripted events through the addon's real engine, so a player can watch it work without a group, an instance or a real event. It is not a test mode. A test mode draws placeholder data on a display; a simulator feeds the engine, and the displays draw whatever the engine makes of it.
 
-A described reference implementation: the simulator wraps the addon's `NS.Compat` table once, in a setup file loaded straight after the compat family (`Sim:NewSeam(compat, opts)`); binds one session to that seam with a descriptor of scenarios, a `deliver` into the addon's own event handlers and a `prepare` that builds its world (`Sim:New(d)`); and is driven by one feature-verb row, `/<slash> sim …`, whose words reach `sim:RunVerb`. The library's docked step panel shows the scenario's steps while it runs.
+A described reference implementation: the simulator wraps the addon's `NS.Compat` table once, in a setup file loaded straight after the compat family (`Sim:NewSeam(compat, opts)`); binds one session to that seam with a descriptor of scenarios, a `deliver` into the addon's own event handlers and a `prepare` that builds its world (`Sim:New(d)`); and is driven by one feature-verb row, `/<slash> sim …`, whose words reach `sim:RunVerb`. The library's docked step panel shows the scenario's steps while it runs. From `LibKa0s v1.76.0` a session started from the verb or the panel plays on its own at the host's step delay. Pause holds it, and a step typed or a row clicked while it plays holds it first and then plays by hand.
 
 An addon that ships one:
 
@@ -46,9 +48,32 @@ An addon that ships one:
   - act on a real player;
   - write SavedVariables from a simulated event. The step panel's position is session-only. A session log the host keeps in memory and drops at stop is not SavedVariables.
 - **MUST** leave the addon exactly as it was at stop. Every module the session touched registers its cleanup (`sim:OnStopGuarded` for a step that must still see simulated answers, `sim:OnStop` once the seam is off), and every timer inside the simulation is `sim:After`, so it dies with the session.
-- **MUST** mark the session on the display while it runs, as a test mode is marked (the marker bullet above). The major's step panel on screen satisfies this.
+- **MUST** mark the session on the display while it runs, as a test mode is marked (the marker bullet above). The major's step panel on screen satisfies this. A window that marks test mode with the strip **SHOULD** mark a running simulation with the strip's simulation flavor (`kind = "sim"`, Widgets minor 14, `LibKa0s v1.76.0`), under the same one-marker rule; the step panel on screen still satisfies the MUST on its own.
 - Is **slash-only**: one `/<slash> sim …` feature verb, which the dispatcher refuses while the addon is disabled, with **no launcher entry and no key binding**. A launcher entry would bring launcher-§6's binding with it.
 - Keeps its host members off the library instance. The host holds its own table for its own fields, and a running session's host fields go on the session table (`sim:Session()`).
 - Asserts in its own suite that `seam:Unwrapped()` is empty after the whole addon loads: a `Compat` member added after the seam, or replaced by assignment, escapes it.
 
 These are the host's contract. The library guarantees only what it computes, the refusal order with its stood-down backstop and a guarded member that never reaches the client while a session runs, and never advertises the rest as enforced (`LibKa0s#54`). The full descriptor and its obligations are in the `LibKa0s-Sim-1.0` API document (`docs/api/Sim/` in the library repo).
+
+### Kept current at every release (MUST)
+
+This applies to every addon that ships a test mode, a preview drawn by unlocking, or a simulator. A frameless addon, with no positionable display and no simulator, owes only the *Not applicable* answer below.
+
+At every version bump (versioning-git) the addon **MUST** re-look at its placeholder data, its simulator scenarios and the suites that cover them, on three counts:
+
+- **Coverage.** Every display element and feature the release adds or changes that the preview draws appears in the placeholder data. Every event-driven feature added since the previous release that a scenario could exercise is in a scenario step, or the scenario list says why it is not.
+- **Currency.** Data naming game content (item, spell, encounter, instance, currency and affix ids or names, the season's dungeon list, level and item-level ranges) matches the season and patch the release targets, which the TOC `## Interface:` names (toc-file-§3).
+- **Fidelity.** The data and the scenarios still drive the current render path, verbs and UI: no field the display stopped reading, no removed option, and no step driving a control that is gone.
+
+The addon **MUST** record the outcome in that release run's `ANALYSIS.md`, under `## Preview and simulation data` (automated-tests-§5), with exactly one answer:
+
+- **Current**: nothing needed changing.
+- **Refreshed**: the data or scenarios were brought up to date, citing the commits.
+- **Deferred**: the re-look found work that did not land in this release, naming the reason; it **SHOULD** cite a GitHub issue.
+- **Not applicable**: the addon is frameless, as above.
+
+The section also lists the files reviewed. `/dev-copilot:bump-version` asks the question before its release gate and writes the section; a release recorded by hand asks the owner the same question.
+
+Why at release: data naming game content ages with every patch, and nothing else revisits it. The measured shape: the test-mode strip and the simulator arrived in v2.86.0, and their data and scenarios have no other checkpoint.
+
+The rule commences with each addon's first release after v2.87.0. Release bundles frozen earlier are not backfilled (automated-tests-§5). It carries no anti-pattern number: a missing section, or one without an answer, is a **MUST** finding against preview-mode.

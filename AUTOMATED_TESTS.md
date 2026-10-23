@@ -132,6 +132,16 @@ so; silence reads as "not checked".>
 Location / Disposition. Files: Band / File / LOC / Disposition, band as a column so more bands than
 today's two render uniformly. "None." rather than dropping a heading.>
 
+## Preview and simulation data
+
+<Release runs only; omit this section on a non-release run. Written from the answer the bump command
+asked for (preview-mode, *Kept current at every release*):
+- **Answer:** Current | Refreshed | Deferred | Not applicable
+- **Asked:** <date>, by `/dev-copilot:bump-version` | by hand
+- **Files reviewed:** <test-mode data; simulator scenarios; their suites>
+- **Commits since the previous release touching them:** <count>
+- **Note:** <the commits for Refreshed; the reason and issue for Deferred; why, for Not applicable>>
+
 ## Actions
 
 <Numbered, or "None." Each action names the file and what would change. An action with no owner in
@@ -265,6 +275,8 @@ A release run is `--release X.Y.Z`, which stamps the manifest. It is produced as
 bump, **before** the tag (`automated-tests-§6`), and:
 
 - **MUST** carry an `ANALYSIS.md` (`automated-tests-§5`).
+- **MUST** carry the `## Preview and simulation data` section in that `ANALYSIS.md` (preview-mode,
+  *Kept current at every release*).
 - **MUST** have its verdict reported to the user while they are deciding whether to tag — a `red` or
   `amber` release run is a decision point, not a footnote.
 

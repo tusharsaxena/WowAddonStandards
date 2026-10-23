@@ -460,6 +460,9 @@ and what it costs is the trend line the whole section exists to keep.
   the SHOULD, which is why the number is a note and not a backlog.
 - **MUST** follow the uniform prompt in the root **`AUTOMATED_TESTS.md`** playbook, so every addon's
   write-up has the same shape and two addons' analyses can be read against each other.
+- **MUST**, on a **release** run, carry a `## Preview and simulation data` section recording the
+  release-time re-look at the test-mode data and simulator scenarios (preview-mode,
+  *Kept current at every release*). The section is release-only: a non-release run omits it.
 - **MUST** link each suite's artifact from the row that reports it, so a reader gets from a figure to
   the evidence in one click, and **MUST** report `complexity` with **totals and averages both** —
   every field of `lizard`'s footer, which `manifest.json` records. A total that rose because the addon
