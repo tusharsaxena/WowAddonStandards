@@ -943,8 +943,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        content whose visible text names the test is a marker. An addon whose test mode is the
        unlocked view owes no marker under this rule. A filter-bar window not using
        `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
-       host-built copy of the strip there is #47. A missing, hover-only or layout-hidden marker is
-       #97. Behavior is confirmed only by the owner's in-client smoke, never by the auditor.
+       host-built copy of the strip there is #47. With the strip shown, confirm that the header
+       carries no word for the same mode, and that the word does come back when the window is
+       minimized or degraded (no Widgets library) where it has those states (`preview-mode`, *One
+       marker per mode on screen*, v2.87.0); the word said twice is #97. A simulator host whose
+       window carries a test strip and does not mark its session with a sim-flavor strip
+       (`kind = "sim"`, `LibKa0s v1.76.0`) is a **SHOULD** finding. A missing, hover-only or
+       layout-hidden marker is #97. Behavior is confirmed only by the owner's in-client smoke, never
+       by the auditor.
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check

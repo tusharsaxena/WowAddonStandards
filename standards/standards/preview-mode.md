@@ -15,6 +15,8 @@ Reference implementation (in the collection): the modular tracker's cast bar sho
 
   A display that is minimized with its header hidden shows no placeholder data, so it owes no marker in that state; the rule binds every layout in which placeholder data is visible. The measured failure: a meter window's test text rode its header and vanished with it when the header was turned off, while the sample bars stayed. The marker's form is the addon's: a title badge, inline title text, or a strip. For a standalone window with a filter bar, standalone-windows names the recommended form.
 
+  **One marker per mode on screen (SHOULD NOT, v2.87.0).** Where a display shows the strip (standalone-windows), it **SHOULD NOT** also draw the same mode's word in its header. The header word remains the marker in any state that hides the strip but still shows the display, a minimized window or a load with no Widgets library, and in any display that has no strip.
+
   What is not a marker:
   - The launcher tooltip's `Test mode: On` and the Master-controls `Test mode` checkbox, because neither is on the display.
   - Placeholder data that merely looks plausible. Placeholder content whose visible text names the test **is** a marker: a group popup whose placeholder content reads *Test Group — …* says so on the display and owes nothing more.
@@ -46,7 +48,7 @@ An addon that ships one:
   - act on a real player;
   - write SavedVariables from a simulated event. The step panel's position is session-only. A session log the host keeps in memory and drops at stop is not SavedVariables.
 - **MUST** leave the addon exactly as it was at stop. Every module the session touched registers its cleanup (`sim:OnStopGuarded` for a step that must still see simulated answers, `sim:OnStop` once the seam is off), and every timer inside the simulation is `sim:After`, so it dies with the session.
-- **MUST** mark the session on the display while it runs, as a test mode is marked (the marker bullet above). The major's step panel on screen satisfies this.
+- **MUST** mark the session on the display while it runs, as a test mode is marked (the marker bullet above). The major's step panel on screen satisfies this. A window that marks test mode with the strip **SHOULD** mark a running simulation with the strip's simulation flavor (`kind = "sim"`, Widgets minor 14, `LibKa0s v1.76.0`), under the same one-marker rule; the step panel on screen still satisfies the MUST on its own.
 - Is **slash-only**: one `/<slash> sim …` feature verb, which the dispatcher refuses while the addon is disabled, with **no launcher entry and no key binding**. A launcher entry would bring launcher-§6's binding with it.
 - Keeps its host members off the library instance. The host holds its own table for its own fields, and a running session's host fields go on the session table (`sim:Session()`).
 - Asserts in its own suite that `seam:Unwrapped()` is empty after the whole addon loads: a `Compat` member added after the seam, or replaced by assignment, escapes it.
