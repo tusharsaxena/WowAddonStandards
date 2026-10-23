@@ -961,6 +961,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        fields on the host's own table, never on the library instance; and a suite that asserts
        `seam:Unwrapped()` is empty. Each missing one is a **MUST** finding against preview-mode; an
        unmarked session is #97 as well. Behavior is the owner's in-client smoke.
+       **Then check the release re-look** (`preview-mode`, *Kept current at every release*,
+       v2.87.0). Find the newest release bundle: the newest `docs/automated-tests/*/manifest.json`
+       whose `release` is not null. If that release is the addon's first after v2.87.0 or a later
+       one, its `ANALYSIS.md` **MUST** carry `## Preview and simulation data` with one of the four
+       answers and a list of the files reviewed. A missing section, a missing answer, or *Not
+       applicable* in an addon that has a test mode or a simulator is a **MUST** finding against
+       preview-mode. *Deferred* with no reason is a finding; *Deferred* with a reason is compliant,
+       and two consecutive *Deferred* answers **SHOULD** be raised as a **low** finding. Releases
+       before v2.87.0 owe nothing and are never backfilled (automated-tests-§5). Whether the data
+       is actually current is the owner's judgement, and the auditor does not re-rule it.
        **Then ask for the migration.** `General visibility` is a four-value dropdown, and an addon
        that shipped a *show only in combat* **boolean** at that path has changed the stored type. A
        row whose type changed with **no** raised `NS.SCHEMA_VERSION` and **no** migration step in
