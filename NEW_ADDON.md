@@ -202,7 +202,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
      re-render (anti-pattern #93).
    - **The General page's first tab is named exactly `Master controls`** and is built by the library's
      master-controls composer from **one** declaration — `Enable <Addon>` | `General visibility` /
-     `Master scale` | `Master alpha` / `Lock frame` | `Debug console` / `Minimap button` | `Test mode` /
+     `Master scale` | `Master opacity` / `Lock frame` | `Debug console` / `Minimap button` | `Test mode` /
      `Reset position` | `Reset all settings` — including only the rows the addon has the state for.
      `Minimap button` is **unconditional** (every addon ships a launcher) and takes the **first** column
      precisely because only some addons have a `Test mode` to pair beside it; it stores at LibDBIcon's own

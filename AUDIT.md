@@ -959,13 +959,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **(b) The General page's first tab is exactly `Master controls` (options-ui-§15).** Compare
        the first distinct `group` on the General page against that literal string. Then read the rows
        filed under it, in declaration order, against the canonical set — enable, general visibility,
-       master scale, master alpha, lock frame, debug console, minimap button, test mode,
+       master scale, master opacity, lock frame, debug console, minimap button, test mode,
        reset position, reset all settings.
        They **MUST** be a subsequence of that list, and every canonical row the addon has the state
        for **MUST** be present. A canonical row sitting under a different tab is a finding against
        **§15**, not against the tab it is in. An addon that draws no positionable frame — proven by a
        whole-repo `SetMovable` sweep, not assumed — legitimately omits exactly master scale, master
-       alpha, lock frame and reset position; record that as compliant and file nothing.
+       opacity, lock frame and reset position; record that as compliant and file nothing.
        **Test mode is required in every addon with a positionable display** — proven by the same
        whole-repo `SetMovable` sweep that proves a frameless addon — **unless unticking Lock frame
        already shows the display with its placeholder content**, in which case Lock frame is the
