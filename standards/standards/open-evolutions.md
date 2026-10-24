@@ -211,3 +211,27 @@ Items recorded for future versions of this standard:
   cannot drift from the live surface, but it gives up the partial function a stub keeps, such as host
   verbs that still answer. No rule changes until this is ruled: the stubs and parity cases stay
   required, and a host carrying a full stub is not a finding.
+- **A library context menu, `W.ContextMenu` (recorded, not ruled).** Two addons, LootHistory and
+  BankLedger, hand-build an identical right-click row menu over a full-screen click catcher, the
+  shape frame-layering-§4 forbids. A `LibKa0s-Widgets-1.0` `ContextMenu` would be a new widget
+  surface, and both addons can take the local fix in the 2026-10-24 run: drop the catcher and dismiss
+  on `GLOBAL_MOUSE_DOWN`, ignoring presses inside the menu. Re-check when a third addon builds a row
+  context menu, or the two local menus diverge in shape.
+- **A StaticPopup lift-while-shown helper (recorded, not ruled).** QuickComms lifts a borrowed
+  Blizzard confirmation above its own `DIALOG` band while it is shown and restores the recorded
+  strata on hide (`ModalWindow.LiftConfirm`), the one strata switch frame-layering-§4 allows.
+  PremadeGroupsFilterExtension may need the same, pending an in-client confirmation. Promote the
+  helper into `LibKa0s` if a second addon confirms the case in the client.
+- **A guarded `LevelOf(frame, fallback)` (recorded, not ruled).** A frame-level read made secret-safe
+  and forbidden-frame-safe, answering the fallback when the level cannot be read (frame-layering-§1,
+  host-matched surfaces; events-frames-taint-§8). One consumer, AuraMaster, so it stays local.
+  Re-check when a second addon reads another addon's or Blizzard's frame levels under the same guard.
+- **A `strata` option on the library's tool windows and copy window (recorded, not ruled).** A
+  `strata` field on the `LibKa0s-DebugLog-1.0` and `LibKa0s-Perf-1.0` descriptors and on
+  `LibKa0s-Widgets-1.0` `CopyWindow`, default unchanged, with the console's copy window opening one
+  strata above whatever the console uses, for an addon whose own surface sits at `DIALOG` or above
+  (QuickComms' dial, PremadeGroupsFilterExtension's surface at `FULLSCREEN`). Both cases are
+  developer-facing, so it is not in `LibKa0s v1.77.0` (STRATA_MODEL LK-05, Ka0sAddonsCommonTasks
+  `docs/2026-10-24-KEYBINDS_LAYOUT_STRATA/`); until then such an addon says in its layers table's
+  comment that the surface can cover the console (debug-logging, frame-layering-§5). Re-check when a player-facing surface of an addon sits at `DIALOG` or
+  above and its console is covered in the client.

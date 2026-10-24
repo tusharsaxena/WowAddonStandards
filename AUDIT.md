@@ -907,6 +907,37 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the row's own trigger names WowAddonStandards#7; not the registry. A row whose only content is (e)
      state is **stale since v2.44.0** on the same footing: file the naming sentence as the fix and the
      row's retirement with it. A row that mixes (e) state with (f) state narrows to its (f) part.
+   - **Check frame layering (`frame-layering`, v2.88.0).** Code only, `libs/` and `tests/_kit/`
+     excluded. Run and classify:
+     (a) `grep -rn 'SetFrameStrata("' --include='*.lua' core modules settings`: any hit is
+     anti-pattern #99, except the single named local an addon with one explicit strata call **MAY**
+     use (frame-layering-§5).
+     (b) `grep -rnE 'SetFrameLevel\([0-9]' --include='*.lua' core modules settings` (absolute) and
+     `grep -rnE 'SetFrameLevel\([A-Za-z_.]+:GetFrameLevel\(\)' --include='*.lua' core modules settings`;
+     any hit of the first kind is #99; read each hit of the second kind: a sibling base, not the
+     band owner, is #99 (frame-layering-§3).
+     (c) An addon that sets any strata or level has `NS.Constants.LAYERS` in `core/Constants.lua`
+     with the stack comment, and `docs/ARCHITECTURE.md` points at it rather than copying it. A
+     frameless addon calls none of `SetFrameStrata`, `SetFrameLevel`, `SetToplevel` or `Raise` and
+     **SHOULD** pin that with a static test (frame-layering-§5).
+     (d) A text, mark or veil region created on a frame that also gets a `Cooldown` or
+     `BackdropTemplate` child is #100 (frame-layering-§3).
+     (e) Every movable window calls `SetToplevel(true)`, in its frame-layering-§1 tier; one that does
+     not is #103 (frame-layering-§4).
+     (f) A transient popup with a full-screen sibling at `SetAllPoints(UIParent)`, with no
+     `GLOBAL_MOUSE_DOWN` dismissal, or not clamped, is #104 (frame-layering-§4).
+     (g) A player strata row offering values above `HIGH` that shipped after v2.88.0, or whose
+     tooltip is not `O.StrataTooltip(<its values>)` (from the addon's first re-vendor of
+     `LibKa0s v1.77.0`), is #102 (frame-layering-§1).
+     (h) Library tool windows toplevel, menus clamped and the IdList suggestion list closed at
+     combat start come from `LibKa0s v1.77.0`; an addon on an earlier tag files a re-vendor item,
+     not an addon deviation (frame-layering-§6).
+     (i) Documented exceptions (the secure fixed point, the event-raised notice) need a call-site
+     comment and a `## Documented deviations` row; read the register before filing
+     (frame-layering-§1).
+     Rendering, ties and reachability are confirmed only by the owner's in-client smoke (`/fstack`),
+     never by this read. The rules apply from each addon's first release after v2.88.0
+     (frame-layering-§7).
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
      screen.** Eleven checks. Each is a read of the schema array or a grep, none needs judgment, and
      all eleven are invisible to lint and to the headless suite — which is how every one of them

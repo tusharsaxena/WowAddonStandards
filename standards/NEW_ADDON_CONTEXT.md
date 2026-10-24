@@ -118,7 +118,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
     Compat<Topic>.lua    -- optional, one topic each, only once Compat.lua would pass 1000 lines; right after Compat.lua (compat)
     MediaSetup.lua       -- NS.Icon / NS.MediaFont from LibKa0s-Media-1.0 + the one RegisterLSM call
                             LOAD-BEARING: Constants resolves FONT_MONO from it at file load
-    Constants.lua
+    Constants.lua        -- incl. NS.Constants.LAYERS, the one strata and level table (frame-layering-§5)
     State.lua            -- session-only state incl. NS.State.debug (never in SV)
     EnvSetup.lua         -- NS.Env from LibKa0s-Env-1.0: TOC metadata, own version, map ID / zone
     CoreSetup.lua        -- NS.Print from LibKa0s-Core-1.0:New{prefix=...} (slash-commands-§4)
@@ -810,6 +810,33 @@ button's `OnClick` while disabled and under the `perf` hold alone (slash-command
 binding test calls `Kit.assertBindingsXml` (launcher-§6). The README's `## Usage` names the binding and
 both places to set it: Options → Keybindings → `Ka0s <Name>`, and General → Keybindings in the
 addon's settings. `docs/settings-panel.md`'s launcher row lists it beside the *Show window* entry.
+
+### `core/Constants.lua` — the layers table (frame-layering-§5)
+
+An addon that draws frames of its own declares every strata and every frame level it uses **once**,
+here, so a call site never carries a strata string or a bare level number. Start from this table and
+the header comment above it, then fill the comment in with this addon's stack:
+
+```lua
+-- The layers table (frame-layering-§5). The one strata and level table: every SetFrameStrata and
+-- SetFrameLevel in this addon reads it, and docs/ARCHITECTURE.md points here rather than copying it.
+-- This addon's stack, bottom to top (frame-layering-§1 tiers):
+--   T1 HUD    <display root>  MEDIUM, set on the root; the element ladder below is relative to it
+--   T2 chrome <handle, outline, marker>  the display's strata, at the top of its band (HANDLE)
+--   ...       <each further tier this addon draws, with its frame>
+-- Library- and Blizzard-owned tiers this addon relies on (frame-layering-§6): debug console DIALOG,
+-- toplevel; copy window FULLSCREEN; menus FULLSCREEN_DIALOG; the window grip at +10.
+NS.Constants.LAYERS = {
+    STRATA = { HUD = "MEDIUM" },
+    LEVEL  = { FILL = 1, BORDER = 2, EFFECT = 3, OVERLAY = 4, HANDLE = 50 },
+}
+```
+
+Every level is set as `base:GetFrameLevel() + LAYERS.LEVEL.<NAME>`, never as an absolute number
+and never against a sibling (frame-layering-§3); add a key for each further tier or band the addon
+uses, under the §1 key names. **A frameless addon** (its only surfaces are the Settings canvas,
+library windows and Blizzard or Ace3 popups) deletes the table and pins *no strata calls* with a
+static test: no `SetFrameStrata`, `SetFrameLevel`, `SetToplevel` or `Raise` in its own code.
 
 ### `core/MediaSetup.lua` — the shared art and type (`LibKa0s-Media-1.0`)
 
@@ -1643,6 +1670,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 22. Versioning: semver. Bump TOC, code constants, README. `dev-copilot:bump-version` automates this. Bump `## Interface:` + README `[wow]` badge each patch.
 23. Git: commit to the default branch on a **green** unit of work. An owner-directed or multi-repo changeset goes on `feat/<YYYY-MM-DD>-<topic>`, the same name in every repo it touches, merged `--no-ff` on the owner's go-ahead and then deleted; no other feature branches. Never push unless asked (a feature branch pushed at an owner-authorized checkpoint is the sanctioned case).
 24. Standalone main window (data browser/log/tracker): non-secure `CreateFrame` (no combat gate), `UISpecialFrames` (ESC), persist pos/size in SV, scale setting, lazy tabs, pooled rows — and take the look from **`LibKa0s-Core-1.0`'s shared `SKIN` + `ApplySkin`** (and `MakeCloseButton`) rather than a private lookalike, so a re-skin has one touch point across the collection. Reach `ApplySkin` through Core itself; only `MakeCloseButton` is re-exported on the console instance. **Every close control the addon builds — on any window, and inside any decoration hook it hands a shared module — goes through the single `NS.MakeCloseButton` wrapper defined in `core/CoreSetup.lua`, which supplies the folder name (MUST).** A bare two-argument call to the factory silently draws the fallback glyph instead of the shared mark: no path is built, so nothing draws and nothing raises, and no gate can see it (anti-patterns #64, #65). The look it draws is normative and is **two lines, not one** — a flat 1px black outer edge with a 1px gray highlight just inside it, plus a gold title and a gray divider; assign `frame.title` / `frame.divider` and let `ApplySkin` tint them, and **never** hardcode the values. See standalone-windows, "The Ka0s window edge".
+24a. **Frame layering** (frame-layering): strata separates roles and level orders within a role; HUD roots `MEDIUM`, set on the root; windows toplevel at `MEDIUM`/`HIGH`; modals `DIALOG`; popups `FULLSCREEN_DIALOG`, clamped, closed with their opener, no catcher; the element ladder fill < border < effect < overlay frame; every level relative; one `NS.Constants.LAYERS` table; a strata row's tooltip is `O.StrataTooltip`.
 
 ## Forbidden patterns
 
@@ -1699,6 +1727,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - A locale topic file that creates its own `NS.L`, a key defined in two files of one locale, or a locale gate that reads `enUS.lua` alone once the locale is split (localization-§6, anti-pattern #94).
 - British spelling in authored English text — `colour`/`grey`/`behaviour`/`centre`/`cancelled`/`-ise`/`-isation` in a locale key or value, a player-visible string, a comment, an identifier, or docs (localization-§5, anti-pattern #46).
 - Creating a feature/topic branch the owner did not direct, or one not shared by name across the repos of a multi-repo changeset (versioning-git, anti-pattern #21).
+- **Layering by accident** (anti-patterns #99-#105) — a strata string or a bare level number at a call site, or no layers table (#99); text or a mark drawn as a region under its own frame's cooldown or border child (#100); edit chrome under the content it edits, or faded but still clickable (#101); a HUD at `DIALOG` or above, or a new player strata choice above `HIGH` (#102); a movable window that is not toplevel (#103); a popup behind a full-screen click catcher, unclamped, or outliving its opener (#104); an alpha-0 frame still taking the mouse, or a StaticPopup left re-strata'd (#105) (frame-layering).
 
 ---
 
@@ -1730,6 +1759,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] **One launcher object, registered twice** — a single LibDataBroker-1.1 `launcher` object named for the addon folder, registered with LibDBIcon-1.0, with **one** library-owned `OnClick`: left-click opens the settings panel and right-click opens the options menu, whose entries (Enabled, then Locked / Test mode / Show window where the addon has them) each call the addon's own handler and are recorded in `standards/ADDONS.md` (launcher-§2). No host click handler, no host menu, no broker enable setting, and no `minimap.show` or `minimap.shown` key beside LibDBIcon's `hide` (anti-pattern #81); the visibility row is declared at `global.minimap.shown`, its closures inverting onto `minimap.hide` (launcher-§3). Its `label` is **`Ka0s <Name>`** in plain text — not the TOC `## Title`, not the folder name (anti-pattern #84) — and **neither *Reset all settings* nor the page Defaults button reaches `minimap.hide`**, which is vetoed out of both (anti-pattern #83). Hovering it shows the library-drawn status tooltip, disabled or not, with the states the addon has passed in the descriptor and no title, status line or click hint drawn by the host (launcher-§1, anti-pattern #89).
 - [ ] Show window key binding (launcher-§6) if the addon has a primary window — a root `Bindings.xml` `CLICK` line with no `default`, with `category="BINDING_HEADER_<FOLDERUPPER>"` and no `header`, the labels in `NS.BINDINGS`, and `Kit.assertBindingsXml` in the suite, on a plain hidden named button whose `OnClick` calls the `toggleWindow` handler and refuses as the `toggle` verb does while stood down (anti-pattern #96).
 - [ ] **The General page's last tab is `Keybindings`** if the addon ships launcher-§6 bindings, drawn by `O.KeybindingsTab({ bindings = NS.BINDINGS })`: two slots per action labeled by `GetBindingName`, keys saved to the set in force and never in a profile, refused in combat, untouched by Defaults and *Reset all settings*, and the Defaults tooltip ending with `O.KEYBINDS_UNCHANGED`; the suite pins the strip's last tab, the rows against `NS.BINDINGS`, the labels and one key bound through `Kit.keybindThroughTab` (options-ui-§20, anti-pattern #98).
+- [ ] **Frame layering (frame-layering)** — `NS.Constants.LAYERS` present and read by every strata/level call (or none, frameless, pinned by a static test); windows toplevel; no strata literal at a call site.
 - [ ] **`media/logos/<addon>.logo.128.tga` exists, is 128×128 and is uncompressed 32-bit**, `## IconTexture` points at it and the LDB object carries the same path — not a Blizzard icon, not a file id, not an RLE TGA (layout-§4, toc-file-§1, anti-pattern #82).
 - [ ] **`/<slash> enable` and `/<slash> disable` exist** as aliases writing the *Enable* row's stored path through the single write seam, holding no state of their own (slash-commands-§2).
 - [ ] **Disabled means the addon is not running** (slash-commands-§7) — frames hidden, every event, message and bucket registration **actually unregistered** (an early-returning handler does **not** satisfy this: the addon stopped reacting, not watching, and still pays the dispatch), every timer, ticker and `OnUpdate` canceled, no SavedVariables write from any game event, and all of it through the **same latch the perf harness's suspend takes a hold on** — never a second teardown path. The chat command, `NS.COMMANDS`, the dispatcher, the settings-category registration and AceDB's profile callbacks are **setup** and stay up in either state. **Every verb keeps answering while disabled** (slash-commands-§2): every reserved verb — `help`, `config`, `version`, `enable`, `disable`, `debug`, `diagnostics`, `perf` — the bare `/<slash>`, which opens the panel, and the whole schema CLI (`get`, `set`, `list`, `reset`, `resetall`). Only a **feature** verb SHOULD refuse, printing **one** tagged line — `<tag> <Ka0s Name> is disabled — enable it with |cFFFFFF00/<slash> enable|r` — and doing nothing else. Under the `perf` hold alone the line is `<tag> Not available during a performance capture.` instead, chosen by one helper that reads `IsHeld("disabled")` first (slash-commands-§7, *Which refusal, by hold*). The launcher's left-click still opens the panel; its right-click menu keeps *Enabled* live and grays every other entry, and **MUST NOT** write except through *Enabled*. Vendor LibKa0s **v1.42.0** or later — `LibKa0s-Lifecycle-1.0` ships from v1.40.0, and v1.42.0's Slash minor 14 is the first dispatcher that answers the restored surface exactly. Ship `tests/test_disabled.lua` (slash-commands-§7, *The conformance test every addon ships*), all ten steps, with step 6 asserting `__fireUnconditional`'s returned count is at least 1 for every event it fires, so a fire that reached no handler fails rather than passes.

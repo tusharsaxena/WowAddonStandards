@@ -80,6 +80,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    nobody receives and nothing anywhere goes red; through a constant the same typo is a nil name, so a
    subscriber raises at once, and a publisher stays silent unless the table is a strict catalog
    (`LibKa0s-Bus-1.0`'s `Catalog`, a MAY).
+   `core/Constants.lua` starts from the pack's layers-table snippet: one `NS.Constants.LAYERS` table
+   that every strata and level call reads, or none at all in a frameless addon (frame-layering-§5).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
