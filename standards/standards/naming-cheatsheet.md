@@ -21,6 +21,7 @@
 | Bus messages | `Ka0s_<Addon>_<Event>`, declared once as a constant and never typed as a literal at a call site (architecture-§4). `<Event>` is **PascalCase** (MUST) and **SHOULD** name what happened, preferably as a past participle: not `ROSTER_CHANGED`, not `UpdateRoster`. The constant's **key** is SCREAMING_SNAKE, and that casing belongs to the key alone — exactly one addon in the collection diverged by letting it leak into the wire string. The other SCREAMING_SNAKE publisher keeps no constant table at all, so it has nothing to leak: what it misses is the declare-once MUST (architecture-§4), not this row. | `NS.MSG.ROSTER_CHANGED = "Ka0s_ExampleBar_RosterChanged"` |
 | Settings key | snake_case dotted path | `display.scale` |
 | Locale keys | English source string | `L["Reset all settings"]` |
+| Settings labels | Sentence case; '(px)', '(seconds)'; 'opacity', never 'alpha'; ASCII ' > ' in location strings (options-ui-§21) | *Window scale*, *Faded opacity*, *General > Master controls* |
 | English text (everywhere) | **US English** spelling — strings, labels, comments, identifiers, docs; never British (localization-§5) | `L["Bar color"]`, `NS.Util.colorize`, `gray`, `initialize` |
 | Module table | `NS.<PascalCase>` | `NS.IconGrid` |
 | Chat printer | `NS.Util.print` — never a bare `NS.Print` when AceConsole is embedded into `NS` (its `:Print` mixin clobbers it; architecture-§2, anti-pattern #36) | `NS.Util.print("…")` |
