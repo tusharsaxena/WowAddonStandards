@@ -13,7 +13,7 @@ Reference implementation (in the collection): the modular tracker's cast bar sho
   - is localized (localization);
   - is visible in **every layout in which the placeholder data is visible**, a hidden header and a compact layout included.
 
-  A display that is minimized with its header hidden shows no placeholder data, so it owes no marker in that state; the rule binds every layout in which placeholder data is visible. The measured failure: a meter window's test text rode its header and vanished with it when the header was turned off, while the sample bars stayed. The marker's form is the addon's: a title badge, inline title text, or a strip. For a standalone window with a filter bar, standalone-windows names the recommended form.
+  A display that is minimized with its header hidden shows no placeholder data, so it owes no marker in that state; the rule binds every layout in which placeholder data is visible. The measured failure: a meter window's test text rode its header and vanished with it when the header was turned off, while the sample bars stayed. The marker's form is the addon's: a title badge, inline title text, or a strip. For a standalone window with a filter bar, standalone-windows names the recommended form. A marker that overlays the display sits in the display's chrome band (frame-layering-§2); a strip that displaces content stays at the content's chrome level.
 
   **One marker per mode on screen (SHOULD NOT, v2.87.0).** Where a display shows the strip (standalone-windows), it **SHOULD NOT** also draw the same mode's word in its header. The header word remains the marker in any state that hides the strip but still shows the display, a minimized window or a load with no Widgets library, and in any display that has no strip.
 
