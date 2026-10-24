@@ -10,7 +10,7 @@ Items recorded for future versions of this standard:
 - ~~**Shared test scaffolding.**~~ **Shipped** as `testkit/` in the LibKa0s repo, vendored to each addon's `tests/_kit/` — the framework, the sandboxed loader and the universal WoW/Ace mock base (testing-§1).
 - **Multi-zone profile model adoption** for group-context addons.
 - ~~**Object pool standard** packaged as a copyable micro-lib.~~ **Shipped**, and not as a copyable micro-lib — as `LibKa0s-Pool-1.0`, in both the array and keyed shapes (library-stack-§7). A copyable micro-lib was the wrong answer for the same reason the pool needed doing at all: four copies shipped across two addons and one of them never returned anything to the free list, which a fifth copy would not have caught either.
-- **Further `LibKa0s` modules.** `LibKa0s` is now the sanctioned path for shared Ka0s-owned code (library-stack-§7), and its per-module-major layout makes each addition independent and purely additive. Shipped so far: the secret-safe/printer seams (Core), the client-fact reader (Env), the widget pool (Pool), the item primitives (Item), the shared media catalog (Media), the flat dropdown, copy window, reorder list and drag handle (Widgets), the debug console and, from `LibKa0s v1.60.0`, the diagnostics-report helper (DebugLog), the slash dispatcher (Slash), the options toolkit (Options), the perf harness (Perf), the minimap/broker launcher (Launcher) and the stand-down latch (Lifecycle), from `LibKa0s v1.55.0` the version-variant readers and secret guards (Compat), the bus stand-down record and strict message catalog (Bus) and the schema runtime's portable half (Schema), and from `LibKa0s v1.75.0` the flat search box and test-mode strip (Widgets), the bonus ids of a link (Item), the stateless LibCustomGlow driver (Glow) and the in-game simulator's core (Sim) — **seventeen majors across forty files** (recounted at `LibKa0s v1.75.0` from `LibKa0s/tests/majors.lua` and `LibKa0s/LibKa0s.xml`, library-stack-§7), plus the non-code `media/` payload. The three candidates this entry used to name each moved, and each only in part. **`Compat`: a narrow major shipped; the wide extraction was measured and rejected** — the nine `core/Compat.lua` copies hold 2820 lines (`wc -l */core/Compat.lua` over the collection), of which the absorbed members occupy 248 (330 with the two `core/Secrets.lua` seams), summed from the per-member `file:line` spans in `Ka0sAddonsCommonTasks` `docs/2026-09-22-SUITE_STANDARDS_AND_LIBKA0S_SWEEP/3b-specs/compat.md`, §1 *Measurements* (commit `79ed441`), each span counted `end − start + 1`: the nine copies' rows sum to 248 and the two `Secrets.lua` rows to 82 (library-stack-§7), and the rest is single-consumer, content-free or disagreed-on. **The bus: the stand-down record and the catalog shipped**; the untracked host factory stays host code (architecture-§4). **`Schema`: the portable half shipped**; root resolution and announcement stay per addon, and **migration stamps were ruled at v2.65.0 in the standard's template, not in a library** (below). What the collection still duplicates beyond those is what each major's API document lists under what it leaves out. Each is its own decision, adopted on its own schedule — deliberately **not** a lockstep migration, and deliberately not a `Ka0s-Core` addon (library-stack-§6 forbids requiring another addon).
+- **Further `LibKa0s` modules.** `LibKa0s` is now the sanctioned path for shared Ka0s-owned code (library-stack-§7), and its per-module-major layout makes each addition independent and purely additive. Shipped so far: the secret-safe/printer seams (Core), the client-fact reader (Env), the widget pool (Pool), the item primitives (Item), the shared media catalog (Media), the flat dropdown, copy window, reorder list and drag handle (Widgets), the debug console and, from `LibKa0s v1.60.0`, the diagnostics-report helper (DebugLog), the slash dispatcher (Slash), the options toolkit (Options), the perf harness (Perf), the minimap/broker launcher (Launcher) and the stand-down latch (Lifecycle), from `LibKa0s v1.55.0` the version-variant readers and secret guards (Compat), the bus stand-down record and strict message catalog (Bus) and the schema runtime's portable half (Schema), and from `LibKa0s v1.75.0` the flat search box and test-mode strip (Widgets), the bonus ids of a link (Item), the stateless LibCustomGlow driver (Glow) and the in-game simulator's core (Sim), and from `LibKa0s v1.77.0` the settings-panel Keybindings tab and the one strata tooltip (Options) — **seventeen majors across forty-one files** (recounted at `LibKa0s v1.77.0` from `LibKa0s/tests/majors.lua` and `LibKa0s/LibKa0s.xml`, library-stack-§7), plus the non-code `media/` payload. The three candidates this entry used to name each moved, and each only in part. **`Compat`: a narrow major shipped; the wide extraction was measured and rejected** — the nine `core/Compat.lua` copies hold 2820 lines (`wc -l */core/Compat.lua` over the collection), of which the absorbed members occupy 248 (330 with the two `core/Secrets.lua` seams), summed from the per-member `file:line` spans in `Ka0sAddonsCommonTasks` `docs/2026-09-22-SUITE_STANDARDS_AND_LIBKA0S_SWEEP/3b-specs/compat.md`, §1 *Measurements* (commit `79ed441`), each span counted `end − start + 1`: the nine copies' rows sum to 248 and the two `Secrets.lua` rows to 82 (library-stack-§7), and the rest is single-consumer, content-free or disagreed-on. **The bus: the stand-down record and the catalog shipped**; the untracked host factory stays host code (architecture-§4). **`Schema`: the portable half shipped**; root resolution and announcement stay per addon, and **migration stamps were ruled at v2.65.0 in the standard's template, not in a library** (below). What the collection still duplicates beyond those is what each major's API document lists under what it leaves out. Each is its own decision, adopted on its own schedule — deliberately **not** a lockstep migration, and deliberately not a `Ka0s-Core` addon (library-stack-§6 forbids requiring another addon).
   - **Recorded rejections, LibKa0s#46–#58 (2026-10-22).** Each line names the bar it failed (library-stack-§7's bars 1–3, frequency alone, or a correctness disagreement) and the trigger that reopens it; none carries an API sketch, so no later nomination is anchored to one. The full record of each is the issue's closing comment or the API document of the major it would have joined.
     - **#49 chat sender.** No content: the fallback rung is unreachable on every admitted client. Re-check when the send API moves again and the second rung becomes reachable, or a third addon sends chat through the API with the same resolution.
     - **#49 tooltip line reader and duration decoder.** Bar 1, one consumer. Re-check when a second addon reads tooltip lines with the same first-answer semantics, or decodes a whole localized duration sentence.
@@ -174,9 +174,10 @@ Items recorded for future versions of this standard:
   a panel's subscription to its own refresh message left live across a stand-down is not filed under
   slash-commands-§7's *What MUST stand down*, and one taken down is not filed either.
 - **Whether a runtime-critical major that calls nothing in Core should floor on it (recorded, not
-  ruled).** Eleven of the seventeen `LibKa0s` majors floor on `LibKa0s-Core-1.0` without calling a member
+  ruled).** Ten of the seventeen `LibKa0s` majors floor on `LibKa0s-Core-1.0` without calling a member
   (library-stack-§7), so that a partial payload leaves every module absent rather than a mixed set.
-  `LibKa0s-Schema-1.0` is one of the eleven, and so is `LibKa0s-Compat-1.0`, and the feature runtime
+  `LibKa0s-Schema-1.0` is one of the ten (eleven until `LibKa0s v1.77.0`, when `Options` began
+  reading Core's `SafeRegisterEvent`), and so is `LibKa0s-Compat-1.0`, and the feature runtime
   reaches both while neither calls a Core member (`grep -l 'local NEEDS_CORE' LibKa0s/*.lua` in
   the library; no Core read in `Compat.lua` or `Schema.lua` beyond the floor). Schema's seam is read
   on a repaint pass; Compat's readers and guards are built for hot paths, and KickCD called
@@ -211,3 +212,49 @@ Items recorded for future versions of this standard:
   cannot drift from the live surface, but it gives up the partial function a stub keeps, such as host
   verbs that still answer. No rule changes until this is ruled: the stubs and parity cases stay
   required, and a host carrying a full stub is not a finding.
+- **A library context menu, `W.ContextMenu` (recorded, not ruled).** Two addons, LootHistory and
+  BankLedger, hand-build an identical right-click row menu over a full-screen click catcher, the
+  shape frame-layering-§4 forbids. A `LibKa0s-Widgets-1.0` `ContextMenu` would be a new widget
+  surface, and both addons can take the local fix in the 2026-10-24 run: drop the catcher and dismiss
+  on `GLOBAL_MOUSE_DOWN`, ignoring presses inside the menu. Re-check when a third addon builds a row
+  context menu, or the two local menus diverge in shape.
+- **A StaticPopup lift-while-shown helper (recorded, not ruled).** QuickComms lifts a borrowed
+  Blizzard confirmation above its own `DIALOG` band while it is shown and restores the recorded
+  strata on hide (`ModalWindow.LiftConfirm`), the one strata switch frame-layering-§4 allows.
+  PremadeGroupsFilterExtension may need the same, pending an in-client confirmation. Promote the
+  helper into `LibKa0s` if a second addon confirms the case in the client.
+- **A guarded `LevelOf(frame, fallback)` (recorded, not ruled).** A frame-level read made secret-safe
+  and forbidden-frame-safe, answering the fallback when the level cannot be read (frame-layering-§1,
+  host-matched surfaces; events-frames-taint-§8). One consumer, AuraMaster, so it stays local.
+  Re-check when a second addon reads another addon's or Blizzard's frame levels under the same guard.
+- **A `strata` option on the library's tool windows and copy window (recorded, not ruled).** A
+  `strata` field on the `LibKa0s-DebugLog-1.0` and `LibKa0s-Perf-1.0` descriptors and on
+  `LibKa0s-Widgets-1.0` `CopyWindow`, default unchanged, with the console's copy window opening one
+  strata above whatever the console uses, for an addon whose own surface sits at `DIALOG` or above
+  (QuickComms' dial, PremadeGroupsFilterExtension's surface at `FULLSCREEN`). Both cases are
+  developer-facing, so it is not in `LibKa0s v1.77.0` (STRATA_MODEL LK-05, Ka0sAddonsCommonTasks
+  `docs/2026-10-24-KEYBINDS_LAYOUT_STRATA/`); until then such an addon says in its layers table's
+  comment that the surface can cover the console (debug-logging, frame-layering-§5). Re-check when a player-facing surface of an addon sits at `DIALOG` or
+  above and its console is covered in the client.
+- **A `PageBanner` that takes several acts (recorded, not ruled).** A band holding a picker plus
+  enable, link and copy acts draws one `O.PageHeader` block today (U-08(d), Ka0sAddonsCommonTasks
+  `docs/2026-10-24-KEYBINDS_LAYOUT_STRATA/`); a `PageBanner{ acts = { ... } }` arm would keep the
+  picker library-drawn beside them. Not ruled at v2.88.0: one accepted change needed it and expressed
+  it with `PageHeader`, and the library's tabbed-page file is at its size re-check trigger. Re-check
+  when a second addon's band needs it.
+- **Gating a swatch on its feature's own switch (deferred, owner call CALL-05).** options-ui-§17
+  forbids `disabledIf` on a color row because the swatch's alpha survives class color; where the
+  whole feature is off, though, the swatch is truly not read (U-13). The proposal: allow gating a
+  swatch on its feature's on/off row, never on its class-color companion. Not ruled at v2.88.0: the
+  owner deferred it to an issue,
+  <https://github.com/tusharsaxena/WowAddonStandards/issues/13>. Re-check when that issue is triaged.
+- **Flow-engine seams for host blocks (recorded, not ruled).** An after-subgroup hook, a
+  before-group hook, a schema `note` row drawn dim and full width and skipped by `/list`, and a
+  Position-block composer (U-14). Not ruled at v2.88.0: every change that wanted one landed on
+  existing seams (two `RenderRows` slices, an after-group `TextRow`, a host-drawn position block),
+  and the flow engine's file is at its re-check trigger, so a seam there is a peel. Re-check with the
+  first layout that cannot be expressed on today's seams.
+- **A library line naming what is account-wide (recorded, not ruled).** An optional library-drawn
+  line above the AceDBOptions group listing what is account-wide, from a descriptor field (U-15).
+  Not ruled at v2.88.0: it fell below the run's confidence threshold and one addon asked for it.
+  Re-check when a second addon asks for it.

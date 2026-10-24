@@ -51,6 +51,7 @@ The vendored test kit's mock already raises for any event named in `M.__badEvent
 ### 2. Combat lockdown
 
 - **MUST** guard secure-environment writes (frame `:SetAttribute`, secure-template parents, focus-frame mutations) with `InCombatLockdown()` returning early and replaying on `PLAYER_REGEN_ENABLED`.
+- Strata, frame-level and toplevel writes on a protected frame, or on a frame that secure elements are anchored to, are secure-environment writes and take the same deferral (frame-layering-§4).
 - Reference implementation (in the collection): the group-composition utility uses a 3-layer cascade (config open → settings register → frame show), each re-checking combat; the chat-formatting addon combat-gates its config open.
 
 **`InCombatLockdown()` vs `UnitAffectingCombat("player")` — not interchangeable.** They answer different questions and usually (but not always) agree for the player:
@@ -92,6 +93,7 @@ If your addon formats chat:
 - **MUST** prefer Lua `CreateFrame` over XML for non-templated frames.
 - **MAY** use XML for declarative groups of similar widgets (the manifest-XML pattern used by auction-house addons).
 - **MUST** use object pooling for any high-churn UI (≥10 dynamic frames): an ~80-line object-pool mixin (Acquire/Release/HideAll), the pattern party-cooldown trackers use so roster churn becomes free.
+- **MUST** set a frame's strata, where it sets one at all, in the same block as its `CreateFrame`, read from the addon's layers table (frame-layering-§5).
 
 ### 7. Hot-path upvalue cache
 

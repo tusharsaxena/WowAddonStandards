@@ -80,6 +80,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    nobody receives and nothing anywhere goes red; through a constant the same typo is a nil name, so a
    subscriber raises at once, and a publisher stays silent unless the table is a strict catalog
    (`LibKa0s-Bus-1.0`'s `Catalog`, a MAY).
+   `core/Constants.lua` starts from the pack's layers-table snippet: one `NS.Constants.LAYERS` table
+   that every strata and level call reads, or none at all in a frameless addon (frame-layering-§5).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
@@ -200,8 +202,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
      re-render (anti-pattern #93).
    - **The General page's first tab is named exactly `Master controls`** and is built by the library's
      master-controls composer from **one** declaration — `Enable <Addon>` | `General visibility` /
-     `Master scale` | `Master alpha` / `Lock frame` | `Debug console` / `Minimap button` | `Test mode` /
+     `Master scale` | `Master opacity` / `Lock frame` | `Debug console` / `Minimap button` | `Test mode` /
      `Reset position` | `Reset all settings` — including only the rows the addon has the state for.
+     An addon-specific sentence goes through the composer's `notes` field, never into the row; a
+     frameless addon's *Minimap button* sits beside *Debug console* (options-ui-§15).
      `Minimap button` is **unconditional** (every addon ships a launcher) and takes the **first** column
      precisely because only some addons have a `Test mode` to pair beside it; it stores at LibDBIcon's own
      `minimap.hide` and never at a second key, and its schema path reads `global.minimap.shown`, with
@@ -243,7 +247,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
      `NS.DebugAtEnable` (Launcher minor 5, LibKa0s v1.65.0), so the registration's state lines land
      the first time logging is turned on (debug-logging-§4, §8). Then record the addon's menu entries in `standards/ADDONS.md`'s Launcher menu
      entries column in the same pass, and, where the addon has a primary window, the Show window key
-     binding (launcher-§6): a root `Bindings.xml` `CLICK` line and the button, from the context pack.
+     binding (launcher-§6): a root `Bindings.xml` `CLICK` line in the addon's own category, the button,
+     `NS.BINDINGS` and the General page's Keybindings tab (options-ui-§20), from the context pack.
    - **Generate the icon before the button** (layout-§4, toc-file-§1). `media/logos/<addon>.logo.128.tga`,
      128×128, **uncompressed 32-bit**, from the 2000×2000 `.png` source:
      `Image.open(src).convert("RGBA").resize((128, 128), Image.LANCZOS).save(out, format="TGA")`. Point

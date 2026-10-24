@@ -44,7 +44,7 @@ what this section carries is which paths exist, what reads each one, and which a
 | `PERF_ANALYSIS.md` | Playbook: per-addon in-game capture bundle | `/dev-copilot:wow-perf-analysis` |
 | `standards/STANDARDS.md` | **The index.** Its Sections list is what a consumer follows to find every section file. Its `## Changelog` holds only the current entry. | every standards-reading command |
 | `standards/CHANGELOG.md` | Every earlier changelog entry, newest first; listed under the index's Related documents, not its Sections, because history is not normative | `/dev-copilot:wow-harvest-standards`, and any run that needs history |
-| `standards/standards/*.md` | The 27 canonical section files — the substance of the standard | followed from the index |
+| `standards/standards/*.md` | The 28 canonical section files — the substance of the standard | followed from the index |
 | `standards/ADDONS.md` | The roster: which repos the standard covers | the standards-refresh process; `/dev-copilot:wow-harvest-standards` (the collection list); `/dev-copilot:wow-standards-audit` (repo kind and launcher entries, via `AUDIT.md`); `/dev-copilot:wow-new-addon` (adds the new addon's row); `/dev-copilot:wow-revendor-libka0s` and the `issue-*` commands' `all` scope (the roster tables) |
 | `standards/NEW_ADDON_CONTEXT.md` | The context pack read at scaffold time, never written into the new addon | `/dev-copilot:wow-new-addon` |
 | `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/_raw/` | Background and the research the standard was drawn from | humans |
@@ -91,7 +91,7 @@ Every `.md` in this repo appears in exactly one row below.
 | `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` | The four process playbooks |
 | `standards/STANDARDS.md` | The standard's index, with the current changelog entry |
 | `standards/CHANGELOG.md` | The standard's changelog history: every earlier entry, newest first |
-| `standards/standards/*.md` (27 files) | The canonical section files |
+| `standards/standards/*.md` (28 files) | The canonical section files |
 | `standards/ADDONS.md` | The roster |
 | `standards/README.md`, `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/NEW_ADDON_CONTEXT.md` | Process entry point, summary, research, scaffold context pack |
 | `standards/_raw/_industry/` | Frozen source material behind `INDUSTRY_RESEARCH.md` |

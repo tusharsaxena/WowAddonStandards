@@ -6,6 +6,7 @@ options-ui governs the **options** surface. An addon's own **main window** — a
 
 - **MUST** be a plain **non-secure** `CreateFrame("Frame")` (movable/resizable) — **not** a Blizzard Settings canvas, **not** a secure/protected frame. A non-secure window touches no protected functions, so it needs **no combat-lockdown gate** and may open/refresh in combat. (Secure/action-button content is the exception and follows events-frames-taint-§2.)
 - **MUST** register the window in `UISpecialFrames` so `Escape` closes it and it joins the standard close-stack.
+- **MUST** call `SetToplevel(true)` and sit in the window tier of frame-layering-§1: `MEDIUM` for a window kept up while playing, `HIGH` for a browser opened to read and closed. A popup it opens closes with it (frame-layering-§4).
 - **MUST** persist window position and size in SavedVariables (e.g. `db.global.settings.window`), restored on open. **SHOULD** clamp to a readable minimum size and `SetClampedToScreen(true)`.
 - **SHOULD** expose a scale setting (e.g. `windowScale`) applied via `frame:SetScale`.
 - **SHOULD** use a tab strip with **lazy per-tab content build** — build each tab's body on first show, not up front.

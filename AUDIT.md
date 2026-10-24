@@ -663,20 +663,28 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **The Show window key binding** (`launcher-§6`, new in v2.86.0). For a row whose `ADDONS.md`
        column lists *Show window*, check:
        1. A root `Bindings.xml` holds a `CLICK <button>:LeftButton` line, with no `default` attribute
-          and no Lua, and `header` only on the file's first `<Binding>`.
+          and no Lua, `category="BINDING_HEADER_<FOLDERUPPER>"` on **every** `<Binding>` and no
+          `header` (from the addon's first release after v2.88.0; before it, `category="ADDONS"` with
+          `header` on the first line only was the shape), and the Show window line first.
        2. The button is created in a module as a plain `Button`, not a secure template, registered
           `AnyDown`, and its `OnClick` reaches the same function the descriptor's `toggleWindow`
           calls. Grep both and compare; a copy of the body is #81 and #96.
        3. `BINDING_HEADER_<FOLDERUPPER>` and the `BINDING_NAME_…` label are assigned in that module,
-          the label through `L`.
+          the label through `L`; the header at file scope from the brand constant, the labels per
+          `launcher-§6` (`Toggle <window>`, no brand), and `NS.BINDINGS` lists the file's binding
+          names in order.
        4. The press reaches the toggle's handler and refuses as the `toggle` verb does (read the
           handler or the helper): it toggles and writes nothing while stood down, and never prints the
           disabled line under the `perf` hold alone (`slash-commands-§7`).
-       5. `tests/test_disabled.lua` step 8 covers the press, and the README's `## Usage` and
-          `docs/settings-panel.md`'s launcher row name the binding.
+       5. `tests/test_disabled.lua` step 8 covers the press, the README's `## Usage` names the
+          binding and both places to set it (Options → Keybindings → `Ka0s <Name>`, and General →
+          Keybindings), and `docs/settings-panel.md`'s launcher row names the binding.
+       6. The binding test calls `Kit.assertBindingsXml` (from the addon's first re-vendor of
+          `LibKa0s v1.77.0`).
 
        A missing binding is a MUST finding from the addon's first release after v2.86.0; any defect
-       above is anti-pattern #96.
+       above is anti-pattern #96, and so is a category still `ADDONS` after the addon's first release
+       past v2.88.0.
    - **Check `/<slash> enable` and `/<slash> disable` exist and are aliases** (`slash-commands-§2`).
      Both **MUST** be entries in `NS.COMMANDS`, and both **MUST** write the Master-controls *Enable*
      row's stored path through the addon's single write seam. A handler setting a local, a module
@@ -899,9 +907,40 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the row's own trigger names WowAddonStandards#7; not the registry. A row whose only content is (e)
      state is **stale since v2.44.0** on the same footing: file the naming sentence as the fix and the
      row's retirement with it. A row that mixes (e) state with (f) state narrows to its (f) part.
+   - **Check frame layering (`frame-layering`, v2.88.0).** Code only, `libs/` and `tests/_kit/`
+     excluded. Run and classify:
+     (a) `grep -rn 'SetFrameStrata("' --include='*.lua' core modules settings`: any hit is
+     anti-pattern #99, except the single named local an addon with one explicit strata call **MAY**
+     use (frame-layering-§5).
+     (b) `grep -rnE 'SetFrameLevel\([0-9]' --include='*.lua' core modules settings` (absolute) and
+     `grep -rnE 'SetFrameLevel\([A-Za-z_.]+:GetFrameLevel\(\)' --include='*.lua' core modules settings`;
+     any hit of the first kind is #99; read each hit of the second kind: a sibling base, not the
+     band owner, is #99 (frame-layering-§3).
+     (c) An addon that sets any strata or level has `NS.Constants.LAYERS` in `core/Constants.lua`
+     with the stack comment, and `docs/ARCHITECTURE.md` points at it rather than copying it. A
+     frameless addon calls none of `SetFrameStrata`, `SetFrameLevel`, `SetToplevel` or `Raise` and
+     **SHOULD** pin that with a static test (frame-layering-§5).
+     (d) A text, mark or veil region created on a frame that also gets a `Cooldown` or
+     `BackdropTemplate` child is #100 (frame-layering-§3).
+     (e) Every movable window calls `SetToplevel(true)`, in its frame-layering-§1 tier; one that does
+     not is #103 (frame-layering-§4).
+     (f) A transient popup with a full-screen sibling at `SetAllPoints(UIParent)`, with no
+     `GLOBAL_MOUSE_DOWN` dismissal, or not clamped, is #104 (frame-layering-§4).
+     (g) A player strata row offering values above `HIGH` that shipped after v2.88.0, or whose
+     tooltip is not `O.StrataTooltip(<its values>)` (from the addon's first re-vendor of
+     `LibKa0s v1.77.0`), is #102 (frame-layering-§1).
+     (h) Library tool windows toplevel, menus clamped and the IdList suggestion list closed at
+     combat start come from `LibKa0s v1.77.0`; an addon on an earlier tag files a re-vendor item,
+     not an addon deviation (frame-layering-§6).
+     (i) Documented exceptions (the secure fixed point, the event-raised notice) need a call-site
+     comment and a `## Documented deviations` row; read the register before filing
+     (frame-layering-§1).
+     Rendering, ties and reachability are confirmed only by the owner's in-client smoke (`/fstack`),
+     never by this read. The rules apply from each addon's first release after v2.88.0
+     (frame-layering-§7).
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
-     screen.** Ten checks. Each is a read of the schema array or a grep, none needs judgment, and
-     all ten are invisible to lint and to the headless suite — which is how every one of them
+     screen.** Twelve checks. Each is a read of the schema array or a grep, none needs judgment, and
+     all twelve are invisible to lint and to the headless suite — which is how every one of them
      shipped. Do them in this order; the first changes what the rest are counting.
      - **(a) Every page draws a tab strip (options-ui-§13).** List the addon's settings pages and,
        per page, the distinct `group` values in declaration order. A page with **no** `group` values,
@@ -920,13 +959,22 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      - **(b) The General page's first tab is exactly `Master controls` (options-ui-§15).** Compare
        the first distinct `group` on the General page against that literal string. Then read the rows
        filed under it, in declaration order, against the canonical set — enable, general visibility,
-       master scale, master alpha, lock frame, debug console, minimap button, test mode,
+       master scale, master opacity, lock frame, debug console, minimap button, test mode,
        reset position, reset all settings.
        They **MUST** be a subsequence of that list, and every canonical row the addon has the state
        for **MUST** be present. A canonical row sitting under a different tab is a finding against
        **§15**, not against the tab it is in. An addon that draws no positionable frame — proven by a
        whole-repo `SetMovable` sweep, not assumed — legitimately omits exactly master scale, master
-       alpha, lock frame and reset position; record that as compliant and file nothing.
+       master opacity, lock frame and reset position; record that as compliant and file nothing.
+       Then read the composed words (options-ui-§15, v2.88.0): no assignment to `.label` or
+       `.tooltip` on a row or button `MasterControls` returned, and no `labels` key in its spec
+       (`grep -n 'MasterControls' settings/*.lua`, then read each call site and the code after it).
+       A rewrite is anti-pattern #106 from the addon's first release on `LibKa0s v1.77.0`, a
+       re-vendor item before it. A multi-frame addon's *Lock frame* keeps its name. Where *Lock
+       frame* is omitted (every frameless addon, and a framed one passing `omit.locked`), *Minimap
+       button* sits beside *Debug console* rather than in the first column, and *Test mode*, where
+       present, opens its own line: options-ui-§15's frameless packing, the composer's layout from
+       that same release, so a host that hand-places these rows is the finding.
        **Test mode is required in every addon with a positionable display** — proven by the same
        whole-repo `SetMovable` sweep that proves a frameless addon — **unless unticking Lock frame
        already shows the display with its placeholder content**, in which case Lock frame is the
@@ -1099,6 +1147,33 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `widget.frame:SetParent(addonFrame)`, which AceGUI's own `Release` resets. Report each hit as
        `file:line` with the widget type and whether its release undoes it. A hand-rolled landing body is one root; a leak inside it is
        its dependent, not a second finding.
+     - **(k) The Keybindings tab (options-ui-§20, v2.88.0).** For an addon with a root
+       `Bindings.xml`: the General page's last tab is `Keybindings`, drawn by `O.KeybindingsTab` /
+       `O.KeybindRows` and passed `NS.BINDINGS`; a missing tab, or one that is not the last, is the
+       finding. No `AceGUI:Create("Keybinding")`, `SetBinding(`, `SaveBindings` or `KeybindListener`
+       in the addon's own code:
+       `grep -rnE 'Create\("Keybinding"\)|SetBinding\(|SaveBindings|KeybindListener' --include='*.lua' . | grep -v -e /libs/ -e /tests/`.
+       A hit outside a documented secure override-binding path is anti-pattern #98; `SetBindingClick`
+       does not match. The General page's Defaults tooltip ends with `O.KEYBINDS_UNCHANGED`
+       (**SHOULD**). Owed from the addon's first release on `LibKa0s v1.77.0` or later; before that
+       tag it is a re-vendor item, not a panel deviation.
+     - **(l) The settings vocabulary and shape (options-ui-§7, §13, §14, §16, §21, v2.88.0).** Each
+       hit is a finding against the section named, owed from the addon's next release after
+       v2.88.0. Over `settings core modules locales`: `grep -rnE '\((in px|in seconds|sec|s)\)'`
+       (§21 units); `grep -rnE '"[^"]*\bMax [a-z]'` (§21 limits);
+       `grep -rnE 'label *= *"[^"]*[Aa]lpha'` (§21 opacity);
+       `grep -rnE '(group|subgroup|label) *= *"[^"]* & '` (§21 joining); a settings location written
+       with '->' or a triangle glyph, or a multiplier tooltip naming bare *General > Master
+       controls* in an addon that also has a General tab or rail entry (§21 location strings); a
+       button whose `onClick` raises `StaticPopup_Show` and whose text does not end in '…', *Reset
+       all settings* excepted (§21); a builder-drawn `Section` or `Heading` over a non-row act, or a
+       `subgroup` restating its tab (§7); a row drawn on one page whose `page`/`panel` stamp names
+       another page while either page's Defaults tooltip is silent about it (§14, MUST); a band
+       whose height changes with the selection (§14, MUST, read from the host's band code). SHOULD
+       findings, graded low: a disclosed cross-page stamp that could be re-stamped (§14); a one-line
+       tab other than the exempt ones, a strip over eight labels (six on a rail page) (§13); a bar
+       surface split over several tabs (§16). Case is read, not grepped: Title Case in a row label,
+       tab label or heading is a §21 finding.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a
