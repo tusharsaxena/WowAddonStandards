@@ -82,6 +82,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
    (`LibKa0s-Bus-1.0`'s `Catalog`, a MAY).
    `core/Constants.lua` starts from the pack's layers-table snippet: one `NS.Constants.LAYERS` table
    that every strata and level call reads, or none at all in a frameless addon (frame-layering-§5).
+   Skins (skinning) are optional until the collection's skin rollout reaches the addon: it **MAY**
+   adopt from its first release, with a `core/SkinSetup.lua` that calls `Skin:RegisterOwner(addonName)`
+   at file load and an Appearance tab before Keybindings, and is not required to. Either way, its
+   Options stub answers `AppearanceTab` and `AppearanceRows` (the pack's hard rule 24b and its
+   definition-of-done line).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those

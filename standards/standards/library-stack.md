@@ -67,6 +67,7 @@ A Ka0s addon **MUST** stand on its own. The vendoring rule (library-stack-§3) m
 
 - **MUST NOT** hard-depend on any addon suite or standalone addon: no `## Dependencies:` / `## RequiredDeps:` naming one, and no code path that assumes a suite's globals, API, callbacks, or frames exist (`ElvUI`, `DBM`, `WeakAuras`, `BigWigs`, …).
 - **MUST** be fully functional and behave **identically** with no other addon installed. Every texture, font, sound, and layout the addon needs is either vendored under `media/` (layout-§3) or drawn from LibSharedMedia's built-ins — **MUST NOT** read a suite's media files, textures, fonts, or SavedVariables, and **MUST NOT** rely on a suite having skinned or repositioned any frame.
+  - **The skinning exception (v2.89.0), and the only one.** `LibKa0s-Skin-1.0`'s EllesmereUI provider, in `LibKa0s/SkinEUI.lua` and in no other file, **MAY** read `EllesmereUIDB.thirdPartySkinsOff` and `EllesmereUIDB.thirdPartySkinAddons[<owner>]`: read-only, at call time, nil-guarded, never written, and only to decide whether the player has EllesmereUI's third-party skinning on for that owner (skinning-§5). EllesmereUI publishes no query for those two switches, and the player's choice in EllesmereUI's own options is what decides whether a skin it offers may paint. The exception is the library's: an addon reaches the answer through the library and **MUST NOT** read `EllesmereUIDB` itself, and a read that spreads to another file or another key is outside it. An addon that read those switches under a ratified register row before the provider existed keeps its row until it moves onto the provider.
 - **MUST NOT** embed, copy, or private-fork a suite's code, media, or a suite-renamed Ace library (this is the library-stack-§5 fork ban applied to suites — depend on nothing you did not vendor and own).
 - **MAY** *optionally* integrate with a suite that happens to be present — e.g. register an ElvUI/EllesmereUI skin for the addon's own frames, or subscribe to a DBM/BigWigs timer callback — **only when all** of the following hold: (a) the integration is presence-guarded (`C_AddOns.IsAddOnLoaded("ElvUI")`) and never assumes the suite loaded; (b) the suite is listed in `## OptionalDeps:`, never `## Dependencies:`; (c) with the suite absent the addon falls back to its own styling/behavior with no loss of core function. This is the same soft-fallback discipline required for optional libraries (library-stack-§3–§4): the addon is whole on its own and the integration is pure enhancement.
 
@@ -387,7 +388,8 @@ at and has nowhere else to look.
 ### 8. The shared media library (MUST)
 
 `LibKa0s-Media-1.0` ships the **art and type this collection draws with** — an icon set, a monospace
-face, and a family of statusbar textures — inside the vendored payload, at `libs/LibKa0s/media/`.
+face, and a family of statusbar textures, and from **LibKa0s v1.78.0** the display faces, borders and
+backgrounds the skins draw with (skinning) — inside the vendored payload, at `libs/LibKa0s/media/`.
 Introduced in **LibKa0s v1.9.0**; the icon path spelling and the texture family settled at v1.9.1 and
 v1.9.2.
 
@@ -410,6 +412,28 @@ nothing at all — and a texture that does not load draws nothing and raises not
 | `Texture(addonName, name)` | The statusbar path, or `nil` when `name` is not in `TEXTURES` |
 | `RegisterLSM(addonName)` | Registers every face and texture with LibSharedMedia under its catalog name; answers `fonts, bars`, and `0, 0` where LSM is absent |
 | `ICONS` / `FONTS` / `TEXTURES` | The catalogs — enumerate these, never hard-code a list |
+| `BORDERS` / `BACKGROUNDS` | From `LibKa0s v1.78.0`: the border and background catalogs, registered with LibSharedMedia by the same `RegisterLSM` call |
+
+**The skin media (from `LibKa0s v1.78.0`).** What the skins draw with arrives in the same payload and
+under the same rules:
+
+- **Five OFL display faces** beside the monospace one: Barlow Regular and Barlow SemiBold, Cinzel
+  SemiBold, and Atkinson Hyperlegible Regular and Bold, registered as `Ka0s Barlow`,
+  `Ka0s Barlow SemiBold`, `Ka0s Cinzel`, `Ka0s Atkinson` and `Ka0s Atkinson Bold`. Each ships as a
+  static instance with its SIL Open Font License 1.1 text beside it.
+- **Every face carries its own locale mask**, a per-entry field of `FONTS` rather than one mask for
+  the catalog: the five display faces are Western-only, and the monospace face keeps its Western-plus-
+  Russian mask. A face is registered only for the locales it covers, so on another client a skin that
+  names it falls back to the client font rather than drawing missing glyphs.
+- **The border and background catalogs** register the shipped rounded-corner nine-slice textures (the
+  Glass skin's) and the in-client art the skins name, under LibSharedMedia's `border` and
+  `background` types. The rounded textures are white, with their shape in the alpha channel, like
+  every other piece of the library's art, and are produced by the library's generator under `tools/`
+  (layout-§1), which records every value that decides a pixel.
+- **Skins name media by LibSharedMedia key**, and the skin engine resolves each key at paint time; it
+  never builds a file path. LibSharedMedia keeps the first registration of a key, so a face resolves
+  from the folder of whichever host registered it first; every host still passes its own folder, by
+  the MUST below.
 
 **Every call takes the host's own addon FOLDER name (MUST).** A texture path is absolute from
 `Interface\AddOns\`, and this library is vendored: there is no one path to it, there are as many as

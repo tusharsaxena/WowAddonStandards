@@ -938,6 +938,37 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      Rendering, ties and reachability are confirmed only by the owner's in-client smoke (`/fstack`),
      never by this read. The rules apply from each addon's first release after v2.88.0
      (frame-layering-§7).
+   - **Check skinning (`skinning`, v2.89.0).** Code only, `libs/` and `tests/_kit/` excluded. First
+     decide adoption: `grep -rn 'RegisterOwner(' --include='*.lua' core modules settings`. **No hit:
+     not adopted, not a finding.** File nothing under (b) to (g) or anti-pattern #107; grade the
+     addon's look against the Ka0s Default values the rescoped rules state (skinning-§7), and run (a)
+     only. With a hit, run all of them:
+     (a) From the addon's first re-vendor of `LibKa0s v1.78.0`, adopted or not, the Options
+     degradation stub answers `AppearanceTab` and `AppearanceRows` and the surface-parity case
+     covers them (skinning-§3, options-ui-§1); a stub missing them is the addon's finding, a vendor
+     older than v1.78.0 is not.
+     (b) The registration passes the file's own first vararg as the owner, at file load, in one setup
+     file with a stub (skinning-§1).
+     (c) The literal grep outside the seam:
+     `grep -rnE 'Set(TextColor|ColorTexture|VertexColor|BackdropColor|BackdropBorderColor|Gradient|Font|FontObject)\(' --include='*.lua' core modules settings`.
+     Read each hit: a literal value, or a constants-table entry, painting a frame the addon draws is
+     #107; a facade primitive, a `S.Color` / `S.Token` read, or a call inside the skin setup file is
+     not. A library factory that takes an owner called without one is #107 too (skinning-§1).
+     (d) The Appearance tab is on the General page, labeled `Appearance`, immediately before
+     `Keybindings` (last where there is none), drawn by `O.AppearanceTab` or `O.AppearanceRows`; a
+     hand-built picker is #47 (skinning-§3).
+     (e) The choice is two values stored in the profile, defaulting to `ka0s`, written only through
+     the write seam (`opts.set` and the tab's `spec.set` name it), and re-applied through
+     `Skin:SetChoice` on a profile switch, copy or reset (skinning-§2).
+     (f) The TOC lists `EllesmereUI` in `## OptionalDeps:` and never in `## Dependencies:`;
+     `grep -rn 'EllesmereUIDB' --include='*.lua' core modules settings` returns nothing, unless a
+     ratified `## Documented deviations` row predating the provider covers it (skinning-§5,
+     library-stack-§6).
+     (g) An addon with a HUD carries the one-time per-profile reset of its saved HUD style values in
+     its migration runner, and its font, border and bar groups take the `fromSkin` companion
+     (skinning-§6).
+     How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
+     owner's in-client smoke, never by this read (skinning-§8).
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
      screen.** Twelve checks. Each is a read of the schema array or a grep, none needs judgment, and
      all twelve are invisible to lint and to the headless suite — which is how every one of them

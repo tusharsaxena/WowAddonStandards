@@ -258,3 +258,20 @@ Items recorded for future versions of this standard:
   line above the AceDBOptions group listing what is account-wide, from a descriptor field (U-15).
   Not ruled at v2.88.0: it fell below the run's confidence threshold and one addon asked for it.
   Re-check when a second addon asks for it.
+- **The collection's skin rollout (recorded, not ruled).** `skinning` (v2.89.0) binds an addon from
+  its adoption, and the first run converted one addon, LootHistory, as the prototype. The other
+  addons adopt in a later run, which also moves PremadeGroupsFilterExtension's own EllesmereUI bridge
+  onto the library's provider (its ratified register row stands until then, library-stack-§6) and
+  applies skinning-§6's one-time HUD style reset to each addon with a HUD. The reset's helpers ship
+  in `LibKa0s v1.78.0` but have no adopter until then, because the prototype has no HUD. Re-check at
+  that run, and if it has not landed within two `LibKa0s` releases of v1.78.0.
+- **Ka0s Default's split tokens (recorded, not ruled).** Where two call sites drew one role in two
+  colors before skins, Ka0s Default keeps both values as two tokens, so that adopting changes no
+  pixel; the list is in `LibKa0s` `docs/api/Skin`. Each pair is a candidate to merge into one token
+  in the rollout, which is a visible change to Ka0s Default and so a standard change first
+  (standalone-windows, *The Ka0s window edge*). Re-check pair by pair as the rollout reaches the
+  addons that draw them.
+- **The WoW Forever client (recorded, not ruled).** The *WoW Forever* skin is a look usable on
+  retail (skinning-§4). Running Ka0s addons on the WoW Forever client itself is not supported:
+  `SetDesaturation` is missing there, which breaks every AceGUI checkbox, and the work is tracked in
+  LibKa0s#44. Re-check when that issue moves.

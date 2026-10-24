@@ -1,0 +1,97 @@
+> Part of the **[Ka0s WoW Addon Standard](../STANDARDS.md)** — the split standard. Cross-references use the `filename-§N` form (see the index's section map).
+
+## Skinning: one skin per addon, through the library's facade
+
+A **skin** is a named look for every visual element an addon draws: its windows, panels and dialogs, list rows, the tooltips and menus it owns, its settings pages, the library tool windows it hosts (debug console, perf and sim panels, copy windows), test strips, charts and its HUD. The player picks the skin **per addon**, in an **Appearance** tab on the addon's General page. The collection ships nine skins, and the first of them, **Ka0s Default**, is the look every Ka0s addon drew before skins existed, value for value. Instead of a Ka0s skin the player **MAY** take the addon's look from **EllesmereUI**, when that suite is loaded and its third-party skinning is on for the addon.
+
+All of it is drawn by `LibKa0s-Skin-1.0` (from `LibKa0s v1.78.0`). A skin is **data**, a token table inside the library, and the painting vocabulary mirrors EllesmereUI's skinning API by name (`Shell`, `Panel`, `Button`, `EditBox`, `Checkbox`, `ScrollBar`, `Tab`, `CloseButton`, `Font`, `GetAccentColor`, `OnLooksChanged`, ...) so that a call site reads the same under either provider. The names and the token model are mirrored; EllesmereUI's code and media are not, because its license reserves all rights (library-stack-§6).
+
+### 1. Adoption and the owner (MUST)
+
+**An addon has adopted skins when its own code calls `Skin:RegisterOwner(<its folder>)`.** That one call is the test, mechanically: `grep -rn 'RegisterOwner(' --include='*.lua' core modules settings` returns it or it does not. Everything below binds an addon from its adoption (§8); an addon that has not adopted is graded against the rules §7 lists exactly as they read for it, and nothing in this section is a finding against it.
+
+- **The owner is the addon's FOLDER name**, the first vararg of the file that registers it, for the reason library-stack-§8 gives for every path the library builds: nothing else the addon carries *is* that string, and a near miss (an `## Title`, a frame-name prefix, the brand) registers an owner nothing else asks for. The same string is what `LibKa0s-Options-1.0`'s descriptor already carries as `addonName` (options-ui-§1), so a page's owner and the addon's owner are one name.
+- **Register once, at file load, in one setup file.** The call sits in its own setup file, `core/SkinSetup.lua` by convention, matching library-stack-§7's one-file-per-module pattern, with a degradation stub beside it. It runs at **file load**, never at `PLAYER_LOGIN`, because the EllesmereUI provider has to offer the owner to EllesmereUI before EllesmereUI dispatches its skins (§5). `opts.get` answers the stored choice and `opts.set` writes it through the addon's write seam (§2); `opts.label` is the brand the Appearance tab and the copy confirmation print.
+- **Every visual element of an adopted addon paints through the facade.** `Skin:For(owner)` returns the owner's facade, `S`. Addon code calls a primitive once, at frame creation (`S.Shell(frame)`, `S.Button(btn)`, `S.Text(fs, role)`), and the library records the frame against the owner so that a skin change repaints it with no further call. Colors, fonts, textures, borders and backgrounds that the addon would otherwise write itself are read from the skin (`S.Color(name)`, `S.Token(name)`), never typed at the call site (anti-pattern #107).
+- **Every library factory that takes an owner is given one.** `Core.ApplySkin`, `MakeCloseButton`, the `LibKa0s-Widgets-1.0` factories (dropdown and its shared menu, search box, copy window, test strip, autocomplete, drag handle, reorder list, line chart), the tool windows' descriptors and the Options descriptor's `addonName` each accept the owner, additively. Called without one, or with a name that is not a registered owner, each draws Ka0s Default exactly as it did before skins, so an addon that has not adopted is unaffected by a re-vendor.
+- **Facade overlays follow frame-layering-§3.** A primitive that adds art (a border, a title-bar fill, a divider, a list-row stripe) draws it on a holder child frame one level over the frame it decorates, created once per frame and reused on every repaint, and never as a direct region of a frame another provider may fade. The holder is part of the element's band, so the order fill < border < overlay holds under every skin.
+- **Shared objects follow whoever opened them.** The library's one popup menu, the reorder ghost and any other library singleton are repainted on **every** open: to the opener's skin when the opener is a registered owner, otherwise back to Ka0s Default. A singleton left in the last owner's colors is a leak across addons (§7).
+
+### 2. The choice is per addon, per profile (MUST)
+
+The skin choice is **two values**: the **source**, `ka0s` (a Ka0s skin) or `eui` (EllesmereUI), and the **skin**, one of §4's keys. Both default to `ka0s`.
+
+- **Per addon.** Two addons sharing one loaded copy of the library show two different skins at once. There is no collection-wide skin and no account-wide store for one; the Appearance tab's *Copy to every Ka0s addon…* (§3) is the way to make several addons match, and it writes each one's own choice.
+- **Per profile, through the write seam.** The two values are stored in the profile, written **only** through the addon's single write seam (options-ui-§1) — the function `opts.set` names and the tab calls. Where they live inside the profile is the addon's own convention (`appearance.source` and `appearance.skin` are the shape the first adopter uses); they are defaulted by AceDB like any other profile value.
+- **A profile change re-applies the choice.** A profile switch, copy or reset hands the new values to `Skin:SetChoice(owner, source, skin)`, which repaints the owner's frames. `SetChoice` is idempotent, so a write that reaches it twice (the tab, then the row's own `onChange`) repaints once.
+- **Ka0s skins switch live.** A change between two Ka0s skins, and a change from `ka0s` to `eui`, repaints every recorded frame of that owner and nobody else's, with no reload, no `OnUpdate` and no event. A change **away** from `eui` cannot (EllesmereUI's paint is one-way, §5): it offers a reload instead, once, and never claims to have repainted.
+- **Settings rows repaint by re-rendering.** AceGUI rows on an open page are not repainted in place: the page re-renders on the next frame, which releases each widget (restoring it, §7) and acquires it again under the new skin.
+
+### 3. The Appearance tab (MUST, for an addon that has adopted skins)
+
+- **Where.** A tab on the **General** page labeled exactly **`Appearance`**, immediately **before** `Keybindings`, or **last** where the page has no Keybindings tab. `Master controls` stays first (options-ui-§15) and `Keybindings` stays last (options-ui-§20). On a page drawn by `O.RenderTabbedSchema` it is a host tab in `opts.tabs` whose `before` is the Keybindings tab's key; on a General page the host draws itself, it is the strip entry before Keybindings, with its body drawn through `O.AppearanceRows(ctx, spec, parent)`. The tab counts toward options-ui-§13's budget of eight tab labels per page (six beside a nav rail); a General page already at the budget merges a tab rather than wrapping the strip for this one.
+- **Drawn by the library.** `O.AppearanceTab(spec)` (`LibKa0s-Options-1.0`, from `LibKa0s v1.78.0`) returns the tab entry; `spec.get` and `spec.set` are the owner's read and its write seam (§2), and `spec.strings` translates, and only translates, every string the tab draws, the skins' names and descriptions included. A hand-built skin picker beside it is **anti-pattern #47**.
+- **What it holds.** The **skin source** (Ka0s skins, or EllesmereUI, the latter disabled with a hint while §5's gate is closed, each condition listed with a check or a cross and its one-line fix); the **skin**, a choice grid of the nine with each one's swatches, name and one-line description, where selecting one repaints live; **Copy to every Ka0s addon…** (options-ui-§21's ellipsis: it opens a confirmation naming the loaded addons it will change and saying that addons not loaded are unchanged; disabled, with a hint, while no other loaded addon has adopted); and the library's fixed note that a skin changes every visual element and that HUD style options follow the skin unless the player sets them.
+- **Resets reach it as a profile value.** *Reset all settings* (options-ui-§12) resets the profile, so the choice returns to Ka0s Default and is re-applied (§2). The tab holds rows of its own, so it meets options-ui-§13's two-line floor.
+- **Degradation.** The Options degradation stub answers `AppearanceTab` and `AppearanceRows` (options-ui-§1). `Kit.assertSurfaceParity` compares the stub against the live instance, so every addon's stub, adopted or not, owes the two members from its first re-vendor of `LibKa0s v1.78.0`, the same footing as options-ui-§20's three. Without the library the tab is not drawn and the addon draws Ka0s Default's values through its own fallbacks.
+
+### 4. The shipped skins
+
+Nine skins ship in the library. The **key** is what the profile stores; the **name** is what the tab shows.
+
+| key | name | in one line |
+|---|---|---|
+| `ka0s` | Ka0s Default | the collection's look before skins: slate, gold, Blizzard buttons |
+| `obsidian` | Obsidian | flat and quiet, one blue accent |
+| `azeroth` | Azeroth | parchment and leather, like a quest log |
+| `glass` | Glass | translucent panels with rounded corners (the client draws no blur) |
+| `contrast` | High Contrast | black, white and yellow, 2px edges, larger text |
+| `ember` | Ember | charcoal and brass with a fire accent |
+| `wow` | WoW Default | the vanilla client: stone, steel trim, red buttons with gold text |
+| `midnight` | WoW Midnight | night blue, gold and violet |
+| `forever` | WoW Forever | warm charcoal, black title bars with centered white titles, a tan accent, gold headings, thin borders |
+
+- **Ka0s Default reproduces the look as it was.** Its values are the ones the rules §7 lists state, and an addon that adopts skins and leaves the choice at its default draws exactly what it drew before; every golden and color pin it carried stays green unchanged.
+- **A skin is library data (MUST NOT).** A skin is a token table registered inside `LibKa0s`. An addon **MUST NOT** register a skin of its own or patch one: the registry is process-global, so a local skin is offered to every addon on the client. A new or changed skin is a library minor, added upstream like a missing icon mark (library-stack-§8).
+- **Meaning colors keep their meaning.** Item quality, class colors, gain and loss and the test strip's amber and cyan mean the same thing under every skin. A skin **MAY** change their **legibility** (a darker quality color on a light background) through its semantic tokens; it never changes which hue means what. In an addon that has adopted skins, those colors are read from the skin's semantic tokens too, which under Ka0s Default answer the values the addon used before.
+- **Fonts and art.** Skins name faces, borders and backgrounds by their LibSharedMedia keys, and the library resolves each at paint time, falling back to the client font where a face does not cover the client's locale (library-stack-§8). A skin never builds a file path.
+- **Geometry is skin-invariant.** Title-bar height, scrollbar width and every content inset are Ka0s Default's in every skin, and border art is drawn outside, or inside a fixed inset, so no skin moves a content anchor. options-ui-§8's layout constants hold under every skin.
+- **WoW Forever is a look.** It is the EllesmereUI-on-WoW-Forever appearance, usable on retail. The WoW Forever client itself is not supported (open-evolutions).
+
+### 5. The EllesmereUI provider (MUST)
+
+With the source set to `eui`, the library hands each primitive call to EllesmereUI's own facade for the names EllesmereUI has, and paints the Ka0s extras (title bars, dividers, list rows, cards, strips) from EllesmereUI's accent, panel color and font.
+
+- **The gate.** The source is selectable only while all four hold, each read at call time: `EllesmereUI.RegisterSkin` is a function and `EllesmereUIBlizzardSkin` is loaded; `EllesmereUIDB.thirdPartySkinsOff` is not truthy; `EllesmereUIDB.thirdPartySkinAddons[<owner>]` is not `false`; and EllesmereUI handed the owner its facade this session. While the gate is closed and EllesmereUI has not painted this session, the owner falls back live to its Ka0s skin and the Appearance tab says which condition failed.
+- **The read is library-stack-§6's skinning exception.** The two `EllesmereUIDB` reads above are the one named exception to library-stack-§6's ban on reading a suite's SavedVariables: confined to `LibKa0s/SkinEUI.lua`, read-only, at call time, nil-guarded, never written. An addon **MUST NOT** read `EllesmereUIDB` itself, and **MUST NOT** copy the gate: it asks the library (`Skin:GetEUIStatus(owner)`). An addon that read `EllesmereUIDB` under a ratified register row before the provider existed keeps that row until it moves onto the provider.
+- **`## OptionalDeps`.** An adopted addon lists `EllesmereUI` in `## OptionalDeps:` (library-stack-§6(b)), never in `## Dependencies:`, so that EllesmereUI loads first where it is installed and the addon is offered in its Third-Party list.
+- **One-way, and said so.** `ka0s` to `eui` applies live. `eui` to anything else, or a gate condition failing after EllesmereUI has painted this session, offers **one** reload and never falls back live, because EllesmereUI's paint cannot be removed without one.
+- **Fail closed.** A facade missing a primitive the provider needs is refused before any paint, latched and logged once; a paint that raises leaves the frame as it was. Pooled and shared objects (AceGUI widgets and pull-outs, the library's popup menu and reorder ghost) are **never** handed to an EllesmereUI primitive: under `eui` they keep the library's own technique, colored from EllesmereUI's getters, because EllesmereUI's paint is one-way and a pooled frame would carry it into another addon.
+
+### 6. HUD style follows the skin (MUST, owner ruling R3)
+
+A skin reaches the HUD too: bars, icons, glows and HUD text. A HUD style setting (a bar texture, a border, a HUD font) of an adopted addon **follows the skin** unless the player has set it.
+
+- **Through the library's seam.** A stored value resolves through `S.Resolve(kind, value)`, which answers the skin's value for the sentinel `Skin.FROM_SKIN`; a font, border or bar group composed by `LibKa0s-OptionsCompose` takes the composer's `fromSkin` companion row (*Use the skin's font*, and so on), which disables the picker while it is on (options-ui-§16). A sentinel string never enters a LibSharedMedia list or the CLI's allowed values.
+- **Reset once, on adoption.** Under the collection owner's ruling R3, the chosen skin shows **at once**: the addon's adoption resets the player's saved HUD style values to follow the skin, **once**, as one per-profile step in its own migration runner (savedvariables), through `Skin.ResetToSkin` or by setting the companions. A player who then sets a value keeps it.
+- An addon with no HUD has nothing here.
+
+### 7. What a skin never touches, and the rules it rescopes (MUST)
+
+**Never a Blizzard shared frame.** A skin paints the addon's own frames and the library's. It never restyles `SettingsPanel`'s chrome, a `StaticPopup`, `GameTooltip` itself, `ColorPickerFrame` or AceGUI-3.0-SharedMediaWidgets' pull-outs. Lines the addon writes onto `GameTooltip` take their colors from the skin; the frame keeps Blizzard's look.
+
+**No taint.** No `Hide`, `SetParent` or `SetScript` on a Blizzard frame; no `SetBackdrop` on a Blizzard template; nothing written into a Blizzard frame's table. The state a primitive records (prior colors, alpha, font, the holders it created) lives in a weak-keyed table on the library, never on the frame (events-frames-taint-§3).
+
+**No leak through AceGUI's pool.** A painted AceGUI widget follows options-ui-§19 exactly: everything the paint changed is restored, and its holders hidden, by that widget's `"OnRelease"` before the widget returns to the shared pool, so the next addon to acquire it, Ka0s or not, gets a stock widget. The library paints the widgets its own makers acquire. A host that acquires a widget itself, on an owned page, paints it with `Skin:PaintAce(owner, widget)` (or `Skin:PaintAceTree(owner, container)`) and, because AceGUI keeps one callback per name, attaches any `"OnRelease"` of its own through `Skin:OnRelease(widget, fn)`, which chains it with the restore rather than replacing it. Where another skinning addon has already skinned a widget, the library steps aside and paints nothing.
+
+**The rules rescoped to the Ka0s Default skin.** The look values these rules state are **Ka0s Default's**. An addon that has not adopted skins keeps them exactly as written. An addon that has adopted takes each from its owner's skin through the facade and **MUST NOT** diverge from that skin:
+
+- standalone-windows, *The Ka0s window edge*: the background, the two-line edge, the title and the divider.
+- standalone-windows, the close-control bullet: the close mark's rest and hover tints.
+- standalone-windows, the `TestStrip` bullet: amber and cyan stay the library's meaning colors under every skin; a skin changes only their legibility, through its `strip.*` tokens.
+- options-ui-§5 and options-ui-§8: the header title's face and gold, the divider tracking the title's color, the heading face and the font summary.
+- debug-logging-§3: the console's timestamp, tag and content colors, which stay three distinct colors under every skin.
+
+### 8. Commencement
+
+**Adoption is the commencement.** This section, and anti-pattern #107, bind an addon from the commit in which its own code first calls `Skin:RegisterOwner(<its folder>)`, and from no earlier point: an addon that has not adopted is not a finding under any of it, whatever its release. The collection adopts addon by addon, on the rollout recorded in open-evolutions; a new addon **MAY** adopt from its first release and is not required to before that rollout reaches it. A repository that registers no owner, a library or a documentation-and-tooling repo, has nothing here to audit. One obligation reaches every addon whether or not it has adopted, from its first re-vendor of `LibKa0s v1.78.0`: its Options stub answers `AppearanceTab` and `AppearanceRows` (§3). The audit step is `AUDIT.md`'s *Check skinning*.
