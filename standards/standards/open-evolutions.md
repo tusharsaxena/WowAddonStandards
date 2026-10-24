@@ -246,7 +246,8 @@ Items recorded for future versions of this standard:
   forbids `disabledIf` on a color row because the swatch's alpha survives class color; where the
   whole feature is off, though, the swatch is truly not read (U-13). The proposal: allow gating a
   swatch on its feature's on/off row, never on its class-color companion. Not ruled at v2.88.0: the
-  owner deferred it to an issue (WS-95 adds its link). Re-check when that issue is triaged.
+  owner deferred it to an issue,
+  <https://github.com/tusharsaxena/WowAddonStandards/issues/13>. Re-check when that issue is triaged.
 - **Flow-engine seams for host blocks (recorded, not ruled).** An after-subgroup hook, a
   before-group hook, a schema `note` row drawn dim and full width and skipped by `/list`, and a
   Position-block composer (U-14). Not ruled at v2.88.0: every change that wanted one landed on
