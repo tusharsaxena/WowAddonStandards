@@ -236,3 +236,24 @@ Items recorded for future versions of this standard:
   `docs/2026-10-24-KEYBINDS_LAYOUT_STRATA/`); until then such an addon says in its layers table's
   comment that the surface can cover the console (debug-logging, frame-layering-§5). Re-check when a player-facing surface of an addon sits at `DIALOG` or
   above and its console is covered in the client.
+- **A `PageBanner` that takes several acts (recorded, not ruled).** A band holding a picker plus
+  enable, link and copy acts draws one `O.PageHeader` block today (U-08(d), Ka0sAddonsCommonTasks
+  `docs/2026-10-24-KEYBINDS_LAYOUT_STRATA/`); a `PageBanner{ acts = { ... } }` arm would keep the
+  picker library-drawn beside them. Not ruled at v2.88.0: one accepted change needed it and expressed
+  it with `PageHeader`, and the library's tabbed-page file is at its size re-check trigger. Re-check
+  when a second addon's band needs it.
+- **Gating a swatch on its feature's own switch (deferred, owner call CALL-05).** options-ui-§17
+  forbids `disabledIf` on a color row because the swatch's alpha survives class color; where the
+  whole feature is off, though, the swatch is truly not read (U-13). The proposal: allow gating a
+  swatch on its feature's on/off row, never on its class-color companion. Not ruled at v2.88.0: the
+  owner deferred it to an issue (WS-95 adds its link). Re-check when that issue is triaged.
+- **Flow-engine seams for host blocks (recorded, not ruled).** An after-subgroup hook, a
+  before-group hook, a schema `note` row drawn dim and full width and skipped by `/list`, and a
+  Position-block composer (U-14). Not ruled at v2.88.0: every change that wanted one landed on
+  existing seams (two `RenderRows` slices, an after-group `TextRow`, a host-drawn position block),
+  and the flow engine's file is at its re-check trigger, so a seam there is a peel. Re-check with the
+  first layout that cannot be expressed on today's seams.
+- **A library line naming what is account-wide (recorded, not ruled).** An optional library-drawn
+  line above the AceDBOptions group listing what is account-wide, from a descriptor field (U-15).
+  Not ruled at v2.88.0: it fell below the run's confidence threshold and one addon asked for it.
+  Re-check when a second addon asks for it.

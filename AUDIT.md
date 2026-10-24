@@ -939,8 +939,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      never by this read. The rules apply from each addon's first release after v2.88.0
      (frame-layering-§7).
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
-     screen.** Eleven checks. Each is a read of the schema array or a grep, none needs judgment, and
-     all eleven are invisible to lint and to the headless suite — which is how every one of them
+     screen.** Twelve checks. Each is a read of the schema array or a grep, none needs judgment, and
+     all twelve are invisible to lint and to the headless suite — which is how every one of them
      shipped. Do them in this order; the first changes what the rest are counting.
      - **(a) Every page draws a tab strip (options-ui-§13).** List the addon's settings pages and,
        per page, the distinct `group` values in declaration order. A page with **no** `group` values,
@@ -965,7 +965,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        for **MUST** be present. A canonical row sitting under a different tab is a finding against
        **§15**, not against the tab it is in. An addon that draws no positionable frame — proven by a
        whole-repo `SetMovable` sweep, not assumed — legitimately omits exactly master scale, master
-       opacity, lock frame and reset position; record that as compliant and file nothing.
+       master opacity, lock frame and reset position; record that as compliant and file nothing.
+       Then read the composed words (options-ui-§15, v2.88.0): no assignment to `.label` or
+       `.tooltip` on a row or button `MasterControls` returned, and no `labels` key in its spec
+       (`grep -n 'MasterControls' settings/*.lua`, then read each call site and the code after it).
+       A rewrite is anti-pattern #106 from the addon's first release on `LibKa0s v1.77.0`, a
+       re-vendor item before it. A multi-frame addon's *Lock frame* keeps its name. Where *Lock
+       frame* is omitted (every frameless addon, and a framed one passing `omit.locked`), *Minimap
+       button* sits beside *Debug console* rather than in the first column, and *Test mode*, where
+       present, opens its own line: options-ui-§15's frameless packing, the composer's layout from
+       that same release, so a host that hand-places these rows is the finding.
        **Test mode is required in every addon with a positionable display** — proven by the same
        whole-repo `SetMovable` sweep that proves a frameless addon — **unless unticking Lock frame
        already shows the display with its placeholder content**, in which case Lock frame is the
@@ -1148,6 +1157,23 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        does not match. The General page's Defaults tooltip ends with `O.KEYBINDS_UNCHANGED`
        (**SHOULD**). Owed from the addon's first release on `LibKa0s v1.77.0` or later; before that
        tag it is a re-vendor item, not a panel deviation.
+     - **(l) The settings vocabulary and shape (options-ui-§7, §13, §14, §16, §21, v2.88.0).** Each
+       hit is a finding against the section named, owed from the addon's next release after
+       v2.88.0. Over `settings core modules locales`: `grep -rnE '\((in px|in seconds|sec|s)\)'`
+       (§21 units); `grep -rnE '"[^"]*\bMax [a-z]'` (§21 limits);
+       `grep -rnE 'label *= *"[^"]*[Aa]lpha'` (§21 opacity);
+       `grep -rnE '(group|subgroup|label) *= *"[^"]* & '` (§21 joining); a settings location written
+       with '->' or a triangle glyph, or a multiplier tooltip naming bare *General > Master
+       controls* in an addon that also has a General tab or rail entry (§21 location strings); a
+       button whose `onClick` raises `StaticPopup_Show` and whose text does not end in '…', *Reset
+       all settings* excepted (§21); a builder-drawn `Section` or `Heading` over a non-row act, or a
+       `subgroup` restating its tab (§7); a row drawn on one page whose `page`/`panel` stamp names
+       another page while either page's Defaults tooltip is silent about it (§14, MUST); a band
+       whose height changes with the selection (§14, MUST, read from the host's band code). SHOULD
+       findings, graded low: a disclosed cross-page stamp that could be re-stamped (§14); a one-line
+       tab other than the exempt ones, a strip over eight labels (six on a rail page) (§13); a bar
+       surface split over several tabs (§16). Case is read, not grepped: Title Case in a row label,
+       tab label or heading is a §21 finding.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a
