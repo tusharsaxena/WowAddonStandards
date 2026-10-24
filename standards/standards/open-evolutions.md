@@ -174,9 +174,10 @@ Items recorded for future versions of this standard:
   a panel's subscription to its own refresh message left live across a stand-down is not filed under
   slash-commands-§7's *What MUST stand down*, and one taken down is not filed either.
 - **Whether a runtime-critical major that calls nothing in Core should floor on it (recorded, not
-  ruled).** Eleven of the seventeen `LibKa0s` majors floor on `LibKa0s-Core-1.0` without calling a member
+  ruled).** Ten of the seventeen `LibKa0s` majors floor on `LibKa0s-Core-1.0` without calling a member
   (library-stack-§7), so that a partial payload leaves every module absent rather than a mixed set.
-  `LibKa0s-Schema-1.0` is one of the eleven, and so is `LibKa0s-Compat-1.0`, and the feature runtime
+  `LibKa0s-Schema-1.0` is one of the ten (eleven until `LibKa0s v1.77.0`, when `Options` began
+  reading Core's `SafeRegisterEvent`), and so is `LibKa0s-Compat-1.0`, and the feature runtime
   reaches both while neither calls a Core member (`grep -l 'local NEEDS_CORE' LibKa0s/*.lua` in
   the library; no Core read in `Compat.lua` or `Schema.lua` beyond the floor). Schema's seam is read
   on a repaint pass; Compat's readers and guards are built for hot paths, and KickCD called
