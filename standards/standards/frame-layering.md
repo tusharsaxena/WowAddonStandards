@@ -31,7 +31,14 @@ What the ladder guarantees, and why each line is where it is:
 - A non-interactive alert is not in the popup strata, so a menu opened while it shows draws over it.
 
 **Variants of T1.**
-- **Player-chosen strata.** A display whose strata is a setting **MUST** offer `BACKGROUND`, `LOW`, `MEDIUM` and `HIGH` only. A knob that shipped before v2.88.0 with `DIALOG` or higher keeps its stored values (a value-set change needs a migration and an owner decision), and its tooltip **MUST** say what those values cover: the addon's own popups and debug console, and the Settings window.
+- **Player-chosen strata.** A display whose strata is a setting **MUST** offer `BACKGROUND`, `LOW`, `MEDIUM` and `HIGH` only. A knob that shipped before v2.88.0 with `DIALOG` or higher keeps its stored values (a value-set change needs a migration and an owner decision), and its tooltip **MUST** say what those values cover: the addon's own popups and debug console, and the Settings window. The row's tooltip **MUST** be the library's `O.StrataTooltip(values)` (`LibKa0s-Options-1.0`, from `LibKa0s v1.77.0`), passed the row's own value table. It states the tiers once for the collection and adds the dialog-and-above sentences only when the row offers those values. A host **MUST NOT** write tier sentences of its own; a row-specific sentence (what the frame is) MAY precede it. The three sentences, in order, the second only when the values hold `DIALOG`, `FULLSCREEN`, `FULLSCREEN_DIALOG` or `TOOLTIP`, the third only when they hold `FULLSCREEN_DIALOG` or `TOOLTIP`:
+
+  > The layer this frame draws in. Background and Low draw under most of the interface, Medium is the default for displays, and High draws over other windows, in the same layer as the game's Settings window.
+  >
+  > Dialog and above also cover confirmation dialogs, this addon's debug console and the Settings window, so a frame placed there can hide them.
+  >
+  > Fullscreen Dialog and Tooltip can also cover dropdown menus and tooltips.
+
 - **Host-matched surfaces.** A surface grafted onto another addon's or Blizzard's frame **MUST** take the host's strata by reading it (`host:GetFrameStrata()`) or by inheriting it, never by restating it as a literal, and raises its level by a named offset over the host. Elements that decorate a host's frames copy its strata and stack one level over its highest readable descendant, the read guarded against secret values and forbidden frames.
 - **Player-layered backdrops.** An addon whose purpose is letting the player compose strata and level (a backdrop panel addon) **MAY** offer every strata, as a row in its `## Documented deviations`; it **MUST** keep its own confirmations answerable while its frames are unlocked (§4).
 

@@ -439,6 +439,7 @@ Three kinds of control recur in every addon that paints anything, and a player w
   - It **MUST NOT** be the only place its media kind is settable. The per-surface groups it broadcasts to have to exist, and to be composed; a broadcast row over nothing is a group that skipped the composer.
   - **The exemption retires** the day `LibKa0s-OptionsCompose` exposes a broadcast-meta arm — at which point the row is composed like every other and the rule above binds it with no exception at all.
 - **A tab holding more than one of these groups carries a subsection heading per group** (options-ui-§7). Merging a background group and a border group onto one tab is a legitimate choice and is not undone by this rule — what the rule requires is that the merged tab says where one stops and the next starts.
+- **A strata row (v2.88.0).** A dropdown that lets the player pick a frame's strata takes its value set and its tooltip from frame-layering-§1 (player-chosen strata): `BACKGROUND` to `HIGH` for a new row, the stored values kept for a row shipped before v2.88.0, and the library's `O.StrataTooltip(values)` as its tooltip. Its label and placement are this page's ordinary rules. The Options degradation stub answers `StrataTooltip` (§1; `Kit.assertSurfaceParity`).
 
 ### 17. The class-color companion
 
