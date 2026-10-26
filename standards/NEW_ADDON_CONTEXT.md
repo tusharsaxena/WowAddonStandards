@@ -1488,8 +1488,9 @@ Start here, then read the docs:
 - **`docs/testing.md`** — how to verify: the headless harness, lint, and the green commit gate.
 - Topic detail in `docs/` as needed (`schema.md`, `settings-panel.md`, `smoke-tests.md`, …).
 
-Green gate before every commit: `lua tests/run.lua` and `luacheck .` (0/0). Never auto-stage/commit/
-push and never bump the version without an explicit instruction.
+Green gate before every commit: `lua tests/run.lua` and `~/.claude/dev-copilot/bin/ka0s-bounded luacheck .`
+(0/0). The kit bounds the suite on load; `luacheck` loads no kit, so it runs through the bounded runner
+(testing-§15). Never auto-stage/commit/push and never bump the version without an explicit instruction.
 
 Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).
 LibKa0s icons: close, copy, clear.
@@ -1608,9 +1609,11 @@ the "not needed to build, run or test" sentence.)*
 lua tests/run.lua                                     # the suite — must be green
 lua tests/run.lua -j auto                             # same, fanned across CPUs (testing-§14)
 # every run above is bounded by the vendored kit on load (testing-§15); KA0S_KIT_GUARD=off only under a debugger
-luacheck .                                            # must be 0 warnings / 0 errors
-bash tests/_kit/run-automated-tests.sh --suite complexity   # the sighted complexity report (release-time);
-                                                      # never raw `lizard`, which is blind in Lua (automated-tests-§3)
+~/.claude/dev-copilot/bin/ka0s-bounded luacheck .     # must be 0 warnings / 0 errors
+                                                      # luacheck loads no kit, so it runs through the bounded runner (testing-§15)
+~/.claude/dev-copilot/bin/ka0s-bounded bash tests/_kit/run-automated-tests.sh --suite complexity --no-bundle
+                                                      # the sighted complexity report (release-time); never raw
+                                                      # `lizard`, which is blind in Lua (automated-tests-§3)
 ```
 
 See `docs/testing.md` for what those commands mean and when each is run.
