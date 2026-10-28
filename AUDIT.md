@@ -954,6 +954,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      Read each hit: a literal value, or a constants-table entry, painting a frame the addon draws is
      #107; a facade primitive, a `S.Color` / `S.Token` read, or a call inside the skin setup file is
      not. A library factory that takes an owner called without one is #107 too (skinning-§1).
+     From the addon's re-vendor of `LibKa0s v1.80.0`, read the `tokens` table its registration
+     declares and every `opts.tokens` it passes: an owner token's literal `default` and `skins`
+     values in the setup file are not #107, while a color value in `opts.tokens`, or an own color
+     painted with a library token whose Ka0s Default value differs from the one it drew before
+     (snapped rather than declared), is (skinning-§1).
      (d) The Appearance tab is on the General page, labeled `Appearance`, immediately before
      `Keybindings` (last where there is none), drawn by `O.AppearanceTab` or `O.AppearanceRows`; a
      hand-built picker is #47 (skinning-§3).
