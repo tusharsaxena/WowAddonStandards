@@ -258,13 +258,21 @@ Items recorded for future versions of this standard:
   line above the AceDBOptions group listing what is account-wide, from a descriptor field (U-15).
   Not ruled at v2.88.0: it fell below the run's confidence threshold and one addon asked for it.
   Re-check when a second addon asks for it.
-- **The collection's skin rollout (recorded, not ruled).** `skinning` (v2.89.0) binds an addon from
-  its adoption, and the first run converted one addon, LootHistory, as the prototype. The other
-  addons adopt in a later run, which also moves PremadeGroupsFilterExtension's own EllesmereUI bridge
-  onto the library's provider (its ratified register row stands until then, library-stack-§6) and
-  applies skinning-§6's one-time HUD style reset to each addon with a HUD. The reset's helpers ship
-  in `LibKa0s v1.78.0` but have no adopter until then, because the prototype has no HUD. Re-check at
-  that run, and if it has not landed within two `LibKa0s` releases of v1.78.0.
+- **The collection's skin rollout (in progress, recorded, not ruled).** `skinning` (v2.89.0) binds
+  an addon from its adoption. The first run converted one addon, LootHistory, as the prototype, and
+  Ka0s Skin Tester adopted at its creation. The rollout run (Ka0sAddonsCommonTasks
+  `docs/2026-10-29-SKINNING_ROLLOUT/`, branch `feat/2026-10-29-skinning-rollout` in every repo it
+  touches) adopts the fourteen roster addons that had not adopted, every row of `ADDONS.md` but
+  those two, on `LibKa0s v1.80.0`, which adds the owner tokens, `opts.tokens` and `opts.stockDefault`
+  of skinning-§1. Three owner rulings of 2026-10-29 govern it. **O2:** skinning-§6's one-time HUD
+  style reset is kept now that the addons are published, so adoption resets every player's saved
+  HUD style values to follow the skin, once. **O3:** the first-run skin picker is shown to every
+  player, existing ones included, because `pickerSeen` defaults to false on every profile, old and
+  new. **O4:** PremadeGroupsFilterExtension's own EllesmereUI bridge is retired in favor of the
+  library's `eui` source, with a migration step that carries the player's saved choice over; its
+  ratified register row (library-stack-§6) stands until that merges. Each addon is bound from the commit
+  that adopts, as skinning-§8 says, and not before. Re-check when the run merges:
+  close this entry, and retire the register row in the same change.
 - **Ka0s Default's split tokens (recorded, not ruled).** Where two call sites drew one role in two
   colors before skins, Ka0s Default keeps both values as two tokens, so that adopting changes no
   pixel; the list is in `LibKa0s` `docs/api/Skin`. Each pair is a candidate to merge into one token
