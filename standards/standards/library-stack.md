@@ -431,20 +431,22 @@ under the same rules:
   key and listed in `FONTS`, with the file recording its terms shipped beside it. The catalog is the
   list, and this standard does not restate it (it first shipped five faces in `LibKa0s v1.78.0`, and
   the set has changed in most minors since). Which face each skin draws is skin data (skinning-§4).
-- **A face ships only under terms that allow redistributing it with a free addon (MUST, v2.93.0).**
-  The SIL Open Font License 1.1 is the default. A face under other terms ships only on a recorded owner
-  ruling that names the face and its terms, with its terms file beside it verbatim and the library's
-  media test naming those terms, so a face whose license file is missing or unnamed fails a test. The
-  ruling is recorded in the library's changelog and README credits. From `LibKa0s v1.82.0` one face
-  ships this way (owner ruling of 2026-10-30): Ka0s Prototype, whose own name table reads "free for
-  personal use, freely distributed with Prototype.txt", shipped with its `Prototype.txt` verbatim and
-  taken from its public distribution, never from a player's media pack. The owner ruled that those
-  terms allow it to ship with a free addon and accepted the risk the personal-use wording carries. A
-  face whose own terms forbid redistributing it never ships, whatever the ruling. **Ka0s Expressway was
-  refused under that clause.** The same ruling asked for Expressway Regular as Obsidian's face, but the
-  archive its author distributes carries the Typodermic Desktop EULA, which puts embedding in software
-  outside the free license and forbids sharing or including the font in publicly available software,
-  and the file's embedding bits say the same (`LibKa0s v1.82.0`'s changelog), so it does not ship.
+- **A face ships only under terms that allow redistributing it with a free addon, or on an owner
+  ruling that names it (MUST, v2.93.0).** The SIL Open Font License 1.1 is the default. A face under
+  any other terms ships only on a recorded owner ruling that names the face, with its terms file beside
+  it verbatim and the library's media test naming those terms, so a face whose license file is missing
+  or unnamed fails a test. The ruling is quoted where the face is registered and recorded in the
+  library's changelog and README credits, together with what its terms say; a face no ruling names
+  ships only under OFL. From `LibKa0s v1.82.0` two faces ship this way, each on an owner ruling of
+  2026-10-30. **Ka0s Prototype**, whose own name table reads "free for personal use, freely
+  distributed with Prototype.txt", ships with its `Prototype.txt` verbatim, taken from its public
+  distribution; the owner ruled that those terms allow it to ship with a free addon and accepted the
+  risk the personal-use wording carries. **Ka0s Expressway** ships on the ruling "Ship it anyways",
+  given after the owner saw that the archive its author distributes carries the Typodermic Desktop
+  EULA, which puts embedding in software outside the free license, and that the file's own embedding
+  bits and notice say the same ("Do not distribute"). It ships as the owner's pack copy, the face the
+  client already loads, with the archive's EULA files beside it as its terms record, and the owner
+  carries the risk those terms describe (`LibKa0s v1.82.0`'s changelog).
 - **A face no skin names leaves the payload** in the next library minor, together with its terms
   file, once a search of every consumer's tree proves nothing names it. A saved choice naming a removed
   face needs no migration, because an unknown face already falls back to the skin's own. The monospace
