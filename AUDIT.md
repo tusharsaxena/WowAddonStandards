@@ -968,6 +968,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      before `Keybindings` (last where there is none), drawn by `O.AppearanceTab` or
      `O.AppearanceRows`; a hand-built picker is #47. The profile defaults store *Ignore settings
      panel* on and *Ignore fonts* off (skinning-§3).
+     From the addon's re-vendor of `LibKa0s v1.82.0`: the profile defaults store `skin.outline` as
+     `all`, through the write seam like the Scope; the `COMMANDS` table carries a `skin` row directly
+     after `config` whose handler reaches `O.SkinVerb` (`NS.RunSkinVerb`), with no alias and no
+     hand-built window (#47), and the Options stub answers `SkinVerb`; nothing in the addon's own code
+     writes the skin choice for a player's pick around the library's chooser, so the font and texture
+     overrides reset on a skin change. Each miss is a **MUST** finding against skinning-§3
+     (slash-commands-§2 for the verb). The reset buttons, the outline dropdown and its gray state
+     under *Ignore fonts*, and the reset itself are the owner's in-client smoke.
      (e) The choice is two values stored in the profile, defaulting to `ka0s`, written only through
      the write seam (`opts.set` and the tab's `spec.set` name it), and re-applied through
      `Skin:SetChoice` on a profile switch, copy or reset (skinning-§2).
@@ -980,9 +988,26 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      its re-vendor of `LibKa0s v1.81.0`, a HUD face the addon resolves itself goes through
      `S.Resolve`, so *Ignore fonts* reaches it, and falls back on nil to the element's stored pick, else
      its default; one resolved around the seam, or one that hands a nil face to `SetFont`, is #107
-     (skinning-§6).
+     (skinning-§6). From its re-vendor of `LibKa0s v1.82.0`: every HUD element drawing the skin's face
+     sizes its text through `S.HudFontSize`, and its degraded facade answers `HudFontSize`; every font
+     setting stores its flags, its *Font flags* row offering *From skin* as the default and resolved
+     by the library. A bypass is #107; a missing flags row or stored flag is options-ui-§16.
+     (h) From the same re-vendor, read the addon's own fixed widths (`SetWidth` on a label or column
+     holding text, a truncation length): each fits its longest string under Ka0s Default with the
+     outline on (skinning-§4). A width the addon sizes from a measured string is compliant; whether
+     it fits in every skin is the owner's in-client smoke.
      How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
      owner's in-client smoke, never by this read (skinning-§8).
+   - **Check display characters (`localization-§7`, v2.93.0).** Code only, `libs/` and `tests/_kit/`
+     excluded, owed from the addon's next release after v2.93.0. Run
+     `grep -rnP '[^\x00-\x7F]' --include='*.lua' core modules settings locales` and
+     `grep -rnE '\\[12][0-9]{2}' --include='*.lua' core modules settings locales` (the decimal byte
+     escapes most glyphs are written in), and read each hit inside a string literal, comments ignored.
+     A character outside localization-§7's safe set in a string the addon paints in a skinned face is a
+     **MUST** finding, unless it is drawn in its own `FontString` pinned to the monospace face, or the
+     string is game data, chat output or test data. A suite that builds such strings and never calls
+     the kit's glyph guard is a **SHOULD** finding. Whether a face draws a character is the guard's
+     to say, not the auditor's.
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
      screen.** Twelve checks. Each is a read of the schema array or a grep, none needs judgment, and
      all twelve are invisible to lint and to the headless suite — which is how every one of them
@@ -1034,7 +1059,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        A display minimized with its header hidden shows no sample data and owes none. Read the code
        path that hides the header or title and confirm the marker does not ride it. Placeholder
        content whose visible text names the test is a marker. An addon whose test mode is the
-       unlocked view owes no marker under this rule. A filter-bar window not using
+       unlocked view owes no marker under this rule. From v2.93.0 a **HUD display** (bars, icons,
+       grids, containers and HUD text with no window chrome) **MAY** go unmarked, so an unmarked one
+       is not a finding; a window, whatever the addon calls it, is still bound, and an unlocked drag
+       strip's tag is not this marker. A filter-bar window not using
        `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
        host-built copy of the strip there is #47. With the strip shown, confirm that the header
        carries no word for the same mode, and that the word does come back when the window is
@@ -1055,8 +1083,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        addon message, trade) in `opts.guarded`; no write to the SavedVariables tables from a
        simulated event's path, and no position store (`d.panel` carries no `store`); every module the
        session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
-       the simulation a `sim:After`; the session marked on the display (the major's step panel
-       shown); a single `sim` feature-verb row and no launcher entry or key binding for it; host
+       the simulation a `sim:After`; the session marked on screen by the major's step panel, built
+       with `close = false` where no window strip marks the session, and no simulation strip, anchor
+       or badge over a HUD display (#97, v2.93.0); a single `sim` feature-verb row and no launcher entry or key binding for it; host
        fields on the host's own table, never on the library instance; and a suite that asserts
        `seam:Unwrapped()` is empty. Each missing one is a **MUST** finding against preview-mode; an
        unmarked session is #97 as well. Behavior is the owner's in-client smoke.
@@ -1202,7 +1231,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        does not match. The General page's Defaults tooltip ends with `O.KEYBINDS_UNCHANGED`
        (**SHOULD**). Owed from the addon's first release on `LibKa0s v1.77.0` or later; before that
        tag it is a re-vendor item, not a panel deviation.
-     - **(l) The settings vocabulary and shape (options-ui-§7, §13, §14, §16, §21, v2.88.0).** Each
+     - **(l) The settings vocabulary and shape (options-ui-§7, §13, §14, §16, §21, §22, v2.88.0).** Each
        hit is a finding against the section named, owed from the addon's next release after
        v2.88.0. Over `settings core modules locales`: `grep -rnE '\((in px|in seconds|sec|s)\)'`
        (§21 units); `grep -rnE '"[^"]*\bMax [a-z]'` (§21 limits);
@@ -1218,7 +1247,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        findings, graded low: a disclosed cross-page stamp that could be re-stamped (§14); a one-line
        tab other than the exempt ones, a strip over eight labels (six on a rail page) (§13); a bar
        surface split over several tabs (§16). Case is read, not grepped: Title Case in a row label,
-       tab label or heading is a §21 finding.
+       tab label or heading is a §21 finding. From the addon's next release after v2.93.0: a group of
+       rows that describes one value of a style, mode or kind selector and is drawn (dimmed or not)
+       while no selector picks that value is a §22 finding, as is a host `onChange` that re-renders the
+       page to hide rows in place of `shownWhen`; read each dropdown whose values own row groups. From
+       the addon's re-vendor of `LibKa0s v1.82.0`, a font setting carrying fewer than the whole Font
+       block (face, size, color and class color, flags, shadow) is a §16 finding.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a

@@ -427,14 +427,28 @@ nothing at all — and a texture that does not load draws nothing and raises not
 **The skin media (from `LibKa0s v1.78.0`).** What the skins draw with arrives in the same payload and
 under the same rules:
 
-- **Five OFL display faces** beside the monospace one: Barlow Regular and Barlow SemiBold, Cinzel
-  SemiBold, and Atkinson Hyperlegible Regular and Bold, registered as `Ka0s Barlow`,
-  `Ka0s Barlow SemiBold`, `Ka0s Cinzel`, `Ka0s Atkinson` and `Ka0s Atkinson Bold`. Each ships as a
-  static instance with its SIL Open Font License 1.1 text beside it.
+- **The display faces the skins name**, beside the monospace one, each registered under a `Ka0s`
+  key and listed in `FONTS`, with the file recording its terms shipped beside it. The catalog is the
+  list, and this standard does not restate it (it first shipped five faces in `LibKa0s v1.78.0`, and
+  the set has changed in most minors since). Which face each skin draws is skin data (skinning-§4).
+- **A face ships only under terms that allow redistributing it with a free addon (MUST, v2.93.0).**
+  The SIL Open Font License 1.1 is the default. A face under other terms ships only on a recorded owner
+  ruling that names the face and its terms, with its terms file beside it verbatim and the library's
+  media test naming those terms, so a face whose license file is missing or unnamed fails a test. The
+  ruling is recorded in the library's changelog and README credits. From `LibKa0s v1.82.0` two faces
+  ship this way (owner ruling of 2026-10-30): Ka0s Prototype, freeware distributed with its
+  `Prototype.txt`, and Ka0s Expressway (Expressway Regular), under the Typodermic Desktop License, each
+  taken from its public distribution, never from a player's media pack. A face whose own terms forbid
+  redistributing it never ships, whatever the ruling.
+- **A face no skin names leaves the payload** in the next library minor, together with its terms
+  file, once a search of every consumer's tree proves nothing names it. A saved choice naming a removed
+  face needs no migration, because an unknown face already falls back to the skin's own. The monospace
+  face stays, because the debug console names it (debug-logging-§2).
 - **Every face carries its own locale mask**, a per-entry field of `FONTS` rather than one mask for
-  the catalog: the five display faces are Western-only, and the monospace face keeps its Western-plus-
-  Russian mask. A face is registered only for the locales it covers, so on another client a skin that
-  names it falls back to the client font rather than drawing missing glyphs.
+  the catalog, read from the shipped bytes' character map: a Latin-only face is Western-only, and the
+  monospace face keeps its Western-plus-Russian mask. A face is registered only for the locales it
+  covers, so on another client a skin that names it falls back to the client font rather than drawing
+  missing glyphs. Which characters a displayed string may use is localization-§7's.
 - **The border and background catalogs** register the shipped rounded-corner nine-slice textures (the
   Glass skin's) and the in-client art the skins name, under LibSharedMedia's `border` and
   `background` types. The rounded textures are white, with their shape in the alpha channel, like

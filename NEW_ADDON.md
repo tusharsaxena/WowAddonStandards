@@ -85,8 +85,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    Skins (skinning) are optional until the collection's skin rollout reaches the addon: it **MAY**
    adopt from its first release, with a `core/SkinSetup.lua` that calls `Skin:RegisterOwner(addonName)`
    at file load and a Skin tab before Keybindings, and is not required to. Either way, its
-   Options stub answers `AppearanceTab` and `AppearanceRows` (the pack's hard rule 24b and its
-   definition-of-done line).
+   Options stub answers `AppearanceTab` and `AppearanceRows`, and `SkinVerb` on `LibKa0s v1.82.0` or
+   later, and an adopted addon registers the `skin` verb directly after `config` (the pack's hard
+   rules 8a and 24b and its definition-of-done line).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
