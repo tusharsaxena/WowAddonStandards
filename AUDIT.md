@@ -959,9 +959,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      values in the setup file are not #107, while a color value in `opts.tokens`, or an own color
      painted with a library token whose Ka0s Default value differs from the one it drew before
      (snapped rather than declared), is (skinning-§1).
-     (d) The Appearance tab is on the General page, labeled `Appearance`, immediately before
-     `Keybindings` (last where there is none), drawn by `O.AppearanceTab` or `O.AppearanceRows`; a
-     hand-built picker is #47 (skinning-§3).
+     From the addon's re-vendor of `LibKa0s v1.81.0`: `grep -rn 'stockDefault' --include='*.lua' core modules settings`
+     returns nothing (the stock look is the WoW Default skin); every library widget the addon places
+     on a settings page passes `panel = true` (`S.Text`, the Widgets constructors), and a settings-page
+     surface the addon paints from tokens is gated on `Skin:GetIgnore(owner)`. Each miss is #107
+     (skinning-§1).
+     (d) The Skin tab is on the General page, labeled `Skin` (its key stays `Appearance`), immediately
+     before `Keybindings` (last where there is none), drawn by `O.AppearanceTab` or
+     `O.AppearanceRows`; a hand-built picker is #47. The profile defaults store *Ignore settings
+     panel* on and *Ignore fonts* off (skinning-§3).
      (e) The choice is two values stored in the profile, defaulting to `ka0s`, written only through
      the write seam (`opts.set` and the tab's `spec.set` name it), and re-applied through
      `Skin:SetChoice` on a profile switch, copy or reset (skinning-§2).
@@ -970,7 +976,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      ratified `## Documented deviations` row predating the provider covers it (skinning-§5,
      library-stack-§6).
      (g) An addon with a HUD carries the one-time per-profile reset of its saved HUD style values in
-     its migration runner, and its font, border and bar groups take the `fromSkin` companion
+     its migration runner, and its font, border and bar groups take the `fromSkin` companion. From
+     its re-vendor of `LibKa0s v1.81.0`, a HUD face the addon resolves itself goes through
+     `S.Resolve`, so *Ignore fonts* reaches it, and falls back on nil to the element's stored pick, else
+     its default; one resolved around the seam, or one that hands a nil face to `SetFont`, is #107
      (skinning-§6).
      How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
      owner's in-client smoke, never by this read (skinning-§8).

@@ -84,7 +84,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
    that every strata and level call reads, or none at all in a frameless addon (frame-layering-§5).
    Skins (skinning) are optional until the collection's skin rollout reaches the addon: it **MAY**
    adopt from its first release, with a `core/SkinSetup.lua` that calls `Skin:RegisterOwner(addonName)`
-   at file load and an Appearance tab before Keybindings, and is not required to. Either way, its
+   at file load and a Skin tab before Keybindings, and is not required to. Either way, its
    Options stub answers `AppearanceTab` and `AppearanceRows` (the pack's hard rule 24b and its
    definition-of-done line).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
