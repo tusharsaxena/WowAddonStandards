@@ -978,7 +978,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (g) An addon with a HUD carries the one-time per-profile reset of its saved HUD style values in
      its migration runner, and its font, border and bar groups take the `fromSkin` companion. From
      its re-vendor of `LibKa0s v1.81.0`, a HUD face the addon resolves itself goes through
-     `S.Resolve`, so *Ignore fonts* reaches it; one resolved around the seam is #107 (skinning-§6).
+     `S.Resolve`, so *Ignore fonts* reaches it, and falls back on nil to the element's stored pick, else
+     its default; one resolved around the seam, or one that hands a nil face to `SetFont`, is #107
+     (skinning-§6).
      How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
      owner's in-client smoke, never by this read (skinning-§8).
    - **Check the settings panel's CONTENT against `options-ui`, from the schema rather than from the
