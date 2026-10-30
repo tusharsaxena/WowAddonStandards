@@ -435,11 +435,16 @@ under the same rules:
   The SIL Open Font License 1.1 is the default. A face under other terms ships only on a recorded owner
   ruling that names the face and its terms, with its terms file beside it verbatim and the library's
   media test naming those terms, so a face whose license file is missing or unnamed fails a test. The
-  ruling is recorded in the library's changelog and README credits. From `LibKa0s v1.82.0` two faces
-  ship this way (owner ruling of 2026-10-30): Ka0s Prototype, freeware distributed with its
-  `Prototype.txt`, and Ka0s Expressway (Expressway Regular), under the Typodermic Desktop License, each
-  taken from its public distribution, never from a player's media pack. A face whose own terms forbid
-  redistributing it never ships, whatever the ruling.
+  ruling is recorded in the library's changelog and README credits. From `LibKa0s v1.82.0` one face
+  ships this way (owner ruling of 2026-10-30): Ka0s Prototype, whose own name table reads "free for
+  personal use, freely distributed with Prototype.txt", shipped with its `Prototype.txt` verbatim and
+  taken from its public distribution, never from a player's media pack. The owner ruled that those
+  terms allow it to ship with a free addon and accepted the risk the personal-use wording carries. A
+  face whose own terms forbid redistributing it never ships, whatever the ruling. **Ka0s Expressway was
+  refused under that clause.** The same ruling asked for Expressway Regular as Obsidian's face, but the
+  archive its author distributes carries the Typodermic Desktop EULA, which puts embedding in software
+  outside the free license and forbids sharing or including the font in publicly available software,
+  and the file's embedding bits say the same (`LibKa0s v1.82.0`'s changelog), so it does not ship.
 - **A face no skin names leaves the payload** in the next library minor, together with its terms
   file, once a search of every consumer's tree proves nothing names it. A saved choice naming a removed
   face needs no migration, because an unknown face already falls back to the skin's own. The monospace

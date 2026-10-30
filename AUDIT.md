@@ -971,7 +971,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      From the addon's re-vendor of `LibKa0s v1.82.0`: the profile defaults store `skin.outline` as
      `all`, through the write seam like the Scope; the `COMMANDS` table carries a `skin` row directly
      after `config` whose handler reaches `O.SkinVerb` (`NS.RunSkinVerb`), with no alias and no
-     hand-built window (#47), and the Options stub answers `SkinVerb`; nothing in the addon's own code
+     hand-built window (#47), no `liveVerbs` the host passes lists `skin` (it is refused while
+     disabled), and the Options stub answers `SkinVerb`; nothing in the addon's own code
      writes the skin choice for a player's pick around the library's chooser, so the font and texture
      overrides reset on a skin change. Each miss is a **MUST** finding against skinning-§3
      (slash-commands-§2 for the verb). The reset buttons, the outline dropdown and its gray state
@@ -991,7 +992,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (skinning-§6). From its re-vendor of `LibKa0s v1.82.0`: every HUD element drawing the skin's face
      sizes its text through `S.HudFontSize`, and its degraded facade answers `HudFontSize`; every font
      setting stores its flags, its *Font flags* row offering *From skin* as the default and resolved
-     by the library. A bypass is #107; a missing flags row or stored flag is options-ui-§16.
+     by the library, and a stored flag still at the addon's previous default after the re-vendor
+     (no one-time migration step moved it to *From skin*) is a finding too, since only a flag the
+     player picked is kept (skinning-§6). A bypass is #107; a missing flags row or stored flag is
+     options-ui-§16.
      (h) From the same re-vendor, read the addon's own fixed widths (`SetWidth` on a label or column
      holding text, a truncation length): each fits its longest string under Ka0s Default with the
      outline on (skinning-§4). A width the addon sizes from a measured string is compliant; whether

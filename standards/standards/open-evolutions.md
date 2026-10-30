@@ -294,7 +294,8 @@ Items recorded for future versions of this standard:
   given after the follow-ups' smoke pass (Ka0sAddonsCommonTasks `docs/2026-10-30-SKIN_FONTS_AND_FEEDBACK/`,
   branch `feat/2026-10-30-skin-fonts-feedback` in every repo it touches), ships in `LibKa0s v1.82.0`
   and re-vendors every adopted addon onto it. Its rulings that change the standard are ruled at
-  v2.93.0: three faces ship and the unused ones leave the payload, under a license rule
+  v2.93.0: two new faces ship (Prototype and Fira Sans Medium) and the unused ones leave the
+  payload, under a license rule that refused the third the owner asked for, Expressway
   (library-stack-§8); each skin's faces are named (skinning-§4); text width and HUD sizes are
   skin-invariant, measured with the outline on (skinning-§4); an enabled button reads as enabled in
   every skin (skinning-§4); a skin change resets the overrides, and the *Font outline* choice joins
@@ -307,6 +308,11 @@ Items recorded for future versions of this standard:
   anchor-width check across every addon (above) and the real Friz Quadrata measurement (next entry).
   These rules bind an adopted addon from its re-vendor of `v1.82.0`, not yet tagged. Re-check when the
   run merges: close this entry.
+- **Obsidian's face (recorded, not ruled).** The owner's ruling of 2026-10-30 named Ka0s Expressway
+  for Obsidian's body, titles and HUD, and library-stack-§8 refused it, because its distributed
+  license forbids embedding it in software. Obsidian keeps Ka0s Inter and Ka0s Inter SemiBold
+  (skinning-§4) and its width-parity sizes are measured on them. Re-check when the owner names
+  another face for it.
 - **WoW Default's sizes against real Friz Quadrata (recorded, not ruled).** Width parity
   (skinning-§4) holds every skin's sizes to Ka0s Default's widths, but on the owner's client the file
   at `Fonts/FRIZQT__.TTF` is byte-identical to Ka0s Prototype, so the face the WoW Default skin
