@@ -118,8 +118,8 @@ What a Ka0s addon inherits, so its own tiers are placed around known neighbors. 
 | `LibKa0s-Options-1.0` combat cover | inherited | `max(panel + 100, deepest + 1)`, capped 10000 | — |
 | Blizzard Settings panel | `HIGH` | Blizzard | toplevel |
 | Blizzard StaticPopups | `DIALOG` | Blizzard | toplevel |
-| AceGUI pullouts and color picker | `FULLSCREEN_DIALOG` | AceGUI | clamped |
-| AceGUI-3.0-SharedMediaWidgets pullouts; AceConfigDialog confirmation | `TOOLTIP` (the latter at level 100) | — | — |
+| AceGUI pullouts, the `Ka0sMedia_*` picker's among them, and color picker | `FULLSCREEN_DIALOG` (a pullout lifts to `TOOLTIP` while open) | AceGUI | clamped |
+| AceConfigDialog confirmation | `TOOLTIP` | 100 | — |
 | LibDBIcon minimap button | `MEDIUM`, fixed | 8, fixed | — |
 
 Third-party rows are documented, not fought: an addon **MUST NOT** re-strata a third-party or shared Blizzard frame except by the lift-and-restore of §4.

@@ -527,9 +527,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      re-vendor item, not a deviation; from that gate's tag on, the missing line is #95.
    - **Check no stub mirrors a removed `__` member** (library-stack-§7, *A documented-internal `__`
      member with no consumer is not contract*). A library-absent stub that still mirrors a `__` member
-     the bundled tag removed (from `LibKa0s v1.75.0`, `O.__releaseChrome`) is a finding, cited
-     `file:line`: the member is dead and the stub line is removed at re-vendor. A consumer call to a
-     documented, live `__` member (`__PatchLSM30Border`, `__IsCombatLocked`, `__AttachCompose`,
+     the bundled tag removed (from `LibKa0s v1.75.0`, `O.__releaseChrome`; from `LibKa0s v1.84.0`,
+     `lib.__PatchLSM30Border`) is a finding, cited `file:line`: the member is dead and the stub line
+     is removed at re-vendor. So is a consumer call to a removed member, which raises. A consumer call
+     to a documented, live `__` member (`__MediaWidgetType`, `__IsCombatLocked`, `__AttachCompose`,
      `__panels`) is **not** a finding: those remain contract.
    - **Check the shared media is used, not duplicated** (library-stack-§8, layout-§3). The face and
      the textures under `libs/LibKa0s/media/` are present in **every** addon whether or not it wires
@@ -1141,8 +1142,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        consumer drawing its own row fill, border or handle, a control placed left of the handle, a
        list of unequal row heights, or a drag that can cross a fixed section boundary is the finding.
      - **(f) No hand-written font, border or bar group (options-ui-§16).** Grep the settings files for
-       the shared-media dropdown controls (`LSM30_Font`, `LSM30_Border`, `LSM30_Statusbar`, and the
-       `Ka0sMedia_*` type for the same kind): on an
+       the media picker controls (`Ka0sMedia_Font`, `Ka0sMedia_Border`, `Ka0sMedia_Statusbar`, and a
+       leftover `LSM30_*` name for the same kind): on an
        addon whose vendored library carries the composers, the grep is a **finder, not the
        finding**: a hit is a deviation when the rows around it **reproduce a mandated block**,
        which is what its *companions* tell you — a font copy carries size, flags, shadow or the
@@ -1260,9 +1261,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        page to hide rows in place of `shownWhen`; read each dropdown whose values own row groups. From
        the addon's re-vendor of `LibKa0s v1.82.0`, a font setting carrying fewer than the whole Font
        block (face, size, color and class color, flags, shadow) is a §16 finding.
-     - **(m) Every media picker previews its entries (options-ui-§23, anti-pattern #109, v2.94.0).**
-       From the addon's re-vendor of `LibKa0s v1.83.0`, adopted or not. Code only, `libs/` and
-       `tests/_kit/` excluded:
+     - **(m) Every media picker previews its entries (options-ui-§23, anti-pattern #109, v2.94.0;
+       one picker from v2.95.0).** From the addon's re-vendor of `LibKa0s v1.83.0`, adopted or not.
+       Code only, `libs/` and `tests/_kit/` excluded:
 
        ```bash
        grep -rnE '(:|LSM\.)(List|HashTable)\(|LSMValues\(' \
@@ -1272,11 +1273,23 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        The kind is often a variable, and rows usually take their keys from `O.LSMValues` or
        `H.LSMValues`, so the finder matches the calls rather than a literal kind; follow a helper to
        the rows it feeds. A hit on a list that holds no media keys is not a finding. Read each hit: a
-       key list feeding a row whose `dialogControl` is an `LSM30_*` or `Ka0sMedia_*` type is compliant,
+       key list feeding a row whose `dialogControl` is a `Ka0sMedia_*` type is compliant,
        and one feeding a row with no `dialogControl`, a plain `Dropdown` or a `LibKa0s-Widgets-1.0`
        flat dropdown, on a settings page or in a window, is #109. So is a hand-built pull-out over those keys. A key
        list used to resolve or validate a value, with no picker drawn from it, is not a finding. How
        the rows look is the owner's in-client smoke.
+
+       From the addon's re-vendor of `LibKa0s v1.84.0`, `Ka0sMedia_*` is the only picker, and any
+       hit here is #109: a row naming `LSM30_*` (it draws the picker, but the name is the finding),
+       an `AceGUI:Create("LSM30_*")`, or a vendored SharedMediaWidgets:
+
+       ```bash
+       grep -rn 'LSM30_' --include='*.lua' core modules settings
+       ls -d libs/AceGUI-3.0-SharedMediaWidgets
+       ```
+
+       An addon's own window that creates the picker from `lib.__MediaWidgetType(kind)` is
+       compliant. On an older vendor all of this is a re-vendor item, not a finding.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a

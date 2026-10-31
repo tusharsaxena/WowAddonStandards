@@ -102,7 +102,7 @@ A skin reaches the HUD too: bars, icons, glows and HUD text. A HUD style setting
 
 ### 7. What a skin never touches, and the rules it rescopes (MUST)
 
-**Never a Blizzard shared frame.** A skin paints the addon's own frames and the library's. It never restyles `SettingsPanel`'s chrome, a `StaticPopup`, `GameTooltip` itself, `ColorPickerFrame` or AceGUI-3.0-SharedMediaWidgets' pull-outs. Lines the addon writes onto `GameTooltip` take their colors from the skin; the frame keeps Blizzard's look. The `Ka0sMedia_*` picker's pull-out (options-ui-§23) is none of these: it is the library's own frame, so it wears the opener's skin and obeys the Scope as a widget on a settings page does (§1). Its font rows keep their own faces (§3).
+**Never a Blizzard shared frame.** A skin paints the addon's own frames and the library's. It never restyles `SettingsPanel`'s chrome, a `StaticPopup`, `GameTooltip` itself or `ColorPickerFrame`. Lines the addon writes onto `GameTooltip` take their colors from the skin; the frame keeps Blizzard's look. The `Ka0sMedia_*` picker's pull-out, the collection's only media pull-out (options-ui-§23), is none of these: it is the library's own frame, so it wears the opener's skin and obeys the Scope as a widget on a settings page does (§1). Its font rows keep their own faces (§3).
 
 **No taint.** No `Hide`, `SetParent` or `SetScript` on a Blizzard frame (a skin replaces no Blizzard frame, so events-frames-taint-§3's hidden-parent case never arises); no `SetBackdrop` on a Blizzard template; nothing written into a Blizzard frame's table. The state a primitive records (prior colors, alpha, font, the holders it created) lives in a weak-keyed table on the library, never on the frame.
 
