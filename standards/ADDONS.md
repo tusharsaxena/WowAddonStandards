@@ -23,6 +23,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Enabled · Locked · Test mode · Show window (the race HUD) |
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Enabled · Locked · Test mode · Show window (the drop feed) |
 | Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked |
+| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) |
 | Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) |
 | Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) |
 | Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked |
@@ -30,7 +31,6 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled |
 | Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled |
 | Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Enabled · Locked · Test mode · Show window (its Comms Pads) |
-| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) |
 
 **The launcher column is normative input to an audit, not decoration.** Every addon ships one minimap button and one
