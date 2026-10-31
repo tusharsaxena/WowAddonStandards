@@ -527,9 +527,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      re-vendor item, not a deviation; from that gate's tag on, the missing line is #95.
    - **Check no stub mirrors a removed `__` member** (library-stack-§7, *A documented-internal `__`
      member with no consumer is not contract*). A library-absent stub that still mirrors a `__` member
-     the bundled tag removed (from `LibKa0s v1.75.0`, `O.__releaseChrome`) is a finding, cited
-     `file:line`: the member is dead and the stub line is removed at re-vendor. A consumer call to a
-     documented, live `__` member (`__PatchLSM30Border`, `__MediaWidgetType`, `__IsCombatLocked`, `__AttachCompose`,
+     the bundled tag removed (from `LibKa0s v1.75.0`, `O.__releaseChrome`; from `LibKa0s v1.84.0`,
+     `lib.__PatchLSM30Border`) is a finding, cited `file:line`: the member is dead and the stub line
+     is removed at re-vendor. So is a consumer call to a removed member, which raises. A consumer call
+     to a documented, live `__` member (`__MediaWidgetType`, `__IsCombatLocked`, `__AttachCompose`,
      `__panels`) is **not** a finding: those remain contract.
    - **Check the shared media is used, not duplicated** (library-stack-§8, layout-§3). The face and
      the textures under `libs/LibKa0s/media/` are present in **every** addon whether or not it wires
