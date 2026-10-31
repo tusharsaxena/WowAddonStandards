@@ -97,7 +97,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      name, CC BY 3.0, <https://game-icons.net>, the shipped marks' authors, a modified-marks
      statement; missing is a **MUST** finding), each shipped MIT set (Open Iconic, Phosphor) named
      with author, license and link (missing is a **SHOULD** finding), and no credit line for a set
-     the prune removed; the
+     the prune removed; the README carries **no font license or font credit text**, in `## Credits`
+     or anywhere else (documentation-§1 item 12, v2.94.0, read `grep -inE 'font|OFL' README.md`; a
+     Ka0s-owned library's root README is held to the same); the
      README carries **no numbered list** — `grep -nE '^[[:space:]]*[0-9]+[.)][[:space:]]' README.md`
      is empty outside a fenced code block, because CurseForge's description page does not render one
      and every list there is a `- ` bullet list (v2.72.0; a hit is a documentation-§1 **MUST**
@@ -968,8 +970,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      before `Keybindings` (last where there is none), drawn by `O.AppearanceTab` or
      `O.AppearanceRows`; a hand-built picker is #47. The profile defaults store *Ignore settings
      panel* on and *Ignore fonts* off (skinning-§3).
-     From the addon's re-vendor of `LibKa0s v1.82.0`: the profile defaults store `skin.outline` as
-     `all`, through the write seam like the Scope; the `COMMANDS` table carries a `skin` row directly
+     From the addon's re-vendor of `LibKa0s v1.82.0`: the profile defaults store `skin.outline`
+     (`hud` from its re-vendor of `v1.83.0`, `all` before it), through the write seam like the Scope; the `COMMANDS` table carries a `skin` row directly
      after `config` whose handler reaches `O.SkinVerb` (`NS.RunSkinVerb`), with no alias and no
      hand-built window (#47), no `liveVerbs` the host passes lists `skin` (it is refused while
      disabled), and the Options stub answers `SkinVerb`; nothing in the addon's own code
@@ -1139,7 +1141,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        consumer drawing its own row fill, border or handle, a control placed left of the handle, a
        list of unequal row heights, or a drag that can cross a fixed section boundary is the finding.
      - **(f) No hand-written font, border or bar group (options-ui-§16).** Grep the settings files for
-       the shared-media dropdown controls (`LSM30_Font`, `LSM30_Border`, `LSM30_Statusbar`): on an
+       the shared-media dropdown controls (`LSM30_Font`, `LSM30_Border`, `LSM30_Statusbar`, and the
+       `Ka0sMedia_*` type for the same kind): on an
        addon whose vendored library carries the composers, the grep is a **finder, not the
        finding**: a hit is a deviation when the rows around it **reproduce a mandated block**,
        which is what its *companions* tell you — a font copy carries size, flags, shadow or the
@@ -1257,6 +1260,20 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        page to hide rows in place of `shownWhen`; read each dropdown whose values own row groups. From
        the addon's re-vendor of `LibKa0s v1.82.0`, a font setting carrying fewer than the whole Font
        block (face, size, color and class color, flags, shadow) is a §16 finding.
+     - **(m) Every media picker previews its entries (options-ui-§23, anti-pattern #109, v2.94.0).**
+       From the addon's re-vendor of `LibKa0s v1.83.0`, adopted or not. Code only, `libs/` and
+       `tests/_kit/` excluded:
+
+       ```bash
+       grep -rnE '(:|\.)(List|HashTable)\("(font|statusbar|border|background|sound)"\)' \
+         --include='*.lua' core modules settings
+       ```
+
+       Read each hit: a key list feeding a row whose `dialogControl` is an `LSM30_*` or `Ka0sMedia_*`
+       type is compliant, and one feeding a plain `Dropdown` or a `LibKa0s-Widgets-1.0` flat dropdown,
+       on a settings page or in a window, is #109. So is a hand-built pull-out over those keys. A key
+       list used to resolve or validate a value, with no picker drawn from it, is not a finding. How
+       the rows look is the owner's in-client smoke.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder
        widget or the mandatory strip has nothing to adopt yet. Say which tag it carries (root
        `CLAUDE.md`'s provenance line) and file the adoption as a re-vendor item rather than as a

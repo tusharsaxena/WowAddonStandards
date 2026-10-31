@@ -428,16 +428,16 @@ nothing at all — and a texture that does not load draws nothing and raises not
 under the same rules:
 
 - **The display faces the skins name**, beside the monospace one, each registered under a `Ka0s`
-  key and listed in `FONTS`, with the file recording its terms shipped beside it. The catalog is the
-  list, and this standard does not restate it (it first shipped five faces in `LibKa0s v1.78.0`, and
+  key and listed in `FONTS`, each recorded in `LibKa0s/media/fonts/FONTS.md` with its license files
+  beside it. The catalog is the list, and this standard does not restate it (it first shipped five faces in `LibKa0s v1.78.0`, and
   the set has changed in most minors since). Which face each skin draws is skin data (skinning-§4).
 - **A face ships only under terms that allow redistributing it with a free addon, or on an owner
   ruling that names it (MUST, v2.93.0).** The SIL Open Font License 1.1 is the default. A face under
-  any other terms ships only on a recorded owner ruling that names the face, with its terms file beside
-  it verbatim and the library's media test naming those terms, so a face whose license file is missing
-  or unnamed fails a test. The ruling is quoted where the face is registered and recorded in the
-  library's changelog and README credits, together with what its terms say; a face no ruling names
-  ships only under OFL. From `LibKa0s v1.82.0` two faces ship this way, each on an owner ruling of
+  any other terms ships only on a recorded owner ruling that names the face, with any terms file its
+  source distributes beside it verbatim and the library's media test naming the record, so a face with
+  no record fails a test. The ruling is quoted where the face is registered and recorded in the
+  library's changelog and in `FONTS.md`, together with what its terms or its name table say; a face no
+  ruling names ships only under OFL. No README carries this record (documentation-§1 item 12). From `LibKa0s v1.82.0` two faces ship this way, each on an owner ruling of
   2026-10-30. **Ka0s Prototype**, whose own name table reads "free for personal use, freely
   distributed with Prototype.txt", ships with its `Prototype.txt` verbatim, taken from its public
   distribution; the owner ruled that those terms allow it to ship with a free addon and accepted the
@@ -446,11 +446,16 @@ under the same rules:
   EULA, which puts embedding in software outside the free license, and that the file's own embedding
   bits and notice say the same ("Do not distribute"). It ships as the owner's pack copy, the face the
   client already loads, with the archive's EULA files beside it as its terms record, and the owner
-  carries the risk those terms describe (`LibKa0s v1.82.0`'s changelog).
-- **A face no skin names leaves the payload** in the next library minor, together with its terms
-  file, once a search of every consumer's tree proves nothing names it. A saved choice naming a removed
-  face needs no migration, because an unknown face already falls back to the skin's own. The monospace
-  face stays, because the debug console names it (debug-logging-§2).
+  carries the risk those terms describe (`LibKa0s v1.82.0`'s changelog). From `LibKa0s v1.83.0` the
+  owner's rulings of 2026-10-31 name Ka0s Friz Quadrata TT, the four Ka0s Segoe UI weights, the five
+  Ka0s Open Sans weights, Ka0s Emblem, Ka0s Doris PP and Ka0s Avant Garde. Open Sans is Apache 2.0 by
+  its name table. The others carry third-party copyright lines, most reserving all rights; the owner
+  ruled on the Segoe UI weights after hearing they are Microsoft's, that the repos are public and that
+  they add 3.7 MB per addon, and carries the risk. `FONTS.md` records each.
+- **A face no skin names stays in the payload (owner ruling of 2026-10-31, from `LibKa0s v1.83.0`).**
+  The player can still pick it as an override. This replaces the earlier rule, which removed such a
+  face in the next library minor. A saved choice naming a face that did leave needs no migration,
+  because an unknown face already falls back to the skin's default.
 - **Every face carries its own locale mask**, a per-entry field of `FONTS` rather than one mask for
   the catalog, read from the shipped bytes' character map: a Latin-only face is Western-only, and the
   monospace face keeps its Western-plus-Russian mask. A face is registered only for the locales it

@@ -307,14 +307,23 @@ Items recorded for future versions of this standard:
   keep to the characters every shipped face draws (localization-§7). Its `LibKa0s` issues, filed
   after the release: the conditional-sections sweep across every addon (options-ui-§22), the
   anchor-width check across every addon (above) and the real Friz Quadrata measurement (next entry).
-  These rules bind an adopted addon from its re-vendor of `v1.82.0`, not yet tagged. Re-check when the
+  These rules bind an adopted addon from its re-vendor of `v1.82.0`, tagged locally and not yet pushed. Re-check when the
   run merges: close this entry.
-- **WoW Default's sizes against real Friz Quadrata (recorded, not ruled).** Width parity
-  (skinning-§4) holds every skin's sizes to Ka0s Default's widths, but on the owner's client the file
-  at `Fonts/FRIZQT__.TTF` is byte-identical to Ka0s Prototype, so the face the WoW Default skin
-  actually draws has not been measured, and neither has its character coverage (localization-§7).
-  WoW Default's sizes stay as they were. Re-check when the `LibKa0s` measurement issue filed by the
-  run above closes.
+- ~~**WoW Default's sizes against real Friz Quadrata.**~~ **Settled by the run below.** On the owner's
+  client `Fonts/FRIZQT__.TTF` is byte-identical to Ka0s Prototype, so the face WoW Default drew could
+  not be measured. `LibKa0s v1.83.0` ships real Friz Quadrata as `Ka0s Friz Quadrata TT` and the skin
+  draws it, so its sizes and character coverage are measured like every other skin's (skinning-§4,
+  localization-§7). The owner's client file is left alone.
+- **Font pickers and skin faces (in progress, recorded).** The owner's batch of 2026-10-31
+  (Ka0sAddonsCommonTasks `docs/2026-10-31-FONT_PICKERS_AND_SKIN_FACES/`, branch
+  `feat/2026-10-31-font-pickers-skin-faces` in every repo it touches, stacked on the run above) ships
+  in `LibKa0s v1.83.0` and re-vendors every addon onto it. Its rulings at v2.94.0: every media picker
+  previews its entries (options-ui-§23, anti-pattern #109); the font override label reads
+  *Skin's default* and the default outline is *HUD text only* (skinning-§3); five skins change face and
+  a font override of a Ka0s face scales to Prototype's width (skinning-§4); faces no skin names stay
+  in the payload and font license and credit text leaves every README (library-stack-§8,
+  documentation-§1 item 12). These rules bind from the re-vendor of `v1.83.0`, not yet tagged. Re-check
+  when the run merges: close this entry.
 - **Ka0s Default's split tokens (recorded, not ruled).** Where two call sites drew one role in two
   colors before skins, Ka0s Default keeps both values as two tokens, so that adopting changes no
   pixel; the list is in `LibKa0s` `docs/api/Skin`. Each pair is a candidate to merge into one token
