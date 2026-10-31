@@ -1265,13 +1265,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `tests/_kit/` excluded:
 
        ```bash
-       grep -rnE '(:|\.)(List|HashTable)\("(font|statusbar|border|background|sound)"\)' \
+       grep -rnE '(:|LSM\.)(List|HashTable)\(|LSMValues\(' \
          --include='*.lua' core modules settings
        ```
 
-       Read each hit: a key list feeding a row whose `dialogControl` is an `LSM30_*` or `Ka0sMedia_*`
-       type is compliant, and one feeding a plain `Dropdown` or a `LibKa0s-Widgets-1.0` flat dropdown,
-       on a settings page or in a window, is #109. So is a hand-built pull-out over those keys. A key
+       The kind is often a variable, and rows usually take their keys from `O.LSMValues` or
+       `H.LSMValues`, so the finder matches the calls rather than a literal kind; follow a helper to
+       the rows it feeds. A hit on a list that holds no media keys is not a finding. Read each hit: a
+       key list feeding a row whose `dialogControl` is an `LSM30_*` or `Ka0sMedia_*` type is compliant,
+       and one feeding a row with no `dialogControl`, a plain `Dropdown` or a `LibKa0s-Widgets-1.0`
+       flat dropdown, on a settings page or in a window, is #109. So is a hand-built pull-out over those keys. A key
        list used to resolve or validate a value, with no picker drawn from it, is not a finding. How
        the rows look is the owner's in-client smoke.
      - **Not a deviation:** an addon on a LibKa0s tag that predates the composers, the reorder

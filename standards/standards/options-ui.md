@@ -568,14 +568,15 @@ A list of font names tells the player nothing about the fonts. Every picker over
 | Kind | Each row of the pull-out shows |
 |---|---|
 | Font | its name, drawn in that face |
-| Status-bar texture | its name over a swatch of that bar |
+| Status-bar texture | its name with a swatch of that bar |
 | Border | its name beside a sample of that border |
 | Background | its name beside a sample of that background |
 | Sound | its name with a control that plays it |
 
-- **Two widget families satisfy it, and nothing else does.** `LSM30_*` rows from AceGUI-3.0-SharedMediaWidgets, or the library's self-contained `Ka0sMedia_*` AceGUI types (from `LibKa0s v1.83.0`), one per kind, named in the library's Options API document. An addon that does not vendor SharedMediaWidgets uses the `Ka0sMedia_*` types and owes no new vendored library.
+- **Two widget families satisfy it, and nothing else does.** `LSM30_*` rows from AceGUI-3.0-SharedMediaWidgets, or the library's self-contained `Ka0sMedia_*` AceGUI types (from `LibKa0s v1.83.0`), one per kind, named in the library's Options API document. On a settings page an addon that does not vendor SharedMediaWidgets names a `Ka0sMedia_*` type as the row's `dialogControl`, or an `LSM30_*` type (next bullet), and owes no new vendored library.
 - **The library closes the gap.** From `LibKa0s v1.83.0` a row naming an `LSM30_*` type that is not registered draws the matching `Ka0sMedia_*` type, never the plain Dropdown it fell back to before, so a composed group (§16) previews on a load without SharedMediaWidgets.
-- **The Skin tab and the first-run picker always use the `Ka0sMedia_*` types**, because they take the leading *Skin's default (X)* row (skinning-§3).
-- **A plain dropdown over media keys is the finding, wherever it is drawn.** That is an AceGUI `Dropdown` or a `LibKa0s-Widgets-1.0` flat dropdown, on a settings page or in the addon's own window, whose values come from `LSM:List` or `LSM:HashTable` (**anti-pattern #109**). A dropdown over values that are not media keys, such as *Font flags* or *Frame strata*, is not a picker in this sense.
+- **The Skin tab always uses the `Ka0sMedia_*` types**, because its font and texture rows lead with *Skin's default (X)* (skinning-§3). The first-run picker offers skins, not media keys, so this section does not reach it.
+- **A window has no public route to the `Ka0sMedia_*` types yet.** They are registered on first ask, through the internal `lib.__MediaWidgetType`, and only a schema row and the Skin tab ask. `AceGUI:Create("Ka0sMedia_Font")` in an addon's own window therefore raises AceGUI's unknown-widget error unless something else asked first, and it stays unpainted for that owner unless the host calls `Skin:PaintAce`. Until the library publishes a seam (open-evolutions), a media picker in a window uses `LSM30_*` from a vendored SharedMediaWidgets.
+- **A plain dropdown over media keys is the finding, wherever it is drawn.** That is an AceGUI `Dropdown` or a `LibKa0s-Widgets-1.0` flat dropdown, on a settings page or in the addon's own window, whose values come from `LSM:List` or `LSM:HashTable`, directly or through `O.LSMValues` (**anti-pattern #109**). A dropdown over values that are not media keys, such as *Font flags* or *Frame strata*, is not a picker in this sense.
 - **Who paints the pull-out.** SharedMediaWidgets' pull-outs stay stock; the `Ka0sMedia_*` pull-out wears the skin (skinning-§7).
 - **Commencement.** An addon's re-vendor of `LibKa0s v1.83.0`, adopted or not. An older vendor is a re-vendor item, not a finding. The check is AUDIT.md's settings check (m).

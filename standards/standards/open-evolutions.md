@@ -319,11 +319,15 @@ Items recorded for future versions of this standard:
   `feat/2026-10-31-font-pickers-skin-faces` in every repo it touches, stacked on the run above) ships
   in `LibKa0s v1.83.0` and re-vendors every addon onto it. Its rulings at v2.94.0: every media picker
   previews its entries (options-ui-§23, anti-pattern #109); the font override label reads
-  *Skin's default* and the default outline is *HUD text only* (skinning-§3); five skins change face and
+  *Skin's default* and the default outline is *HUD text only* (skinning-§3); six skins change face and
   a font override of a Ka0s face scales to Prototype's width (skinning-§4); faces no skin names stay
   in the payload and font license and credit text leaves every README (library-stack-§8,
-  documentation-§1 item 12). These rules bind from the re-vendor of `v1.83.0`, not yet tagged. Re-check
-  when the run merges: close this entry.
+  documentation-§1 item 12). These rules bind from the re-vendor of `v1.83.0`, tagged locally and not
+  yet pushed. Re-check when the run merges: close this entry.
+- **A public route to the `Ka0sMedia_*` types (recorded, not ruled).** `LibKa0s v1.83.0` registers them
+  only through the internal `lib.__MediaWidgetType`, so an addon's own window cannot create one
+  reliably and uses `LSM30_*` (options-ui-§23). No addon needs one today. Re-check when a window
+  without SharedMediaWidgets needs a media picker: the library publishes a seam first.
 - **Ka0s Default's split tokens (recorded, not ruled).** Where two call sites drew one role in two
   colors before skins, Ka0s Default keeps both values as two tokens, so that adopting changes no
   pixel; the list is in `LibKa0s` `docs/api/Skin`. Each pair is a candidate to merge into one token
