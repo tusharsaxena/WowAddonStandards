@@ -7,7 +7,7 @@ into the player's language via `NS.L`. Section 4 governs the addon's **input** �
 arrives *already* in the player's language, so any logic that branches on a localized display string
 silently breaks on every client whose locale differs from the author's. Both directions are mandatory.
 Section 5 fixes the **source dialect** every English string in the collection is written in.
-Section 6 says how a locale file is **split** when it would pass layout-§1's 1500-line cap.
+Section 6 says how a locale file is **split** when it would pass layout-§1's 1500-line cap. Section 7 fixes the **characters** a displayed string may use, so that every face a skin names can draw it.
 
 ### 1. Module shape
 
@@ -427,3 +427,13 @@ key, the file list read from the TOC or pinned equal to it, the duplicate-key fa
 line's `LOAD-BEARING` comment. The translation mirror is new, because the addon ships no other locale.
 As measured on 2026-10-18 no other addon in the roster has split a locale file. The largest single
 `enUS.lua` outside Drop Watcher was MultiMeters' at 1062 lines, in the 1000–1500 band.
+
+### 7. Display characters every shipped face draws (MUST, v2.93.0)
+
+A face that lacks a character draws a box in its place, so a string that reads well under one skin breaks under the next. The measured case: a browser footer that wrote its database size as `≈ 1.6 MB` read "Database [] 1.6 MB" under a skin whose face has no `≈` (owner ruling of 2026-10-30).
+
+- **The safe set.** A string the addon or the library paints in a skinned face (every string under skinning-§1) uses only printable ASCII and these characters, which every display face a shipped skin names draws (first drawn from the character-map survey of the run that ships `LibKa0s v1.82.0`; the set the library's glyph guard generates from the faces that tag actually ships, Prototype, Expressway and Fira Sans 4.203 among them, is the authority, below): `—` `–` `…` `•` `·` `×` `›` `§` `°` `±` `‘` `’` `“` `”` `£` `¥`, the no-break space, and `é` `ê` `è` `à` `â` `ä` `ö` `ü` `ù` `É` `Ä` `Ö` `Ü`. Every face `LibKa0s v1.83.0` adds draws them all, Friz Quadrata, the WoW Default skin's face, included, measured on the source files of that run.
+- **Anything else is replaced, with the fix fitted to the string:** ASCII for a symbol in prose (`~` for `≈`, `!=` for `≠`, `->` or the word "to" for `→`), a catalog mark for an icon (library-stack-§8), or the glyph drawn in its own `FontString` pinned to the monospace face, which carries the arrows and triangles (debug-logging-§2). A glyph is never kept because the Ka0s Default face happens to draw it.
+- **Exempt:** game data the client hands over (item, player, spell and zone names), a string sent to chat (it draws in the chat frame's font, not a skin face), and test data.
+- **Guarded.** The library's test kit carries a glyph guard (from `LibKa0s v1.82.0`) that fails a display string carrying a character outside the safe set; an addon's suite calls it on the strings its footer, panel and tooltip tests already build. The guard's set is generated from the faces the library actually ships, so it is the authority: a face added or replaced is checked against it before it ships, a narrower face narrows it in the same library minor, and this list follows the guard in the standard's next release.
+- **Commencement.** Each addon's next release after v2.93.0. A stray is a finding against this section (there is no anti-pattern; it is AUDIT.md's localization read).

@@ -119,6 +119,11 @@ Items recorded for future versions of this standard:
   addon's lock/unlock state is expressed through, so a handle rule and the preview rules must agree
   about when the strip is on screen.
 
+  From `LibKa0s v1.82.0` the library's handle re-measures its title in its own font on every skin
+  repaint, so it fits under every shipped skin (skinning-§4, *Text width is skin-invariant*), and a
+  `LibKa0s` issue checks every addon's anchors once the faces and sizes are frozen (the run of
+  2026-10-30, below). Re-check this question when that issue closes.
+
 - **The schema write seam's name and call style (recorded, not ruled).** The standard names the seam
   twice and two ways. architecture-§5 reads *"one helper: `NS.Schema:Set(path, value)`"* — a colon
   method on `NS.Schema`; slash-commands-§3's descriptor example reads `set = function(path, v)
@@ -267,7 +272,7 @@ Items recorded for future versions of this standard:
   EllesmereUI bridge retired for the library's `eui` source, its saved choice migrated and its
   ratified register row (library-stack-§6) retired with it. The run merged on 2026-10-29 and
   `v1.80.0` is tagged. Each addon is bound from the commit that adopted, as skinning-§8 says.
-- **The skinning rollout's library follow-ups (in progress, recorded).** The rollout left nine
+- ~~**The skinning rollout's library follow-ups.**~~ **Shipped.** The rollout left nine
   `LibKa0s` follow-ups and one open call. The follow-up run (Ka0sAddonsCommonTasks
   `docs/2026-10-30-SKIN_LIBRARY_FOLLOWUPS/`, branch `feat/2026-10-30-skin-library-followups` in
   every repo it touches) fixes them in `LibKa0s v1.81.0` and re-vendors every adopted addon onto it,
@@ -283,8 +288,46 @@ Items recorded for future versions of this standard:
   handle's tooltip and the library's other tooltip lines take the skin's tooltip colors, the `q.*`
   tokens match the client's quality colors exactly, `Skin:DrawsKey(owner)` is public, and the
   first-run picker's title reads "Choose a skin" with the addon's name on its own line above the
-  dropdown. These rules bind an adopted addon from its re-vendor of `v1.81.0`, not yet tagged.
-  Re-check when the run merges: close this entry.
+  dropdown. These rules bind an adopted addon from its re-vendor of `v1.81.0`. The run merged on
+  2026-10-30, `v1.81.0` is tagged, and the owner's smoke pass is recorded in its bundle.
+- **Skin fonts and the owner's feedback (in progress, recorded).** The owner's batch of 2026-10-30,
+  given after the follow-ups' smoke pass (Ka0sAddonsCommonTasks `docs/2026-10-30-SKIN_FONTS_AND_FEEDBACK/`,
+  branch `feat/2026-10-30-skin-fonts-feedback` in every repo it touches), ships in `LibKa0s v1.82.0`
+  and re-vendors every adopted addon onto it. Its rulings that change the standard are ruled at
+  v2.93.0: three new faces ship (Prototype, Expressway and Fira Sans Medium) and the unused ones,
+  Inter among them, leave the payload, under a license rule that ships a non-OFL face only on a
+  recorded owner ruling naming it, as the owner's rulings name Prototype and Expressway
+  (library-stack-§8); each skin's faces are named (skinning-§4); text width and HUD sizes are
+  skin-invariant, measured with the outline on (skinning-§4); an enabled button reads as enabled in
+  every skin (skinning-§4); a skin change resets the overrides, and the *Font outline* choice joins
+  the Skin tab (skinning-§3, skinning-§6); every font setting is the whole block, its flags following
+  the skin by default (options-ui-§16); `/<slash> skin` is reserved (slash-commands-§2,
+  skinning-§3); a HUD display may go unmarked in test mode and carries no simulation marker
+  (preview-mode); sections a choice does not use are hidden (options-ui-§22); and displayed strings
+  keep to the characters every shipped face draws (localization-§7). Its `LibKa0s` issues, filed
+  after the release: the conditional-sections sweep across every addon (options-ui-§22), the
+  anchor-width check across every addon (above) and the real Friz Quadrata measurement (next entry).
+  These rules bind an adopted addon from its re-vendor of `v1.82.0`, tagged locally and not yet pushed. Re-check when the
+  run merges: close this entry.
+- ~~**WoW Default's sizes against real Friz Quadrata.**~~ **Settled by the run below.** On the owner's
+  client `Fonts/FRIZQT__.TTF` is byte-identical to Ka0s Prototype, so the face WoW Default drew could
+  not be measured. `LibKa0s v1.83.0` ships real Friz Quadrata as `Ka0s Friz Quadrata TT` and the skin
+  draws it, so its sizes and character coverage are measured like every other skin's (skinning-§4,
+  localization-§7). The owner's client file is left alone.
+- **Font pickers and skin faces (in progress, recorded).** The owner's batch of 2026-10-31
+  (Ka0sAddonsCommonTasks `docs/2026-10-31-FONT_PICKERS_AND_SKIN_FACES/`, branch
+  `feat/2026-10-31-font-pickers-skin-faces` in every repo it touches, stacked on the run above) ships
+  in `LibKa0s v1.83.0` and re-vendors every addon onto it. Its rulings at v2.94.0: every media picker
+  previews its entries (options-ui-§23, anti-pattern #109); the font override label reads
+  *Skin's default* and the default outline is *HUD text only* (skinning-§3); six skins change face and
+  a font override of a Ka0s face scales to Prototype's width (skinning-§4); faces no skin names stay
+  in the payload and font license and credit text leaves every README (library-stack-§8,
+  documentation-§1 item 12). These rules bind from the re-vendor of `v1.83.0`, tagged locally and not
+  yet pushed. Re-check when the run merges: close this entry.
+- **A public route to the `Ka0sMedia_*` types (recorded, not ruled).** `LibKa0s v1.83.0` registers them
+  only through the internal `lib.__MediaWidgetType`, so an addon's own window cannot create one
+  reliably and uses `LSM30_*` (options-ui-§23). No addon needs one today. Re-check when a window
+  without SharedMediaWidgets needs a media picker: the library publishes a seam first.
 - **Ka0s Default's split tokens (recorded, not ruled).** Where two call sites drew one role in two
   colors before skins, Ka0s Default keeps both values as two tokens, so that adopting changes no
   pixel; the list is in `LibKa0s` `docs/api/Skin`. Each pair is a candidate to merge into one token

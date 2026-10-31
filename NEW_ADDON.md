@@ -85,8 +85,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    Skins (skinning) are optional until the collection's skin rollout reaches the addon: it **MAY**
    adopt from its first release, with a `core/SkinSetup.lua` that calls `Skin:RegisterOwner(addonName)`
    at file load and a Skin tab before Keybindings, and is not required to. Either way, its
-   Options stub answers `AppearanceTab` and `AppearanceRows` (the pack's hard rule 24b and its
-   definition-of-done line).
+   Options stub answers `AppearanceTab` and `AppearanceRows`, and `SkinVerb` on `LibKa0s v1.82.0` or
+   later, and an adopted addon registers the `skin` verb directly after `config` (the pack's hard
+   rules 8a and 24b and its definition-of-done line).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
@@ -318,8 +319,8 @@ disagreeing with the collection's intent while looking, in review, like it had b
    anti-pattern #79) and **no bundled-library inventory** — no `## Libraries` / `## Bundled libraries` /
    `## Libraries and credits` section and no library list in the intro prose; that fact lives in
    `DEPENDENCIES.md` and `docs/ARCHITECTURE.md`, and the LibKa0s provenance line lives in root
-   `CLAUDE.md` (step 6a). `## Credits` carries only external credit — artwork, a font, a sound pack,
-   another author's work — and **must** credit Game-icons (and **should** credit each MIT icon set)
+   `CLAUDE.md` (step 6a). `## Credits` carries only external credit — artwork, a sound pack,
+   another author's work, never a font's license or credit — and **must** credit Game-icons (and **should** credit each MIT icon set)
    that the addon's `LibKa0s icons:` line ships (documentation-§1 item 12): the set's name, author,
    license and link, and for Game-icons <https://game-icons.net>, CC BY 3.0, the shipped marks'
    authors and a note that the marks were modified. A scaffold ships Open Iconic's `close`, `copy`
