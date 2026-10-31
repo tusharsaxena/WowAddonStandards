@@ -328,10 +328,9 @@ Items recorded for future versions of this standard:
   in the payload and font license and credit text leaves every README (library-stack-§8,
   documentation-§1 item 12). These rules bind from the re-vendor of `v1.83.0`, tagged locally and not
   yet pushed. Re-check when the run merges: close this entry.
-- **A public route to the `Ka0sMedia_*` types (recorded, not ruled).** `LibKa0s v1.83.0` registers them
-  only through the internal `lib.__MediaWidgetType`, so an addon's own window cannot create one
-  reliably and uses `LSM30_*` (options-ui-§23). No addon needs one today. Re-check when a window
-  without SharedMediaWidgets needs a media picker: the library publishes a seam first.
+- ~~**A public route to the `Ka0sMedia_*` types.**~~ **Settled by the one-picker ruling of
+  2026-11-01.** A window asks `lib.__MediaWidgetType(kind)`, documented in the library's Options API
+  document from `LibKa0s v1.84.0`, and no addon vendors SharedMediaWidgets (options-ui-§23).
 - **Ka0s Default's split tokens (recorded, not ruled).** Where two call sites drew one role in two
   colors before skins, Ka0s Default keeps both values as two tokens, so that adopting changes no
   pixel; the list is in `LibKa0s` `docs/api/Skin`. Each pair is a candidate to merge into one token
