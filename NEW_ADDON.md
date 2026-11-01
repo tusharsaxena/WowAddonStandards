@@ -87,7 +87,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    at file load and a Skin tab before Keybindings, and is not required to. Either way, its
    Options stub answers `AppearanceTab` and `AppearanceRows`, and `SkinVerb` on `LibKa0s v1.82.0` or
    later, and an adopted addon registers the `skin` verb directly after `config` (the pack's hard
-   rules 8a and 24b and its definition-of-done line).
+   rules 8a and 24b and its definition-of-done line). On `LibKa0s v1.85.0` or later an adopted addon
+   is born under skinning-§9: it wires the kit's `test_skin_values` and `test_skin_switch` from its
+   first commit, and owes no migration, having no stored profiles.
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those

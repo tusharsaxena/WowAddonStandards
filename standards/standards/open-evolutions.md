@@ -328,6 +328,8 @@ Items recorded for future versions of this standard:
   in the payload and font license and credit text leaves every README (library-stack-§8,
   documentation-§1 item 12). These rules bind from the re-vendor of `v1.83.0`, tagged locally and not
   yet pushed. Re-check when the run merges: close this entry.
+- **Full skinning (in progress, recorded).** The owner's goal of 2026-11-01, change the skin and every Ka0s addon changes with it (Ka0sAddonsCommonTasks `docs/2026-11-01-FULL_SKINNING/`, branch
+  `feat/2026-11-01-full-skinning` in every repo it touches), ships in `LibKa0s v1.85.0` and re-vendors every addon onto it. Its rulings at v2.97.0: every surface follows the skin, with a closed list of exceptions and a named cause for every typed value (skinning-§9, anti-pattern #110); HUD colors follow the skin and existing profiles migrate once, reversing the rollout's decision X4 (skinning-§6); the settings panel stays stock by default and every element supports skins. These rules bind from the re-vendor of `v1.85.0`, tagged locally and not yet pushed. Re-check when the run merges: close this entry.
 - ~~**A public route to the `Ka0sMedia_*` types.**~~ **Settled by the one-picker ruling of
   2026-11-01.** A window asks `lib.__MediaWidgetType(kind)`, documented in the library's Options API
   document from `LibKa0s v1.84.0`, and no addon vendors SharedMediaWidgets (options-ui-§23).
