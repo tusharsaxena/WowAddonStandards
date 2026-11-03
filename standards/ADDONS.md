@@ -14,24 +14,24 @@ this repo — each addon audits **itself**, in its own repo, via `/dev-copilot:w
 Each addon lives in its own repository, as a **sibling folder** next to this repo under
 `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. Paths below are relative to this file (`standards/`).
 
-| Addon | Folder | Repository | Launcher menu entries (launcher-§2) |
-|---|---|---|---|
-| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked |
-| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode |
-| Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Show window (the ledger browser) |
-| Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) |
-| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Enabled · Locked · Test mode · Show window (the race HUD) |
-| Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Enabled · Locked · Test mode · Show window (the drop feed) |
-| Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked |
-| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) |
-| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) |
-| Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) |
-| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked |
-| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked |
-| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled |
-| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled |
-| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Enabled · Locked · Test mode · Show window (its Comms Pads) |
-| Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) |
+| Addon | Folder | Repository | Launcher menu entries (launcher-§2) | Skin picker preview (skinning-§10) |
+|---|---|---|---|---|
+| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked | unlock |
+| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode | test |
+| Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Show window (the ledger browser) | test |
+| Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) | unlock |
+| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Enabled · Locked · Test mode · Show window (the race HUD) | test |
+| Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Enabled · Locked · Test mode · Show window (the drop feed) | test |
+| Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked | unlock |
+| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) | window (the skin showroom) |
+| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) | test |
+| Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) | test |
+| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked | unlock |
+| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked | unlock |
+| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled | none (its panel lives inside PremadeGroupsFilter's dialog) |
+| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled | console (the debug console, filled with `/pc test` sample lines) |
+| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Enabled · Locked · Test mode · Show window (its Comms Pads) | test |
+| Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) | test |
 
 **The launcher column is normative input to an audit, not decoration.** Every addon ships one minimap button and one
 broker plugin, from one LibDataBroker-1.1 object (launcher). **Left-click opens the settings panel and right-click opens
@@ -44,6 +44,13 @@ column when v2.67.0 retired the rungs.
 
 **Show window** also means the addon owes launcher-§6's key binding: a `CLICK` binding in a root `Bindings.xml` on the
 same toggle handler. The audit reads this column for that too. No new column.
+
+**The skin picker preview column is normative input too.** It names the mode the addon's skin picker enters while the
+addon's main surface is hidden, and that its eye toggles: the first of **test**, **unlock**, **window** and **console** the
+addon has (skinning-§10), read like the launcher column from the descriptor and Master-controls rows, with **console**
+PrettyChat's by owner ruling. **none** is the
+documented no-preview case: the picker draws no eye and enters nothing, and the parenthesis says why. A new addon lists its
+mode with its row; a new **none** needs an owner ruling.
 
 ## Ka0s-owned library repos
 
@@ -75,7 +82,7 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
 
 ## Adding an addon
 
-1. Add one row above (display name, folder, repository URL, launcher menu entries). Keep the table alphabetical by folder.
+1. Add one row above (display name, folder, repository URL, launcher menu entries, skin picker preview). Keep the table alphabetical by folder.
 2. That's it for scope. The addon is now covered by **the next standards refresh** — its current
    habits become an input to [`STANDARDS.md`](STANDARDS.md) (see [`README.md`](README.md)).
 3. New addons should be scaffolded from the standard so they are born compliant — see

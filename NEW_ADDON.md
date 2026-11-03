@@ -89,7 +89,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    later, and an adopted addon registers the `skin` verb directly after `config` (the pack's hard
    rules 8a and 24b and its definition-of-done line). On `LibKa0s v1.85.0` or later an adopted addon
    is born under skinning-§9: it wires the kit's `test_skin_values` and `test_skin_switch` from its
-   first commit, and owes no migration, having no stored profiles.
+   first commit, and owes no migration, having no stored profiles. Its skin picker spec passes
+   `spec.preview` in the mode the first of test, unlock, window and console it has, and its new
+   `standards/ADDONS.md` row names that mode (skinning-§10).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those

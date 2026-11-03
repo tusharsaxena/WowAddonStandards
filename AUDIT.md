@@ -943,7 +943,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (frame-layering-§7).
    - **Check skinning (`skinning`, v2.89.0).** Code only, `libs/` and `tests/_kit/` excluded. First
      decide adoption: `grep -rn 'RegisterOwner(' --include='*.lua' core modules settings`. **No hit:
-     not adopted, not a finding.** File nothing under (b) to (i) or anti-pattern #107 or #110; grade the
+     not adopted, not a finding.** File nothing under (b) to (j) or anti-pattern #107, #110 or #111; grade the
      addon's look against the Ka0s Default values the rescoped rules state (skinning-§7), and run (a)
      only. With a hit, run all of them:
      (a) From the addon's first re-vendor of `LibKa0s v1.78.0`, adopted or not, the Options
@@ -1019,6 +1019,17 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      neither `skin.ignorePanel` nor `skin.ignoreFonts` (#110). A host with no HUD owes no step and
      records why. Grade a settings-page surface with the Scope cleared: one that stays stock is #110
      whatever the default hides, and nothing writes `skin.ignorePanel`.
+     (j) From the addon's re-vendor of `LibKa0s v1.85.0`, the skin picker's preview (skinning-§10,
+     v2.98.0). Run `grep -rn 'onPreview\|preview *=' --include='*.lua' core modules settings` and read
+     the spec the addon hands `O.SkinPicker`, `O.SkinNotice` and `O.SkinVerb`: it passes
+     `spec.preview` and no `onPreview`, and its `mode` is the one `standards/ADDONS.md`'s *Skin
+     picker preview* column records for the addon. Read `enter` and `exit`: each reaches the same
+     handler the addon's `test` or `unlock` verb, launcher entry and Master-controls row use, never a
+     frame `Show`, a direct lock call or a raw SavedVariables write; `isActive` reads the same state,
+     and `isShown`, where passed, reads the main surface. A one-shot `onPreview`, a missing
+     `spec.preview` on an addon whose column is not `none`, a mode that disagrees with the column, or
+     a seam bypass is #111. An addon recorded `none` passes neither. Whether the picker enters, the
+     eye toggles and each close route restores is the owner's in-client smoke.
      How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
      owner's in-client smoke, never by this read (skinning-§8).
    - **Check display characters (`localization-§7`, v2.93.0).** Code only, `libs/` and `tests/_kit/`
