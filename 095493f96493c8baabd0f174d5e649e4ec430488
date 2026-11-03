@@ -1,0 +1,5 @@
+R6-SIM-STD independent adversarial review, 2026-11-04: PASS with one wording fix (42ca8d4).
+- check-standard.sh re-run: all 7 checks pass, anti-patterns #1-#112, v2.99.0 stamps.
+- options-ui-§15 agrees with LibKa0s e98a178 (pair, state.sim/simPath, leaf simMode, value-gated set, default false, sessionOnly, show refresh, RefreshScalars from Sim:AddListener). Fixed: two sentences said Sim mode sits under Test mode, when the composer puts it in column 1 under Minimap button, as the grid table shows.
+- ADDONS.md Sim column matches the code: the seven hosts with isSimMode in their launcher; AbsorbTracker and KickCD use lockIsPreview with no testModePath (next to Lock frame); the other five pass testModePath; the rest none.
+- skinning-§10 no-preview case names only PremadeGroupsFilterExtension.
