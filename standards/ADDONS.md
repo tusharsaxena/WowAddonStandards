@@ -14,30 +14,31 @@ this repo — each addon audits **itself**, in its own repo, via `/dev-copilot:w
 Each addon lives in its own repository, as a **sibling folder** next to this repo under
 `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. Paths below are relative to this file (`standards/`).
 
-| Addon | Folder | Repository | Launcher menu entries (launcher-§2) | Skin picker preview (skinning-§10) |
-|---|---|---|---|---|
-| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked | unlock |
-| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode | test |
-| Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Show window (the ledger browser) | test |
-| Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) | unlock |
-| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Enabled · Locked · Test mode · Show window (the race HUD) | test |
-| Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Enabled · Locked · Test mode · Show window (the drop feed) | test |
-| Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked | unlock |
-| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) | window (the skin showroom) |
-| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Show window (the History browser) | test |
-| Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Show window (its meter windows) | test |
-| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked | unlock |
-| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked | unlock |
-| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled | none (its panel lives inside PremadeGroupsFilter's dialog) |
-| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled | console (the debug console, filled with `/pc test` sample lines) |
-| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Enabled · Locked · Test mode · Show window (its Comms Pads) | test |
-| Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) | test |
+| Addon | Folder | Repository | Launcher menu entries (launcher-§2) | Skin picker preview (skinning-§10) | Sim mode checkbox (options-ui-§15) |
+|---|---|---|---|---|---|
+| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked · Sim mode | unlock | next to Lock frame |
+| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode | test | none |
+| Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
+| Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) | unlock | none |
+| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
+| Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
+| Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked · Sim mode | unlock | next to Lock frame |
+| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
+| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
+| Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Sim mode · Show window (its meter windows) | test | next to Test mode |
+| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked | unlock | none |
+| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked | unlock | none |
+| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled | none (its panel lives inside PremadeGroupsFilter's dialog) | none |
+| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
+| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
+| Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
 
 **The launcher column is normative input to an audit, not decoration.** Every addon ships one minimap button and one
 broker plugin, from one LibDataBroker-1.1 object (launcher). **Left-click opens the settings panel and right-click opens
 the options menu in every row above** (launcher-§2). The column lists that menu's entries, which are the toggles the addon
 has, in the menu's fixed order — **Enabled** always, then **Locked** where it has a lock, **Test mode** where it has a
-test mode, and **Show window** where it has a primary window, a parenthesis naming the window or what the lock holds — read from each addon's
+test mode, **Sim mode** where it has an in-game simulator (recorded from v2.99.0; launcher-§2 added the entry in the full
+skinning run), and **Show window** where it has a primary window, a parenthesis naming the window or what the lock holds — read from each addon's
 `core/LauncherSetup.lua` and Master-controls rows, so an audit checks the descriptor against it rather than re-deriving
 it from the addon's shape. A new addon lists its entries with its row. The column replaced v2.66.0's left-click rung
 column when v2.67.0 retired the rungs.
@@ -51,6 +52,13 @@ addon has (skinning-§10), read like the launcher column from the descriptor and
 PrettyChat's by owner ruling. **none** is the
 documented no-preview case: the picker draws no eye and enters nothing, and the parenthesis says why. A new addon lists its
 mode with its row; a new **none** needs an owner ruling.
+
+**The Sim mode checkbox column is normative input too** (v2.99.0). It names where an addon with an in-game simulator
+(preview-mode, *The in-game simulator*) draws the session-only *Sim mode* checkbox in General → Master controls: **next to
+Test mode** where the addon has a *Test mode* row, **next to Lock frame** where unlocking is its preview and there is no
+*Test mode* row (`lockIsPreview`), and **none** for an addon with no simulator (options-ui-§15). It matches the launcher
+column: an addon whose launcher lists *Sim mode* owes the checkbox, and one that does not owes none. A missing checkbox is
+anti-pattern #112. A new addon lists its answer with its row.
 
 ## Ka0s-owned library repos
 

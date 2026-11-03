@@ -1087,6 +1087,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        mode that is only a one-shot verb, its switch drawn as a button or hand-written, or a test
        mode that survives the start of combat or can be started during it, is anti-pattern #80. A
        frameless addon omits the row and is compliant.
+       **Sim mode is required in every addon with an in-game simulator** (options-ui-§15, v2.99.0):
+       `grep -rn 'RunVerb\|isSimMode' --include='*.lua' core modules settings` finds the `sim` verb
+       and the launcher's `isSimMode` / `toggleSim`; the addon's `MasterControls` spec then passes the
+       same pair, so the composer draws *Sim mode* next to *Test mode* (next to *Lock frame* where
+       unlocking is the preview). Read the pair: the toggle is the handler `/<slash> sim` and the
+       launcher call, never a copy, and the accessor reads the live session (`Sim:IsActive()` or the
+       host's equivalent), so nothing is stored. A missing row, a hand-written one, a button, a copy
+       of the handler or a stored value is anti-pattern #112. An addon with no simulator draws no row
+       and is compliant. That the box follows a session started elsewhere, and that a refused start
+       leaves it unticked, is the owner's in-client smoke.
        **Then check the marker** (`preview-mode`, v2.86.0). With the explicit test mode on, every
        display drawing sample data shows a visible, localized text marker, and it stays visible in
        every layout option the display offers in which the sample data shows: header off, compact.
@@ -1119,7 +1129,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
        the simulation a `sim:After`; the session marked on screen by the major's step panel, built
        with `close = false` where no window strip marks the session, and no simulation strip, anchor
-       or badge over a HUD display (#97, v2.93.0); a single `sim` feature-verb row and no launcher entry or key binding for it; host
+       or badge over a HUD display (#97, v2.93.0); a single `sim` feature-verb row, the launcher's *Sim mode* entry
+       and the Master-controls *Sim mode* checkbox on one handler, and no key binding for it
+       (v2.99.0; the checkbox is the Master-controls check above, #112); host
        fields on the host's own table, never on the library instance; and a suite that asserts
        `seam:Unwrapped()` is empty. Each missing one is a **MUST** finding against preview-mode; an
        unmarked session is #97 as well. Behavior is the owner's in-client smoke.

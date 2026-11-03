@@ -224,7 +224,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
      ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
      (anti-pattern #80). An addon whose unlocked view already shows those placeholders omits it:
      *Lock frame* is its switch, it ships no `test` verb, and a one-shot value hold, if kept, lives at
-     `/<slash> debug hold <value> [secs]` (options-ui-§15). A frameless addon
+     `/<slash> debug hold <value> [secs]` (options-ui-§15). An addon that ships an in-game
+     simulator also passes the composer its launcher pair (`isSimMode` / `toggleSim`), so a
+     session-only *Sim mode* checkbox sits next to *Test mode*, or next to *Lock frame* where
+     unlocking is the preview, and starts and stops the session as `/<slash> sim` does
+     (options-ui-§15, anti-pattern #112). A frameless addon
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.
