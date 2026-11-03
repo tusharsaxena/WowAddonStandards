@@ -1,0 +1,4 @@
+R6 independent review (2026-11-04) of 3fa9226 R6-STD: CONFIRMED with one fix (a3a4ecd).
+Checked against LibKa0s 14fcbab/62ba52f and 00_PLAN.md: the contract (mode, enter(why), exit(why), isActive, isShown optional), why values picker/eye, OptionsSkinPicker minor 11, the close routes, Alt-Z, the queued-never-shown case, onPreview back-compat and spec.preview winning, the mode order and the ADDONS.md column (all 16 match call 2's table; no unlock host lists a Test mode entry), PGFE as the one no-preview case, unlock stored across /reload, anti-pattern #111 contiguous.
+Fixed in a3a4ecd: the tooltip examples did not match the library's strings (unlock words name the frames), and the library's end-of-combat park of a refused restore was not stated.
+check-standard.sh: all checks passed.
