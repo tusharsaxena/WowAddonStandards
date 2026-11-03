@@ -87,7 +87,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
    at file load and a Skin tab before Keybindings, and is not required to. Either way, its
    Options stub answers `AppearanceTab` and `AppearanceRows`, and `SkinVerb` on `LibKa0s v1.82.0` or
    later, and an adopted addon registers the `skin` verb directly after `config` (the pack's hard
-   rules 8a and 24b and its definition-of-done line).
+   rules 8a and 24b and its definition-of-done line). On `LibKa0s v1.85.0` or later an adopted addon
+   is born under skinning-§9: it wires the kit's `test_skin_values` and `test_skin_switch` from its
+   first commit, and owes no migration, having no stored profiles. Its skin picker spec passes
+   `spec.preview` in the mode the first of test, unlock, window and console it has, and its new
+   `standards/ADDONS.md` row names that mode (skinning-§10).
    Every authored file opens with `local addonName, NS = ...` on line 1 (`local _, NS = ...` where
    the file never reads the name, architecture-§1) and, directly beneath it, a
    comment naming its own path and saying in one line what it is for (documentation-§9). Write those
@@ -220,7 +224,11 @@ disagreeing with the collection's intent while looking, in review, like it had b
      ended by combat), a session-only checkbox the composer emits from `testModePath`, never a button
      (anti-pattern #80). An addon whose unlocked view already shows those placeholders omits it:
      *Lock frame* is its switch, it ships no `test` verb, and a one-shot value hold, if kept, lives at
-     `/<slash> debug hold <value> [secs]` (options-ui-§15). A frameless addon
+     `/<slash> debug hold <value> [secs]` (options-ui-§15). An addon that ships an in-game
+     simulator also passes the composer its launcher pair (`isSimMode` / `toggleSim`), so a
+     session-only *Sim mode* checkbox sits next to *Test mode*, or next to *Lock frame* where
+     unlocking is the preview, and starts and stops the session as `/<slash> sim` does
+     (options-ui-§15, anti-pattern #112). A frameless addon
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.

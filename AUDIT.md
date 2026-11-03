@@ -943,7 +943,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (frame-layering-§7).
    - **Check skinning (`skinning`, v2.89.0).** Code only, `libs/` and `tests/_kit/` excluded. First
      decide adoption: `grep -rn 'RegisterOwner(' --include='*.lua' core modules settings`. **No hit:
-     not adopted, not a finding.** File nothing under (b) to (g) or anti-pattern #107; grade the
+     not adopted, not a finding.** File nothing under (b) to (j) or anti-pattern #107, #110 or #111; grade the
      addon's look against the Ka0s Default values the rescoped rules state (skinning-§7), and run (a)
      only. With a hit, run all of them:
      (a) From the addon's first re-vendor of `LibKa0s v1.78.0`, adopted or not, the Options
@@ -1003,6 +1003,33 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      holding text, a truncation length): each fits its longest string under Ka0s Default with the
      outline on (skinning-§4). A width the addon sizes from a measured string is compliant; whether
      it fits in every skin is the owner's in-client smoke.
+     (i) From the addon's re-vendor of `LibKa0s v1.85.0`, every surface follows the skin
+     (skinning-§9, v2.97.0). `tests/run.lua` declares `test_skin_values` and `test_skin_switch` with
+     `dir = "tests/_kit/"` and sets `Kit.skinValues` and `Kit.skinSwitch`; a suite undeclared, or
+     reported as its one declared skip, is #110. Read `Kit.skinValues.rows`: each row names a `cause`
+     on skinning-§9's list of exceptions, or the plan item that ruled on it, and a `why` that says
+     why the skin never reaches the value. Read `Kit.skinSwitch.surfaces` against the addon's
+     windows and HUD, because coverage is the declaration: a painted surface missing from the list is
+     #110. For an addon with a HUD, every HUD color and shadow that is not a class or meaning color
+     has a `<key>FromSkin` or `fontShadowFromSkin` companion defaulting `true` in the AceDB defaults
+     and on the row, and its reader goes through the skin while it is on (skinning-§6); a class or
+     meaning color with a companion is a finding too. Its one per-profile step calls
+     `Skin.FollowOnce` with the profile root, the record `skin.fullSkinReset` has a `false` default
+     no Defaults path can put back, and the keys list no font size, no class or meaning color and
+     neither `skin.ignorePanel` nor `skin.ignoreFonts` (#110). A host with no HUD owes no step and
+     records why. Grade a settings-page surface with the Scope cleared: one that stays stock is #110
+     whatever the default hides, and nothing writes `skin.ignorePanel`.
+     (j) From the addon's re-vendor of `LibKa0s v1.85.0`, the skin picker's preview (skinning-§10,
+     v2.98.0). Run `grep -rn 'onPreview\|preview *=' --include='*.lua' core modules settings` and read
+     the spec the addon hands `O.SkinPicker`, `O.SkinNotice` and `O.SkinVerb`: it passes
+     `spec.preview` and no `onPreview`, and its `mode` is the one `standards/ADDONS.md`'s *Skin
+     picker preview* column records for the addon. Read `enter` and `exit`: each reaches the same
+     handler the addon's `test` or `unlock` verb, launcher entry and Master-controls row use, never a
+     frame `Show`, a direct lock call or a raw SavedVariables write; `isActive` reads the same state,
+     and `isShown`, where passed, reads the main surface. A one-shot `onPreview`, a missing
+     `spec.preview` on an addon whose column is not `none`, a mode that disagrees with the column, or
+     a seam bypass is #111. An addon recorded `none` passes neither. Whether the picker enters, the
+     eye toggles and each close route restores is the owner's in-client smoke.
      How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
      owner's in-client smoke, never by this read (skinning-§8).
    - **Check display characters (`localization-§7`, v2.93.0).** Code only, `libs/` and `tests/_kit/`
@@ -1060,6 +1087,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        mode that is only a one-shot verb, its switch drawn as a button or hand-written, or a test
        mode that survives the start of combat or can be started during it, is anti-pattern #80. A
        frameless addon omits the row and is compliant.
+       **Sim mode is required in every addon with an in-game simulator** (options-ui-§15, v2.99.0):
+       `grep -rn 'RunVerb\|isSimMode' --include='*.lua' core modules settings` finds the `sim` verb
+       and the launcher's `isSimMode` / `toggleSim`; the addon's `MasterControls` spec then passes the
+       same pair, so the composer draws *Sim mode* next to *Test mode* (next to *Lock frame* where
+       unlocking is the preview). Read the pair: the toggle is the handler `/<slash> sim` and the
+       launcher call, never a copy, and the accessor reads the live session (`Sim:IsActive()` or the
+       host's equivalent), so nothing is stored. A missing row, a hand-written one, a button, a copy
+       of the handler or a stored value is anti-pattern #112. An addon with no simulator draws no row
+       and is compliant. That the box follows a session started elsewhere, and that a refused start
+       leaves it unticked, is the owner's in-client smoke.
        **Then check the marker** (`preview-mode`, v2.86.0). With the explicit test mode on, every
        display drawing sample data shows a visible, localized text marker, and it stays visible in
        every layout option the display offers in which the sample data shows: header off, compact.
@@ -1092,7 +1129,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
        the simulation a `sim:After`; the session marked on screen by the major's step panel, built
        with `close = false` where no window strip marks the session, and no simulation strip, anchor
-       or badge over a HUD display (#97, v2.93.0); a single `sim` feature-verb row and no launcher entry or key binding for it; host
+       or badge over a HUD display (#97, v2.93.0); a single `sim` feature-verb row, the launcher's *Sim mode* entry
+       and the Master-controls *Sim mode* checkbox on one handler, and no key binding for it
+       (v2.99.0; the checkbox is the Master-controls check above, #112); host
        fields on the host's own table, never on the library instance; and a suite that asserts
        `seam:Unwrapped()` is empty. Each missing one is a **MUST** finding against preview-mode; an
        unmarked session is #97 as well. Behavior is the owner's in-client smoke.
