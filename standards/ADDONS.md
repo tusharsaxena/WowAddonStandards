@@ -29,7 +29,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Outfitter Reborn | `../../OutfitterReborn/` | https://github.com/tusharsaxena/Outfitter | Enabled · Locked (the outfit bar) · Test mode · Show window (the outfit window) | test | none |
 | Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked | unlock | none |
 | Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked | unlock | none |
-| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled | none (its panel lives inside PremadeGroupsFilter's dialog) | none |
+| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled · Test mode (the attached panel shown on its own) | test | none |
 | Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
 | Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
@@ -51,15 +51,18 @@ same toggle handler. The audit reads this column for that too. No new column.
 addon's main surface is hidden, and that its eye toggles: the first of **test**, **unlock**, **window** and **console** the
 addon has (skinning-§10), read like the launcher column from the descriptor and Master-controls rows, with **console**
 PrettyChat's by owner ruling. **none** is the
-documented no-preview case: the picker draws no eye and enters nothing, and the parenthesis says why. A new addon lists its
-mode with its row; a new **none** needs an owner ruling.
+documented no-preview case: the picker draws no eye and enters nothing, and the parenthesis says why. No row reads **none**
+today: PremadeGroupsFilterExtension's was the last, and it reads **test** from v2.100.0, when `/pgfe test` gave its attached
+panel a session-only test mode of its own (owner ruling of 2026-11-04). A new addon lists its mode with its row; a new
+**none** needs an owner ruling.
 
 **The Sim mode checkbox column is normative input too** (v2.99.0). It names where an addon with an in-game simulator
 (preview-mode, *The in-game simulator*) draws the session-only *Sim mode* checkbox in General → Master controls: **next to
 Test mode** where the addon has a *Test mode* row, **next to Lock frame** where unlocking is its preview and there is no
 *Test mode* row (`lockIsPreview`), and **none** for an addon with no simulator (options-ui-§15). It matches the launcher
-column: an addon whose launcher lists *Sim mode* owes the checkbox, and one that does not owes none. A missing checkbox is
-anti-pattern #112. A new addon lists its answer with its row.
+column: an addon whose launcher lists *Sim mode* owes the checkbox, and one that does not owes none. Both read one
+`isSimMode()`, ticked while the sim window is shown or a session is running and unticked when neither (v2.100.0). A missing
+checkbox is anti-pattern #112. A new addon lists its answer with its row.
 
 ## Ka0s-owned library repos
 
