@@ -26,6 +26,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
 | Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
 | Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Sim mode · Show window (its meter windows) | test | next to Test mode |
+| Ka0s Outfitter Reborn | `../../OutfitterReborn/` | https://github.com/tusharsaxena/Outfitter | Enabled · Locked (the outfit bar) · Test mode · Show window (the outfit window) | test | none |
 | Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked | unlock | none |
 | Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked | unlock | none |
 | Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled | none (its panel lives inside PremadeGroupsFilter's dialog) | none |

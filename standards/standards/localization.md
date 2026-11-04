@@ -86,7 +86,7 @@ English-speaking author and silently disables the feature for every deDE/frFR/ru
   | Item | `itemID` | the item name |
   | Class | `classFile` token — 2nd return of `UnitClass`, or `UnitClassBase` — `"WARRIOR"` | the 1st return, `"Warrior"` |
   | Race | race token — 2nd return of `UnitRace` | the 1st return |
-  | Faction | `"Alliance"`/`"Horde"` token — 2nd return of `UnitFactionGroup` | `UnitFactionGroup`'s 1st return |
+  | Faction | `"Alliance"`/`"Horde"` token — 1st return of `UnitFactionGroup` (`englishFaction`) | `UnitFactionGroup`'s 2nd return (`localizedFaction`) |
   | Unit / NPC | `creatureID` parsed from `UnitGUID` | `UnitName` |
   | Zone / instance | `uiMapID` (`C_Map.GetBestMapForUnit`) or `instanceID` (8th return of `GetInstanceInfo`) | `GetZoneText` / `GetRealZoneText` / `GetSubZoneText` |
   | Fixed set | an `Enum.*` member | any string spelling of it |
