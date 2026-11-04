@@ -84,7 +84,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
    (`line-endings` — record the pin verbatim, or record that the file is absent), the root doc set
    — `README.md`, the `CLAUDE.md` stub and `DEPENDENCIES.md` (documentation-§1/§2/§7) — and `docs/`)
    and record what it does now, citing files.
-   - **Five cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
+   - **The cheap README/`CLAUDE.md` checks belong in this walk**, because each is a one-line grep
      and each is invisible to every suite: the standard badge is the **bare** `![Standard](…)` and
      not wrapped in a link (documentation-§1 #2); the README shows **no logo image** under its title or
      badge row — no `![…](media/logos/…)` line and no `<img>` (documentation-§1, anti-pattern #79); the
@@ -103,7 +103,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      README carries **no numbered list** — `grep -nE '^[[:space:]]*[0-9]+[.)][[:space:]]' README.md`
      is empty outside a fenced code block, because CurseForge's description page does not render one
      and every list there is a `- ` bullet list (v2.72.0; a hit is a documentation-§1 **MUST**
-     failure); and
+     failure); the README's `## Usage` **names the skin verb** — `grep -n 'skin' README.md` finds the
+     addon's real `/<slash> skin` inside the Usage section, in prose that says it opens the skin
+     picker, and in no table row (documentation-§1 item 5, v2.100.0; missing in an addon that has
+     adopted skins is a **MUST** failure); and
      the **LibKa0s provenance line is in root `CLAUDE.md`**, not `README.md` (documentation-§2 item 6,
      anti-pattern #59 — see the step-6 `diff -r` evidence).
    - **Look in the right place for the shared subsystems.** The debug console, the options toolkit,
@@ -1092,11 +1095,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        and the launcher's `isSimMode` / `toggleSim`; the addon's `MasterControls` spec then passes the
        same pair, so the composer draws *Sim mode* next to *Test mode* (next to *Lock frame* where
        unlocking is the preview). Read the pair: the toggle is the handler `/<slash> sim` and the
-       launcher call, never a copy, and the accessor reads the live session (`Sim:IsActive()` or the
-       host's equivalent), so nothing is stored. A missing row, a hand-written one, a button, a copy
-       of the handler or a stored value is anti-pattern #112. An addon with no simulator draws no row
-       and is compliant. That the box follows a session started elsewhere, and that a refused start
-       leaves it unticked, is the owner's in-client smoke.
+       launcher call, never a copy, and the accessor reads the live window and session together
+       (`sim:IsPanelShown() or sim:IsActive()`, or the host's equivalent, v2.100.0), so nothing is
+       stored; the toggle, while that accessor answers true, stops a running session and hides the
+       window, and otherwise does what the bare verb does; and the host re-reads the box and the
+       launcher on the sim window's show and hide as well as on its session listener. A missing row,
+       a hand-written one, a button, a copy of the handler, a stored value, or an accessor that reads
+       the session alone is anti-pattern #112. An addon with no simulator draws no row and is
+       compliant. That the box follows a window or session opened or closed elsewhere, and that a
+       refused start leaves it unticked, is the owner's in-client smoke.
        **Then check the marker** (`preview-mode`, v2.86.0). With the explicit test mode on, every
        display drawing sample data shows a visible, localized text marker, and it stays visible in
        every layout option the display offers in which the sample data shows: header off, compact.

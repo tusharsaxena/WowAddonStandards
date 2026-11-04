@@ -227,8 +227,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
      `/<slash> debug hold <value> [secs]` (options-ui-§15). An addon that ships an in-game
      simulator also passes the composer its launcher pair (`isSimMode` / `toggleSim`), so a
      session-only *Sim mode* checkbox sits next to *Test mode*, or next to *Lock frame* where
-     unlocking is the preview, and starts and stops the session as `/<slash> sim` does
-     (options-ui-§15, anti-pattern #112). A frameless addon
+     unlocking is the preview. Ticking it opens the sim window as `/<slash> sim` does, unticking it
+     stops a running session and hides the window, and `isSimMode()` answers true while the window
+     is shown or a session is running, re-read on the window's show and hide as well as on session
+     start and stop (options-ui-§15, anti-pattern #112). A frameless addon
      omits exactly the four frame-only rows and **MUST NOT** invent a movable frame to fill the tab
      out (options-ui-§15). Declare `General visibility` as the four-value dropdown from the start:
      shipping the *show only in combat* boolean instead buys a migration later for nothing.
@@ -316,7 +318,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
 6. **Write the README to the canonical structure.** It is a **player-facing**, plain-language document
    (no contributor material — that lives under `docs/`). Root `README.md` follows documentation-§1 (title → badges
    incl. the standard badge, which is **not** a link and MUST NOT be wrapped in one → description →
-   Screenshots → Usage (prose, no tables) → How it works → FAQ →
+   Screenshots → Usage (prose, no tables, naming `/<slash> skin` and what it does) → How it works → FAQ →
    Troubleshooting → Reporting a bug → Issues and feature requests → Version History → optional `## Credits`, last — there is
    **no** `## Testing` section; verify-how-to lives in `docs/`, and the README keeps only the `[tests]` badge).
    `## Reporting a bug` is **MUST**, and its three bullets and closing line are documentation-§1 item 9's
