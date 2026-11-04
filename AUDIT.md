@@ -421,6 +421,16 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      neither is the finding. `C_EventUtils.IsEventValid` in front of the `pcall` is the SHOULD and
      never a substitute for it — grade its absence accordingly, and grade its presence **alone** as
      the MUST failure it is.
+   - **Check every Blizzard hook names a function the UI source still has (`events-frames-taint-§9`,
+     v2.101.0).** Code only, `libs/` and `tests/_kit/` excluded:
+     `grep -rnE 'hooksecurefunc|HookScript' --include='*.lua' . | grep -v -e '/libs/' -e '/tests/_kit/'`.
+     For each hit, look the hooked function (or the frame and script) up in
+     <https://github.com/Gethe/wow-ui-source> on the `live` branch, or in a
+     `/console exportInterfaceFiles code` export of the addon's interface version, and cite what you
+     found as `wow-ui-source@<sha>:path:line` in `03_EVIDENCE.md`. A hook on a function absent there
+     is the finding, graded by what it breaks (`hooksecurefunc` on a missing global raises at load).
+     Never confirm a symbol from memory. An existing doc that cites no pin is not a finding: the
+     section commenced with v2.101.0 and owes no retrofit.
    - **Check the TOC's position annotations (`toc-file-§5`).** At every position in the listing
      (`# Core`, `# Defaults`, `# Modules`, `# Settings` and any other group), every line whose
      position is **load-bearing** under toc-file-§5's positional test — (a) a file-scope read of

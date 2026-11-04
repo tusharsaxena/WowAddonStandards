@@ -215,3 +215,12 @@ an unguarded secret on a repeating ticker stops the callback rescheduling and fr
 `/reload`.
 
 Reference implementation: `LibKa0s-Core-1.0` (`Core.lua`) owns the probe, the stringifier and the prefixed printer; a consuming addon's `core/CoreSetup.lua` publishes them and reclaims `NS.Print` after `NewAddon` where AceConsole is embedded (architecture-§2). An addon that still defines its own stringifier is carrying a pre-library copy — that is the deviation, not the absence of one.
+
+### 9. The Blizzard UI source
+
+Blizzard's interface code — FrameXML and the `Blizzard_*` addons — is published, and an addon that hooks, anchors to or reads it is written against that code, not against a memory of it. The canonical mirror is <https://github.com/Gethe/wow-ui-source>: the `live` branch is retail, and the repo also carries `ptr`, `beta` and `classic` branches. A function name recalled from an older patch reads exactly like a current one until the hook silently never fires.
+
+- **SHOULD** verify every Blizzard symbol the addon depends on against that source, at the addon's interface version, **before** the code is written or reviewed and never from memory: every function it hooks (`hooksecurefunc`, `HookScript`), every Blizzard frame or field it anchors to, reads or re-anchors, and every Blizzard table it reads (`PaperDollItemsFrame.flyoutSettings`, `PAPERDOLL_SIDEBARS`).
+- A design, plan, review or doc that relies on such a symbol **SHOULD** cite it commit-pinned, `wow-ui-source@<sha>:path:line` — documentation-§6's form for citing another repo's code, pinned because Blizzard's files move every patch and an unpinned line number goes on reading as current while it points somewhere else.
+- The in-game export (`/console exportInterfaceFiles code`, written under the client's `BlizzardInterfaceCode/`) is an equivalent local source; a citation into it names the client build it was exported from in place of the `<sha>`.
+- A hook on a function absent from the source at the addon's interface version is a defect, not a style point: `hooksecurefunc` on a missing global raises at load, and a hook on a function Blizzard still defines but no longer calls never fires.
