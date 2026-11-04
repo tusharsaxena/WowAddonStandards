@@ -1,0 +1,5 @@
+Independent review (R7 reviewer, 2026-11-04): PASS with one nit fixed.
+- The three rules match 00_PLAN.md calls 1-3: options-ui-§15 / launcher-§2 / preview-mode / #112 say isSimMode = sim window shown or session running, tick opens the window (stays ticked), untick stops and hides, re-read on window show/hide and session start/stop; skinning-§10 no-preview list empty with the clause kept, ADDONS.md PGFE preview = test + launcher Test mode; documentation-§1 item 5 MUST name /<slash> skin in prose (picker, preview mode/eye, Apply), never a table.
+- Agrees with LibKa0s 54ae61c's contract (get = host isSimMode verbatim, set toggles on difference, launcher asks live). The window show/hide re-read is expressible by hosts via the documented <name>SimPanel frame (built on first ShowPanel), so no library change needed.
+- scripts/check-standard.sh exits 0 (v2.100.0 in four places, #1-#112).
+- Nit fixed in bd55542: EXECUTIVE_SUMMARY capital 'No' after a semicolon.
