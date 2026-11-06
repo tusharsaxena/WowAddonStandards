@@ -21,6 +21,10 @@
 #                   README.md Status, EXECUTIVE_SUMMARY.md, NEW_ADDON_CONTEXT.md
 #                   line 1 and CLAUDE.md's "As of" line
 #   links           every relative .md link in a live doc resolves
+#   libka0s-counts  the LibKa0s major and file counts stated in library-stack,
+#                   the index blurb and EXECUTIVE_SUMMARY.md equal the library's
+#                   own manifest (tests/majors.lua, LibKa0s.xml) at its newest
+#                   tag, read from a ../LibKa0s checkout; SKIP when there is none
 #
 # Frozen stores (harvests/, standards/_raw/, docs/audits/, docs/reviews/) and
 # the changelog history (standards/CHANGELOG.md) are history: their citations
@@ -30,6 +34,7 @@
 # Exit:   0 when every check passes, 1 when any fails. Each failure is printed
 #         as "FAIL <check>: <detail>".
 # Needs:  bash, git, coreutils, GNU grep, awk, diff (see DEPENDENCIES.md).
+#         libka0s-counts also reads a sibling ../LibKa0s checkout when present.
 # =============================================================================
 set -u
 export LC_ALL=C
@@ -241,6 +246,53 @@ check_links() {
   fi
 }
 
+# --- 8. libka0s-counts --------------------------------------------------------
+# The standard states the library's size in words ("twenty-one LibStub majors
+# across sixty-seven files"), and that sentence has drifted four times because
+# nothing compared it with the library (harvests/2026-11-06, F8-02). This reads
+# the newest tag of a sibling ../LibKa0s checkout: no checkout, no verdict.
+words_to_n() { # words_to_n "twenty-one" -> 21; prints nothing when unparsed
+  awk -v w="$1" 'BEGIN {
+    split("one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen", u, " ")
+    split("twenty thirty forty fifty sixty seventy eighty ninety", t, " ")
+    for (i = 1; i <= 19; i++) v[u[i]] = i
+    for (i = 1; i <= 8; i++) v[t[i]] = (i + 1) * 10
+    n = split(w, p, "-"); s = 0
+    for (i = 1; i <= n; i++) { if (!(p[i] in v)) exit; s += v[p[i]] }
+    print s }'
+}
+check_libka0s_counts() {
+  local lib=../LibKa0s tag majors files n=0 f label pat text m x
+  if ! git -C "$lib" rev-parse --git-dir >/dev/null 2>&1; then
+    echo "skip libka0s-counts: no ../LibKa0s checkout beside this repo"
+    return
+  fi
+  tag=$(git -C "$lib" tag --list 'v*' --sort=-v:refname | head -1)
+  majors=$(git -C "$lib" show "$tag:tests/majors.lua" 2>/dev/null | grep -c 'major = "LibKa0s-')
+  files=$(git -C "$lib" show "$tag:LibKa0s/LibKa0s.xml" 2>/dev/null | grep -c '<Script file=')
+  if [ -z "$tag" ] || [ "$majors" -eq 0 ] || [ "$files" -eq 0 ]; then
+    fail libka0s-counts "could not read the manifest at ../LibKa0s tag '${tag:-none}'"
+    return
+  fi
+  for f in "$SECT/library-stack.md|ships \\*\\*[a-z-]+ LibStub majors across [a-z-]+ files" \
+           "$INDEX|[a-z-]+ majors across [a-z-]+ files" \
+           "standards/EXECUTIVE_SUMMARY.md|[a-z-]+ LibStub majors across [a-z-]+ files"; do
+    label=${f%%|*}; pat=${f#*|}
+    text=$(grep -oE -- "$pat" "$label" | head -1)
+    if [ -z "$text" ]; then
+      fail libka0s-counts "$label states no LibKa0s count in the form '$pat'"
+      n=$((n + 1)); continue
+    fi
+    m=$(words_to_n "$(grep -oE '[a-z-]+ (LibStub )?majors' <<< "$text" | awk '{print $1}')")
+    x=$(words_to_n "$(grep -oE 'across [a-z-]+ files' <<< "$text" | awk '{print $2}')")
+    if [ "$m" != "$majors" ] || [ "$x" != "$files" ]; then
+      fail libka0s-counts "$label says '$text' ($m majors, $x files); ../LibKa0s $tag ships $majors and $files"
+      n=$((n + 1))
+    fi
+  done
+  [ "$n" -eq 0 ] && pass libka0s-counts "$majors majors across $files files, as LibKa0s $tag ships"
+}
+
 check_cr_bytes
 check_gitattributes
 check_citations
@@ -248,6 +300,7 @@ check_sections
 check_anti_patterns
 check_version_stamps
 check_links
+check_libka0s_counts
 
 if [ "$failed" -ne 0 ]; then
   echo "check-standard: FAILED"

@@ -72,14 +72,19 @@ There is no test suite. There is one check script, and it exits `0` on a healthy
 bash scripts/check-standard.sh; echo "exit $?"   # 0 = every check passed
 ```
 
-It runs seven mechanically decidable checks and prints `ok` or `FAIL <check>: <detail>` for each:
+It runs eight mechanically decidable checks and prints `ok` or `FAIL <check>: <detail>` for each (or `skip` for the eighth, below):
 `cr-bytes` (no tracked file carries a CR), `gitattributes` (`.gitattributes` is line-endings-§5's LF
 body byte for byte), `citations` (every `filename-§N` in a live doc names a real section file and an
 existing `### N.` heading, none targets an unnumbered file, none is malformed), `sections` (the
 `STANDARDS.md` Sections list names exactly the tracked section files), `anti-patterns` (numbered
 #1–#N with no gap, and the index blurb agrees), `version-stamps` (the `STANDARDS.md` title version and
 date are restated in `README.md` Status, `EXECUTIVE_SUMMARY.md`, `NEW_ADDON_CONTEXT.md` line 1 and
-`CLAUDE.md`'s "As of" line) and `links` (every relative `.md` link in a live doc resolves). The frozen
+`CLAUDE.md`'s "As of" line), `links` (every relative `.md` link in a live doc resolves) and
+`libka0s-counts` (the `LibKa0s` major and file counts stated in library-stack-§7, the index blurb and
+`EXECUTIVE_SUMMARY.md` equal `tests/majors.lua`'s majors and `LibKa0s.xml`'s `<Script>` entries at the
+library's newest tag). The eighth reads a **sibling `../LibKa0s` checkout** with `git`, nothing else; with
+no checkout beside this repo it prints `skip` and does not fail, because a clone of this repo alone
+cannot know the library's size. The frozen
 stores (`harvests/`, `standards/_raw/`, `docs/audits/`, `docs/reviews/`) and `standards/CHANGELOG.md`
 are history and are skipped by the citation and link checks. Run it before committing a change to
 the standard. It is **not** a commit hook, on purpose: see `CLAUDE.md`, *The two checkpoints*.
@@ -111,7 +116,9 @@ standard mandates no shell linter, so `scripts/check-standard.sh` is verified th
   a citation numbered past `toc-file`'s last section and a numbered citation against the unnumbered
   `compat`, both written into a live doc (`citations`; spelled out here they would redden this file), a Sections link removed
   (`sections`), an anti-pattern renumbered (`anti-patterns`), the `README.md` Status version changed
-  (`version-stamps`), and a link to a missing `.md` (`links`). Repeat this when the script changes.
+  (`version-stamps`), a link to a missing `.md` (`links`), and library-stack-§7's major count or the
+  index blurb's file count changed by one word (`libka0s-counts`, with `../LibKa0s` symlinked beside the
+  clone; without it the check must print `skip`). Repeat this when the script changes.
 - **Syntax and line endings:** `bash -n scripts/check-standard.sh` is silent,
   `git check-attr eol -- scripts/check-standard.sh` reads `lf` (the `*.sh` carve-out,
   line-endings-§3), and the file is executable.

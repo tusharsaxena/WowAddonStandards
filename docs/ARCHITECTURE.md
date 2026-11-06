@@ -44,13 +44,13 @@ what this section carries is which paths exist, what reads each one, and which a
 | `PERF_ANALYSIS.md` | Playbook: per-addon in-game capture bundle | `/dev-copilot:wow-perf-analysis` |
 | `standards/STANDARDS.md` | **The index.** Its Sections list is what a consumer follows to find every section file. Its `## Changelog` holds only the current entry. | every standards-reading command |
 | `standards/CHANGELOG.md` | Every earlier changelog entry, newest first; listed under the index's Related documents, not its Sections, because history is not normative | `/dev-copilot:wow-harvest-standards`, and any run that needs history |
-| `standards/standards/*.md` | The 29 canonical section files — the substance of the standard | followed from the index |
+| `standards/standards/*.md` | The 30 canonical section files (counted with `ls standards/standards/*.md`, 2026-11-06) — the substance of the standard | followed from the index |
 | `standards/ADDONS.md` | The roster: which repos the standard covers | the standards-refresh process; `/dev-copilot:wow-harvest-standards` (the collection list); `/dev-copilot:wow-standards-audit` (repo kind and launcher entries, via `AUDIT.md`); `/dev-copilot:wow-new-addon` (adds the new addon's row); `/dev-copilot:wow-revendor-libka0s`, the `issue-*` commands' and the `wow-curseforge-*` commands' `all` scope, and the WoW collection review (the roster tables) |
 | `standards/NEW_ADDON_CONTEXT.md` | The context pack read at scaffold time, never written into the new addon | `/dev-copilot:wow-new-addon` |
 | `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/_raw/` | Background and the research the standard was drawn from | humans |
 | `harvests/<date>/` | Frozen bundles from `/dev-copilot:wow-harvest-standards` — what was proposed, what was accepted | humans |
 | `media/logos/` | Collection logo art | humans |
-| `scripts/check-standard.sh` | The on-demand mechanical gate for the standard's own invariants: CR bytes, the `.gitattributes` body, `filename-§N` citation ranges, the Sections list, anti-pattern numbering, the version stamps and relative `.md` links. Exits non-zero on any failure. Not a commit hook. | a human or agent before committing a change to the standard; `/dev-copilot:sync-docs` |
+| `scripts/check-standard.sh` | The on-demand mechanical gate for the standard's own invariants: CR bytes, the `.gitattributes` body, `filename-§N` citation ranges, the Sections list, anti-pattern numbering, the version stamps, relative `.md` links, and the `LibKa0s` major and file counts against a sibling `../LibKa0s` checkout (skipped without one). Exits non-zero on any failure. Not a commit hook. | a human or agent before committing a change to the standard; `/dev-copilot:sync-docs` |
 
 **Renaming any path the plugin fetches — the four playbooks and the `standards/` index, section
 files, changelog history, roster and context pack — is a breaking change** for every addon in the
@@ -62,8 +62,8 @@ collection, because the plugin resolves it by URL at runtime and a 404 is the fa
   a `.gitattributes` that drifts from line-endings-§5's LF body, a `filename-§N` citation that is
   malformed, names a missing file, targets an unnumbered file or goes out of range, a Sections list
   that disagrees with the tracked section files, a gap in the anti-pattern numbering or a stale
-  `(#1–#N)` blurb, a version or date stamp that was not rippled, and a relative `.md` link that does
-  not resolve. It cannot catch a contradiction between two section files, a citation that is in range
+  `(#1–#N)` blurb, a version or date stamp that was not rippled, a relative `.md` link that does
+  not resolve, and a `LibKa0s` major or file count that no longer matches the library's newest tag. It cannot catch a contradiction between two section files, a citation that is in range
   but names the wrong section, or a playbook step that names a path in an *addon* repo that has since
   moved. Those are still found by a human or by an agent reading the file. It runs on demand and
   from `/dev-copilot:sync-docs`, never as a commit hook, so a commit made without running it is not
@@ -91,7 +91,7 @@ Every `.md` in this repo appears in exactly one row below.
 | `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` | The four process playbooks |
 | `standards/STANDARDS.md` | The standard's index, with the current changelog entry |
 | `standards/CHANGELOG.md` | The standard's changelog history: every earlier entry, newest first |
-| `standards/standards/*.md` (29 files) | The canonical section files |
+| `standards/standards/*.md` (30 files, 2026-11-06) | The canonical section files |
 | `standards/ADDONS.md` | The roster |
 | `standards/README.md`, `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/NEW_ADDON_CONTEXT.md` | Process entry point, summary, research, scaffold context pack |
 | `standards/_raw/_industry/` | Frozen source material behind `INDUSTRY_RESEARCH.md` |

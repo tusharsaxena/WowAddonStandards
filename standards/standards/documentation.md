@@ -290,7 +290,7 @@ rather than inventing one.
 |---|---|
 | `docs/perf-analysis/README.md` | the performance harness is wired (performance-§12) — specified above |
 | `docs/slash-dispatch.md` | `NS.COMMANDS` carries **eight or more** commands, or **any** subcommand tree |
-| `docs/midnight-quirks.md` | the addon carries **at least one** client-version workaround of its own |
+| `docs/midnight-quirks.md` | the addon carries **at least one** client-version workaround of its own. A workaround for a behavior catalogued in client-quirks is cited by its client-quirks subsection and its entry's bold title, not restated (v2.102.0); the doc holds what is the addon's own |
 | `docs/compat-layer.md` | a **present** compat family (`core/Compat.lua` and any `core/Compat<Topic>.lua`, compat) publishes **three or more** addon-specific shims beyond what `LibKa0s` supplies, counted across every family file; an addon compat's applicability condition exempts ships no `core/Compat.lua` and the trigger has not fired |
 | `docs/message-bus.md` | the addon defines **more than ten** distinct messages |
 | `docs/profiles.md` | AceDB profiles are **user-visible** (a profile control ships in the options UI) |
@@ -393,6 +393,17 @@ Frozen and generated material is **out of scope** and **MUST NOT** be enumerated
 `docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-analysis/<run>/`,
 `docs/revendor/<date>-v<tag>/`, `docs/superpowers/` and `docs/investigations/` are named as
 directories, once each. A register that grows a row per audit is a register nobody re-reads.
+
+**The shape of `docs/superpowers/` (SHOULD, v2.102.0).** The store holds the design specs and plans of
+single-repo work, and a new file in it is named by its date and topic: a design spec is
+`docs/superpowers/specs/<YYYY-MM-DD>-<topic>-design.md`, a plan is
+`docs/superpowers/plans/<YYYY-MM-DD>-<topic>.md`, each dated the day it is written, with `<topic>` in
+lowercase kebab case; research a spec rests on **MAY** sit in `docs/superpowers/research/`. A plan is
+paired with its spec by the shared `<topic>`. Files already in the store are history and are **not**
+renamed. *Why.* Sixteen of the seventeen addons keep the store, and on 2026-11-06 110 of their 121 specs
+and 141 of their 167 plans already followed this shape, which is also the one the collection's
+cross-repo planning workspace prescribes for single-repo work. The outliers are the ones a later reader
+cannot date or pair (`harvests/2026-11-06/02_FINDINGS.md`, F9-01).
 
 `docs/revendor/` joined that list late, and what its absence cost is the reason the list is upstream
 rather than per-repo. Every addon ships the re-vendor store (`audit-review-history`), and the ten that
@@ -565,6 +576,7 @@ deleted outright, never migrated.
 ### 5. Keeping docs in sync
 
 - **MUST** keep the doc set in sync with code. Drift is the #1 gripe surfaced in every `docs/audits/` run. The `dev-copilot:sync-docs` skill exists exactly for this; run it before every release.
+- **SHOULD** write in-repo citations and counts in the forms that do not drift (documentation-§6, *Citing the repo's own code, and counting its own tree*): a symbol or heading rather than a bare line, and a count as a rule, a date or a named list. Most drift the audits report is one of those two shapes.
 
 ### 6. Standards reference (every addon)
 
@@ -729,6 +741,27 @@ sweep is: a frozen file's line numbers never move.
 matched, 43 pointed somewhere else and 6 named files or ranges that no longer existed
 (`docs/audits/2026-10-07/03_EVIDENCE.md`, E5). Renumbering them would rot again with the next release
 of every cited repo; the form is what makes the fix stick.
+
+**Citing the repo's own code, and counting its own tree (SHOULD, v2.102.0).** The two forms above reach an
+addon's **own** docs as well, and for the same reason. In the live docs of a repo — the root doc set, the
+`docs/` trio, Tier 1 and Tier 2, `docs/performance.md`'s exemption sweep and any Tier 3 doc — a
+present-tense citation of the repo's own code names `path` plus a **symbol or heading**
+(`core/Compat.lua`, `Compat.LoadItem`) and **never** a bare line number; and a present-tense **count of the
+repo's own tree** ("nine modules", "the four pages") is written as a **rule** ("every file under
+`modules/`") or **dated** ("as measured on 2026-11-06"), or names its members, as documentation-§3's doc
+sets do. A historical claim pins the commit (`<sha>:path:line`), as above. History files, the frozen
+bundles (`docs/audits/`, `docs/reviews/`, `docs/revendor/`, `docs/automated-tests/<run>/`,
+`docs/perf-analysis/<run>/`) and `docs/superpowers/` are exempt: a frozen file's line numbers never
+move. A line number inside a **code comment** is out of scope here; this rule is about documents.
+
+*Why.* documentation-§5 was failed in seventeen of the eighteen newest audits, in every repo at every
+audit date, and in twelve repos the drifted items were exactly these two shapes — a hand-written count of
+the repo's own tree and an in-repo `file:line` that had moved. Four addons separately declined to withdraw
+a ratified performance-§12 exemption whose `file:line` citations had rotted while the argument still held,
+which is the cost stated plainly: the citation, not the reasoning, is what goes stale
+(`harvests/2026-11-06/02_FINDINGS.md`, F4-01, F6-01). §5 says *keep the docs in sync*; this paragraph
+removes the two shapes that fall out of sync on every edit, so `/dev-copilot:sync-docs` converts each one
+once instead of renumbering it forever.
 
 ### 7. Root `DEPENDENCIES.md` — the toolchain contract
 

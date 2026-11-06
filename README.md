@@ -88,7 +88,7 @@ This is how the living house rules get revised. The full, authoritative steps ar
    [`standards/NEW_ADDON_CONTEXT.md`](standards/NEW_ADDON_CONTEXT.md) so they stay in sync.
 6. Run `bash scripts/check-standard.sh` and fix whatever it reports; it must exit `0`. It checks the
    mechanical invariants (CR bytes, the `.gitattributes` body, citation ranges, the Sections list,
-   anti-pattern numbering, the version stamps and relative links), not whether the documents agree
+   anti-pattern numbering, the version stamps, relative links and the stated `LibKa0s` counts), not whether the documents agree
    in meaning.
 
 ## B. Audit an addon
@@ -170,7 +170,7 @@ repo's own audits and reviews, frozen once written (documentation-§8).
 
 ## Status
 
-The standard is at **v2.101.0** and is a living document. Addon compliance auditing has moved out of
+The standard is at **v2.102.0** and is a living document. Addon compliance auditing has moved out of
 this repo and into each addon's own repository. The `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`
 and `PERF_ANALYSIS.md` playbooks drive it, and the `dev-copilot` plugin is what consumes them.
 

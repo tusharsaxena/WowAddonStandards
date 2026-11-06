@@ -132,7 +132,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      a **present** compat family (`core/Compat.lua` plus any `core/Compat<Topic>.lua`) publishes, summed
      across the family with documentation-§3's own grep — it is a count now, not a
      judgment; an absent `core/Compat.lua` counts zero, and is itself a finding only if the addon makes a
-     deprecated or version-variant call outside `LibKa0s`'s majors, per compat's applicability condition) and require either the doc or a *Not applicable* row carrying that trigger.
+     deprecated or version-variant call outside `LibKa0s`'s majors, per compat's applicability condition) and require either the doc or a *Not applicable* row carrying that trigger. Where `midnight-quirks.md` ships, read its entries against client-quirks: an entry that restates a catalogued behavior instead of citing its subsection is a SHOULD deviation (client-quirks-§1), and an entry that **contradicts** one is filed against whichever side is wrong — the addon's doc, or the standard, by a note for the next harvest. In the same pass, a present-tense in-repo `path:line` citation or an undated hand count of the repo's own tree in any live doc is a SHOULD deviation (documentation-§6); report the count of each with the grep, not a per-site list.
      An absent doc whose trigger **has** fired is a MUST failure; an absent doc with a fired trigger
      *and* a "Not applicable" row is worse, because the row asserts something false — grade it above
      the bare omission.
@@ -242,11 +242,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      playbook itself could not see until v2.63.0, so no bundle has ever reported it:
 
      ```sh
-     # (a) the named dev-only entries are ignored. THREE of them are conditional — `tools`,
-     #     `.claude` and `.superpowers`: the ignore is owed only by a repo that HAS the folder, and a
-     #     line for a folder that is not there asserts something false (packaging).
+     # (a) the named dev-only entries are ignored. FOUR of them are conditional — `tools`,
+     #     `media/screenshots`, `.claude` and `.superpowers`: the ignore is owed only by a repo that
+     #     HAS the folder, and a line for a folder that is not there asserts something false
+     #     (packaging).
      entries=".luacheckrc .pkgmeta .gitignore .gitattributes docs tests _dev"
      [ -d tools ] && entries="$entries tools"
+     [ -d media/screenshots ] && entries="$entries media/screenshots"
      [ -d .claude ] && entries="$entries .claude"
      [ -d .superpowers ] && entries="$entries .superpowers"
      for e in $entries; do
