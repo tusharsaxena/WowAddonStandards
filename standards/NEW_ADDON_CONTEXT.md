@@ -28,7 +28,7 @@
 
 Authoritative reference: `WowAddonStandards/standards/STANDARDS.md`. This document is its operational distillation. Every Ka0s addon is built to the standard and references it: <https://github.com/tusharsaxena/WowAddonStandards>.
 
-**Scope:** Retail (Mainline) only.
+**Scope:** Retail and WoW Forever from one codebase (clients). A new addon is born dual-client: roster row `Retail · Forever`, one unsuffixed TOC with `## Interface: <retail>, <forever>`, detection only through `LibKa0s-Compat-1.0`, per-client features declared and gated at registration, per-client seed lists, and the suite green under both kit profiles (`KA0S_KIT_CLIENT`).
 
 ---
 
@@ -89,7 +89,7 @@ Then keep it compliant over time with the `dev-copilot:` skills listed at the en
 - **Author:** add1kted2ka0s (Ka0s)
 - **License:** MIT (always; no exceptions)
 - **Substrate:** Ace3
-- **Scope:** Retail only — single latest-Retail `## Interface:` line
+- **Scope:** Retail and WoW Forever (clients) — dual-client by default, with `## Interface: <retail>, <forever>` in the one TOC
 - **TOC `Title` prefix:** `Ka0s <Human Name>`
 - **SavedVariables:** `<Addon>DB`
 - **Slash:** 2-3 lowercase chars
@@ -191,7 +191,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
 Fixed field order (toc-file-§1), then a blank line, then the file listing in commented sections (toc-file-§5):
 
 ```
-## Interface: <latest Retail>
+## Interface: <latest Retail>, <Forever>
 ## Title: Ka0s <Name>
 ## Notes: <one-line description>
 ## Author: add1kted2ka0s
@@ -264,7 +264,7 @@ resolves and which files satisfy it (toc-file-§5).
 partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file
 (library-stack-§7). The library block never carries an addon-authored `embeds.xml` (anti-pattern #38).
 
-The `## Interface:` is a **single** latest-Retail number (Retail only, toc-file-§3); bump it each patch with `dev-copilot:wow-bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
+The `## Interface:` is **one line in one unsuffixed TOC** (toc-file-§3): a dual-client addon carries two numbers, `<latest Retail>, <Forever>` (today `120105, 16001`), and no load-gating line; a Retail-only addon, one number plus `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot`. Bump the Retail number each patch with `dev-copilot:wow-bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
 
 ### `<Addon>.lua` (entry)
 
@@ -302,7 +302,7 @@ local addonName, NS = ...
 -- API call (compat). Family: core/Compat.lua (this file only; list any core/Compat<Topic>.lua here).
 NS.Compat = NS.Compat or {}
 local Compat = NS.Compat
--- Retail only: shims cross-patch API differences, NOT game flavors.
+-- Shims Retail patch differences and the Retail/Forever split; the client questions (IsForever, IsRetail, ClientKey, ForClient) are LibKa0s-Compat-1.0's, reached as NS.Compat.X (clients-§3).
 local CompatLib = LibStub and LibStub("LibKa0s-Compat-1.0", true)
 
 -- Illustrative (compat): a member LibKa0s-Compat-1.0 carries is routed through it. Contract:
@@ -1555,7 +1555,7 @@ marked as such rather than listed as a requirement.
 
 ## Runtime (in-game) — what a player needs
 
-- **World of Warcraft (Retail).** Single `## Interface:` line in `<Addon>.toc` — Retail only.
+- **World of Warcraft (Retail, and WoW Forever for a dual-client addon).** One `## Interface:` line in `<Addon>.toc`, with the Forever number beside the Retail one when the addon supports both (toc-file-§3).
 - **Nothing else.** Every library is vendored under `libs/` and committed (library-stack), so the
   player installs no separate library addon. `## OptionalDeps:` names the vendored libs for load
   ordering, not as things to download.
@@ -1639,7 +1639,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 2. SavedVariables: `<Addon>DB` with `schemaVersion = 0` in defaults and the runner's target in `NS.SCHEMA_VERSION` (savedvariables-§1), plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
-5. TOC: single latest-Retail `## Interface:` (Retail only), plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge; **before that, omitted with a one-line comment in its position — never a placeholder id, which would publish this addon into somebody else's project**). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
+5. TOC: one `## Interface:` line — `<retail>, <forever>` for a dual-client addon, one number plus the two load-gating lines for a Retail-only one (toc-file-§3) — plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge; **before that, omitted with a one-line comment in its position — never a placeholder id, which would publish this addon into somebody else's project**). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
 6. Slash: AceConsole `:RegisterChatCommand`. Never raw `SLASH_*`.
 7. Locale: metatable fallback `__index = function(_,k) return k end`. Never AceLocale strict.
 7a. **US English everywhere** (localization-§5): every English word you author — locale keys and their `enUS` values, chat/console output, options labels and tooltips, slash help, README and `docs/` prose, code comments, and identifiers — uses **US** spelling. `color` not `colour`, `gray` not `grey`, `behavior` not `behaviour`, `center`/`centered` not `centre`/`centred`, `canceled` not `cancelled`, `-ize`/`-ization` not `-ise`/`-isation`, `catalog`/`dialog`/`defense`/`license`/`analyze`. WoW's own API is US-spelled (`SetTextColor`, `GRAY_FONT_COLOR`), so a British-spelled identifier sits one letter from the Blizzard symbol beside it and greps miss. Locale **keys are the English string**, so fixing a spelling **changes the key** — update it in every `locales/*.lua` and at every call site in the same change, or the metatable silently renders the raw key on that client. Reproduce verbatim (never "correct"): Blizzard/library symbols, quoted external text, published proper nouns, and a deliberate `locales/enGB.lua` translation.
@@ -1659,6 +1659,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 10. Closed message bus: modules talk via `Ka0s_<Addon>_<Event>` messages, one sender each. No cross-module table reach. **Every message name is declared once as a constant** — `NS.MSG.<SCREAMING_SNAKE>` in `core/Bus.lua`, or in `core/Constants.lua` where there is no bus file, or a module-scoped exported constant for a message one module owns — and every `SendMessage` and `RegisterMessage` call site uses that constant, never the literal (architecture-§4). `<Event>` is **PascalCase** and SHOULD name what happened, preferably as a past participle; the constant's SCREAMING_SNAKE key is the key's casing and never leaks into the wire string (naming-cheatsheet).
 11. All deprecated-API calls live in the compat family — `core/Compat.lua`, which exists only when the addon has one (compat's applicability condition), plus a `core/Compat<Topic>.lua` per topic once the root would pass 1000 lines. Every family file publishes into the one `NS.Compat` table; modules call `NS.Compat.X` and never know which file holds it. No `WOW_PROJECT_ID` flavor branching (Retail only).
 11a. Events (events-frames-taint-§1): AceEvent-3.0, and every registration goes through `LibKa0s-Core-1.0`'s `SafeRegisterEvent` / `SafeRegisterUnitEvent` / `SafeRegisterEvents`, published from `core/CoreSetup.lua`, never a bare `RegisterEvent` and never a private copy of the loop. The **host** owns the rejected list (`NS.rejectedEvents`) and surfaces it in the `[Init]` summary or a debug verb. The library-absent Core stub carries the three as one-rung `pcall` bodies. The only private frames are the unit-filter frame and, for an addon that embeds **no** AceEvent-3.0, one lazily created boundary watcher for `PLAYER_REGEN_DISABLED`/`_ENABLED`.
+11c. Clients (clients): the roster row is `Retail · Forever` for a new addon; ask the client only through `NS.Compat.IsForever()` / `IsRetail()` / `ClientKey()`; declare a one-client feature with `clients = { "retail" }` (or `Compat.ForClient`) so it is absent, never hidden, on the other; keep two seed lists, picked once; run the suite under `KA0S_KIT_CLIENT=retail` and `=forever`.
 11b. Blizzard symbols (events-frames-taint-§9): every Blizzard function the addon hooks (`hooksecurefunc`, `HookScript`), every Blizzard frame or field it anchors to or reads, and every Blizzard table it reads is looked up in <https://github.com/Gethe/wow-ui-source> (`live` branch) or a `/console exportInterfaceFiles code` export before it is written, never from memory, and a doc that relies on one cites it `wow-ui-source@<sha>:path:line`.
 12. Combat lockdown: gate `InCombatLockdown()` (secure writes — settings setters, secure-frame attributes) and defer those with `PLAYER_REGEN_ENABLED`. **Exception — options-panel open (options-ui-§2): refuse under lockdown, do not defer.** Outside combat the open is the library's: `Settings.OpenToCategory` takes the numeric category ID captured with `:GetID()` at registration — never the category object, never the frame, and never a string written over `category.ID`, which fails silently — and the `pcall`'d `SettingsPanel:GetCategoryList():GetCategoryEntry(category):SetExpanded(true)` walk that opens a parent's collapsed tree runs **after** it. Do not hand-roll either; `LibKa0s-Options-1.0` does both once for every addon. Print a gray `NS.PREFIX` notice ("cannot open settings during combat — Blizzard's category-switch is protected") and return; **never** `Settings.OpenToCategory` under lockdown, and **never** auto-open on `PLAYER_REGEN_ENABLED`. **Never** close, hide or commit Blizzard's settings window from addon code in combat (`SettingsPanel:Close`, `HideUIPanel(SettingsPanel)`, `ToggleGameMenu`) — a page shown in combat is locked by the options library, tab strip included, and the host adds no page-level lock of its own — no cover, tab guard, render refusal or close — while a setter that creates, destroys or rebuilds frames still gates itself on `InCombatLockdown()` (options-ui-§2/§13, anti-pattern #88). For combat-reactive *display/logic* use `UnitAffectingCombat(unit)` — **not** `InCombatLockdown()` (which is player-only and can raise *action blocked* if it gates a secure call at the combat boundary).
 13. Per-frame loops: cache db values into module locals, refresh via `M:RefreshUpvalues()` on settings change.
@@ -1706,8 +1707,8 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - Vendoring the test kit to `libs/` (it must not ship) or editing it in place.
 - `.pkgmeta` `externals:` for libraries (Ka0s vendors and commits all libs).
 - Forking Ace libs.
-- Multi-flavor / Classic support: comma `Interface` lists, per-flavor TOCs, `_Classic` data splits, `enable-toc-creation` fan-out (Retail only, single Interface line).
-- `if WOW_PROJECT_ID ==` game-flavor branching (Retail only; Retail-patch checks go in Compat).
+- Classic support, per-flavor TOC files, `_Classic` / `_Forever` data-file suffix splits, `enable-toc-creation` fan-out (one unsuffixed TOC, Retail and Forever only; #15).
+- `if WOW_PROJECT_ID ==` game-flavor branching in feature code, and any `WOW_PROJECT_*` read outside `LibKa0s-Compat-1.0` (ask `NS.Compat.IsForever()` / `IsRetail()` / `ClientKey()`; #9, #117). Client detection by interface number (#113), `== WOW_PROJECT_MAINLINE` as "modern" (#114), a per-client feature registered and then hidden (#115), a seed list filtered rather than split per client (#116).
 - Direct calls to deprecated APIs (route through Compat).
 - `:Hide()` on Blizzard frames you replace (reparent to hidden parent).
 - Replacing `_G.AddMessage`.
@@ -1755,7 +1756,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 
 ## Definition of done (new addon ready for v0.1.0 release)
 
-- [ ] TOC has all required fields incl. single latest-Retail `## Interface:`, `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge; until then a commented placeholder-free line saying so).
+- [ ] TOC has all required fields incl. the `## Interface:` line (`<retail>, <forever>`; or one number plus the two load-gating lines for a Retail-only addon), `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge; until then a commented placeholder-free line saying so).
 - [ ] Every **load-bearing** TOC position carries a comment naming what resolves at load; conventional positions are marked too (toc-file-§5). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`; the `ignore:` list names every root dot-entry the repo **actually has** and no entry it does not — `.claude/`, `.superpowers/` and `tools/` only once the folder exists (packaging).
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors** **with `tests/` in scope** — only `tests/_kit/` is excluded, and the harness global is declared in the `files["tests/"]` stanza rather than in top-level `read_globals` (lint).

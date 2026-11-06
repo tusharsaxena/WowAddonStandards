@@ -24,6 +24,19 @@ tests/_kit/run-automated-tests.sh --suite complexity           # a subset
 tests/_kit/run-automated-tests.sh --suite lint --suite tests --no-bundle   # the green gate, writes nothing
 ```
 
+**A `Retail · Forever` addon runs the battery under both kit profiles** (`clients-§6`, `testing-§2`). The
+vendored kit picks its client profile from `KA0S_KIT_CLIENT=retail|forever`, and **retail is the default**,
+so every command above is the Retail run. Read the addon's **Clients** value in `standards/ADDONS.md`
+first. For `Retail · Forever`, run the full battery as above, then run the headless suite as Forever and
+carry the result into `ANALYSIS.md`'s Headline and Suites:
+
+```sh
+KA0S_KIT_CLIENT=forever tests/_kit/run-automated-tests.sh --suite tests --no-bundle
+```
+
+A suite green on one profile and red on the other is a `red` record, and the profile that failed is
+named. A `Retail` or `Retail (port pending)` addon runs the default profile only.
+
 If the runner fails with `bad interpreter` or a `\r`-shaped syntax error, it arrived CRLF: the repo's
 `.gitattributes` is missing `*.sh text eol=lf`, or has it and was never renormalized. The rule and the
 fix are one hop away at `line-endings-§3`/`§6` — do not edit the vendored script.
