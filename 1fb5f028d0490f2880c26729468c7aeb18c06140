@@ -1,0 +1,1 @@
+WFP M1 review (2026-11-07): task review spec ❌ → fix round 1 (2aae630, 1fb5f02) → scoped re-review: 6/6 ADDRESSED, no new breakage. check-standard.sh: all 8 checks ok. Deferred minor: open-evolutions.md:13 'sixty-seven' recount wording.
