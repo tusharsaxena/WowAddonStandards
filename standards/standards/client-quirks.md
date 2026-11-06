@@ -36,12 +36,17 @@ than being deleted, because the behavior may only have moved.
 **What an addon does with this section (MUST): carry it as a vendored block.** This section is the one
 part of the standard an addon carries a **copy** of, because it is reference data about the game client
 that a working addon needs offline, next to the code that works around it — not a rule, which is only ever
-pointed at. Every addon's `docs/midnight-quirks.md` (documentation-§3) is two parts:
+pointed at. Every addon's `docs/midnight-quirks.md` (documentation-§3) is two parts: the vendored block,
+opened by a `BEGIN VENDORED` HTML comment naming the catalog's version and source and closed by an
+`END VENDORED` HTML comment, each spelled exactly as `/dev-copilot:wow-revendor-standards` writes it; then
+the addon's own section. The markers are described here rather than shown, because this text travels
+inside them: a literal marker in the vendored copy would give the file a second end marker for the next
+re-vendor to cut at.
 
 ```markdown
-<!-- BEGIN VENDORED: quirks catalog v<X.Y.Z> (source: WowAddonStandards) -->
+[the BEGIN VENDORED comment, stamped quirks catalog v<X.Y.Z>]
 … this section, whole …
-<!-- END VENDORED -->
+[the END VENDORED comment]
 
 ## <Addon>-specific quirks
 
