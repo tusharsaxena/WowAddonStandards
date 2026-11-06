@@ -33,11 +33,30 @@ newest *Measured* stamp in an entry and an addon observes otherwise, the entry i
 release — not worked around in the addon. An entry nobody can reproduce moves to §6 as an open probe rather
 than being deleted, because the behavior may only have moved.
 
-**What an addon does with this section (SHOULD).** An addon's `docs/midnight-quirks.md`
-(documentation-§3, Tier 2) **SHOULD** cite an entry here by its subsection (client-quirks-§2 and the rest) and its bold title rather
-than restate it, and **SHOULD** keep only what is its own: a quirk no second repo has met, the addon's
-per-event costs, and the addon's own probe tables. A restatement is the shape that drifted three times
-into contradiction.
+**What an addon does with this section (MUST): carry it as a vendored block.** This section is the one
+part of the standard an addon carries a **copy** of, because it is reference data about the game client
+that a working addon needs offline, next to the code that works around it — not a rule, which is only ever
+pointed at. Every addon's `docs/midnight-quirks.md` (documentation-§3) is two parts:
+
+```markdown
+<!-- BEGIN VENDORED: quirks catalog v<X.Y.Z> (source: WowAddonStandards) -->
+… this section, whole …
+<!-- END VENDORED -->
+
+## <Addon>-specific quirks
+
+… the addon's own quirks: one no second repo has met, its per-event costs, its own probe tables …
+```
+
+- The block is **copied whole and replaced wholesale** by `/dev-copilot:wow-revendor-standards`, stamped with
+  the standard version it came from, under the same discipline as `libs/LibKa0s/` (anti-pattern #45): never
+  a subset, **never edited inside the markers**. A local edit inside them is reverted by the next revendor,
+  and the behavior it fixed comes back with no cause in the addon's history; a correction belongs in the
+  addon's own section, where the next harvest finds it.
+- The addon's own section **MUST NOT** restate a behavior the block carries. When a harvest promotes an
+  entry, the revendor prunes the addon's copy: the upstream entry is the deeper write-up, and two live
+  copies of one finding is the shape that drifted three times into contradiction.
+- An addon with no quirks of its own still carries the block, with an empty own section.
 
 **Contested behaviors are not rules.** Where two repos recorded opposite behavior and nobody has probed
 the difference, the entry goes in §6 with both sides and the probe that would settle it.

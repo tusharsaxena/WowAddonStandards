@@ -89,3 +89,19 @@ No accepted proposal needs a `LibKa0s` change first. Every addon needs
 - Fourteen addons are on kit revision 50 and miss revision 51's flake fix until their next
   `/dev-copilot:wow-revendor-libka0s`.
 - Thirteen repos were last audited against v2.76.1; twenty-six releases are unmeasured there.
+
+## Correction made during the run, before the release left the branch
+
+P-05 as proposed and first applied told an addon to **cite** a catalogued behavior rather than restate it.
+Reading `/dev-copilot:wow-revendor-standards` (installed plugin 2.7.0, its Step 3d) before the first re-vendor
+showed that the collection's own tooling already defines the other shape: when the standard has a quirks
+catalogue, the command **vendors it whole** into `docs/midnight-quirks.md` between stamped markers, replaces it
+wholesale, prunes the addon's own duplicates, and creates the file where it is missing. A standard that said
+"cite" beside a command that copies would have contradicted itself on the first run. The release was corrected
+on the branch, before any addon read it: client-quirks-§1 now states the vendored-block contract,
+documentation-§3's Tier 2 row for `docs/midnight-quirks.md` is **required in every addon** (six addons owe the
+file: DpsRace, LibKa0sSkinTester, PanelMaster, PremadeGroupsFilterExtension, PrettyChat, QuickComms), and the
+`AUDIT.md`, `NEW_ADDON_CONTEXT.md`, `EXECUTIVE_SUMMARY.md`, `STANDARDS.md` blurb, changelog entry and
+`CLAUDE.md` doc-set paragraph say the same. The fix in every addon is the re-vendor itself. P-05's rollout row
+above reads accordingly: `/dev-copilot:wow-revendor-standards` writes the block and prunes duplicates; sync-docs
+is not needed for it.

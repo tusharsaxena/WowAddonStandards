@@ -290,7 +290,7 @@ rather than inventing one.
 |---|---|
 | `docs/perf-analysis/README.md` | the performance harness is wired (performance-§12) — specified above |
 | `docs/slash-dispatch.md` | `NS.COMMANDS` carries **eight or more** commands, or **any** subcommand tree |
-| `docs/midnight-quirks.md` | the addon carries **at least one** client-version workaround of its own. A workaround for a behavior catalogued in client-quirks is cited by its client-quirks subsection and its entry's bold title, not restated (v2.102.0); the doc holds what is the addon's own |
+| `docs/midnight-quirks.md` | **always, from v2.102.0**: it carries the client-quirks catalogue as a vendored block, written and replaced by `/dev-copilot:wow-revendor-standards` (client-quirks-§1), above the addon's own section, which holds the addon's own client-version workarounds and may be empty. Before v2.102.0 the trigger was *at least one workaround of its own*; an addon that recorded *Not applicable* under that trigger now owes the file |
 | `docs/compat-layer.md` | a **present** compat family (`core/Compat.lua` and any `core/Compat<Topic>.lua`, compat) publishes **three or more** addon-specific shims beyond what `LibKa0s` supplies, counted across every family file; an addon compat's applicability condition exempts ships no `core/Compat.lua` and the trigger has not fired |
 | `docs/message-bus.md` | the addon defines **more than ten** distinct messages |
 | `docs/profiles.md` | AceDB profiles are **user-visible** (a profile control ships in the options UI) |

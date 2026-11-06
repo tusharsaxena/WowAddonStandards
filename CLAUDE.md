@@ -186,7 +186,9 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   verification-and-record docs above) required per stated trigger and recorded as *Not applicable* in the map when the
   trigger has not fired, except that since v2.68.0 the `docs/debug.md` trigger has fired in every
   addon (the diagnostics dump is a debug surface beyond the default console), so `docs/debug.md` is
-  never *Not applicable*, and Tier 3 free-form (documentation-§3).
+  never *Not applicable*, and since v2.102.0 `docs/midnight-quirks.md` is required in every addon, because
+  it carries the client-quirks catalogue as a vendored block (client-quirks-§1), so it is never *Not
+  applicable* either, and Tier 3 free-form (documentation-§3).
   `docs/automated-tests/RESULTS.md` is generated, one file overwritten in place — its single-path
   git history is the trend line — and a full run bundle is produced at **release**, never as a
   commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see
