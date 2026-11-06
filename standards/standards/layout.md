@@ -26,7 +26,7 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
   defaults/
     Profile.lua            -- C = profile defaults table
     Global.lua             -- G = global defaults table (rare; only when needed)
-    Spells.lua / Data*.lua -- data tables; a per-client seed list is two tables or two plainly named files chosen once through Compat (clients-§5)
+    Spells.lua / Data*.lua -- data tables; a per-client seed list is two tables or a two-file pair, both listed in the one TOC and chosen at runtime through `ClientKey()` (clients-§5; toc-file-§3 exempts it from the suffix-split ban)
   settings/
     Schema.lua             -- one row per setting: {path, default, type, label, widget, validate, onChange}
     Panel.lua              -- Blizzard Settings.RegisterCanvasLayoutCategory + raw AceGUI render

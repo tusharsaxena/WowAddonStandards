@@ -18,7 +18,7 @@ For quick reference, the rules above as a do-not list:
 12. Replacing `AddMessage` — override globals or use AddMessageEventFilter.
 13. Hard `## Dependencies:` (use OptionalDeps + soft fallback).
 14. `## X-License: All Rights Reserved` — must be MIT.
-15. Classic support, per-flavor TOC files, `_Classic` / `_Forever` data-file suffix splits and `enable-toc-creation` fan-out — one unsuffixed TOC, Retail and Forever only (toc-file-§3, clients-§1). The two-number `## Interface:` line of a dual-client addon is **not** this anti-pattern.
+15. Classic support, per-flavor TOC files, `_Classic` / `_Forever` data-file or TOC suffix splits that the client loads per flavor, and `enable-toc-creation` fan-out — one unsuffixed TOC, Retail and Forever only (toc-file-§3, clients-§1). Exempt: clients-§5's seed pair, two files both loaded by the one TOC, the list chosen at runtime through `ClientKey()`. The two-number `## Interface:` line of a dual-client addon is **not** this anti-pattern.
 16. Files >1500 LOC — peel. The cap reaches every authored `.lua` in the repo, `tests/` included; `libs/`, `tests/_kit/` and generated non-shipping data are the carve-outs, and an over-cap file that is neither peeled, issue-tracked nor register-recorded is what this entry is actually pointing at (layout-§1).
 17. Multiple senders for the same bus message.
 18. Debug output to the chat frame when the addon has a main window — use the on-screen debug console (debug-logging).

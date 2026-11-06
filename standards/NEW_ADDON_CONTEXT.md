@@ -106,7 +106,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
 
 ```
 <Addon>/
-  <Addon>.toc            -- single Interface line (latest Retail)
+  <Addon>.toc            -- one Interface line (latest Retail, plus Forever's number when dual-client)
   Bindings.xml           -- key bindings: owed by every addon with a Show window entry (launcher-§6), else ONLY
                          -- if the addon ships bindings; exactly this name, at the root, never in the TOC; no Lua
                          -- beyond what the client requires, labels set from a module (layout-§1)
@@ -1868,7 +1868,7 @@ of its **setup file**, never the machinery inside.
 - `dev-copilot:run-tests` — run the test battery (luacheck, the headless harness, any `make test`) and report a combined pass/fail. No record is kept; that is `automated-tests`.
 - `dev-copilot:wow-perf-analysis` — record and interpret an in-game perf run into a frozen `docs/perf-analysis/<run>/` bundle (performance-§8).
 - `dev-copilot:sync-docs` — eliminate doc drift across README, CLAUDE.md, ARCHITECTURE.md.
-- `dev-copilot:wow-bump-interface` — bump the single TOC Interface line to the latest Retail patch.
+- `dev-copilot:wow-bump-interface` — bump the Retail number of the TOC Interface line to the latest Retail patch (a dual-client addon's Forever slot moves only when the Forever client does).
 - `dev-copilot:bump-version` — bump version everywhere (TOC, code constants, README badges + Version History, CLAUDE/ARCHITECTURE, CHANGELOG).
 - `dev-copilot:diff` — summarize uncommitted changes with risk assessment.
 - `dev-copilot:commit` — generated-message commit.
