@@ -75,7 +75,8 @@ The standard is a **synthesis** of two inputs:
 6. **Gate it.** From the repo root, run `bash scripts/check-standard.sh`
    ([`../scripts/check-standard.sh`](../scripts/check-standard.sh)) and fix whatever it reports; it
    must exit `0`. It catches the mechanical drift (CR bytes, the `.gitattributes` body, citation
-   ranges, the Sections list, anti-pattern numbering, the version stamps, relative `.md` links) and
+   ranges, the Sections list, anti-pattern numbering, the version stamps, relative `.md` links, the
+   stated `LibKa0s` counts) and
    nothing else, so read the ripple for meaning as well.
 
 ### Where audits fit

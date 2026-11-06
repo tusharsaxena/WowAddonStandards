@@ -153,8 +153,8 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   (`line-endings-§7`).
 - **Run `bash scripts/check-standard.sh` before committing a change to the standard**, and fix
   whatever it reports. It must exit `0`. It checks CR bytes, the `.gitattributes` body, `filename-§N`
-  citation ranges, the Sections list, anti-pattern numbering, the version stamps and relative `.md`
-  links; `DEPENDENCIES.md` lists the checks and how the script itself is verified. It is deliberately
+  citation ranges, the Sections list, anti-pattern numbering, the version stamps, relative `.md`
+  links and, with a `../LibKa0s` checkout beside it, the library counts library-stack-§7 states; `DEPENDENCIES.md` lists the checks and how the script itself is verified. It is deliberately
   **not** a commit hook (see *The two checkpoints*, below). A passing run does not prove the
   documents agree in meaning, so read for that as well. If you change the script, rerun its
   injected-defect checks from `DEPENDENCIES.md` in a throwaway clone.
@@ -169,7 +169,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.101.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.102.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
@@ -186,7 +186,9 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   verification-and-record docs above) required per stated trigger and recorded as *Not applicable* in the map when the
   trigger has not fired, except that since v2.68.0 the `docs/debug.md` trigger has fired in every
   addon (the diagnostics dump is a debug surface beyond the default console), so `docs/debug.md` is
-  never *Not applicable*, and Tier 3 free-form (documentation-§3).
+  never *Not applicable*, and since v2.102.0 `docs/midnight-quirks.md` is required in every addon, because
+  it carries the client-quirks catalogue as a vendored block (client-quirks-§1), so it is never *Not
+  applicable* either, and Tier 3 free-form (documentation-§3).
   `docs/automated-tests/RESULTS.md` is generated, one file overwritten in place — its single-path
   git history is the trend line — and a full run bundle is produced at **release**, never as a
   commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see

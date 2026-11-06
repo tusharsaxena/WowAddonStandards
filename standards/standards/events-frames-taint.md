@@ -44,7 +44,7 @@ Modern retail **raises** on a name the client does not know — `Attempt to regi
 - **The host's library-absent `Core` stub carries the three members as one-rung bodies**: a plain `pcall` of the registration with no `C_EventUtils` front gate, appending to `rejected` on failure. A stub that dropped them would leave a degraded load with bare registrations, which is the silence this rule exists to prevent.
 - The rejected names **MUST** be recorded, and the record **MUST** be reachable by the player — through the reserved `debug` verb or the debug console (slash-commands-§2, debug-logging-§4). Surviving the throw is not the bar: a deaf event nobody can see is the same silence one layer down. A deaf event has to be **discoverable**.
 - An addon **SHOULD** additionally front-gate a name newer than the clients it supports with `C_EventUtils.IsEventValid(event)` — the cheap ask, and it answers before the throw rather than after. It **MUST NOT** be relied on alone: where even `C_EventUtils` is missing, the `pcall` is the whole guard, because the failure being avoided is a hard error at load on a client one patch behind, not a wrong answer.
-- Probing rather than registering outright costs the edge that event covers on a client that lacks it. Take the trade deliberately and write it down in the addon's quirks doc: losing one edge is survivable where losing the block is not.
+- Probing rather than registering outright costs the edge that event covers on a client that lacks it. Take the trade deliberately and write down, in the addon's quirks doc, which edge each probed event gives up: losing one edge is survivable where losing the block is not. The raise itself is stated here once; the quirks doc's own section records only the addon's own per-event costs (client-quirks-§1).
 
 The vendored test kit's mock already raises for any event named in `M.__badEvents`, on that event's first registrant and at call time, so a suite can reproduce the failure without waiting for a patch to retire an event for real.
 
@@ -56,12 +56,19 @@ The vendored test kit's mock already raises for any event named in `M.__badEvent
 
 **`InCombatLockdown()` vs `UnitAffectingCombat("player")` — not interchangeable.** They answer different questions and usually (but not always) agree for the player:
 
-- `InCombatLockdown()` — *"are protected actions forbidden right now?"* The authoritative gate for **secure operations**. No args (player-only); true from `PLAYER_REGEN_DISABLED` to `PLAYER_REGEN_ENABLED`.
+- `InCombatLockdown()` — *"are protected actions forbidden right now?"* The authoritative gate for **secure operations**. No args (player-only); true for the span of combat, **but not yet inside `PLAYER_REGEN_DISABLED`'s own handler** (*The combat-start edge*, below), and false again by `PLAYER_REGEN_ENABLED`.
 - `UnitAffectingCombat(unit)` — the actual **combat flag** on any unit (`"player"`, `"target"`, `"party1"`, `"boss1"`…). The tool for **gameplay/UI state** (fade an out-of-combat frame, show an in-combat indicator, check a *non-player* unit).
 
 - **MUST** gate secure writes on `InCombatLockdown()` — **MUST NOT** substitute `UnitAffectingCombat("player")`. The two can diverge at the combat boundary, and gating a secure call on the combat flag can raise *"action blocked / interface action failed"* in exactly those moments.
 - **SHOULD** use `UnitAffectingCombat(unit)` for combat-reactive display/logic — that is what "is this unit in combat?" is *for*, and it is the only option for units other than the player. Using `InCombatLockdown()` here is a bug: a purely visual show/hide gated on lockdown state reads player-only lockdown, not the unit's actual combat status. (A live AbsorbTracker bug: the bar failed to appear in combat because visibility was gated on `InCombatLockdown()` instead of `UnitAffectingCombat("player")`.)
-- **SHOULD** drive player combat *transitions* off the `PLAYER_REGEN_DISABLED` / `PLAYER_REGEN_ENABLED` events — they fire exactly at the lockdown boundary and flush any deferred-secure-write queue — rather than polling either function.
+- **SHOULD** drive player combat *transitions* off the `PLAYER_REGEN_DISABLED` / `PLAYER_REGEN_ENABLED` events — they mark the lockdown boundary, and `PLAYER_REGEN_ENABLED` flushes any deferred-secure-write queue — rather than polling either function.
+
+**The combat-start edge (corrected in v2.102.0).** `PLAYER_REGEN_DISABLED` fires **before** lockdown begins, so `InCombatLockdown()` reads **false inside its handler**, and anything that handler calls synchronously. `UnitAffectingCombat("player")` is already true there. Two consequences:
+
+- A combat-start handler that decides what to draw by asking `InCombatLockdown()` draws the **out-of-combat** state at the one moment it was called to change it. The handler **SHOULD** take its answer from the event itself and pass it on explicitly (`Refresh(true)`), or read `UnitAffectingCombat("player")` for a display gate, as above.
+- A secure write made **inside** the handler is still allowed by the client — that is what the gap means, and it is the last chance to arm or disarm a secure child before lockdown (frame-layering-§4's disarm at `PLAYER_REGEN_DISABLED`). The **MUST** above is unchanged: a secure write anywhere else still gates on `InCombatLockdown()`.
+
+*Why.* Until v2.102.0 this section said lockdown was true "from `PLAYER_REGEN_DISABLED`" and that the events "fire exactly at the lockdown boundary". Four addons found otherwise independently: one measured `InCombatLockdown()` false inside the handler and moved its visibility gate to `UnitAffectingCombat`; one passes `true` explicitly to its combat-start render because a render that asked lockdown drew the out-of-combat look; two more rely on the gap to arm secure frames at the edge (`harvests/2026-11-06/02_FINDINGS.md`, F3-02).
 
 ### 3. Taint-replacing Blizzard UI
 
