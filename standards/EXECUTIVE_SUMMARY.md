@@ -8,7 +8,7 @@
 
 The house standard for the Ka0s World of Warcraft addon collection — the canonical set of rules for tech stack, libraries, design patterns, code structure, naming, packaging, localization, settings, slash commands, debug, and docs. It codifies what already works across the collection and closes the gaps, so every future addon is **born compliant**.
 
-**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in three places** — the TOC `X-Standard` field, the README standard badge (a declaration, deliberately **not** a link), and the root `CLAUDE.md` "Standards compliance (read first)" section — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned in the header of `STANDARDS.md` (current: **v2.102.0**, 2026-11-06); the index carries the current changelog entry and `CHANGELOG.md` every earlier one.
+**Substrate:** Ace3. **License:** MIT (always). **Scope:** Retail only. Every addon must be built to this standard and **reference it in three places** — the TOC `X-Standard` field, the README standard badge (a declaration, deliberately **not** a link), and the root `CLAUDE.md` "Standards compliance (read first)" section — so <https://github.com/tusharsaxena/WowAddonStandards> is always in the addon's project memory and context (documentation-§6). The standard is versioned in the header of `STANDARDS.md` (current: **v2.102.1**, 2026-11-06); the index carries the current changelog entry and `CHANGELOG.md` every earlier one.
 
 ## The seven patterns it makes canonical
 
@@ -42,7 +42,7 @@ Fixed and predictable in every repo, so any human or agent lands in the same pla
 - **No `TODO.md`** once released — GitHub issues are the single backlog (`documentation-§4`) — and **no `docs/agent-context.md`**: the scaffolding pack is fetched at runtime, never stored (`documentation-§3`, anti-patterns #49).
 - **Another repo's code is cited so the citation cannot rot** (`documentation-§6`, SHOULD): a present-tense claim names `Repo path` plus a symbol or heading, never a bare line number; a historical claim pins the commit, `Repo@<sha>:path:line`; and a present-tense count of the collection is written as a rule ("every addon …") or dated.
 - **A repo's own code is cited and counted the same way** (`documentation-§5/§6`, SHOULD, v2.102.0): an in-repo citation names `path` plus a symbol or heading, never a bare line, and a count of the repo's own tree is a rule, a date or a named list — the two shapes behind most of the drift seventeen of eighteen audits reported.
-- **Client behaviors two or more repos discovered live in one catalogue** (`client-quirks`, v2.102.0): each entry stamped with the build it was measured on, its cost and its workaround; every addon's `docs/midnight-quirks.md` carries it as a vendored block, copied whole and never edited, above an own section that never restates it; contested behaviors are open probes, not rules.
+- **Client behaviors two or more repos discovered live in one catalog** (`client-quirks`, v2.102.0): each entry stamped with the build it was measured on, its cost and its workaround; every addon's `docs/midnight-quirks.md` carries it as a vendored block, copied whole and never edited, above an own section that never restates it; contested behaviors are open probes, not rules.
 
 ## How to use it
 
