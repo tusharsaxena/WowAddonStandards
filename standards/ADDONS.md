@@ -14,25 +14,38 @@ this repo — each addon audits **itself**, in its own repo, via `/dev-copilot:w
 Each addon lives in its own repository, as a **sibling folder** next to this repo under
 `/mnt/d/Profile/Users/Tushar/Documents/GIT/`. Paths below are relative to this file (`standards/`).
 
-| Addon | Folder | Repository | Launcher menu entries (launcher-§2) | Skin picker preview (skinning-§10) | Sim mode checkbox (options-ui-§15) |
-|---|---|---|---|---|---|
-| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Enabled · Locked · Sim mode | unlock | next to Lock frame |
-| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Enabled · Locked · Test mode | test | none |
-| Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
-| Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Enabled · Locked (the macro bar) | unlock | none |
-| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
-| Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
-| Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Enabled · Locked · Sim mode | unlock | next to Lock frame |
-| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
-| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
-| Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Enabled · Locked · Test mode · Sim mode · Show window (its meter windows) | test | next to Test mode |
-| Ka0s Outfitter Reborn | `../../OutfitterReborn/` | https://github.com/tusharsaxena/Outfitter | Enabled · Locked (the outfit bar) · Test mode · Show window (the outfit window) | test | none |
-| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Enabled · Locked | unlock | none |
-| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Enabled · Locked | unlock | none |
-| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Enabled · Test mode (the attached panel shown on its own) | test | none |
-| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
-| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
-| Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
+| Addon | Folder | Repository | Clients | Launcher menu entries (launcher-§2) | Skin picker preview (skinning-§10) | Sim mode checkbox (options-ui-§15) |
+|---|---|---|---|---|---|---|
+| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Retail (port pending) | Enabled · Locked · Sim mode | unlock | next to Lock frame |
+| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Retail (port pending) | Enabled · Locked · Test mode | test | none |
+| Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
+| Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail (port pending) | Enabled · Locked (the macro bar) | unlock | none |
+| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
+| Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
+| Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Retail (port pending) | Enabled · Locked · Sim mode | unlock | next to Lock frame |
+| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Retail (port pending) | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
+| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
+| Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (its meter windows) | test | next to Test mode |
+| Ka0s Outfitter Reborn | `../../OutfitterReborn/` | https://github.com/tusharsaxena/Outfitter | Retail (port pending) | Enabled · Locked (the outfit bar) · Test mode · Show window (the outfit window) | test | none |
+| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Retail (port pending) | Enabled · Locked | unlock | none |
+| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Retail (port pending) | Enabled · Locked | unlock | none |
+| Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Retail | Enabled · Test mode (the attached panel shown on its own) | test | none |
+| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Retail (port pending) | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
+| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Retail (port pending) | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
+| Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Retail | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
+
+**The Clients column is normative input to an audit, not decoration** (v2.103.0). It is the single source of truth that
+`dev-copilot` and the audit read for which game clients an addon supports, and it records what the addon **ships today**,
+not what it is planned to ship: a port flips its row in the same change that lands the port. The value decides the TOC
+shape the addon needs (toc-file-§3) and what an audit flags (clients-§2). Three values, written verbatim:
+
+| Value | Meaning | TOC shape it requires | What the audit flags |
+|---|---|---|---|
+| `Retail · Forever` | Ported. One codebase serves Retail and WoW Forever. | One unsuffixed TOC with a two-number line, `## Interface: <retail>, <forever>`. No load-gating line. | Any clients-§3..§6 shape that is missing or broken: detection outside Compat, an ungated per-client feature, a filtered seed list, a smoke file or test run that covers one client. |
+| `Retail` | Retail-only **by the owner's decision**, not ported and not to be. | One number, plus `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot`, so Forever never lists it. | A missing or misspelled load-gating line; a `WOW_PROJECT_CAMELOT` read or a Forever branch (dead code in a Retail-only addon). |
+| `Retail (port pending)` | Retail today, not ported yet. A port flips the row to `Retail · Forever`. | One number and **no** load-gating line, because Forever players already run some of these addons out of date and must not be cut off. | A new Retail-only feature added with no declaration (clients-§4). It does **not** flag the missing dual-client shapes. |
+
+Both clients are named in clients-§1. The Clients column gives no addon a Classic value, because the collection has no Classic support.
 
 **The launcher column is normative input to an audit, not decoration.** Every addon ships one minimap button and one
 broker plugin, from one LibDataBroker-1.1 object (launcher). **Left-click opens the settings panel and right-click opens
