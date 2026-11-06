@@ -300,6 +300,12 @@ And the rule that catches the most tempting mistake:
   is the owner's, for this major alone, and is not a precedent that one consumer is enough. **Re-check
   trigger: leg 2 has not landed within two `LibKa0s` releases** of v1.78.0; the promotion is then
   re-examined against bar 1 rather than left standing on the ruling.
+- **The client helpers in `LibKa0s-Compat-1.0` clear bar 1 by ruling (v2.103.0).** `IsForever()`, `IsRetail()`,
+  `ClientKey()` and `ForClient(clients)` (Compat minor 2, `LibKa0s v1.92.0`) are a collection-wide seam that the
+  standard itself mandates (clients-§3, clients-§4): every addon that supports both clients needs them, and
+  a hand-written copy per addon is the shape that drifts. They therefore satisfy the two-consumer bar by the owner's
+  ruling of 2026-11-07, not by counting callers, and a caller count is not how this ruling is re-examined. Bars 2
+  and 3 still bind them. The ruling is for these helpers alone and is not a precedent that one consumer is enough.
 - **A promotion into `Core` is not free** even when it is right: the other majors declare a **minimum
   minor floor** on Core, and raising a floor is a breaking change to the vendoring (library-stack-§7,
   above). So a helper added to `Core` **MAY** ship for hosts immediately while the library's own

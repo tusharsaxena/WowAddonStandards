@@ -8,7 +8,7 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
 
 ```
 <AddonName>/
-  <AddonName>.toc          -- single file, single Interface line (latest Retail), lists all .lua in dependency order
+  <AddonName>.toc          -- single file; one Interface line (latest Retail, plus Forever's number when dual-client; toc-file-§3); lists all .lua in dependency order
   Bindings.xml             -- key bindings: owed by every addon with a Show window entry (launcher-§6), else ONLY if
                            -- the addon ships bindings; client-mandated name and place, beside the TOC; no Lua
                            -- beyond what the client requires; NOT a TOC line (layout-§1)
@@ -26,7 +26,7 @@ Every Ka0s addon uses one **modular** folder layout — `core/`, `defaults/`, `s
   defaults/
     Profile.lua            -- C = profile defaults table
     Global.lua             -- G = global defaults table (rare; only when needed)
-    Spells.lua / Data*.lua -- Retail data tables (no per-flavor suffix; Retail only)
+    Spells.lua / Data*.lua -- data tables; a per-client seed list is two tables or two plainly named files chosen once through Compat (clients-§5)
   settings/
     Schema.lua             -- one row per setting: {path, default, type, label, widget, validate, onChange}
     Panel.lua              -- Blizzard Settings.RegisterCanvasLayoutCategory + raw AceGUI render
