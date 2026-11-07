@@ -346,10 +346,15 @@ Items recorded for future versions of this standard:
   in the rollout, which is a visible change to Ka0s Default and so a standard change first
   (standalone-windows, *The Ka0s window edge*). Re-check pair by pair as the rollout reaches the
   addons that draw them.
-- **The WoW Forever client (recorded, not ruled).** The *WoW Forever* skin is a look usable on
-  retail (skinning-§4). Running Ka0s addons on the WoW Forever client itself is not supported:
-  `SetDesaturation` is missing there, which breaks every AceGUI checkbox, and the work is tracked in
-  LibKa0s#44. Re-check when that issue moves.
+- ~~**The WoW Forever client (recorded, not ruled).**~~ **Ruled in v2.103.0, by the owner's decision of
+  2026-11-07.** The collection supports Retail and WoW Forever from one codebase, each addon declaring
+  what it ships in the roster's **Clients** column (clients). The *WoW Forever* skin stays a look usable
+  on Retail (skinning-§4), and is not the client. The `SetDesaturation` gap that made this "not
+  supported" (LibKa0s#44) is the library's to close for the clients it supports; the standard no longer
+  waits on it.
+- **CurseForge tagging of a two-number Interface line (open, verify at the first port).** packaging
+  assumes the packager tags one file for both clients from `## Interface: <retail>, <forever>`. The first
+  `Retail · Forever` addon to release verifies that on CurseForge before any other relies on it.
 - **A pre-clear hook on `RenderTabbedSchema`'s tab switch (recorded, library-first).** The strip's `onSelect` runs `O.ClearScroll(ctx)` and re-enters `O.RenderTabbedSchema` directly, so no host code runs before the clear. Two addons decline adoption for exactly that: ConsumableMaster#41 (the Macro Bar's Buttons tab) and MultiMeters#53 (the Columns page) each hold a live reorder handle that goes back into AceGUI's process-wide pool, still parented, if the clear runs before the host cancels the drag; both pin the behavior in a test. KickCD#23 declines for a neighbor: `disabledNotice` heads the rows instead of replacing them, and the strip is inert only through a private field. What would unblock all three is a library change (an `opts.beforeClear(ctx)` hook, a notice that replaces the rows, and the strip's buttons returned to the host), not a standard change. Re-check when `LibKa0s-Options-1.0` ships the hook (`harvests/2026-11-06/02_FINDINGS.md`, F6-02).
 - **Chat an addon sends on the player's behalf (recorded, no rule yet).** No section says when an addon may put text in a chat channel as the player, how it is throttled, or what a test mode and a simulator must refuse beyond preview-mode's no-send contract. DropWatcher's register carries a row marked "(no rule yet)" and its issue #11 is open; QuickComms sends callouts by design. Two addons are not yet a rule; re-check when a third addon sends chat, or either one's register row is challenged (`harvests/2026-11-06/02_FINDINGS.md`, F5-03).
 - **A moved `LibKa0s` tag (recorded, owner-first).** `LibKa0s v1.85.0` was re-cut after it was pushed (`550ef68`), and fourteen addons re-vendored on 2026-11-04 under an unchanged `v1.85.0` provenance string; two (KickCD, PartyFrameEnhanced) wrote a `-recut` re-vendor bundle and twelve did not. DropWatcher once vendored a branch tip labeled v1.87.0 (`b2726c7`). The provenance line names a tag and no commit, so a moved tag is invisible to every check, though the kit's `vendor_sync.lua` compares bytes. Re-cuts have been owner-directed, so whether a pushed tag may move is the owner's ruling first, and a provenance line that names the commit is the cheap half either way (`harvests/2026-11-06/02_FINDINGS.md`, F8-06).

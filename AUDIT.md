@@ -464,6 +464,26 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      non-128 file at the right path is the same finding in its subtler form. The **landing-page**
      logo is a different, larger file in the same folder and is **not** a finding for being neither
      128 nor uncompressed (`options-ui-§5`).
+   - **Read the addon's Clients value first, and apply the check set for it (`clients`, v2.103.0).**
+     `standards/ADDONS.md`'s **Clients** column is the single source of truth for what the addon ships
+     today; read the row before anything below that touches the TOC, detection, a feature or a seed list,
+     and never infer the value from the code. Then apply the checks the table under that column defines:
+     - **`Retail · Forever`:** the TOC carries `## Interface: <retail>, <forever>` and no load-gating line
+       (`toc-file-§3`); no `WOW_PROJECT_*` read and no interface-number comparison outside
+       `LibKa0s-Compat-1.0` (`grep -rnE 'WOW_PROJECT_|GetBuildInfo' --include='*.lua' .`, `libs/` and
+       `tests/_kit/` excluded; anti-patterns #113, #114, #117); every per-client feature carries a `clients`
+       declaration or a `Compat.ForClient` gate at registration and none is registered and then hidden
+       (`clients-§4`, #115) and `docs/ARCHITECTURE.md` carries the per-client feature table; seed lists are
+       two lists picked once through `ClientKey()` (`clients-§5`, #116); the suite is green under both kit
+       profiles (`KA0S_KIT_CLIENT`, `clients-§6`) and `docs/smoke-tests.md` covers both clients; the README
+       badge and supported-clients line name both (`documentation-§1`).
+     - **`Retail`:** one number plus exactly `## AllowLoadGameType: standard` and
+       `## ExcludeLoadGameType: camelot` (`toc-file-§3`); no Forever branch, seed list or `forever` token.
+     - **`Retail (port pending)`:** one number and **no** load-gating line. Do **not** flag the missing
+       dual-client shapes. **Do** flag a new Retail-only feature added with no `clients = { "retail" }`
+       declaration (`clients-§8`).
+     A row that disagrees with the TOC (a dual-client TOC on a pending row, a gate on a pending row) is a
+     finding against `clients-§2`; say which of the two to correct from the code's shipped state.
    - **`X-Curse-Project-ID` on an unpublished addon is not a deviation (`toc-file-§1`).** If the
      field is absent and the TOC carries a comment in its position saying the addon is not published
      yet, that is **compliant** — record it as such and file nothing. A placeholder, invented, or

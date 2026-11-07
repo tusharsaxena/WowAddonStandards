@@ -54,15 +54,26 @@ against the client.
 - **SHOULD NOT** use `SavedVariablesPerCharacter` unless the data is genuinely per-character (most Ka0s addons run profile-per-character via AceDB; that's enough).
 - **MUST** declare `schemaVersion = 0` in defaults — the pre-migration floor, never the current version, which lives in `NS.SCHEMA_VERSION` (savedvariables-§1 says why and who advances the stamp). **MUST** ship a `Database.lua` migration runner even if the body is empty — schema migration is a from-day-one concern.
 
-### 3. Retail only — single Interface line
+### 3. Clients and the Interface line
 
-The collection targets **Retail (Mainline) only**. Classic/other flavors are out of scope for the standard.
+The collection supports **Retail and WoW Forever** from one codebase (clients). Which of the two an addon ships today is its **Clients** value in the roster (`ADDONS.md`), and the value decides the TOC. Whatever the value, there is **one** TOC, `<Addon>.toc`, and **no** per-client TOC file.
 
-- **MUST** ship a single TOC with a **single** `## Interface:` value = the **latest Retail patch** interface number. The standard deliberately carries no literal for it, because a number written here goes stale the next patch: the collection's current value is the one its addons ship (the roster, `ADDONS.md`, lists them), and `/dev-copilot:wow-bump-interface` determines the Live value and bumps it each patch.
-- **MUST NOT** use a comma-separated multi-flavor Interface list, per-flavor TOC files, or `enable-toc-creation` flavor fan-out.
-- **MUST NOT** ship `_Mainline`/`_Classic` data splits. Data files are plain (`Spells.lua`, `Data*.lua`).
-- **MUST NOT** use `if WOW_PROJECT_ID == ...` ladders inline in feature code. Any genuine cross-patch version check is a Retail-patch check and is branched in the compat family (`core/Compat.lua` or a `core/Compat<Topic>.lua`) behind a named flag (compat).
-- The README `[wow]` badge (canonical template `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, documentation-§1 #1) **MUST** show this same single Interface number and stay in lockstep with the TOC: bumping `## Interface:` and updating the badge is **one change**, never deferred (documentation).
+- **MUST** ship a single, unsuffixed TOC. **MUST NOT** ship per-flavor TOC files (`_Mainline`, `_Classic`, `_Vanilla`) or use `enable-toc-creation` flavor fan-out.
+- **`Retail · Forever`** (a ported, dual-client addon) **MUST** carry one `## Interface:` line with **two** numbers, the latest Retail patch and Forever's: `## Interface: <retail>, <forever>`, today `120105, 16001`. The line stays comma-separated in one TOC, and the client picks the number that matches it. **No** load-gating line.
+- **`Retail`** (Retail-only by the owner's decision) **MUST** carry **one** `## Interface:` number, the latest Retail patch, **and** both load-gating lines, so that the Forever client never lists the addon:
+
+  ```
+  ## Interface: <retail>
+  ## AllowLoadGameType: standard
+  ## ExcludeLoadGameType: camelot
+  ```
+
+  Both lines are needed: the wiki warns that when at least one game type is named and none is recognized by the client, the condition counts as satisfied, so an allow-list alone is not a safe gate and the exclude line is the one that holds. `ExcludeLoadGameType` is a directive from client 12.0.0, so the Retail number must be 12.0.0 or later, which every Ka0s addon is. Spelling and values: warcraft.wiki.gg, [TOC format](https://warcraft.wiki.gg/wiki/TOC_format) (the `AllowLoadGameType` and `ExcludeLoadGameType` directives; the game types are `standard`, which is Retail, and `camelot` and `forever`, which name WoW Forever). The two directives are the only form the standard uses; the inline `[AllowLoadGameType ...]` suffix on a file line is not part of the standard.
+- **`Retail (port pending)`** **MUST** carry **one** `## Interface:` number and **MUST NOT** carry a load-gating line: Forever players already run some of these addons out of date, and a gate would cut them off before the port decides anything (clients-§8).
+- The standard deliberately carries no literal for the Retail number, because a number written here goes stale the next patch: the collection's current value is the one its addons ship (the roster, `ADDONS.md`, lists them), and `/dev-copilot:wow-bump-interface` determines the Live value and bumps it each patch. The Forever number is `16001` (clients-§1) until Blizzard moves it.
+- **MUST NOT** ship `_Mainline`/`_Classic` or `_Retail`/`_Forever` data splits by file or TOC suffix that the client loads per flavor. Data files are plain (`Spells.lua`, `Data*.lua`). The one exemption is clients-§5's seed pair: two plainly named files (`data/Seeds_Retail.lua`, `data/Seeds_Forever.lua`) or two tables in one file, **both loaded by the one TOC on both clients**, with the list chosen at runtime through `ClientKey()`. Loading is not what differs per client there; only the choice is.
+- **MUST NOT** use `if WOW_PROJECT_ID == ...` ladders inline in feature code, or anywhere outside `LibKa0s-Compat-1.0`. Detection goes through the Compat API (clients-§3); a genuine cross-patch version check is a Retail-patch check and is branched in the compat family (`core/Compat.lua` or a `core/Compat<Topic>.lua`) behind a named flag (compat).
+- The README `[wow]` badge (canonical template `![WoW](https://img.shields.io/badge/WoW-<Expansion>_<X.Y.Z>-purple)`, documentation-§1 #1) **MUST** show the same number or numbers as the TOC and stay in lockstep with it: bumping `## Interface:` and updating the badge is **one change**, never deferred (documentation). A `Retail · Forever` addon's badge names both clients (documentation-§1 #1).
 
 ### 4. File listing
 

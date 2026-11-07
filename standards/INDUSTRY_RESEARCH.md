@@ -205,7 +205,7 @@ layer, so it names the reference addons; the normative standard describes these 
 naming addons — see `STANDARDS.md` (the reading guide).) This is a targeted addendum, not a full 10-addon
 re-survey — these changes are mostly Ka0s-preference decisions with partial industry support.
 
-- **Retail-only single Interface — a deliberate divergence.** toc-file-§3 above records that a **multi-flavor
+- **Retail-only single Interface — a deliberate divergence.** *(Superseded in v2.103.0: Retail and Forever are both supported, declared per addon; see clients and toc-file-§3. The research below is left as written.)* toc-file-§3 above records that a **multi-flavor
   TOC is the industry norm (8 of 10)**. The standard **rejects** it: the Ka0s collection ships
   **Retail only** with a single latest-Retail `## Interface:` line. This is an intentional scope
   decision (the collection targets Retail), not an industry-aligned one — noted here so future
