@@ -2,10 +2,11 @@
 
 ## Clients — Retail and WoW Forever
 
-The collection supports **two game clients**: Retail, and WoW Forever (Blizzard's vanilla-era game type, "Camelot"). Each addon serves both from **one codebase**: one repo, one unsuffixed TOC, one `libs/` tree. There are no separate Forever addons, and no Classic flavors. This section says which clients exist, how an addon declares the ones it supports, how it asks which one it is on, and how a feature or a seeded list that only one client can have is kept apart from the other. It is the owner's ruling of 2026-11-07, and two rules follow from it that the sections below only apply:
+The collection supports **two game clients**: Retail, and WoW Forever (Blizzard's vanilla-era game type, "Camelot"). Each addon serves both from **one codebase**: one repo, one unsuffixed TOC, one `libs/` tree. There are no separate Forever addons, and no Classic flavors. This section says which clients exist, how an addon declares the ones it supports, how it asks which one it is on, and how a feature or a seeded list that only one client can have is kept apart from the other. It is the owner's ruling of 2026-11-07, and the rules that follow from it are these, which the sections below and skinning-§2 apply:
 
 - **A feature is absent, never just hidden, on a client that cannot support it.** A Forever player never sees a Retail-only feature (the group finder, the warband bank, Mythic+, transmog, the Encounter Journal), and a Retail player never sees a Forever-only one.
 - **Seed lists are kept per client.** Spells, items, talents and similar seeded data, and the actions built on them, have one list per client. Forever gets its own list, not a filtered Retail one.
+- **The default skin is per client** (owner ruling of 2026-11-08): WoW Forever on Forever, Ka0s Default on Retail, answered by the library and never by an addon's own client check (skinning-§2).
 
 ### 1. The supported clients
 

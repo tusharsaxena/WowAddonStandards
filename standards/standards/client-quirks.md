@@ -206,6 +206,22 @@ spelling. *Source:* DropWatcher `docs/midnight-quirks.md`, the research's enum v
 build a `Name-Realm` key before the realm is known; defer, or fall back to `GetRealmName` with its spaces
 and hyphens removed. *Source:* DropWatcher `docs/midnight-quirks.md`, realm names; four repos (Q25).
 
+**On Forever a character's name is two words, and its realm is a long ruleset label.** *Client:* Forever
+(1.60.1, build 70790). Every character has a first name and a last name, and only the pair is unique, so
+two characters share a first name ("Traxex Silentshot"). A realm is not a short unique word like
+"Frostmourne" but a descriptive label such as "CAMWOW AU1 Realm 2 PvP", and players know it by its
+ruleset (Normal, PvP, RP-PvP), not by name. *Measured:* the owner's report and screenshot of 2026-11-08;
+what each API returns for the pair is *not measured* (§6). *Cost:* a name column, nameplate-sized label,
+tooltip line or profile key (`Name - Realm`, AceDB's character key) sized for one Retail word truncates
+or overflows, and code that takes the first word, or the text before a space, as the name merges two
+different characters. *Do:* treat a character name as a string that can contain a space and is unique
+only whole; never split it on whitespace or key anything on its first word; size every surface that shows
+a name, and every surface that shows a realm or a profile key, for the long Forever form, or truncate it
+with the whole value in a tooltip; where a realm is shown for orientation, prefer the ruleset to the raw
+label. *Source:* the owner's ruling of 2026-11-08 during the WoW Forever port's step 5
+(Ka0sAddonsCommonTasks `docs/2026-11-07-WOW_FOREVER_PORT_STEP5/`), recorded ahead of the two-repo bar by
+that ruling.
+
 **A template-less `FontString` with no font raises on `SetText`.** "Font not set" from a `FontString`
 created without a template or `SetFontObject` takes the addon down at load; a mock that does not enforce it
 passes every test. *Do:* give every bare `FontString` a font object before its first `SetText`; the kit's
@@ -216,7 +232,8 @@ mock enforces it. *Source:* MultiMeters `tests/mock_frame.lua`, the font-not-set
 
 Each needs an in-game probe, recorded with the build, before any section of this standard changes.
 
-- **WoW Forever behaviors (none recorded yet).** The catalog was written on Retail. The Forever client (build 70790) has a missing-API surface, `SetDesaturation` among it, that LibKa0s tracks in LibKa0s#44, and no quirk entry yet meets this section's two-repo bar for it. Record a Forever behavior in the repo that meets it, with the build, and promote it by a harvest like any other.
+- **WoW Forever behaviors (one recorded).** The catalog was written on Retail. The Forever client (build 70790) has a missing-API surface, `SetDesaturation` among it, that LibKa0s tracks in LibKa0s#44. One Forever entry is in §5, the two-word names and long realm labels, by the owner's ruling. Record any other Forever behavior in the repo that meets it, with the build, and promote it by a harvest like any other.
+- **What the name APIs return for a two-word Forever name (open).** Unprobed on build 70790: whether `UnitName`, `GetUnitName(unit, true)`, `UnitFullName`, a chat event's sender and `Ambiguate` hand back "First Last" with its space, the first name alone, or a joined form; what `GetRealmName` and `GetNormalizedRealmName` answer for a label like "CAMWOW AU1 Realm 2 PvP", and whether a `Name-Realm` string still splits cleanly on its hyphen; and where, if anywhere, the ruleset is readable. Probe each on Forever, on your own character and on another player's, with the build, before an addon that keys on names (a loot, chat or party addon) is ported. Until then §5's entry stands as written.
 
 - **`string.format` on a secret.** events-frames-taint-§8 says it raises, with three repos; two say it
   works, one with a mid-combat observation. The likely difference is the specifier (`%s` against `%d` and

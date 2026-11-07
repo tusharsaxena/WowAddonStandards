@@ -349,7 +349,8 @@ Items recorded for future versions of this standard:
 - ~~**The WoW Forever client (recorded, not ruled).**~~ **Ruled in v2.103.0, by the owner's decision of
   2026-11-07.** The collection supports Retail and WoW Forever from one codebase, each addon declaring
   what it ships in the roster's **Clients** column (clients). The *WoW Forever* skin stays a look usable
-  on Retail (skinning-§4), and is not the client. The `SetDesaturation` gap that made this "not
+  on Retail (skinning-§4), and is not the client; from v2.104.0 it is the Forever client's default skin
+  (skinning-§2). The `SetDesaturation` gap that made this "not
   supported" (LibKa0s#44) is the library's to close for the clients it supports; the standard no longer
   waits on it.
 - **CurseForge tagging of a two-number Interface line (open, verify at the first port).** packaging
