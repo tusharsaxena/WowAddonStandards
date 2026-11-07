@@ -16,14 +16,14 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 
 | Addon | Folder | Repository | Clients | Launcher menu entries (launcher-§2) | Skin picker preview (skinning-§10) | Sim mode checkbox (options-ui-§15) |
 |---|---|---|---|---|---|---|
-| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Retail (port pending) | Enabled · Locked · Sim mode | unlock | next to Lock frame |
+| Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Retail · Forever | Enabled · Locked · Sim mode | unlock | next to Lock frame |
 | Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Retail (port pending) | Enabled · Locked · Test mode | test | none |
 | Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail (port pending) | Enabled · Locked (the macro bar) | unlock | none |
 | Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
 | Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Retail (port pending) | Enabled · Locked · Sim mode | unlock | next to Lock frame |
-| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Retail (port pending) | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
+| Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Retail · Forever | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
 | Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
 | Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (its meter windows) | test | next to Test mode |
 | Ka0s Outfitter Reborn | `../../OutfitterReborn/` | https://github.com/tusharsaxena/Outfitter | Retail (port pending) | Enabled · Locked (the outfit bar) · Test mode · Show window (the outfit window) | test | none |

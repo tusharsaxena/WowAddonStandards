@@ -206,6 +206,38 @@ spelling. *Source:* DropWatcher `docs/midnight-quirks.md`, the research's enum v
 build a `Name-Realm` key before the realm is known; defer, or fall back to `GetRealmName` with its spaces
 and hyphens removed. *Source:* DropWatcher `docs/midnight-quirks.md`, realm names; four repos (Q25).
 
+**On Forever a character's name is two words, unique per region, and its realm is a long label.** *Client:*
+Forever (1.60.1, build 70790). *Measured:* the owner's in-game probe of 2026-11-08 (Ka0sAddonsCommonTasks
+`docs/2026-11-07-WOW_FOREVER_PORT_STEP5/W1_FOREVER_NAME_PROBE.md`). Every character has a first name and a
+surname, and only the pair is unique; `RegionalUniqueNamesEnabled()` answers true. The name APIs answer:
+
+| Call | Forever answers | Retail answers |
+|---|---|---|
+| `UnitName(unit)`, `UnitFullName(unit)` | `"Traxex"`, `"Silentshot"`: the **surname** second | the name, then the realm (nil on your own realm) |
+| `GetUnitName(unit, true)`, `Ambiguate(…, "short")` | `"Traxex Silentshot"` | `"Name"`, or `"Name-Realm"` across realms |
+| a chat event's sender (arg 2) | `"Doom Dock"`, no realm suffix | `"Name-Realm"` |
+| `GetRealmName()` / `GetNormalizedRealmName()` | `"CAMWOW AU1 Realm 2 PvP"` / `"CAMWOWAU1Realm2PvP"` | the realm, with and without its spaces |
+| AceDB-3.0 40's `db.keys` | `char` `"Traxex Silentshot"`, `realm` `"PvP"`, `factionrealm` `"Alliance - PvP"` | `"Name - Realm"`, the realm |
+
+Players know a realm by its ruleset (Normal, PvP, RP-PvP), not by its label, and there is no cross-realm play to
+put a realm on another player. *Cost:* `local name, realm = UnitName(unit)` reads the surname as a realm and
+builds `"Traxex-Silentshot"`; a one-value `UnitName(unit)` keeps only the first name, so two characters that
+share one ("Traxex Silentshot", "Traxex Ironhide") collide in a key, a filter or a roster; a surface sized for
+one Retail word truncates the pair; a `Name-Realm` key built from `GetNormalizedRealmName` is unique but is
+not the identity the player or AceDB uses. *Do:* read a character through `LibKa0s-Compat-1.0`'s identity readers (from `LibKa0s v1.94.0`):
+`UnitCharacterName(unit)` for any unit, `CharacterKey()` and `RealmKey()` for the player, and `RegionalNames()`
+for the question itself. They implement this rule. When `RegionalUniqueNamesEnabled` exists and answers true,
+a character's identity is its **whole name**: `GetUnitName(unit, true)` for any unit, or
+`UnitNameUnmodified("player")`'s two returns joined by a space for the player, and its realm is the
+**ruleset** AceDB 40 derives from `C_GameRules` (`Hardcore`, `RP-PvP`, `RP`, `PvP`, `PvE`). The ruleset is the realm key for stored realm data too, by the owner's
+ruling of 2026-11-08, so two PvP realms share one realm key. An addon whose
+profile store is AceDB reads those as `db.keys.char` and `db.keys.realm` and never derives them again. That
+test is feature detection inside the compat family (clients-§3, compat), never a client check in feature
+code. Never read `UnitName`'s second return as a realm, never split a name on whitespace or key on its first
+word, and size every surface that shows a name, a realm or a profile key for the long form, or truncate it
+with the whole value in a tooltip. *Source:* the owner's ruling and probe of 2026-11-08 during the WoW
+Forever port's step 5, recorded ahead of the two-repo bar by that ruling; AceDB-3.0 minor 40's key block.
+
 **A template-less `FontString` with no font raises on `SetText`.** "Font not set" from a `FontString`
 created without a template or `SetFontObject` takes the addon down at load; a mock that does not enforce it
 passes every test. *Do:* give every bare `FontString` a font object before its first `SetText`; the kit's
@@ -216,8 +248,7 @@ mock enforces it. *Source:* MultiMeters `tests/mock_frame.lua`, the font-not-set
 
 Each needs an in-game probe, recorded with the build, before any section of this standard changes.
 
-- **WoW Forever behaviors (none recorded yet).** The catalog was written on Retail. The Forever client (build 70790) has a missing-API surface, `SetDesaturation` among it, that LibKa0s tracks in LibKa0s#44, and no quirk entry yet meets this section's two-repo bar for it. Record a Forever behavior in the repo that meets it, with the build, and promote it by a harvest like any other.
-
+- **WoW Forever behaviors (one recorded).** The catalog was written on Retail. The Forever client (build 70790) has a missing-API surface, `SetDesaturation` among it, that LibKa0s tracks in LibKa0s#44. One Forever entry is in §5, the two-word names and long realm labels, measured on build 70790. Record any other Forever behavior in the repo that meets it, with the build, and promote it by a harvest like any other.
 - **`string.format` on a secret.** events-frames-taint-§8 says it raises, with three repos; two say it
   works, one with a mid-combat observation. The likely difference is the specifier (`%s` against `%d` and
   `%.1f`) or that the result is itself a secret string. Probe each specifier, in combat, on a damage-meter
