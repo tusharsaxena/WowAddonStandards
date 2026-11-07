@@ -216,7 +216,7 @@ mock enforces it. *Source:* MultiMeters `tests/mock_frame.lua`, the font-not-set
 
 Each needs an in-game probe, recorded with the build, before any section of this standard changes.
 
-- **WoW Forever behaviors (none catalogued yet).** The catalog was written on Retail. The Forever client (build 70790) has a missing-API surface, `SetDesaturation` among it, that LibKa0s tracks in LibKa0s#44, and no quirk entry yet meets this section's two-repo bar for it. Record a Forever behavior in the repo that meets it, with the build, and promote it by a harvest like any other.
+- **WoW Forever behaviors (none recorded yet).** The catalog was written on Retail. The Forever client (build 70790) has a missing-API surface, `SetDesaturation` among it, that LibKa0s tracks in LibKa0s#44, and no quirk entry yet meets this section's two-repo bar for it. Record a Forever behavior in the repo that meets it, with the build, and promote it by a harvest like any other.
 
 - **`string.format` on a secret.** events-frames-taint-§8 says it raises, with three repos; two say it
   works, one with a mid-combat observation. The likely difference is the specifier (`%s` against `%d` and
