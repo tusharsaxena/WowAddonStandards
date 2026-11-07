@@ -27,10 +27,10 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
 | Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (its meter windows) | test | next to Test mode |
 | Ka0s Outfitter Reborn | `../../OutfitterReborn/` | https://github.com/tusharsaxena/Outfitter | Retail (port pending) | Enabled · Locked (the outfit bar) · Test mode · Show window (the outfit window) | test | none |
-| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Retail (port pending) | Enabled · Locked | unlock | none |
-| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Retail (port pending) | Enabled · Locked | unlock | none |
+| Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Retail · Forever | Enabled · Locked | unlock | none |
+| Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Retail · Forever | Enabled · Locked | unlock | none |
 | Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Retail | Enabled · Test mode (the attached panel shown on its own) | test | none |
-| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Retail (port pending) | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
+| Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Retail · Forever | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
 | Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Retail (port pending) | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Retail | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
 
