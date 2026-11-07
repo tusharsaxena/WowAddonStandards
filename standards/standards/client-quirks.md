@@ -224,10 +224,13 @@ put a realm on another player. *Cost:* `local name, realm = UnitName(unit)` read
 builds `"Traxex-Silentshot"`; a one-value `UnitName(unit)` keeps only the first name, so two characters that
 share one ("Traxex Silentshot", "Traxex Ironhide") collide in a key, a filter or a roster; a surface sized for
 one Retail word truncates the pair; a `Name-Realm` key built from `GetNormalizedRealmName` is unique but is
-not the identity the player or AceDB uses. *Do:* when `RegionalUniqueNamesEnabled` exists and answers true,
+not the identity the player or AceDB uses. *Do:* read a character through `LibKa0s-Compat-1.0`'s identity readers (from `LibKa0s v1.94.0`):
+`UnitCharacterName(unit)` for any unit, `CharacterKey()` and `RealmKey()` for the player, and `RegionalNames()`
+for the question itself. They implement this rule. When `RegionalUniqueNamesEnabled` exists and answers true,
 a character's identity is its **whole name**: `GetUnitName(unit, true)` for any unit, or
 `UnitNameUnmodified("player")`'s two returns joined by a space for the player, and its realm is the
-**ruleset** AceDB 40 derives from `C_GameRules` (`Hardcore`, `RP-PvP`, `RP`, `PvP`, `PvE`). An addon whose
+**ruleset** AceDB 40 derives from `C_GameRules` (`Hardcore`, `RP-PvP`, `RP`, `PvP`, `PvE`). The ruleset is the realm key for stored realm data too, by the owner's
+ruling of 2026-11-08, so two PvP realms share one realm key. An addon whose
 profile store is AceDB reads those as `db.keys.char` and `db.keys.realm` and never derives them again. That
 test is feature detection inside the compat family (clients-§3, compat), never a client check in feature
 code. Never read `UnitName`'s second return as a realm, never split a name on whitespace or key on its first
