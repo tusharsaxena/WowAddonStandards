@@ -353,6 +353,7 @@ Items recorded for future versions of this standard:
   (skinning-§2). The `SetDesaturation` gap that made this "not
   supported" (LibKa0s#44) is the library's to close for the clients it supports; the standard no longer
   waits on it.
+- **The Forever-only load gate (open, verify at the first `Forever` smoke).** clients-§9's pair, `## AllowLoadGameType: camelot` and `## ExcludeLoadGameType: standard`, mirrors the Retail-only pair from the wiki's directive and game-type names; no Forever-only addon has shipped yet. Ka0s Skill Master's first owner smoke checks that the Forever client lists and loads it and the Retail client does not list it. Re-check then: close this entry, or correct toc-file-§3 if either client disagrees.
 - **CurseForge tagging of a two-number Interface line (open, verify at the first port).** packaging
   assumes the packager tags one file for both clients from `## Interface: <retail>, <forever>`. The first
   `Retail · Forever` addon to release verifies that on CurseForge before any other relies on it.

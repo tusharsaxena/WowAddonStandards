@@ -35,7 +35,12 @@ KA0S_KIT_CLIENT=forever tests/_kit/run-automated-tests.sh --suite tests --no-bun
 ```
 
 A suite green on one profile and red on the other is a `red` record, and the profile that failed is
-named. A `Retail` or `Retail (port pending)` addon runs the default profile only.
+named. A `Retail` or `Retail (port pending)` addon runs the default profile only. A `Forever` addon runs
+every command above with `KA0S_KIT_CLIENT=forever` set, and never on the default profile (`clients-§6`):
+
+```sh
+KA0S_KIT_CLIENT=forever tests/_kit/run-automated-tests.sh      # a Forever-only addon's full battery
+```
 
 If the runner fails with `bad interpreter` or a `\r`-shaped syntax error, it arrived CRLF: the repo's
 `.gitattributes` is missing `*.sh text eol=lf`, or has it and was never renormalized. The rule and the

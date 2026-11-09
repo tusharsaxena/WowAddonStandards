@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.104.0, 2026-11-08)
+# New Ka0s Addon — Context Pack (v2.105.0, 2026-11-10)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -28,7 +28,7 @@
 
 Authoritative reference: `WowAddonStandards/standards/STANDARDS.md`. This document is its operational distillation. Every Ka0s addon is built to the standard and references it: <https://github.com/tusharsaxena/WowAddonStandards>.
 
-**Scope:** Retail and WoW Forever from one codebase (clients). A new addon is born dual-client: roster row `Retail · Forever`, one unsuffixed TOC with `## Interface: <retail>, <forever>`, detection only through `LibKa0s-Compat-1.0`, per-client features declared and gated at registration, per-client seed lists, and the suite green under both kit profiles (`KA0S_KIT_CLIENT`).
+**Scope:** Retail and WoW Forever from one codebase (clients). A new addon is born dual-client: roster row `Retail · Forever`, one unsuffixed TOC with `## Interface: <retail>, <forever>`, detection only through `LibKa0s-Compat-1.0`, per-client features declared and gated at registration, per-client seed lists, and the suite green under both kit profiles (`KA0S_KIT_CLIENT`). Single-client (`Retail` or `Forever`) is the owner's decision, taken only when the addon's core does not exist on the other client, and the README and `docs/ARCHITECTURE.md` record the reason (clients-§2, clients-§7, clients-§9).
 
 ---
 
@@ -89,7 +89,7 @@ Then keep it compliant over time with the `dev-copilot:` skills listed at the en
 - **Author:** add1kted2ka0s (Ka0s)
 - **License:** MIT (always; no exceptions)
 - **Substrate:** Ace3
-- **Scope:** Retail and WoW Forever (clients) — dual-client by default, with `## Interface: <retail>, <forever>` in the one TOC
+- **Scope:** Retail and WoW Forever (clients) — dual-client by default, with `## Interface: <retail>, <forever>` in the one TOC; single-client (`Retail` or `Forever`) only by the owner's decision
 - **TOC `Title` prefix:** `Ka0s <Human Name>`
 - **SavedVariables:** `<Addon>DB`
 - **Slash:** 2-3 lowercase chars
@@ -106,7 +106,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
 
 ```
 <Addon>/
-  <Addon>.toc            -- one Interface line (latest Retail, plus Forever's number when dual-client)
+  <Addon>.toc            -- one Interface line (latest Retail, plus Forever's number when dual-client; Forever's alone when Forever-only)
   Bindings.xml           -- key bindings: owed by every addon with a Show window entry (launcher-§6), else ONLY
                          -- if the addon ships bindings; exactly this name, at the root, never in the TOC; no Lua
                          -- beyond what the client requires, labels set from a module (layout-§1)
@@ -264,7 +264,7 @@ resolves and which files satisfy it (toc-file-§5).
 partial-vendoring mistake spelled differently, and it drifts the moment the library gains a file
 (library-stack-§7). The library block never carries an addon-authored `embeds.xml` (anti-pattern #38).
 
-The `## Interface:` is **one line in one unsuffixed TOC** (toc-file-§3): a dual-client addon carries two numbers, `<latest Retail>, <Forever>` (today `120105, 16001`), and no load-gating line; a Retail-only addon, one number plus `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot`. Bump the Retail number each patch with `dev-copilot:wow-bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
+The `## Interface:` is **one line in one unsuffixed TOC** (toc-file-§3): a dual-client addon carries two numbers, `<latest Retail>, <Forever>` (today `120105, 16001`), and no load-gating line; a Retail-only addon, one number plus `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot`; a Forever-only addon, `## Interface: 16001` plus `## AllowLoadGameType: camelot` and `## ExcludeLoadGameType: standard`. Bump the Retail number each patch with `dev-copilot:wow-bump-interface`, and keep the README `[wow]` badge in lockstep. Field order and section comments are fixed (toc-file-§1, toc-file-§5).
 
 ### `<Addon>.lua` (entry)
 
@@ -1555,7 +1555,7 @@ marked as such rather than listed as a requirement.
 
 ## Runtime (in-game) — what a player needs
 
-- **World of Warcraft (Retail, and WoW Forever for a dual-client addon).** One `## Interface:` line in `<Addon>.toc`, with the Forever number beside the Retail one when the addon supports both (toc-file-§3).
+- **World of Warcraft (Retail, and WoW Forever for a dual-client addon; WoW Forever alone for a `Forever` one).** One `## Interface:` line in `<Addon>.toc`, with the Forever number beside the Retail one when the addon supports both, and alone when it is Forever-only (toc-file-§3).
 - **Nothing else.** Every library is vendored under `libs/` and committed (library-stack), so the
   player installs no separate library addon. `## OptionalDeps:` names the vendored libs for load
   ordering, not as things to download.
@@ -1639,7 +1639,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 2. SavedVariables: `<Addon>DB` with `schemaVersion = 0` in defaults and the runner's target in `NS.SCHEMA_VERSION` (savedvariables-§1), plus **`<Addon>PerfDB`** — the diagnostics capture ring, the one sanctioned non-AceDB global, deliberately outside the profile tree (savedvariables-§4, performance-§5). Exactly those two; a third is non-compliant.
 3. License: MIT.
 4. Folder casing: `<Addon>/` PascalCase, all subfolders lowercase (`libs/` not `Libs/`).
-5. TOC: one `## Interface:` line — `<retail>, <forever>` for a dual-client addon, one number plus the two load-gating lines for a Retail-only one (toc-file-§3) — plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge; **before that, omitted with a one-line comment in its position — never a placeholder id, which would publish this addon into somebody else's project**). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
+5. TOC: one `## Interface:` line — `<retail>, <forever>` for a dual-client addon, one number plus that client's two load-gating lines for a Retail-only or a Forever-only one (toc-file-§3) — plus `X-Standard`, and `X-Curse-Project-ID` (mandatory once published on CurseForge; **before that, omitted with a one-line comment in its position — never a placeholder id, which would publish this addon into somebody else's project**). `X-Wago-ID` / `X-WoWI-ID` are optional — include each only if the addon is actually listed on that platform.
 6. Slash: AceConsole `:RegisterChatCommand`. Never raw `SLASH_*`.
 7. Locale: metatable fallback `__index = function(_,k) return k end`. Never AceLocale strict.
 7a. **US English everywhere** (localization-§5): every English word you author — locale keys and their `enUS` values, chat/console output, options labels and tooltips, slash help, README and `docs/` prose, code comments, and identifiers — uses **US** spelling. `color` not `colour`, `gray` not `grey`, `behavior` not `behaviour`, `center`/`centered` not `centre`/`centred`, `canceled` not `cancelled`, `-ize`/`-ization` not `-ise`/`-isation`, `catalog`/`dialog`/`defense`/`license`/`analyze`. WoW's own API is US-spelled (`SetTextColor`, `GRAY_FONT_COLOR`), so a British-spelled identifier sits one letter from the Blizzard symbol beside it and greps miss. Locale **keys are the English string**, so fixing a spelling **changes the key** — update it in every `locales/*.lua` and at every call site in the same change, or the metatable silently renders the raw key on that client. Reproduce verbatim (never "correct"): Blizzard/library symbols, quoted external text, published proper nouns, and a deliberate `locales/enGB.lua` translation.
@@ -1756,7 +1756,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 
 ## Definition of done (new addon ready for v0.1.0 release)
 
-- [ ] TOC has all required fields incl. the `## Interface:` line (`<retail>, <forever>`; or one number plus the two load-gating lines for a Retail-only addon), `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge; until then a commented placeholder-free line saying so).
+- [ ] TOC has all required fields incl. the `## Interface:` line (`<retail>, <forever>`; or one number plus that client's two load-gating lines for a Retail-only or a Forever-only addon), `X-Standard`, and `X-Curse-Project-ID` (once published on CurseForge; until then a commented placeholder-free line saying so).
 - [ ] Every **load-bearing** TOC position carries a comment naming what resolves at load; conventional positions are marked too (toc-file-§5). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`; the `ignore:` list names every root dot-entry the repo **actually has** and no entry it does not — `.claude/`, `.superpowers/` and `tools/` only once the folder exists (packaging).
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors** **with `tests/` in scope** — only `tests/_kit/` is excluded, and the harness global is declared in the `files["tests/"]` stanza rather than in top-level `read_globals` (lint).
@@ -1868,7 +1868,7 @@ of its **setup file**, never the machinery inside.
 - `dev-copilot:run-tests` — run the test battery (luacheck, the headless harness, any `make test`) and report a combined pass/fail. No record is kept; that is `automated-tests`.
 - `dev-copilot:wow-perf-analysis` — record and interpret an in-game perf run into a frozen `docs/perf-analysis/<run>/` bundle (performance-§8).
 - `dev-copilot:sync-docs` — eliminate doc drift across README, CLAUDE.md, ARCHITECTURE.md.
-- `dev-copilot:wow-bump-interface` — bump the Retail number of the TOC Interface line to the latest Retail patch (a dual-client addon's Forever slot moves only when the Forever client does).
+- `dev-copilot:wow-bump-interface` — bump the Retail number of the TOC Interface line to the latest Retail patch (a dual-client addon's Forever slot moves only when the Forever client does; a Forever-only addon has no Retail number to bump).
 - `dev-copilot:bump-version` — bump version everywhere (TOC, code constants, README badges + Version History, CLAUDE/ARCHITECTURE, CHANGELOG).
 - `dev-copilot:diff` — summarize uncommitted changes with risk assessment.
 - `dev-copilot:commit` — generated-message commit.
