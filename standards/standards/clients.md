@@ -84,6 +84,7 @@ An addon the owner has decided stays Retail-only carries `Retail` in the roster 
 - **MUST** keep one `## Interface:` number and **add** `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot` (toc-file-§3), so that the Forever client never lists it. Both lines are needed: the wiki warns that an allow-list the client does not recognize counts as a match, so the exclude line is the one that holds if the allow line is not understood.
 - **MUST** record why it is Retail-only in its README and its `docs/ARCHITECTURE.md` (clients-§2, clients-§4).
 - **MUST NOT** carry a Forever branch, a Forever seed list or a `forever` token: they would be dead code.
+- **MUST** carry `docs/midnight-quirks.md` (the Retail catalog, client-quirks-§1) and **no** `docs/forever-quirks.md`, which its documentation map records as *Not applicable* (documentation-§3). A `Retail (port pending)` addon carries the same one file until its port lands, and the port adds `docs/forever-quirks.md` in the change that flips the row.
 
 ### 8. The port-pending shape
 
@@ -103,3 +104,4 @@ An addon the owner has decided ships on WoW Forever only, because its core does 
 - **MUST NOT** carry a Retail branch (an `IsRetail()` read, a `ClientKey() == "retail"` test), a Retail seed list or a `clients = { "retail" }` declaration: they would be dead code. A seeded data file is the Forever list alone (a `<Name>_Forever.lua` file, clients-§5), not one half of a pair.
 - **SHOULD NOT** read the client at all: on its one client the answer is fixed. The library still answers per client where it decides (the default skin, skinning-§2, is WoW Forever here), and that is the library's read, not the addon's.
 - **MUST** run its suite as Forever and cover only Forever in its smoke file, plus the not-listed-on-Retail check (clients-§6).
+- **MUST** carry `docs/forever-quirks.md` (the Forever catalog, forever-quirks-§1) and **no** `docs/midnight-quirks.md`, which is a retired name in a Forever-only addon (documentation-§3): an addon that became Forever-only renames its file with `git mv` and keeps its own section. A dual-client (`Retail · Forever`) addon carries both files.

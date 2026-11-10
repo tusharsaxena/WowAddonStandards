@@ -169,7 +169,7 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   evidence quoting external addons — leave its wording alone.
 - **Never state a doc-set count without naming its members.** A bare count ("root ships three docs")
   is the shape that goes stale silently and gets mis-propagated. Always write the count *and* the
-  list. As of v2.106.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
+  list. As of v2.107.0 the sets are: **repo root** — exactly three docs plus `LICENSE`: a full
   `README.md`, a stub `CLAUDE.md`, and `DEPENDENCIES.md` (documentation-§1/§2/§7), and **never a
   `CHANGELOG.md`**, which is forbidden at an addon root and required at a Ka0s-owned **library**
   root (documentation-§1/§3, library-stack-§7); the **`docs/` canonical trio** — `ARCHITECTURE.md`,
@@ -181,14 +181,19 @@ Read order for a newcomer: `README.md` → `standards/STANDARDS.md` → the play
   the performance harness is wired, so an addon holding a recorded performance-§12 exemption ships
   four; and **Tier 1** — `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`,
   `data-flow.md`, `common-tasks.md`, all six unconditional and under exactly those names, with Tier 2
-  (`slash-dispatch.md`, `midnight-quirks.md`, `compat-layer.md`, `message-bus.md`, `profiles.md`,
+  (`slash-dispatch.md`, `midnight-quirks.md`, `forever-quirks.md`, `compat-layer.md`, `message-bus.md`, `profiles.md`,
   `debug.md`, `known-limitations.md`, `taint.md`; `perf-analysis/README.md` is a Tier 2 member too, its trigger stated under the
   verification-and-record docs above) required per stated trigger and recorded as *Not applicable* in the map when the
   trigger has not fired, except that since v2.68.0 the `docs/debug.md` trigger has fired in every
   addon (the diagnostics dump is a debug surface beyond the default console), so `docs/debug.md` is
-  never *Not applicable*, and since v2.102.0 `docs/midnight-quirks.md` is required in every addon, because
-  it carries the client-quirks catalog as a vendored block (client-quirks-§1), so it is never *Not
-  applicable* either, and Tier 3 free-form (documentation-§3).
+  never *Not applicable*, and since v2.107.0 the two quirks files are triggered per client by the
+  roster's **Clients** value: `docs/midnight-quirks.md` carries the Retail catalog, client-quirks, as a
+  vendored block and is required when Clients includes Retail (client-quirks-§1), and
+  `docs/forever-quirks.md` carries the Forever catalog, forever-quirks, and is required when Clients
+  includes Forever (forever-quirks-§1), so a dual-client addon carries both, a Forever-only addon only
+  `docs/forever-quirks.md` (its `docs/midnight-quirks.md` is a retired name), and a Retail-only or
+  port-pending addon only `docs/midnight-quirks.md` (from v2.102.0 to v2.106.0 `docs/midnight-quirks.md`
+  was required in every addon), and Tier 3 free-form (documentation-§3).
   `docs/automated-tests/RESULTS.md` is generated, one file overwritten in place — its single-path
   git history is the trend line — and a full run bundle is produced at **release**, never as a
   commit gate (automated-tests-§4/§6). **`docs/complexity.md` was retired in v2.19.0**; if you see

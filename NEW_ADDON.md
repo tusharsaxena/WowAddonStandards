@@ -350,7 +350,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    omitting it, because the tier model's whole value is that the same question has the same filename
    in every repo, and a slot left for later is a slot the next agent fills with a name of its own.
    Then evaluate each **Tier 2** trigger against the code you just wrote and either ship the doc or
-   record it as a *Not applicable* row carrying the trigger. `docs/debug.md` is never *Not
+   record it as a *Not applicable* row carrying the trigger. The two quirks files are triggered by the
+   addon's **Clients** value, not by the code: ship the one for each client it serves
+   (NEW_ADDON_CONTEXT item 20g). `docs/debug.md` is never *Not
    applicable*: the diagnostics dump is a debug surface, so its trigger has fired in every addon, and
    the page documents the report — both forms, append semantics, that a run turns debug logging on
    for the session, the section list, the caps and what the report does not read or call
