@@ -478,7 +478,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        profiles (`KA0S_KIT_CLIENT`, `clients-§6`) and `docs/smoke-tests.md` covers both clients; the README
        badge and supported-clients line name both (`documentation-§1`).
      - **`Retail`:** one number plus exactly `## AllowLoadGameType: standard` and
-       `## ExcludeLoadGameType: camelot` (`toc-file-§3`); no Forever branch, seed list or `forever` token.
+       `## ExcludeLoadGameType: camelot` (`toc-file-§3`); no Forever branch, seed list or `forever` token;
+       the reason it is Retail-only recorded in the README and `docs/ARCHITECTURE.md` (`clients-§2`).
+     - **`Forever`:** `## Interface: 16001` plus exactly `## AllowLoadGameType: camelot` and
+       `## ExcludeLoadGameType: standard` (`toc-file-§3`, `clients-§9`); no Retail branch (`IsRetail()`,
+       `ClientKey() == "retail"`), no Retail seed list and no `clients = { "retail" }` declaration; the
+       suite green under `KA0S_KIT_CLIENT=forever` and the smoke file covering Forever plus the
+       not-listed-on-Retail check (`clients-§6`); the README badge and supported-clients line name Forever
+       alone (`documentation-§1`); the reason it is Forever-only recorded in the README and
+       `docs/ARCHITECTURE.md` (`clients-§2`).
      - **`Retail (port pending)`:** one number and **no** load-gating line. Do **not** flag the missing
        dual-client shapes. **Do** flag a new Retail-only feature added with no `clients = { "retail" }`
        declaration (`clients-§8`).

@@ -44,7 +44,7 @@ The collection has the controlled experiment: on 2026-09-08 the line-ending clas
 
 - **Run unit tests:** `lua tests/run.lua` from the repo root (exits non-zero on failure).
 - **Lint:** `luacheck .` — **0 errors** (config in `.luacheckrc`, lint).
-- **Run unit tests as the other client (`Retail · Forever` addons):** `KA0S_KIT_CLIENT=forever lua tests/run.lua`. The vendored kit selects a client profile from `KA0S_KIT_CLIENT=retail|forever`, and **retail is the default**, so the bare command is the Retail run. The retail profile leaves `WOW_PROJECT_CAMELOT` nil, as Retail does. A `Retail · Forever` addon **MUST** be green under **both** profiles, and its commit gate runs both (clients-§6); a `Retail` or `Retail (port pending)` addon runs the default profile only.
+- **Run unit tests as the other client (`Retail · Forever` addons):** `KA0S_KIT_CLIENT=forever lua tests/run.lua`. The vendored kit selects a client profile from `KA0S_KIT_CLIENT=retail|forever`, and **retail is the default**, so the bare command is the Retail run. The retail profile leaves `WOW_PROJECT_CAMELOT` nil, as Retail does. A `Retail · Forever` addon **MUST** be green under **both** profiles, and its commit gate runs both (clients-§6); a `Retail` or `Retail (port pending)` addon runs the default profile only, and a `Forever` addon runs `KA0S_KIT_CLIENT=forever lua tests/run.lua` as its only test command, commit gate included (clients-§6, clients-§9).
 - **Syntax-check one file:** `luac -p path/to/file.lua`.
 
 Every command here, and in the kit's own vendoring instructions, assumes the **repo root** as the working directory. Two documents giving the same command from two different working directories is a bug in the documents.

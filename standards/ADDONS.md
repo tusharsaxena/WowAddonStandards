@@ -32,17 +32,22 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Retail | Enabled · Test mode (the attached panel shown on its own) | test | none |
 | Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Retail · Forever | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
 | Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Retail · Forever | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
+| Ka0s Skill Master | `../../SkillMaster/` | https://github.com/tusharsaxena/SkillMaster | Forever | Enabled · Locked · Test mode · Sim mode · Show window (the skills window) | test | next to Test mode |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Retail | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
 
 **The Clients column is normative input to an audit, not decoration** (v2.103.0). It is the single source of truth that
 `dev-copilot` and the audit read for which game clients an addon supports, and it records what the addon **ships today**,
 not what it is planned to ship: a port flips its row in the same change that lands the port. The value decides the TOC
-shape the addon needs (toc-file-§3) and what an audit flags (clients-§2). Three values, written verbatim:
+shape the addon needs (toc-file-§3) and what an audit flags (clients-§2). Four values, `Retail · Forever`, `Retail`, `Forever` and
+`Retail (port pending)`, written verbatim. `Retail · Forever` is the default; `Retail` and `Forever` are single-client values the
+owner sets when the addon's core does not exist on the other client, with the reason recorded in the addon's README and
+`docs/ARCHITECTURE.md` (clients-§2, owner ruling of 2026-11-10):
 
 | Value | Meaning | TOC shape it requires | What the audit flags |
 |---|---|---|---|
 | `Retail · Forever` | Ported. One codebase serves Retail and WoW Forever. | One unsuffixed TOC with a two-number line, `## Interface: <retail>, <forever>`. No load-gating line. | Any clients-§3..§6 shape that is missing or broken: detection outside Compat, an ungated per-client feature, a filtered seed list, a smoke file or test run that covers one client. |
-| `Retail` | Retail-only **by the owner's decision**, not ported and not to be. | One number, plus `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot`, so Forever never lists it. | A missing or misspelled load-gating line; a `WOW_PROJECT_CAMELOT` read or a Forever branch (dead code in a Retail-only addon). |
+| `Retail` | Retail-only **by the owner's decision**, not ported and not to be. | One number, plus `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot`, so Forever never lists it. | A missing or misspelled load-gating line; a `WOW_PROJECT_CAMELOT` read or a Forever branch (dead code in a Retail-only addon); no recorded reason in the README and `docs/ARCHITECTURE.md`. |
+| `Forever` | Forever-only **by the owner's decision**, because the addon's core does not exist on Retail (clients-§9). | One number, `## Interface: 16001`, plus `## AllowLoadGameType: camelot` and `## ExcludeLoadGameType: standard`, so Retail never lists it. | A missing or misspelled load-gating line; an `IsRetail()` read or other Retail branch, a Retail seed list, or a `clients = { "retail" }` declaration (dead code in a Forever-only addon); a suite not run as `KA0S_KIT_CLIENT=forever`; no recorded reason in the README and `docs/ARCHITECTURE.md`. |
 | `Retail (port pending)` | Retail today, not ported yet. A port flips the row to `Retail · Forever`. | One number and **no** load-gating line, because Forever players already run some of these addons out of date and must not be cut off. | A new Retail-only feature added with no declaration (clients-§4). It does **not** flag the missing dual-client shapes. |
 
 Both clients are named in clients-§1. The Clients column gives no addon a Classic value, because the collection has no Classic support.
