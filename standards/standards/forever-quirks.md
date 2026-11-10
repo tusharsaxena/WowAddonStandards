@@ -8,7 +8,7 @@ client-quirks, which is the **Retail** catalog. The two are kept apart because a
 client needs only that client's catalog, and because a behavior measured on one client is not assumed to
 hold on the other.
 
-*Why this section exists.* Through v2.106.0 the collection had one catalog, client-quirks, written on
+*Why this section exists.* Through v2.107.0 the collection had one catalog, client-quirks, written on
 Retail, and one Forever entry inside it (the two-word names, now §4). Ka0s Skill Master, Forever-only
 since v2.105.0 (clients-§9), carried that Retail catalog whole in its `docs/midnight-quirks.md` and had
 nowhere upstream to put what it measured on Forever: on 2026-11-10 (build 70862) the client answered a
@@ -147,7 +147,7 @@ code. Never read `UnitName`'s second return as a realm, never split a name on wh
 word, and size every surface that shows a name, a realm or a profile key for the long form, or truncate it
 with the whole value in a tooltip. *Source:* the owner's ruling and probe of 2026-11-08 during the WoW
 Forever port's step 5, recorded ahead of the two-repo bar by that ruling; AceDB-3.0 minor 40's key block.
-Carried in client-quirks-§5 from v2.103.0 to v2.106.0, and moved here in v2.107.0.
+Carried in client-quirks-§5 from v2.103.0 to v2.107.0, and moved here in v2.108.0.
 
 ### 5. Open probes and one-repo findings (not rules)
 

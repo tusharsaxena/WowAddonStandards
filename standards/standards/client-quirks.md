@@ -214,7 +214,7 @@ build a `Name-Realm` key before the realm is known; defer, or fall back to `GetR
 and hyphens removed. *Source:* DropWatcher `docs/midnight-quirks.md`, realm names; four repos (Q25).
 
 **On Forever a character's name is two words, and its realm is a long label.** Moved to forever-quirks-§4
-in v2.107.0, with the Forever catalog; it was here from v2.103.0 to v2.106.0.
+in v2.108.0, with the Forever catalog; it was here from v2.103.0 to v2.107.0.
 
 **A template-less `FontString` with no font raises on `SetText`.** "Font not set" from a `FontString`
 created without a template or `SetFontObject` takes the addon down at load; a mock that does not enforce it
@@ -226,7 +226,7 @@ mock enforces it. *Source:* MultiMeters `tests/mock_frame.lua`, the font-not-set
 
 Each needs an in-game probe, recorded with the build, before any section of this standard changes.
 
-- **WoW Forever behaviors.** Moved to forever-quirks in v2.107.0: its §5 holds the Forever open probes,
+- **WoW Forever behaviors.** Moved to forever-quirks in v2.108.0: its §5 holds the Forever open probes,
   the missing-API surface (LibKa0s#44) among them.
 - **`string.format` on a secret.** events-frames-taint-§8 says it raises, with three repos; two say it
   works, one with a mid-combat observation. The likely difference is the specifier (`%s` against `%d` and
