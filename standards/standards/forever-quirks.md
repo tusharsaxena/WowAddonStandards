@@ -97,8 +97,8 @@ one-repo bar.
 
 **`UnitStat` can answer a secret number.** *Client:* Forever (1.60.1, build 70862). *Measured:* the owner's
 in-game error, 2026-11-10: inside an AceTimer callback, a comparison on the value `UnitStat("player", i)`
-answered raised "attempt to compare field 'value' (a secret number value, while execution tainted by
-'SkillMaster')". Whether the player was in combat is not recorded. *Cost:* a raise on every rescan of the
+answered raised "attempt to compare field 'value' (a secret number value)" (the error as SkillMaster's
+`tests/test_statdata.lua` records it). Whether the player was in combat is not recorded. *Cost:* a raise on every rescan of the
 path that compares the stat; the stat line stops updating. *Do:* client-quirks-§2's rule: test
 `issecretvalue` before any comparison or arithmetic on a stat reader's return, keep the last plain value
 (marked stale) rather than the secret, and rescan on `PLAYER_REGEN_ENABLED`. *Retail entry:*
@@ -176,5 +176,6 @@ Each needs an in-game probe, recorded with the build, or a second repo, before i
   - `C_DamageMeter` ships whole, its two enums match Retail, and the player source's `amountPerSecond` is
     nil out of combat. *Measured:* build 70862, out of combat. *Source:* CombatTrail.
   - `Enum.ItemConsumableSubclass` keeps Retail's numbers and adds Draught 13, Device 14 and
-    ItemenhancementTemporary 15, while the stones and oils report subclass 8. *Measured:* build 70862 (the
-    subclass of stones and oils). *Source:* ConsumableMaster.
+    ItemenhancementTemporary 15, while the stones and oils report subclass 8. *Measured:* the enum is read
+    from BlizzardInterfaceResources' `forever` 1.60.1 (70532) dump, not probed in game; the stones' and oils'
+    subclass 8 is from the owner's item dump on build 70862. *Source:* ConsumableMaster.
