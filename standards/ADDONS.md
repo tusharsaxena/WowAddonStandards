@@ -20,7 +20,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Retail (port pending) | Enabled · Locked · Test mode | test | none |
 | Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail · Forever | Enabled · Locked (the macro bar) | unlock | none |
-| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
+| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
 | Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Retail (port pending) | Enabled · Locked · Sim mode | unlock | next to Lock frame |
 | Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Retail · Forever | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
@@ -31,7 +31,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Party Frame Enhanced | `../../PartyFrameEnhanced/` | https://github.com/tusharsaxena/PartyFrameEnhanced | Retail · Forever | Enabled · Locked | unlock | none |
 | Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Retail | Enabled · Test mode (the attached panel shown on its own) | test | none |
 | Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Retail · Forever | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
-| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Retail (port pending) | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
+| Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Retail · Forever | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
 | Ka0s Skill Master | `../../SkillMaster/` | https://github.com/tusharsaxena/SkillMaster | Forever | Enabled · Locked · Test mode · Sim mode · Show window (the skills window) | test | next to Test mode |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Retail | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
 
