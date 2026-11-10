@@ -101,7 +101,8 @@ answered raised "attempt to compare field 'value' (a secret number value)" (the 
 `tests/test_statdata.lua` records it). Whether the player was in combat is not recorded. *Cost:* a raise on every rescan of the
 path that compares the stat; the stat line stops updating. *Do:* client-quirks-§2's rule: test
 `issecretvalue` before any comparison or arithmetic on a stat reader's return, keep the last plain value
-(marked stale) rather than the secret, and rescan on `PLAYER_REGEN_ENABLED`. *Retail entry:*
+(marked stale) rather than the secret, and rescan on `PLAYER_REGEN_ENABLED`. The combat edge is assumed:
+if the secret persists out of combat, the stale value stands until a later scan reads it plain. *Retail entry:*
 client-quirks-§2, the secret-value family. *Source:* SkillMaster `docs/forever-quirks.md`, its own
 section's measured findings; promoted under §1's one-repo bar for an engine behavior.
 
@@ -110,7 +111,8 @@ build 70862). *Measured:* the owner's in-game error, 2026-11-10: the read raised
 when secret while tainted by 'SkillMaster'". The call fails outright; it does not hand back a secret table
 to test. *Cost:* a raise that takes down the whole scan, not one missing value, so an `issecretvalue` guard
 on the return never runs. *Do:* call the aura reader through `pcall` and treat a failure as "auras are
-secret now": keep the last plain list and read again after combat. *Retail entry:* client-quirks-§2, the
+secret now": keep the last plain list and read again after combat (the combat edge is assumed; if the
+raise persists out of combat, the last list stands until a later read succeeds). *Retail entry:* client-quirks-§2, the
 secret-value family. *Source:* SkillMaster `docs/forever-quirks.md`, its own section's measured findings;
 promoted under §1's one-repo bar for an engine behavior.
 
