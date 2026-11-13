@@ -65,10 +65,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
      part of a multi-file major is anti-pattern #48: the dependent modules refuse to register without
      `Core.lua` and go silently **absent**, and a shell without its attach file `:New`s successfully
      and fails at **call** time, a panel build later. Then prune **`libs/LibKa0s/media/icons/`** to
-     the icons the addon declares — the one carve-out from whole-folder vendoring (library-stack-§7,
+     the icons the addon declares — the first of the two carve-outs from whole-folder vendoring (library-stack-§7,
      *The icon subset*): keep each declared icon, the icons the library draws on the addon's behalf
      (`close`, `copy`, `clear` for the debug console), and the attribution files of each set kept;
      keep the whole folder only for an addon that offers the player a choice among the catalog.
+     Prune **`libs/LibKa0s/media/sounds/`** too, the second carve-out (library-stack-§7, *The sound
+     subset*): a new addon declares no `LibKa0s sounds:` line, which means none, so the folder goes,
+     unless it adopts `LibKa0s-Callout-1.0` with a bundled voice and keeps the packs it declares.
+     The tag's own `tools/prune-icons.lua` does both prunes in one run.
    - the repo's **`testkit/` folder → `tests/_kit/`** — the shared headless harness (testing). It goes
      under `tests/`, **never** `libs/`, because it must not ship with the addon.
 4. **Fill in the starters.** Work through the *Starter snippets* and *Hard rules cheat sheet* in the
@@ -342,7 +346,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    (documentation-§2 item 6, library-stack-§7, testing-§11). Directly under it goes the **icons line**
    matching step 3's prune — `LibKa0s icons: close, copy, clear, ….`, or `LibKa0s icons: all (icon
    picker).` for an addon whose player chooses among the catalog — which the same gate reads
-   (library-stack-§7, *The icon subset*).
+   (library-stack-§7, *The icon subset*). A **sounds line** goes directly under the icons line only
+   when the addon keeps a voice pack (`LibKa0s sounds: callout/<voice>.`); with none, write none
+   (library-stack-§7, *The sound subset*).
 6b. **Write the `docs/` set to documentation-§3's tier model.** The canonical trio
    (`ARCHITECTURE.md`, `testing.md`, `smoke-tests.md`) plus **all six Tier 1 docs, under exactly
    these names**: `scope.md`, `module-map.md`, `schema.md`, `settings-panel.md`, `data-flow.md`,

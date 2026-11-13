@@ -1,4 +1,4 @@
-# New Ka0s Addon — Context Pack (v2.107.0, 2026-11-10)
+# New Ka0s Addon — Context Pack (v2.108.0, 2026-11-13)
 
 
 > ## ⚠ CRITICAL — FETCH THIS, NEVER STORE IT
@@ -53,8 +53,10 @@ standard. Steps run in the **new addon's repo** unless marked *[standards repo]*
      the ones the first release does not wire — and TOC-listed as the single line
      `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block **after Ace3**. Copying part of a
      multi-file major is anti-pattern #48. Then prune `libs/LibKa0s/media/icons/` to the icons the
-     addon declares in root `CLAUDE.md` — the one carve-out, art not code (library-stack-§7, *The icon
-     subset*, anti-pattern #95). The declaration covers the icons the library draws on the addon's
+     addon declares in root `CLAUDE.md` — the first carve-out, art not code (library-stack-§7, *The icon
+     subset*, anti-pattern #95), and prune `libs/LibKa0s/media/sounds/` to its `LibKa0s sounds:`
+     line, the second carve-out, which with no line means none (library-stack-§7, *The sound
+     subset*). The icon declaration covers the icons the library draws on the addon's
      behalf, a set closed at `close`, `copy`, `clear` and `info`, as well as every name the addon
      passes `NS.Icon` or a library widget itself.
    - the repo's root-level **`testkit/` folder → `tests/_kit/`** — a *sibling* of the ship folder, not
@@ -148,7 +150,7 @@ Every Ka0s addon uses one **modular** layout — `core/ defaults/ settings/ loca
   media/                 -- typed subfolders (logos/, screenshots/, ...)
     fonts/               -- the shipped monospace TTF + its OFL.txt (debug-logging-§2)
   libs/                  -- vendored, committed
-    LibKa0s/             -- the WHOLE ship folder, byte-identical to its repo, save media/icons/: the declared subset (library-stack-§7)
+    LibKa0s/             -- the WHOLE ship folder, byte-identical to its repo, save media/icons/ and media/sounds/: the declared subsets (library-stack-§7)
   tests/
     _kit/                -- vendored from the LibKa0s repo's testkit/; never edited (testing-§1)
     run.lua              -- this addon's load list, lifecycle kick and suite list
@@ -1455,7 +1457,7 @@ change.
 
 Libraries are **vendored under `libs/` and committed** (`STANDARDS.md library-stack-§3`). Copy the folder-per-lib set you actually `LibStub()` from an existing Ka0s addon's `libs/` so versions stay consistent across the suite, and list them **first** in the TOC (`.xml` where the lib ships one, `.lua` otherwise). **LibDataBroker-1.1 and LibDBIcon-1.0 are not optional** — every addon ships a launcher (launcher-§1) — so vendor both from the start. Pull libs the suite doesn't yet vendor from a current retail install or the upstream release.
 
-`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, save the icon art under `media/icons/` — which follows "vendor only what you use" after all, as the icons declared on root `CLAUDE.md`'s `LibKa0s icons:` line (library-stack-§7, *The icon subset*) — even the modules this release does not wire, because twenty-one of the twenty-two majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). That commit owes a frozen `docs/revendor/<YYYY-MM-DD>-v<tag>/` bundle naming the tag it vendored, or a `## Documented deviations` row saying why — the convention was consensual and lapsed in every repo that held it, because nothing checked it (audit-review-history). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
+`libs/LibKa0s/` is the exception to "vendor only what you use": its **ship payload is the whole folder, always**, save the icon art under `media/icons/` and the sound art under `media/sounds/` — which follow "vendor only what you use" after all, as the icons declared on root `CLAUDE.md`'s `LibKa0s icons:` line and the voice packs on its `LibKa0s sounds:` line, none when there is no such line (library-stack-§7, *The icon subset*, *The sound subset*) — even the modules this release does not wire, because twenty-one of the twenty-two majors refuse to register without `Core.lua` and a shell without its attach file `:New`s successfully and then fails a panel build later (anti-pattern #48). It is also the one library that needs an ongoing **sync** rather than a one-time copy — `diff -r <LibKa0s>/LibKa0s libs/LibKa0s` must be empty, and every library change needs a **re-vendor commit** here, in its own commit, because both repos stay green while the copies diverge (anti-pattern #45). That commit owes a frozen `docs/revendor/<YYYY-MM-DD>-v<tag>/` bundle naming the tag it vendored, or a `## Documented deviations` row saying why — the convention was consensual and lapsed in every repo that held it, because nothing checked it (audit-review-history). The `tests/_kit/` copy of `testkit/` is under the same discipline. Nothing under `libs/` is ever edited locally, not even a one-line fix that is plainly correct: the next re-vendor reverts it silently, with no cause anywhere in this repo's history.
 
 ### Docs — the root three + the `docs/` trio
 
@@ -1524,6 +1526,12 @@ library widget (a `TestStrip` mark, the simulator panel's step marks) is its own
 like any `NS.Icon` name. Add a name the moment
 the addon draws a new icon, and re-vendor the file in the same commit; an undeclared name draws
 nothing and raises nothing (anti-pattern #95).
+
+The template carries **no sounds line**, and a new addon needs none: no line means `none`, so
+`libs/LibKa0s/media/sounds/` is pruned away (library-stack-§7, *The sound subset*). An addon that
+adopts `LibKa0s-Callout-1.0` with a bundled voice adds **one** `LibKa0s sounds:` line directly under
+the icons line, naming its packs as folders under `media/sounds/` (`LibKa0s sounds: callout/<voice>.`)
+or `all.`, and keeps exactly those packs, each with its license and credits files.
 
 ### Root `DEPENDENCIES.md` — the toolchain contract
 
@@ -1760,7 +1768,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] Every **load-bearing** TOC position carries a comment naming what resolves at load; conventional positions are marked too (toc-file-§5). `X-Wago-ID` / `X-WoWI-ID` are optional — only if listed on that platform.
 - [ ] `.pkgmeta` present with **no** `externals:` block; all libs vendored and committed under `libs/`; the `ignore:` list names every root dot-entry the repo **actually has** and no entry it does not — `.claude/`, `.superpowers/` and `tools/` only once the folder exists (packaging).
 - [ ] `.luacheckrc` present; `luacheck .` reports **0 errors** **with `tests/` in scope** — only `tests/_kit/` is excluded, and the harness global is declared in the `files["tests/"]` stanza rather than in top-level `read_globals` (lint).
-- [ ] **`libs/LibKa0s/` vendored WHOLE** from the library repo's ship folder — every module, byte-identical (`diff -r` empty outside `media/icons/`, library-stack-§7) — with `media/icons/` holding exactly the icons root `CLAUDE.md`'s `LibKa0s icons:` line declares plus their sets' attribution files (library-stack-§7, *The icon subset*), and TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block after Ace3.
+- [ ] **`libs/LibKa0s/` vendored WHOLE** from the library repo's ship folder — every module, byte-identical (`diff -r` empty outside `media/icons/` and `media/sounds/`, library-stack-§7) — with `media/icons/` holding exactly the icons root `CLAUDE.md`'s `LibKa0s icons:` line declares plus their sets' attribution files (library-stack-§7, *The icon subset*), and `media/sounds/` empty or absent unless a `LibKa0s sounds:` line declares a voice pack (library-stack-§7, *The sound subset*), and TOC-listed as the single line `libs\LibKa0s\LibKa0s.xml` in the `# Libraries` block after Ace3.
 - [ ] **The six setup files present**, each a descriptor plus a degradation stub and nothing more: `core/MediaSetup.lua`, `core/CoreSetup.lua`, `core/PerfSetup.lua`, `core/DebugLogSetup.lua`, `settings/Slash.lua`, `settings/OptionsSetup.lua`. No hand-rolled console, options toolkit, dispatcher, printer or harness anywhere in the addon's own source (anti-pattern #47). Each stub answers **every** member the addon actually calls. The Core stub carries `SafeRegisterEvent`, `SafeRegisterUnitEvent` and `SafeRegisterEvents` as one-rung `pcall` bodies; the Slash stub carries no library string but `DISABLED_LINE_FORMAT`, pinned with `Kit.assertLibraryConstant`; the Options stub's composers answer `{}`. The Options descriptor carries `addonName = addonName`, the folder name, so IdList help marks draw the library's art (options-ui-§1).
 - [ ] `tests/_kit/` vendored from the LibKa0s repo's root-level `testkit/` (**not** under `libs/`, not edited); `tests/wow_mock.lua` is a thin extender over `mock_base.lua`; `tests/run.lua` derives the addon's file list from the TOC and lists the vendored library files explicitly in XML order (testing-§1, testing-§9).
 - [ ] `tests/` harness present; `lua tests/run.lua` is **green**; behavior is covered test-first (testing). The rule-subject conformance suites are under exactly their mandated names — `tests/test_surface_parity.lua` (testing-§8), `tests/test_vendor_sync.lua` delegating to `tests/_kit/vendor_sync.lua` rather than reimplementing it (testing-§11), `tests/test_disabled.lua` (slash-commands-§7) — and **every kit suite is declared by its directory**, `{ name = "…", dir = "tests/_kit/" }`, never by bare basename beside a local file of the same name (testing-§9).
@@ -1816,6 +1824,7 @@ fetching it at build time — libraries are vendored and committed (documentatio
 - [ ] `## Credits` names each LibKa0s icon set shipped, and the README carries no font license or font credit text (documentation-§1 item 12)
 - [ ] **LibKa0s provenance line in root `CLAUDE.md`** (documentation-§2 item 6, anti-pattern #59) — `Bundles [LibKa0s](https://github.com/tusharsaxena/LibKa0s) vX.Y.Z (MIT).` naming the tag `libs/LibKa0s/` and `tests/_kit/` were vendored from, landing in the same commit as the bytes. **Not** in `README.md`: the gate reads `CLAUDE.md` with no fallback and fails the case if the line is not there.
 - [ ] **The `LibKa0s icons:` line directly under it** (documentation-§2 item 6, library-stack-§7, anti-pattern #95) — every icon the addon passes `NS.Icon` or a library widget plus the library-drawn `close, copy, clear` (and `info` with an id list that has no `helpIcon`), matching `libs/LibKa0s/media/icons/` file for file; `all (<chooser>).` only when the addon's UI lets the player choose among the catalog.
+- [ ] **No `LibKa0s sounds:` line**, unless the addon adopts `LibKa0s-Callout-1.0` with a bundled voice; then **one**, directly under the icons line, naming its packs (`callout/<voice>`) and matching `libs/LibKa0s/media/sounds/` file for file (library-stack-§7, *The sound subset*, anti-pattern #95).
 - [ ] TOC follows the fixed field order and `#`-section file-listing structure (toc-file-§1/toc-file-§5).
 - [ ] **No `TODO.md`** at release (backlog is in GitHub issues); any pre-release `docs/TODO.md` has been removed (documentation-§4).
 - [ ] LICENSE = MIT full text.

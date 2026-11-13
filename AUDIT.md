@@ -548,8 +548,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      the TOC lists its packaged `libs\LibKa0s\LibKa0s.xml` once, in `# Libraries` after Ace3
      (toc-file-§4/§5). A TOC listing individual `LibKa0s` `.lua` files, or a folder missing files the
      ship folder has, is a deviation even when the addon currently works — the majors it does not use
-     today are not the ones that will break. The one exception is `media/icons/`, which holds the
-     addon's declared subset (next check).
+     today are not the ones that will break. The two exceptions are `media/icons/` and
+     `media/sounds/`, which hold the addon's declared subsets (next checks).
+   - **Check the sound subset matches its declaration** (library-stack-§7, *The sound subset*;
+     anti-pattern #95). Read the `LibKa0s sounds:` line directly under the `LibKa0s icons:` line —
+     **no line means `none`** — and list `libs/LibKa0s/media/sounds/` recursively. The files present
+     **MUST** be exactly every file of each declared pack (`callout/<voice>/`, its license and credits
+     files included), and nothing at all for `none` or no line. Where the addon adopts
+     `LibKa0s-Callout-1.0` and offers a bundled voice, its declaration names that pack.
    - **Check the icon subset matches its declaration** (library-stack-§7, *The icon subset*;
      anti-pattern #95). Read the `LibKa0s icons:` line under root `CLAUDE.md`'s `Bundles` line and
      list `libs/LibKa0s/media/icons/` recursively. The files present **MUST** be exactly the declared
@@ -1506,11 +1512,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      has not drifted from its source repo. For `LibKa0s` that is
      **`diff -r <LibKa0sRepo>/LibKa0s <Addon>/libs/LibKa0s`** over the **whole folder** (every module,
      not just the ones the addon calls) — where under `media/icons/` the only lines allowed are
-     `Only in <LibKa0sRepo>/…` for icons the addon did not declare, and the declared set is checked by
-     step 4's icon-subset check — plus
+     `Only in <LibKa0sRepo>/…` for icons the addon did not declare, and under `media/sounds/` only
+     the same lines for voice packs it did not declare, the declared sets checked by step 4's
+     icon-subset and sound-subset checks — plus
      **`diff -r <LibKa0sRepo>/testkit <Addon>/tests/_kit`** for the vendored test harness — which
      lives under `tests/`, never `libs/`, because it must not ship. Both **MUST** be empty, the first
-     outside `media/icons/`. Diff against the **tag the addon's root `CLAUDE.md` names** — the
+     outside `media/icons/` and `media/sounds/`. Diff against the **tag the addon's root `CLAUDE.md` names** — the
      provenance line `Bundles [LibKa0s](…) vX.Y.Z (MIT).` (documentation-§2 item 6) — which is the
      same ref the repo's own vendored-payload gate resolves. **The line missing from `CLAUDE.md`, or
      still sitting in `README.md`, is itself a finding** (anti-pattern #59): since LibKa0s v1.8.1 /
