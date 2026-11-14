@@ -112,6 +112,7 @@ What a Ka0s addon inherits, so its own tiers are placed around known neighbors. 
 |---|---|---|---|
 | `LibKa0s-DebugLog-1.0` console, `LibKa0s-Perf-1.0` panel, `LibKa0s-Sim-1.0` step panel | `DIALOG` | inherited | toplevel (from `LibKa0s v1.77.0`; not toplevel before) / clamped |
 | `LibKa0s-Widgets-1.0` `CopyWindow` | `FULLSCREEN` | inherited | not toplevel / clamped |
+| `LibKa0s-Callout-1.0` call-out frame (T5 screen alert, from `LibKa0s v1.96.0`; mouse disabled while locked, its drag strip +10 over it while unlocked) | `FULLSCREEN` | inherited | not toplevel / clamped |
 | `LibKa0s-Widgets-1.0` dropdown menu, autocomplete; `LibKa0s-Options-1.0` IdList suggestions | `FULLSCREEN_DIALOG` | inherited | clamped (menu and autocomplete from `LibKa0s v1.77.0`) |
 | `LibKa0s-Widgets-1.0` reorder ghost | `TOOLTIP` | — | — |
 | `LibKa0s-Core-1.0` resize grip | inherited | +10 | — |
