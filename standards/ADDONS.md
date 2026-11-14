@@ -17,7 +17,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Addon | Folder | Repository | Clients | Launcher menu entries (launcher-§2) | Skin picker preview (skinning-§10) | Sim mode checkbox (options-ui-§15) |
 |---|---|---|---|---|---|---|
 | Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Retail · Forever | Enabled · Locked · Sim mode | unlock | next to Lock frame |
-| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Retail (port pending) | Enabled · Locked · Test mode | test | none |
+| Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Retail · Forever | Enabled · Locked · Test mode | test | none |
 | Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail · Forever | Enabled · Locked (the macro bar) | unlock | none |
 | Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
