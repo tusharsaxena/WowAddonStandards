@@ -192,7 +192,13 @@ disagreeing with the collection's intent while looking, in review, like it had b
    see it; the wrapper exists so the mistake is at least greppable (standalone-windows, anti-patterns
    #64/#65). Build **every** close control the addon has through it, including inside any decoration
    hook handed to a shared module. A title-bar control strip and any modal draw catalog
-   marks, and a wide action button gains a mark **beside** its label rather than instead of it. A mark
+   marks, and a wide action button gains a mark **beside** its label rather than instead of it.
+   **Window chrome comes from the library too** (standalone-windows, *Window chrome geometry* and
+   *The footer*; preview-mode, *Where the strip sits*; v2.110.0): a window that has a footer builds
+   it with `Widgets.Footer`, 24 px (`FOOTER.HEIGHT`), and the test or sim strip docks directly under
+   the title bar, or on a HUD display's top edge, through `Widgets.TestStrip`'s docking. Both ship in
+   `LibKa0s v1.103.0`; while the vendored tag predates it, scaffold no footer and place the strip
+   under the title bar yourself, then move both onto the library at the re-vendor. A mark
    the catalog lacks is added upstream in the `LibKa0s` repo, in the same style, by the generator that
    produced the rest — never drawn one-off here.
 
