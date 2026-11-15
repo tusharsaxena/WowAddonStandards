@@ -57,7 +57,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
    only `# Core` (toc-file-§5). Copy the vendored `libs/` set you actually
    `LibStub()` from an existing Ka0s addon so versions stay consistent (library-stack-§3 — libraries are vendored
    and committed). Then vendor the two Ka0s-owned payloads (library-stack-§7) from the **`LibKa0s`
-   repo's own ship folders**, byte-identical, rather than from a sibling addon's copy, which may
+   repo's own ship folders** at its **newest tag**, byte-identical, rather than from a sibling addon's copy, which may
    itself have drifted (anti-pattern #45):
    - the repo's inner **`LibKa0s/` folder → `libs/LibKa0s/`**, copied **whole** — every module, not
      only the ones the first release calls — and TOC-listed as the single line
@@ -197,8 +197,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    *The footer*; preview-mode, *Where the strip sits*; v2.110.0): a window that has a footer builds
    it with `Widgets.Footer`, 24 px (`FOOTER.HEIGHT`), and the test or sim strip docks directly under
    the title bar, or on a HUD display's top edge, through `Widgets.TestStrip`'s docking. Both ship in
-   `LibKa0s v1.103.0`; while the vendored tag predates it, scaffold no footer and place the strip
-   under the title bar yourself, then move both onto the library at the re-vendor. **Place every
+   `LibKa0s v1.103.0`, and a new addon vendors the library's newest tag (step 3), which is that tag
+   or later, so the scaffold builds both through the library from its first commit and never
+   anchors the strip or draws a footer by hand (anti-pattern #118). **Place every
    tooltip by the window, never on the cursor** (standalone-windows, *Tooltip placement*;
    launcher-§7; v2.112.0): a row's, a card's or a HUD bar's beside the whole window group, right
    when it fits and else left, top level with the element; a title bar's, tab's, filter bar's or

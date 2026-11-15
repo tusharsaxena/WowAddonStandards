@@ -1172,7 +1172,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        a filter bar and the body), or one the host anchors itself (a `SetPoint` on the strip in host
        code), is #118. Read it from code: the strip's constructor call and its dock option, and no
        host `SetPoint` on it. Below that tag the v2.109.0 reading holds and the move is a re-vendor
-       item, not a finding: a HUD display **MAY** go unmarked, a filter-bar window not using
+       item, not a finding (a strip the host already places where the rule puts it, under the
+       title bar or on a HUD display's top edge, is compliant): a HUD display **MAY** go unmarked, a filter-bar window not using
        `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
        window with no filter bar may mark the mode with a title badge. Under either reading a
        window, whatever the addon calls it, is bound, an unlocked drag strip's tag is not this
@@ -1189,10 +1190,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        v2.110.0), on every window that draws a band along its bottom edge carrying a status line.
        On `LibKa0s v1.103.0`+ it is built with `Widgets.Footer`: find each footer's construction and
        confirm it is the library's call, that the host draws no fill texture, divider or font strings
-       of its own for it, that the body's bottom inset reads `FOOTER.HEIGHT` rather than a number of
-       the host's (`grep -rnE 'FOOTER_H|footerH|FOOTER_HEIGHT' --include='*.lua' . | grep -v '/libs/' |
+       of its own for it, that its height is the library's 24 px rather than a number of the host's,
+       and that the body's bottom inset reads `FOOTER.HEIGHT`. A grep for named constants alone
+       misses a literal, so read the code as well. First list the names
+       (`grep -rnE 'FOOTER_H|footerH|FOOTER_HEIGHT' --include='*.lua' . | grep -v '/libs/' |
        grep -v '/tests/'`: every hit is a local read of the library's `FOOTER.HEIGHT`, never a
-       number), and that a resize grip sits
+       number). Then list every height and bottom anchor the host's window code sets
+       (`grep -rnE 'SetHeight\(|SetSize\(|"BOTTOM(LEFT|RIGHT)?"' --include='*.lua' . | grep -v '/libs/' |
+       grep -v '/tests/'`) and read each hit on a footer frame or on the body above it: the
+       footer frame is never given a height of the host's (a `SetHeight(22)` or a `SetSize` with a
+       literal height on it is #118), and the body's bottom anchor offset is `FOOTER.HEIGHT` or a
+       sum built from it, never a raw number (a `SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -1, 23)`
+       or a local `= 24` it reads is #118). Then confirm that a resize grip sits
        in the footer's bottom-right corner. A hand-built footer, a filled band, another height or a
        grip outside the corner is #118 (and a host copy beside the library's is #47). Below that tag
        a footer is a re-vendor item, not a finding. That it looks right under each skin is the
@@ -1236,7 +1245,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
        the simulation a `sim:After`; the session marked on screen by the major's step panel, built
        with `close = false` where no window strip marks the session, and, below `LibKa0s v1.103.0`,
-       no simulation strip, anchor or badge over a HUD display (#97, v2.93.0), while on that tag
+       no simulation anchor, badge or strip over a HUD display other than a sim strip the host
+       already docks where preview-mode's HUD rule puts it, which is compliant there and not
+       graded (#97, v2.93.0; v2.112.2), while on that tag
        each HUD display drawing simulated data carries the docked sim strip, the step panel staying
        (preview-mode, *Where the strip sits*, v2.110.0); a single `sim` feature-verb row, the launcher's *Sim mode* entry
        and the Master-controls *Sim mode* checkbox on one handler, and no key binding for it
