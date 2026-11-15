@@ -54,7 +54,7 @@ Chrome lives in the display's strata at the **top of the display's band** (§3),
 - A drag affordance (handle, close mark, grip) **SHOULD NOT** inherit the display's content alpha: `SetIgnoreParentAlpha(true)`, or `LibKa0s-Widgets-1.0` `DragHandle`'s `ignoreParentAlpha` (DragHandle minor 5, `LibKa0s v1.77.0`; its `level` spec field sets the handle's offset over its parent before the help and close marks are built, and `handle:ApplyLevel()` re-applies it after the host re-levels the parent, so a host never re-levels the handle by hand). An affordance that fades to invisible while still clickable is anti-pattern #101.
 - A drag **backplate** (a holder the display is dragged by) sits at the display root's level, under every element, and the elements over it pass the mouse through or forward their drag.
 - Order within chrome: outline < overlaying marker < handle and its marks. A marker and a handle that never show together **MAY** share or invert a slot only when the exclusion is enforced in code.
-- A test or sim strip that **displaces** content (pushes it down by its height) stays at the content's chrome level; one that **covers** content is raised above the content band.
+- A test or sim strip that **displaces** content (pushes it down by its height) stays at the content's chrome level; one that **covers** content is raised above the content band. A strip docked **outside** a HUD display's edge (preview-mode, *Where the strip sits*, v2.110.0) covers nothing of its own display, sits in that display's chrome band and takes no mouse.
 
 ### 3. Level bands (MUST)
 
