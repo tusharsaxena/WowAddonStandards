@@ -311,7 +311,7 @@ Items recorded for future versions of this standard:
   the Skin tab (skinning-§3, skinning-§6); every font setting is the whole block, its flags following
   the skin by default (options-ui-§16); `/<slash> skin` is reserved (slash-commands-§2,
   skinning-§3); a HUD display may go unmarked in test mode and carries no simulation marker
-  (preview-mode); sections a choice does not use are hidden (options-ui-§22); and displayed strings
+  (preview-mode; reversed in v2.110.0, where a HUD display shows the strip on its top edge); sections a choice does not use are hidden (options-ui-§22); and displayed strings
   keep to the characters every shipped face draws (localization-§7). Its `LibKa0s` issues, filed
   after the release: the conditional-sections sweep across every addon (options-ui-§22,
   `LibKa0s#67`; it landed per addon on `feat/2026-10-31-findings-remediation`, with fixes in Aura

@@ -1156,19 +1156,42 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        A display minimized with its header hidden shows no sample data and owes none. Read the code
        path that hides the header or title and confirm the marker does not ride it. Placeholder
        content whose visible text names the test is a marker. An addon whose test mode is the
-       unlocked view owes no marker under this rule. From v2.93.0 a **HUD display** (bars, icons,
-       grids, containers and HUD text with no window chrome) **MAY** go unmarked, so an unmarked one
-       is not a finding; a window, whatever the addon calls it, is still bound, and an unlocked drag
-       strip's tag is not this marker. A filter-bar window not using
+       unlocked view owes no marker under this rule. **Which rule binds depends on the vendored
+       tag** (preview-mode, *Where the strip sits*, v2.110.0). On `LibKa0s v1.103.0`+ every window
+       and every **HUD display** (bars, icons, grids, containers and HUD text with no window chrome)
+       drawing test or simulated data carries `Widgets.TestStrip`, placed through its docking:
+       in a window directly under the title bar, full width, above tabs, a filter bar and the body,
+       with everything below the title bar moved down by `TEST_STRIP.HEIGHT`; on a HUD display on its
+       top edge, outside it, flipping under its bottom edge when the top would leave the screen. A
+       window or HUD display with no strip is #97; a strip anywhere else (the measured shape: between
+       a filter bar and the body), or one the host anchors itself (a `SetPoint` on the strip in host
+       code), is #118. Read it from code: the strip's constructor call and its dock option, and no
+       host `SetPoint` on it. Below that tag the v2.109.0 reading holds and the move is a re-vendor
+       item, not a finding: a HUD display **MAY** go unmarked, a filter-bar window not using
        `Widgets.TestStrip` on `LibKa0s v1.75.0`+ is a **SHOULD** finding (standalone-windows), and a
-       host-built copy of the strip there is #47. With the strip shown, confirm that the header
+       window with no filter bar may mark the mode with a title badge. Under either reading a
+       window, whatever the addon calls it, is bound, an unlocked drag strip's tag is not this
+       marker, and a host-built copy of the strip is #47. With the strip shown, confirm that the header
        carries no word for the same mode, and that the word does come back when the window is
        minimized or degraded (no Widgets library) where it has those states (`preview-mode`, *One
        marker per mode on screen*, v2.87.0); the word said twice is #97. A simulator host whose
        window carries a test strip and does not mark its session with a sim-flavor strip
-       (`kind = "sim"`, `LibKa0s v1.76.0`) is a **SHOULD** finding. A missing, hover-only or
-       layout-hidden marker is #97. Behavior is confirmed only by the owner's in-client smoke, never
-       by the auditor.
+       (`kind = "sim"`, `LibKa0s v1.76.0`) is a **SHOULD** finding below `LibKa0s v1.103.0` and a
+       **MUST** finding (#97) on it, where a HUD display drawing simulated data owes the sim strip
+       too. A missing, hover-only or layout-hidden marker is #97. Behavior is confirmed only by the
+       owner's in-client smoke, never by the auditor.
+       **Then check the footer** (standalone-windows, *The footer* and *Window chrome geometry*,
+       v2.110.0), on every window that draws a band along its bottom edge carrying a status line.
+       On `LibKa0s v1.103.0`+ it is built with `Widgets.Footer`: find each footer's construction and
+       confirm it is the library's call, that the host draws no fill texture, divider or font strings
+       of its own for it, that the body's bottom inset reads `FOOTER.HEIGHT` rather than a number of
+       the host's (`grep -rnE 'FOOTER_H|footerH|FOOTER_HEIGHT' --include='*.lua' . | grep -v '/libs/' |
+       grep -v '/tests/'`: every hit is a local read of the library's `FOOTER.HEIGHT`, never a
+       number), and that a resize grip sits
+       in the footer's bottom-right corner. A hand-built footer, a filled band, another height or a
+       grip outside the corner is #118 (and a host copy beside the library's is #47). Below that tag
+       a footer is a re-vendor item, not a finding. That it looks right under each skin is the
+       owner's in-client smoke.
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check
@@ -1181,8 +1204,10 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        simulated event's path, and no position store (`d.panel` carries no `store`); every module the
        session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
        the simulation a `sim:After`; the session marked on screen by the major's step panel, built
-       with `close = false` where no window strip marks the session, and no simulation strip, anchor
-       or badge over a HUD display (#97, v2.93.0); a single `sim` feature-verb row, the launcher's *Sim mode* entry
+       with `close = false` where no window strip marks the session, and, below `LibKa0s v1.103.0`,
+       no simulation strip, anchor or badge over a HUD display (#97, v2.93.0), while on that tag
+       each HUD display drawing simulated data carries the docked sim strip, the step panel staying
+       (preview-mode, *Where the strip sits*, v2.110.0); a single `sim` feature-verb row, the launcher's *Sim mode* entry
        and the Master-controls *Sim mode* checkbox on one handler, and no key binding for it
        (v2.99.0; the checkbox is the Master-controls check above, #112); host
        fields on the host's own table, never on the library instance; and a suite that asserts
