@@ -1199,8 +1199,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        owner's in-client smoke.
        **Then check tooltip placement** (standalone-windows, *Tooltip placement*; launcher-§7;
        v2.112.0), on every window, HUD display, open dropdown menu the addon draws, and the minimap
-       button. Settings pages in Blizzard's Settings canvas and lines added to a tooltip the client
-       anchors are out of scope. List every anchor the addon's own code sets
+       button. Settings pages in Blizzard's Settings canvas and any tooltip whose placement the
+       client's own code decides are out of scope and are not graded (owner ruling of 2026-11-15,
+       v2.112.1): an entry of a menu the client's menu system draws (`MenuUtil.CreateContextMenu`,
+       the launcher's options menu, a dropdown on the client's templates), its tooltip placed by
+       `MenuUtil.SetTooltip`, and lines added to a tooltip the client anchors. List every anchor
+       the addon's own code sets
        (`grep -rnE 'SetOwner\(|ANCHOR_|GetCursorPosition' --include='*.lua' . | grep -v '/libs/' |
        grep -v '/tests/'`), and classify each hit by the element it serves. A body element (a row,
        a card, a control inside one, a HUD bar or icon) is compliant when the tooltip is placed

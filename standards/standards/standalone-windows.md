@@ -115,7 +115,7 @@ A tooltip is placed by **where the hovered element sits in its window**, never b
 - an addon's standalone window, with every frame docked to it and the modal dialogs it opens;
 - a **HUD display** (bars, icons, an icon grid and its chrome band, preview-mode);
 - a window a library draws for the addon: the debug console and its copy window, the perf, sim and step panels, the icon browser, a `CopyWindow` (these follow the rule in the library's own code);
-- an open dropdown menu the addon or `LibKa0s-Widgets-1.0` draws;
+- an open dropdown menu the addon or `LibKa0s-Widgets-1.0` draws itself (not one the client's menu system draws; *What it does not bind*, below);
 - the addon's minimap button (*The launcher*, below).
 
 It binds `GameTooltip`, a tooltip frame the addon or a library creates, and a chart's hover alike.
@@ -123,7 +123,9 @@ It binds `GameTooltip`, a tooltip frame the addon or a library creates, and a ch
 **What it does not bind.**
 
 - **Settings pages inside Blizzard's Settings canvas.** options-ui governs those pages, including the library's own Options widgets, and this section adds nothing to them.
-- **Lines the addon adds to a tooltip the client anchors**: a unit or item tooltip over a Blizzard frame, written through `TooltipDataProcessor` or a hook. The client owns that tooltip's position.
+- **A tooltip whose placement the client's own code decides (owner ruling of 2026-11-15, v2.112.1).** Blizzard's tooltips are out of scope, and the addon does not re-place them. That covers:
+  - **an entry of a menu the client's menu system draws**, whose tooltip `MenuUtil.SetTooltip` or the menu code itself places: a `MenuUtil.CreateContextMenu` menu (the launcher's options menu, launcher-§2, among them) and the menu of a dropdown built on the client's dropdown templates;
+  - **lines the addon adds to a tooltip the client anchors**: a unit or item tooltip over a Blizzard frame, written through `TooltipDataProcessor` or a hook.
 - **A LibDataBroker display's bar** (Titan Panel, ChocolateBar and the like). The display draws the frame and places the tooltip, and the launcher object only fills it (launcher-§1).
 - **Blizzard's own frames.** The addon only writes lines onto them.
 
@@ -145,7 +147,7 @@ It binds `GameTooltip`, a tooltip frame the addon or a library creates, and a ch
 3. **Never covers another frame of the same addon's window group.** A docked panel is part of the group, which is why rule 1 measures the group and not the frame under the pointer.
 4. **When neither side fits** (the group spans the screen, or nearly), **falls back to the chrome rule below the hovered element**: attached, centered, 2 px under it, flipping above at the screen's bottom (orchestrator ruling). This fallback is the one case in which a body tooltip is attached to its element.
 5. **Extends its comparison tooltips outward.** An item tooltip's comparison tooltips (`ShoppingTooltip1`, `ShoppingTooltip2`) open further out on the **same side**, away from the window, never back over it (orchestrator ruling). The client's comparison manager picks their side from the tooltip's anchor type before it looks at screen room (`wow-ui-source@297d7aaa:Interface/AddOns/Blizzard_SharedXMLGame/Tooltip/TooltipComparisonManager.lua:91-101`). A placer that positions the tooltip with `ANCHOR_NONE` therefore **SHOULD** also call `tooltip:SetAnchorType("ANCHOR_RIGHT", 0, 0)` or `("ANCHOR_LEFT", 0, 0)` for the side it chose, as the client's bag does. Where the screen cannot hold the comparisons on that side, the client's own slide is accepted.
-6. **An entry in an open dropdown menu** follows this rule with the **menu frame** as its window: beside the menu, right when it fits and otherwise left, top level with the entry (orchestrator ruling).
+6. **An entry in an open dropdown menu the addon or `LibKa0s-Widgets-1.0` draws** follows this rule with the **menu frame** as its window: beside the menu, right when it fits and otherwise left, top level with the entry (orchestrator ruling). A menu the client's menu system draws, with its entries' tooltips placed by `MenuUtil.SetTooltip`, is out of scope (*What it does not bind*, above).
 
 **The chrome rule (MUST).** A tooltip for a chrome element:
 
