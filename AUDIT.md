@@ -1197,6 +1197,27 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        grip outside the corner is #118 (and a host copy beside the library's is #47). Below that tag
        a footer is a re-vendor item, not a finding. That it looks right under each skin is the
        owner's in-client smoke.
+       **Then check tooltip placement** (standalone-windows, *Tooltip placement*; launcher-§7;
+       v2.112.0), on every window, HUD display, open dropdown menu the addon draws, and the minimap
+       button. Settings pages in Blizzard's Settings canvas and lines added to a tooltip the client
+       anchors are out of scope. List every anchor the addon's own code sets
+       (`grep -rnE 'SetOwner\(|ANCHOR_|GetCursorPosition' --include='*.lua' . | grep -v '/libs/' |
+       grep -v '/tests/'`), and classify each hit by the element it serves. A body element (a row,
+       a card, a control inside one, a HUD bar or icon) is compliant when the tooltip is placed
+       beside the whole window group (a docked companion panel included, a HUD's whole display),
+       right when it fits and else left, its top level with the element, 2 px out. A chrome element
+       (title bar, strip, tab, filter bar and its controls, footer line or mark, a modal's
+       controls) is compliant when it is attached and centered, 2 px below the top chrome or above
+       the footer. Any `ANCHOR_CURSOR` or `ANCHOR_CURSOR_RIGHT`, a cursor-following `OnUpdate`, a
+       corner anchor (`ANCHOR_RIGHT`, `ANCHOR_TOPRIGHT`, `ANCHOR_TOPLEFT` or a mirror) on a chrome
+       control, or a body tooltip owned by the row at a flat anchor that lands on the window is #119.
+       That holds on any `LibKa0s` tag, because the rules bind now and only the library route waits.
+       No `LibKa0s` tag ships the LibKa0s tooltip placement surface yet, so a host placement that
+       already matches the rules is compliant and not a re-vendor finding. Once the addon vendors
+       the tag that ships it, a host placer beside the library's is #47. A minimap button's tooltip
+       left to LibDBIcon-1.0's own `getAnchors` is compliant. Where it actually opens on screen is
+       the owner's in-client smoke (the `docs/smoke-tests.md` line the section requires; its
+       absence is a finding).
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check

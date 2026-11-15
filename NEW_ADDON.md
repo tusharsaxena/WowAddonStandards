@@ -198,7 +198,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
    it with `Widgets.Footer`, 24 px (`FOOTER.HEIGHT`), and the test or sim strip docks directly under
    the title bar, or on a HUD display's top edge, through `Widgets.TestStrip`'s docking. Both ship in
    `LibKa0s v1.103.0`; while the vendored tag predates it, scaffold no footer and place the strip
-   under the title bar yourself, then move both onto the library at the re-vendor. A mark
+   under the title bar yourself, then move both onto the library at the re-vendor. **Place every
+   tooltip by the window, never on the cursor** (standalone-windows, *Tooltip placement*;
+   launcher-§7; v2.112.0): a row's, a card's or a HUD bar's beside the whole window group, right
+   when it fits and else left, top level with the element; a title bar's, tab's, filter bar's or
+   footer's attached and centered, below the top chrome or above the footer; 2 px from either.
+   Until a `LibKa0s` tag ships the LibKa0s tooltip placement surface, write that placement in one
+   host helper and move it onto the library at the re-vendor; never scaffold `ANCHOR_CURSOR` or
+   `ANCHOR_RIGHT` on a chrome control (anti-pattern #119). A mark
    the catalog lacks is added upstream in the `LibKa0s` repo, in the same style, by the generator that
    produced the rest — never drawn one-off here.
 
