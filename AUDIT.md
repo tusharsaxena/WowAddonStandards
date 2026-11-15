@@ -492,6 +492,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        declaration (`clients-§8`).
      A row that disagrees with the TOC (a dual-client TOC on a pending row, a gate on a pending row) is a
      finding against `clients-§2`; say which of the two to correct from the code's shipped state.
+     Under any value, an addon that ships a seed list derives or re-validates each list against its own
+     client's DB2 (`clients-§10`, a SHOULD, v2.111.0): look for a dated bundle under `docs/` naming a
+     pinned build of that client's product (`wow` or `wowf`) and the rulings applied, or a line in
+     `docs/ARCHITECTURE.md` saying how the list is maintained instead; having neither is the SHOULD
+     failure only. A Forever list derived by filtering the Retail one is still `clients-§5`'s MUST (#116).
    - **`X-Curse-Project-ID` on an unpublished addon is not a deviation (`toc-file-§1`).** If the
      field is absent and the TOC carries a comment in its position saying the addon is not published
      yet, that is **compliant** — record it as such and file nothing. A placeholder, invented, or
