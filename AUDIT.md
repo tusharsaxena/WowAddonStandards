@@ -1206,8 +1206,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        a card, a control inside one, a HUD bar or icon) is compliant when the tooltip is placed
        beside the whole window group (a docked companion panel included, a HUD's whole display),
        right when it fits and else left, its top level with the element, 2 px out. A chrome element
-       (title bar, strip, tab, filter bar and its controls, footer line or mark, a modal's
-       controls) is compliant when it is attached and centered, 2 px below the top chrome or above
+       (title bar, strip, tab, filter bar or toolbar and its controls, footer line or mark,
+       resize grip, a modal's controls; anything else is body) is compliant when it is attached
+       and centered, 2 px below the top chrome or above
        the footer. Any `ANCHOR_CURSOR` or `ANCHOR_CURSOR_RIGHT`, a cursor-following `OnUpdate`, a
        corner anchor (`ANCHOR_RIGHT`, `ANCHOR_TOPRIGHT`, `ANCHOR_TOPLEFT` or a mirror) on a chrome
        control, or a body tooltip owned by the row at a flat anchor that lands on the window is #119.
