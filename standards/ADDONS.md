@@ -58,7 +58,7 @@ broker plugin, from one LibDataBroker-1.1 object (launcher). **Left-click opens 
 the options menu in every row above** (launcher-§2). The column lists that menu's entries, which are the toggles the addon
 has, in the menu's fixed order — **Enabled** always, then **Locked** where it has a lock, **Test mode** where it has a
 test mode, **Sim mode** where it has an in-game simulator (recorded from v2.99.0; launcher-§2 added the entry in the full
-skinning run), and **Show window** where it has a primary window, a parenthesis naming the window or what the lock holds — read from each addon's
+skinning run), and **Show window** where it has a primary window, a parenthesis naming the window or what the lock holds, then any **extra entries** the addon declares through the descriptor's `extraEntries` (at most two, by their labels, in declared order; launcher-§2, v2.113.0, `LibKa0s v1.105.0`) — read from each addon's
 `core/LauncherSetup.lua` and Master-controls rows, so an audit checks the descriptor against it rather than re-deriving
 it from the addon's shape. A new addon lists its entries with its row. The column replaced v2.66.0's left-click rung
 column when v2.67.0 retired the rungs.

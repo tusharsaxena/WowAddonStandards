@@ -204,9 +204,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
    launcher-§7; v2.112.0): a row's, a card's or a HUD bar's beside the whole window group, right
    when it fits and else left, top level with the element; a title bar's, tab's, filter bar's or
    footer's attached and centered, below the top chrome or above the footer; 2 px from either.
-   Until a `LibKa0s` tag ships the LibKa0s tooltip placement surface, write that placement in one
-   host helper and move it onto the library at the re-vendor; never scaffold `ANCHOR_CURSOR` or
-   `ANCHOR_RIGHT` on a chrome control (anti-pattern #119). A mark
+   On `LibKa0s v1.105.0` or later place them through `LibKa0s-Tooltip-1.0` (`PlaceBeside` for a
+   body element, `PlaceAttached` for a chrome one) from the first commit, and on an older tag in one
+   host helper; never scaffold `ANCHOR_CURSOR` or `ANCHOR_RIGHT` on a chrome control (anti-pattern
+   #119). On the same tag, build every window's title-bar marks with `W.HeaderButtons` (extras ·
+   settings · close, standalone-windows, *Title-bar controls*), write every multi-line report through
+   `NS.DebugLog:Report` with one chat pointer (debug-logging-§15), and draw sample characters from
+   `Sim.Sample()` under preview-mode's naming convention (v2.113.0): a new addon has nothing to adopt
+   later. A mark
    the catalog lacks is added upstream in the `LibKa0s` repo, in the same style, by the generator that
    produced the rest — never drawn one-off here.
 
@@ -358,7 +363,7 @@ disagreeing with the collection's intent while looking, in review, like it had b
    the bytes. `tests/_kit/vendor_sync.lua` reads it out of `CLAUDE.md` — since LibKa0s v1.8.1 / testkit
    revision 9, with **no fallback** to `README.md` — so a line in the wrong file fails the gate
    (documentation-§2 item 6, library-stack-§7, testing-§11). Directly under it goes the **icons line**
-   matching step 3's prune — `LibKa0s icons: close, copy, clear, ….`, or `LibKa0s icons: all (icon
+   matching step 3's prune — `LibKa0s icons: close, copy, clear, settings, ….`, or `LibKa0s icons: all (icon
    picker).` for an addon whose player chooses among the catalog — which the same gate reads
    (library-stack-§7, *The icon subset*). A **sounds line** goes directly under the icons line only
    when the addon keeps a voice pack (`LibKa0s sounds: callout/<voice>.`); with none, write none

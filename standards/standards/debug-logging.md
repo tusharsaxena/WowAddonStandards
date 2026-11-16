@@ -103,13 +103,13 @@ NS.Debug("Loot", "%s x%d", name, qty)     -- NS.Debug = NS.DebugLog.Debug, bound
 The Clear and Copy controls are the library's; this is the behavior they guarantee and why it is shaped this way.
 
 - **Clear** wipes both the visible log and the Copy buffer, and resets the line counter (§11). From DebugLog minor 18 (`LibKa0s v1.65.0`) it also re-arms the change gates (§1) and then calls the descriptor's `onClear()` under `pcall`, for a host that keeps a gate of its own (§9); the at-enable queue is left alone.
-- **Copy** opens a read-through multiline `EditBox` pre-filled with the plain buffer and auto-highlighted for `Ctrl+C`, in the same monospace font. WoW exposes **no clipboard API** — the user's `Ctrl+C` inside an `EditBox` is the only copy path, so a button alone cannot write the OS clipboard. *(The color-vs-clean-copy split is deliberate: the `ScrollingMessageFrame` gives the colored live view, the `EditBox` gives code-free copies — one widget cannot do both, since selecting color-coded text copies its `|c…|r` escapes.)*
+- **Copy** opens a read-through multiline `EditBox` pre-filled with the plain buffer and auto-highlighted for `Ctrl+C`, in the same monospace font. **From DebugLog minor 23 (`LibKa0s v1.105.0`) the buffer is plain for every line**, not only the diagnostics report's: `Add` keeps the colored line for the view and stores it in `buffer` with its color, texture, atlas and hyperlink escapes stripped (`||` kept, `|n` a space), so a report line drawn with a colored `[owned]` or `<-- pick` pastes out of Copy as words, not `|cff…|r` escapes. A host test that pins a color reads it through the view, never through `buffer`. This is the library's guarantee and an addon writes nothing for it. WoW exposes **no clipboard API** — the user's `Ctrl+C` inside an `EditBox` is the only copy path, so a button alone cannot write the OS clipboard. *(The color-vs-clean-copy split is deliberate: the `ScrollingMessageFrame` gives the colored live view, the `EditBox` gives code-free copies — one widget cannot do both, since selecting color-coded text copies its `|c…|r` escapes.)*
 
 ### 7. Fallback — the stub when the library is absent
 
 A missing vendored library **MUST NOT** error at load, and **MUST NOT** silently break the addon's own function.
 
-- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, `RunDiagnostics` (which answers with the library-absent line, §14), the raw `buffer`, from `LibKa0s v1.65.0` the gates and queue the addon calls — `DebugOnce`, `DebugChanged`, `DebugForget`, `DebugAtEnable`, each answering `false` or nothing (a stub under the kit's `assertSurfaceParity` gains all four or names them in its `ignore` list, because the by-name form reads the live instance) — and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
+- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, `RunDiagnostics` (which answers with the library-absent line, §14), the raw `buffer`, from `LibKa0s v1.65.0` the gates and queue the addon calls — `DebugOnce`, `DebugChanged`, `DebugForget`, `DebugAtEnable`, each answering `false` or nothing (a stub under the kit's `assertSurfaceParity` gains all four or names them in its `ignore` list, because the by-name form reads the live instance), from `LibKa0s v1.105.0` `Report` (the report streamed to chat, no pointer) and `Serialize` (§15), which a by-name parity stub gains at the re-vendor whether or not the addon has adopted the seam — and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
 - The stub **MUST** still flip the flag and still print the ack. `NS.State.debug` is the addon's, not the library's, and a user who types `/<slash> debug on` must not be told nothing happened. What is lost is the **window**, and the stub **SHOULD** say so once, honestly, through the addon's printer — once, not per call.
 - The stub **MUST NOT** re-implement the formatters or the line format (§3).
 - **Utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
@@ -279,7 +279,7 @@ The log surface carries a **visible scrollbar** and a **line counter**, so the d
 
 - **Scroll API — MUST use the Lua mixin methods.** On current retail the log is the **Lua `ScrollingMessageFrameMixin`**: drive it with **`GetMaxScrollRange()`**, **`GetScrollOffset()`**, **`SetScrollOffset(offset)`** — where **offset `0` = bottom (newest)** and **offset `== maxRange` = top (oldest)** (`ScrollUp` *increases* the offset). The old C getters **`GetNumLinesDisplayed()` / `GetCurrentScroll()` are `nil`** on this mixin and raise *"attempt to call a nil value"* — **MUST NOT** call them (anti-patterns #41). The vertical slider (value `0` = thumb top = oldest) maps as `sliderValue = maxRange − offset` and, on drag, `offset = maxRange − sliderValue`. **Guard method presence** before every call *and* type-check the returns, so a headless test mock — whose stub frame answers with itself — stays a clean no-op rather than a crash.
 
-- **Line counter.** A thin **bottom status bar** — a 1px divider plus a right-aligned label in the **same monospace font** (§2) — shows the live count as **`N / MAX lines`**, where `MAX` is `lib.MAX_BUFFER` (3000, §1) and `N` is the current buffered line count. It updates on **every append** and resets to `0 / MAX` on Clear (§6).
+- **Line counter.** The console's **footer** (standalone-windows, *The footer*: `LibKa0s-Widgets-1.0`'s `Footer`, 24 px, its hairline to the window's edge, from DebugLogWindow minor 5, `LibKa0s v1.105.0`) carries the count as its right text, **`N / MAX lines`**, where `MAX` is `lib.MAX_BUFFER` (3000, §1) and `N` is the current buffered line count; its left text is empty. The counter keeps the **same monospace face** as the log (§2), because the footer has no skin owner to give it a body face, and is drawn in the footer's `text.muted`. It updates on **every append** and resets to `0 / MAX` on Clear (§6). The 700 × 344 default (§1) and the four-line minimum height stay. Before v1.105.0 this was a hand-drawn 16 px status line, a 1px divider plus the right-aligned label, which v2.110.0's footer rule made the library's to move (LibKa0s#90); a console on an older tag is not graded for it, since the console is the library's window, not the addon's.
 
 - **Build order (robustness).** The **initial** scrollbar/counter sync runs at the **end** of the window-build function — after the header, the header refresh, and the `UISpecialFrames` registration — so a frame-API surprise inside the sync can never abort the rest of the console's setup. (A mid-build error otherwise leaves the header label blank and ESC-to-close unregistered, because the build returns early.)
 
@@ -302,12 +302,16 @@ by design — so it is the surface where a lone addon still drawing words is mos
 
 - A host **MUST** pass **`addonName`** (its own folder name, from its first vararg) in the descriptor.
   Given it, the library draws **close, copy and clear** from the shared icon catalog on **both** its
-  windows; omitted, it draws a multiplication sign and two words, which is also what a host without
+  windows, and from `LibKa0s v1.105.0` a **settings** mark beside the close, in the order
+  standalone-windows' *Title-bar controls* fixes (copy · clear · settings · close), which opens the
+  addon's settings through the launcher's registered opener, so the addon declares `settings` on its
+  `LibKa0s icons:` line; omitted, it draws a multiplication sign and two words, which is also what a host without
   `LibKa0s-Media-1.0` and an install missing the art get. One branch, three cases.
 - **MUST NOT** pass the descriptor's `name` field for it. That field seeds the frame globals and only
   *happens* to equal the folder name in most hosts; they are different questions, and a host where
   they diverge hands the library a path into nowhere, which draws nothing and raises nothing.
-- The controls carry **no tooltip**, and an addon **MUST NOT** add one. One shipped for a single
+- The controls carry **no tooltip**, the settings mark included, and an addon **MUST NOT** add one. This is
+  the console's recorded exception to the header-mark tooltips of standalone-windows' *Title-bar controls*. One shipped for a single
   release and was removed rather than repositioned: anchored under the control it covered the first
   line of the log.
 - Requires **DebugLog minor 10** (LibKa0s v1.10.1). Minor 9 accepted `addonName` but its own close
@@ -472,3 +476,67 @@ its adoption is blocked rather than overdue.
   section list, the caps, and what the report deliberately does not read or call (secret values,
   protected APIs). Each addon's sections differ, and a maintainer reading a pasted report needs that
   page to read it.
+
+### 15. Reports go to the console, with one chat pointer (MUST, v2.113.0, owner ruling of 2026-11-08)
+
+A **report** is any multi-line read-out the player asks for, to inspect or to share: every `dump`
+target, every `… list` the addon's own verbs print (other than the reserved `/<slash> list`), the
+diagnostics report (§14), perf reports (performance) and anything of the same shape. A report is
+tens of lines asked for by name, which is what a chat frame is worst at and the console is for: it
+scrolls away under other chat, and a chat line cannot be copied clean. The owner ruled on
+2026-11-08 (LibKa0s#79), as written:
+
+> - **Chat**, through the addon's tagged printer: acknowledgments and short answers (one or two lines), refusals and errors (combat, unknown verb, usage, disabled, library missing), the help index, and the reserved `/<slash> list` verb. The owner chose to keep `list` in chat.
+> - **Debug console**: every report, meaning any multi-line read-out: every `dump` target, `priority … list`, `aio … list` and similar lists, diagnostics, and perf reports.
+> - A report is written **whether or not trace logging is on**. It is not a trace.
+> - The console **opens if it is hidden**.
+> - Chat gets **exactly one** pointer line naming the report and its line count, for example `dump bags: 23 lines written to the debug console. Use Copy to share it.` This matches the diagnostics report's line.
+> - Usage and refusal lines inside a report verb stay in chat and write no report.
+> - Without the library, the stub falls back to printing the report in chat, with no pointer.
+
+**The seam is the library's.** From DebugLog minor 23 (`LibKa0s v1.105.0`) the instance carries
+**`D:Report(tag, title, fn) -> n`** and **`D:Serialize(value, opts) -> lines`**
+(`docs/api/DebugLog/` in the library repo, at that key):
+
+- `fn(out)` writes the body, and the body is collected first, so a refusal that writes nothing
+  writes no report and prints nothing; the refusal's own chat line is the verb's, before it.
+- The report lands under `tag`, after a `/<slash> <title>` header, through the ungated `Add` (§4):
+  it never reads or changes the logging flag (§5). It is capped like the diagnostics report, with a
+  truncated line.
+- The console is shown if it is hidden, and exactly **one** localized pointer line is printed through
+  the descriptor's `print`: `<title>: N lines written to the debug console. Use Copy to share it.`,
+  `N` counting the header.
+- A body that raises keeps what it collected, gains one `<title> failed: <err>` line, and still
+  points.
+- `Serialize` renders a value as report lines (sorted keys, indented tables, secret-safe values,
+  capped depth, lines and cycles) and writes nothing; its lines go through `Report`'s body.
+
+An addon that has adopted it:
+
+- **MUST** write every report through `D:Report`, and **MUST NOT** print a report to chat, line by
+  line or as a table dump. **MUST NOT** call `DevTools_Dump` or any other helper that prints a table
+  to the chat frame; `D:Serialize` is the serializer.
+- **MUST** keep in chat what the ruling keeps there: acknowledgments and one- or two-line answers,
+  refusals, usage and errors (a usage or refusal line inside a report verb included, which writes
+  no report), the help index (slash-commands-§4) and the reserved `/<slash> list` (slash-commands-§5).
+- **MUST** give its library-absent stub (§7) a `Report` that streams the report to chat with **no**
+  pointer, and a `Serialize`. This is the opposite of §14's library-absent rule, on purpose: the
+  diagnostics report is hundreds of lines nobody asked to read in chat, while a report is a read-out
+  the player asked for by name, and losing it is worse than reading it in chat.
+- The diagnostics report keeps §14's own helper and its own pointer line; it is a report under this
+  section's definition and already routes as the ruling says.
+
+**Tested.** The addon's suite **MUST** carry, per report verb or once against the shared shape: the
+report lands with the logging flag off and leaves it off, the console is revealed, exactly one chat
+line is printed, a refusal writes nothing to the console, and the stub streams the report to chat.
+The ungated and single-pointer cases carry testing-§12 falsification comments.
+
+**Documented.** `docs/debug.md` (documentation-§3) lists the addon's report verbs and says that they
+write to the console with one chat pointer.
+
+**When it binds.** Like every v2.113.0 rule, this binds an addon **when it adopts the feature**
+(library-stack-§7, *What a re-vendor owes and what adoption owes*): its report verbs move onto
+`D:Report` in one change, tracked by LibKa0s#79. A re-vendor to `LibKa0s v1.105.0` alone owes the
+stub's two members and nothing under this section, and an addon whose reports still print to chat
+before its adoption is not graded for it. A new addon scaffolded on a tag that ships the seam
+builds its reports on it from the first commit.
