@@ -19,6 +19,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Retail · Forever | Enabled · Locked · Sim mode | unlock | next to Lock frame |
 | Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Retail · Forever | Enabled · Locked · Test mode | test | none |
 | Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
+| Ka0s Combat Trail | `../../CombatTrail/` | https://github.com/tusharsaxena/CombatTrail | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the DPS HUD) | test | next to Test mode |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail · Forever | Enabled · Locked (the macro bar) | unlock | none |
 | Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
@@ -122,6 +123,8 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
 
 - **Do not modify the addons from this repo.** This repository holds the standard and the process
   playbooks only; each addon's code lives in its own repository and is changed there.
+- **Default branches differ.** Most repos above default to `master`; CombatTrail and SkillMaster default to
+  `main`. Detect a repo's default branch rather than assuming it.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
   `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here; this repo's own
   `docs/audits/` holds only its own documentation-lane audits. Changing this roster
