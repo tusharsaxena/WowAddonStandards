@@ -203,12 +203,14 @@ disagreeing with the collection's intent while looking, in review, like it had b
    tooltip by the window, never on the cursor** (standalone-windows, *Tooltip placement*;
    launcher-§7; v2.112.0): a row's, a card's or a HUD bar's beside the whole window group, right
    when it fits and else left, top level with the element; a title bar's, tab's, filter bar's or
-   footer's attached and centered, below the top chrome or above the footer; 2 px from either.
+   footer's attached and centered above its control, below it only without room above (v2.113.0); 2 px from it.
    On `LibKa0s v1.105.0` or later place them through `LibKa0s-Tooltip-1.0` (`PlaceBeside` for a
    body element, `PlaceAttached` for a chrome one) from the first commit, and on an older tag in one
    host helper; never scaffold `ANCHOR_CURSOR` or `ANCHOR_RIGHT` on a chrome control (anti-pattern
    #119). On the same tag, build every window's title-bar marks with `W.HeaderButtons` (extras ·
-   settings · close, standalone-windows, *Title-bar controls*), write every multi-line report through
+   settings · close, standalone-windows, *Title-bar controls*), each control with a tooltip and the
+   title-bar colors (`icon.tint` at rest, `text.link` hot, the close `close.hot`), paint every list's
+   section headers with `list.header.bg` (skinning-§4), write every multi-line report through
    `NS.DebugLog:Report` with one chat pointer (debug-logging-§15), and draw sample characters from
    `Sim.Sample()` under preview-mode's naming convention (v2.113.0): a new addon has nothing to adopt
    later. A mark

@@ -1221,8 +1221,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        right when it fits and else left, its top level with the element, 2 px out. A chrome element
        (title bar, strip, tab, filter bar or toolbar and its controls, footer line or mark,
        resize grip, a modal's controls; anything else is body) is compliant when it is attached
-       and centered, 2 px below the top chrome or above
-       the footer. Any `ANCHOR_CURSOR` or `ANCHOR_CURSOR_RIGHT`, a cursor-following `OnUpdate`, a
+       and centered, 2 px above it, and below it only without room above (v2.113.0); before the
+       addon adopts the placers, a host tooltip centered 2 px below a top-chrome control, v2.112.0's
+       side, is compliant too. Any `ANCHOR_CURSOR` or `ANCHOR_CURSOR_RIGHT`, a cursor-following `OnUpdate`, a
        corner anchor (`ANCHOR_RIGHT`, `ANCHOR_TOPRIGHT`, `ANCHOR_TOPLEFT` or a mirror) on a chrome
        control, or a body tooltip owned by the row at a flat anchor that lands on the window is #119.
        That holds on any `LibKa0s` tag, because the rules bind now and only the library route waits.
@@ -1246,7 +1247,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        (`grep -rn 'DevTools_Dump' --include='*.lua' . | grep -v '/libs/'`), the stub carries
        `Report` and `Serialize`, and the suite carries debug-logging-§15's cases; every window's
        marks read extras · settings · close through the strip, with a settings mark unless a
-       `settingsOptOut` reason is passed, and each window's `owner` equals the launcher's `name`;
+       `settingsOptOut` reason is passed, each window's `owner` equals the launcher's `name`, every
+       title-bar control carries a tooltip, and every one rests in `icon.tint` and lights `text.link`
+       (the close `close.hot`), a state toggle keeping its state colors; where the addon has adopted
+       skins and the floors (LibKa0s#82, #84), every list's section headers paint `list.header.bg`
+       and no owner token for a band, a hover or a stripe defaults fainter than the library's;
        every shipped sample identity follows preview-mode's six rules (no real realm, no
        real-looking `Name-Realm` pair, `Sample`/`Mock` names, never through `L`); at most two
        `extraEntries`, each a verb's own handler, no duplicate of a built-in entry and no settings
