@@ -1252,9 +1252,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        (the close `close.hot`), a state toggle keeping its state colors; where the addon has adopted
        skins and the floors (LibKa0s#82, #84), every list's section headers paint `list.header.bg`,
        no owner token for a band, a hover or a stripe defaults fainter than the library's, every
-       footer button keeps its glow and lights its label in the skin's button hover color, and no
-       owner token for a title-bar or footer-button hover sits under 20 ΔE00 off its rest in any
-       skin (standalone-windows, *Title-bar controls* and *The footer*);
+       footer button keeps its glow and hovers by the skin's tokens (a plain one's label in
+       `btn.hover`, a primary one's fill in `btnPrimary.hoverBg` with its label kept), and no
+       owner token for a title-bar or footer-button hover, a primary's `hoverBg` included, sits
+       under 20 ΔE00 off its rest in any skin (standalone-windows, *Title-bar controls* and
+       *The footer*);
        every shipped sample identity follows preview-mode's six rules (no real realm, no
        real-looking `Name-Realm` pair, `Sample`/`Mock` names, never through `L`); at most two
        `extraEntries`, each a verb's own handler, no duplicate of a built-in entry and no settings
