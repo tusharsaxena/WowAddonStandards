@@ -209,8 +209,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    host helper; never scaffold `ANCHOR_CURSOR` or `ANCHOR_RIGHT` on a chrome control (anti-pattern
    #119). On the same tag, build every window's title-bar marks with `W.HeaderButtons` (extras ·
    settings · close, standalone-windows, *Title-bar controls*), each control with a tooltip and the
-   title-bar colors (`icon.tint` at rest, `text.link` hot, the close `close.hot`), paint every list's
-   section headers with `list.header.bg` (skinning-§4), write every multi-line report through
+   title-bar colors (`icon.tint` at rest, `text.link` hot, the close `close.hot`), build every footer
+   button through the library's painters so its label lights the skin's hover color (*The footer*),
+   paint every list's section headers with `list.header.bg` (skinning-§4), write every multi-line report through
    `NS.DebugLog:Report` with one chat pointer (debug-logging-§15), and draw sample characters from
    `Sim.Sample()` under preview-mode's naming convention (v2.113.0): a new addon has nothing to adopt
    later. A mark
