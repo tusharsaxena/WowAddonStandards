@@ -1221,17 +1221,48 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        right when it fits and else left, its top level with the element, 2 px out. A chrome element
        (title bar, strip, tab, filter bar or toolbar and its controls, footer line or mark,
        resize grip, a modal's controls; anything else is body) is compliant when it is attached
-       and centered, 2 px below the top chrome or above
-       the footer. Any `ANCHOR_CURSOR` or `ANCHOR_CURSOR_RIGHT`, a cursor-following `OnUpdate`, a
+       and centered, 2 px above it, and below it only without room above (v2.113.0); before the
+       addon adopts the placers, a host tooltip centered 2 px below a top-chrome control, v2.112.0's
+       side, is compliant too. Any `ANCHOR_CURSOR` or `ANCHOR_CURSOR_RIGHT`, a cursor-following `OnUpdate`, a
        corner anchor (`ANCHOR_RIGHT`, `ANCHOR_TOPRIGHT`, `ANCHOR_TOPLEFT` or a mirror) on a chrome
        control, or a body tooltip owned by the row at a flat anchor that lands on the window is #119.
        That holds on any `LibKa0s` tag, because the rules bind now and only the library route waits.
-       No `LibKa0s` tag ships the LibKa0s tooltip placement surface yet, so a host placement that
-       already matches the rules is compliant and not a re-vendor finding. Once the addon vendors
-       the tag that ships it, a host placer beside the library's is #47. A minimap button's tooltip
-       left to LibDBIcon-1.0's own `getAnchors` is compliant. Where it actually opens on screen is
+       The surface is `LibKa0s-Tooltip-1.0` (`LibKa0s v1.105.0`), and moving onto it is owed at the
+       addon's **adoption**, not its re-vendor (v2.113.0, library-stack-§7, *What a re-vendor owes
+       and what adoption owes*): before the addon adopts it, a host placement that already matches
+       the rules is compliant and the open LibKa0s#92 adoption is reported, not graded; once it has
+       adopted (it calls `PlaceBeside` / `PlaceAttached`), a host placer beside the library's is
+       #47. A minimap button's tooltip left to LibDBIcon-1.0's own `getAnchors` is compliant below
+       `LibKa0s v1.105.0`, whose launcher adds the gap itself. Where it actually opens on screen is
        the owner's in-client smoke (the `docs/smoke-tests.md` line the section requires; its
        absence is a finding).
+       **Then check the v2.113.0 adoption rules, each only where the addon has adopted its
+       feature** (library-stack-§7, *What a re-vendor owes and what adoption owes*). Read adoption
+       from code: `D:Report` / `:Report(` calls for the report seam, `HeaderButtons(` for the
+       title-bar strip, `Sim.Sample` / `SAMPLE` for the sample characters, `extraEntries` on the
+       launcher descriptor. Where it is not adopted, list the open adoption issue (LibKa0s #79,
+       #86, #87, #92) in `02_DEVIATIONS.md` as owed-at-adoption, with no severity, and grade
+       nothing under that rule. Where it is: every multi-line report goes through `Report` with
+       one chat pointer and none prints to chat, and no `DevTools_Dump` call remains
+       (`grep -rn 'DevTools_Dump' --include='*.lua' . | grep -v '/libs/'`), the stub carries
+       `Report` and `Serialize`, and the suite carries debug-logging-§15's cases; every window's
+       marks read extras · settings · close through the strip, with a settings mark unless a
+       `settingsOptOut` reason is passed, each window's `owner` equals the launcher's `name`, every
+       title-bar control carries a tooltip, and every one rests in `icon.tint` and lights `text.link`
+       (the close `close.hot`), a state toggle keeping its state colors; where the addon has adopted
+       skins and the floors (LibKa0s#82, #84), every list's section headers paint `list.header.bg`,
+       no owner token for a band, a hover or a stripe defaults fainter than the library's, every
+       footer button keeps its glow and hovers by the skin's tokens (a plain one's label in
+       `btn.hover`, a primary one's fill in `btnPrimary.hoverBg` with its label kept), and no
+       owner token for a title-bar or footer-button hover, a primary's `hoverBg` included, sits
+       under 20 ΔE00 off its rest in any skin (standalone-windows, *Title-bar controls* and
+       *The footer*);
+       every shipped sample identity follows preview-mode's six rules (no real realm, no
+       real-looking `Name-Realm` pair, `Sample`/`Mock` names, never through `L`); at most two
+       `extraEntries`, each a verb's own handler, no duplicate of a built-in entry and no settings
+       shortcut, listed in `ADDONS.md`'s launcher column. A re-vendor to `LibKa0s v1.105.0` alone
+       is never a finding under any of them; the re-vendor's own items (stub members, loader lines,
+       `settings` on the icons line) are checked as re-vendor items.
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check

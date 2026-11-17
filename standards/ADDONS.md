@@ -19,6 +19,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Absorb Tracker | `../../AbsorbTracker/` | https://github.com/tusharsaxena/AbsorbTracker | Retail · Forever | Enabled · Locked · Sim mode | unlock | next to Lock frame |
 | Ka0s Aura Master | `../../AuraMaster/` | https://github.com/tusharsaxena/AuraMaster | Retail · Forever | Enabled · Locked · Test mode | test | none |
 | Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
+| Ka0s Combat Trail | `../../CombatTrail/` | https://github.com/tusharsaxena/CombatTrail | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the DPS HUD) | test | next to Test mode |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail · Forever | Enabled · Locked (the macro bar) | unlock | none |
 | Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
@@ -57,7 +58,7 @@ broker plugin, from one LibDataBroker-1.1 object (launcher). **Left-click opens 
 the options menu in every row above** (launcher-§2). The column lists that menu's entries, which are the toggles the addon
 has, in the menu's fixed order — **Enabled** always, then **Locked** where it has a lock, **Test mode** where it has a
 test mode, **Sim mode** where it has an in-game simulator (recorded from v2.99.0; launcher-§2 added the entry in the full
-skinning run), and **Show window** where it has a primary window, a parenthesis naming the window or what the lock holds — read from each addon's
+skinning run), and **Show window** where it has a primary window, a parenthesis naming the window or what the lock holds, then any **extra entries** the addon declares through the descriptor's `extraEntries` (at most two, by their labels, in declared order; launcher-§2, v2.113.0, `LibKa0s v1.105.0`) — read from each addon's
 `core/LauncherSetup.lua` and Master-controls rows, so an audit checks the descriptor against it rather than re-deriving
 it from the addon's shape. A new addon lists its entries with its row. The column replaced v2.66.0's left-click rung
 column when v2.67.0 retired the rungs.
@@ -122,6 +123,8 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
 
 - **Do not modify the addons from this repo.** This repository holds the standard and the process
   playbooks only; each addon's code lives in its own repository and is changed there.
+- **Default branches differ.** Most repos above default to `master`; CombatTrail and SkillMaster default to
+  `main`. Detect a repo's default branch rather than assuming it.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
   `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here; this repo's own
   `docs/audits/` holds only its own documentation-lane audits. Changing this roster

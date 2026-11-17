@@ -19,7 +19,7 @@ The console itself is **not addon code**. It is a **Ka0s-owned shared library**,
 - The descriptor's five **required** fields are `name` (seeds the frame globals and the `UISpecialFrames` entries), `title`, `font` (§2), and `isEnabled` / `setEnabled` (§5). The useful optional ones are `fontSize` (default `10`), `print`, `safeToString`, `initSummary`, `onVisibilityChanged`, `slash` (composes the console checkbox's tooltip), `L` (locale override), `skin`, and, from DebugLog minor 18 (`LibKa0s v1.65.0`), `onClear` (§6, §9).
 - **MUST** pass `print` and `safeToString` as **thin call-time forwarders** — `function(line) NS.Print(line) end`, not `NS.Print` — when the host's printer is established after this file loads. Capturing the reference freezes it to whatever happened to exist at load; an addon that reclaims its printer from AceConsole's embed later would then acknowledge through the wrong function forever (anti-patterns #36).
 
-**What the library guarantees** (so the standard describes the behavior, not the build): a `BackdropTemplate` window named `<name>DebugWindow`, **700 × 344 by default**, resizable from a bottom-right grip down to a minimum that keeps the title bar's controls clear, the size kept on the window **for the session only** (never saved; a `/reload` restores the default), on **`DIALOG`** strata and, from `LibKa0s v1.77.0`, **toplevel**, so it sits above the addon's main window and comes forward on a click, and on show it re-raises any shown StaticPopup so a confirmation is never buried (frame-layering-§1, tier T6; frame-layering-§4), draggable, clamped to screen, registered in `UISpecialFrames`, skinned from `LibKa0s-Core-1.0`'s shared `SKIN` — the flat 1px black edge with its gray inner highlight, the gold title and the gray divider specified normatively in standalone-windows, "The Ka0s window edge" — with **Core's** close glyph — which the addon **MUST NOT** replace with its main window's, even where the two differ by design (standalone-windows); a `ScrollingMessageFrame` capped at `lib.MAX_BUFFER` (**3000**) lines — raised from 500 to 1500 because the perf capture workflow pastes out of this buffer, and a long run's `perf dump` overflowed the old cap and lost its head with nothing saying so; then from 1500 to 3000 at DebugLog minor 14 (`LibKa0s v1.60.0`), so that the diagnostics report (§14) and the trace reproduced above it fit in one Copy. The figure is measured, not chosen: opening Copy on 5000 lines of width 120 took 378 ms against a 250 ms limit and felt sluggish by hand, while 3000 took 246 ms, so 3000 is the ceiling that passes. The compaction slack, `lib.BUFFER_SLACK`, scales with it to **128** — with the always-shown scrollbar and line counter of §11; the two formatters of §3; the Clear/Copy pair of §6; the title-bar state toggle and single `SetEnabled` seam of §5; the orange **Diagnostics** link in the title bar, a small gap after the Debug On/Off label, plain text rather than a button, which runs the diagnostics report exactly as `/<slash> diagnostics` does (§14; DebugLog minor 16, `LibKa0s v1.64.0`, drawn only when `DebugLogDiagnostics.lua` is loaded, and counted in the window's minimum width); and `ConsoleCheckbox()`, a plain `{ label, tooltip, get, set }` table a settings page renders itself (options-ui). None of that is an addon's code to write, and an audit **MUST NOT** ask for it in the addon's own source. An addon whose own surface sits at `DIALOG` or above says in its layers table's comment that the surface can cover the console (frame-layering-§5).
+**What the library guarantees** (so the standard describes the behavior, not the build): a `BackdropTemplate` window named `<name>DebugWindow`, **700 × 344 by default**, resizable from a bottom-right grip down to a minimum that keeps the title bar's controls clear, the size kept on the window **for the session only** (never saved; a `/reload` restores the default), on **`DIALOG`** strata and, from `LibKa0s v1.77.0`, **toplevel**, so it sits above the addon's main window and comes forward on a click, and on show it re-raises any shown StaticPopup so a confirmation is never buried (frame-layering-§1, tier T6; frame-layering-§4), draggable, clamped to screen, registered in `UISpecialFrames`, skinned from `LibKa0s-Core-1.0`'s shared `SKIN` — the flat 1px black edge with its gray inner highlight, the gold title and the gray divider specified normatively in standalone-windows, "The Ka0s window edge" — with **Core's** close glyph — which the addon **MUST NOT** replace with its main window's, even where the two differ by design (standalone-windows); a `ScrollingMessageFrame` capped at `lib.MAX_BUFFER` (**3000**) lines — raised from 500 to 1500 because the perf capture workflow pastes out of this buffer, and a long run's `perf dump` overflowed the old cap and lost its head with nothing saying so; then from 1500 to 3000 at DebugLog minor 14 (`LibKa0s v1.60.0`), so that the diagnostics report (§14) and the trace reproduced above it fit in one Copy. The figure is measured, not chosen: opening Copy on 5000 lines of width 120 took 378 ms against a 250 ms limit and felt sluggish by hand, while 3000 took 246 ms, so 3000 is the ceiling that passes. The compaction slack, `lib.BUFFER_SLACK`, scales with it to **128** — with the always-shown scrollbar and line counter of §11; the two formatters of §3; the Clear/Copy pair of §6; the title-bar state toggle and single `SetEnabled` seam of §5; the **Diagnostics** link in the title bar (orange until `LibKa0s v1.105.0`; from it, resting in `icon.tint` with the marks and orange, `text.link`, under the pointer, standalone-windows' *Title-bar controls*), a small gap after the Debug On/Off label, plain text rather than a button, which runs the diagnostics report exactly as `/<slash> diagnostics` does (§14; DebugLog minor 16, `LibKa0s v1.64.0`, drawn only when `DebugLogDiagnostics.lua` is loaded, and counted in the window's minimum width); and `ConsoleCheckbox()`, a plain `{ label, tooltip, get, set }` table a settings page renders itself (options-ui). None of that is an addon's code to write, and an audit **MUST NOT** ask for it in the addon's own source. An addon whose own surface sits at `DIALOG` or above says in its layers table's comment that the surface can cover the console (frame-layering-§5).
 
 **The library's windows resize, for the session (from `LibKa0s v1.64.0`).** The same guarantee covers the console's copy window (§6) and every copy window `LibKa0s-Widgets-1.0` draws (the shared copy window a host opens for an export): each resizes on **both axes** from its bottom-right grip, opens at the size its descriptor gives, and keeps its own size for the session. The perf step panel resizes on **width only** (performance-§4). One helper draws the grip for all three, so the grip, the minimum and the session-only rule cannot drift between them, and a vendor older than the helper keeps today's fixed windows.
 
@@ -103,13 +103,13 @@ NS.Debug("Loot", "%s x%d", name, qty)     -- NS.Debug = NS.DebugLog.Debug, bound
 The Clear and Copy controls are the library's; this is the behavior they guarantee and why it is shaped this way.
 
 - **Clear** wipes both the visible log and the Copy buffer, and resets the line counter (§11). From DebugLog minor 18 (`LibKa0s v1.65.0`) it also re-arms the change gates (§1) and then calls the descriptor's `onClear()` under `pcall`, for a host that keeps a gate of its own (§9); the at-enable queue is left alone.
-- **Copy** opens a read-through multiline `EditBox` pre-filled with the plain buffer and auto-highlighted for `Ctrl+C`, in the same monospace font. WoW exposes **no clipboard API** — the user's `Ctrl+C` inside an `EditBox` is the only copy path, so a button alone cannot write the OS clipboard. *(The color-vs-clean-copy split is deliberate: the `ScrollingMessageFrame` gives the colored live view, the `EditBox` gives code-free copies — one widget cannot do both, since selecting color-coded text copies its `|c…|r` escapes.)*
+- **Copy** opens a read-through multiline `EditBox` pre-filled with the plain buffer and auto-highlighted for `Ctrl+C`, in the same monospace font. **From DebugLog minor 23 (`LibKa0s v1.105.0`) the buffer is plain for every line**, not only the diagnostics report's: `Add` keeps the colored line for the view and stores it in `buffer` with its color, texture, atlas and hyperlink escapes stripped (`||` kept, `|n` a space), so a report line drawn with a colored `[owned]` or `<-- pick` pastes out of Copy as words, not `|cff…|r` escapes. A host test that pins a color reads it through the view, never through `buffer`. This is the library's guarantee and an addon writes nothing for it. WoW exposes **no clipboard API** — the user's `Ctrl+C` inside an `EditBox` is the only copy path, so a button alone cannot write the OS clipboard. *(The color-vs-clean-copy split is deliberate: the `ScrollingMessageFrame` gives the colored live view, the `EditBox` gives code-free copies — one widget cannot do both, since selecting color-coded text copies its `|c…|r` escapes.)*
 
 ### 7. Fallback — the stub when the library is absent
 
 A missing vendored library **MUST NOT** error at load, and **MUST NOT** silently break the addon's own function.
 
-- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, `RunDiagnostics` (which answers with the library-absent line, §14), the raw `buffer`, from `LibKa0s v1.65.0` the gates and queue the addon calls — `DebugOnce`, `DebugChanged`, `DebugForget`, `DebugAtEnable`, each answering `false` or nothing (a stub under the kit's `assertSurfaceParity` gains all four or names them in its `ignore` list, because the by-name form reads the live instance) — and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
+- **MUST** fall back, in `core/DebugLogSetup.lua`, to a stub carrying **every member the addon actually calls** — the bare `Debug` sink, `Add`, `SetEnabled`, `IsEnabled`, `Show`/`Hide`/`Toggle`/`IsShown`, `Clear`, `ConsoleCheckbox`, `RunDiagnostics` (which answers with the library-absent line, §14), the raw `buffer`, from `LibKa0s v1.65.0` the gates and queue the addon calls — `DebugOnce`, `DebugChanged`, `DebugForget`, `DebugAtEnable`, each answering `false` or nothing (a stub under the kit's `assertSurfaceParity` gains all four or names them in its `ignore` list, because the by-name form reads the live instance), from `LibKa0s v1.105.0` `Report` (the report streamed to chat, no pointer) and `Serialize` (§15), which a by-name parity stub gains at the re-vendor whether or not the addon has adopted the seam — and whatever else the slash layer, the settings page and any shared module reach for. A stub that omits a member is not a fallback — it is a crash moved to a rarer code path.
 - The stub **MUST** still flip the flag and still print the ack. `NS.State.debug` is the addon's, not the library's, and a user who types `/<slash> debug on` must not be told nothing happened. What is lost is the **window**, and the stub **SHOULD** say so once, honestly, through the addon's printer — once, not per call.
 - The stub **MUST NOT** re-implement the formatters or the line format (§3).
 - **Utility addons with no on-screen window MAY** fall back to `NS.PREFIX`-tagged chat output instead of a console; any addon that *has* a main window (standalone-windows) **MUST** use the console.
@@ -279,7 +279,7 @@ The log surface carries a **visible scrollbar** and a **line counter**, so the d
 
 - **Scroll API — MUST use the Lua mixin methods.** On current retail the log is the **Lua `ScrollingMessageFrameMixin`**: drive it with **`GetMaxScrollRange()`**, **`GetScrollOffset()`**, **`SetScrollOffset(offset)`** — where **offset `0` = bottom (newest)** and **offset `== maxRange` = top (oldest)** (`ScrollUp` *increases* the offset). The old C getters **`GetNumLinesDisplayed()` / `GetCurrentScroll()` are `nil`** on this mixin and raise *"attempt to call a nil value"* — **MUST NOT** call them (anti-patterns #41). The vertical slider (value `0` = thumb top = oldest) maps as `sliderValue = maxRange − offset` and, on drag, `offset = maxRange − sliderValue`. **Guard method presence** before every call *and* type-check the returns, so a headless test mock — whose stub frame answers with itself — stays a clean no-op rather than a crash.
 
-- **Line counter.** A thin **bottom status bar** — a 1px divider plus a right-aligned label in the **same monospace font** (§2) — shows the live count as **`N / MAX lines`**, where `MAX` is `lib.MAX_BUFFER` (3000, §1) and `N` is the current buffered line count. It updates on **every append** and resets to `0 / MAX` on Clear (§6).
+- **Line counter.** The console's **footer** (standalone-windows, *The footer*: `LibKa0s-Widgets-1.0`'s `Footer`, 24 px, its hairline to the window's edge, from DebugLogWindow minor 5, `LibKa0s v1.105.0`) carries the count as its right text, **`N / MAX lines`**, where `MAX` is `lib.MAX_BUFFER` (3000, §1) and `N` is the current buffered line count; its left text is empty. The counter keeps the **same monospace face** as the log (§2), because the footer has no skin owner to give it a body face, and is drawn in the footer's `text.muted`. It updates on **every append** and resets to `0 / MAX` on Clear (§6). The 700 × 344 default (§1) and the four-line minimum height stay. Before v1.105.0 this was a hand-drawn 16 px status line, a 1px divider plus the right-aligned label, which v2.110.0's footer rule made the library's to move (LibKa0s#90); a console on an older tag is not graded for it, since the console is the library's window, not the addon's.
 
 - **Build order (robustness).** The **initial** scrollbar/counter sync runs at the **end** of the window-build function — after the header, the header refresh, and the `UISpecialFrames` registration — so a frame-API surprise inside the sync can never abort the rest of the console's setup. (A mid-build error otherwise leaves the header label blank and ESC-to-close unregistered, because the build returns early.)
 
@@ -302,14 +302,28 @@ by design — so it is the surface where a lone addon still drawing words is mos
 
 - A host **MUST** pass **`addonName`** (its own folder name, from its first vararg) in the descriptor.
   Given it, the library draws **close, copy and clear** from the shared icon catalog on **both** its
-  windows; omitted, it draws a multiplication sign and two words, which is also what a host without
+  windows, and from `LibKa0s v1.105.0` a **settings** mark beside the close, in the order
+  standalone-windows' *Title-bar controls* fixes (copy · clear · settings · close), which opens the
+  addon's settings through the launcher's registered opener, so the addon declares `settings` on its
+  `LibKa0s icons:` line; omitted, it draws a multiplication sign and two words, which is also what a host without
   `LibKa0s-Media-1.0` and an install missing the art get. One branch, three cases.
 - **MUST NOT** pass the descriptor's `name` field for it. That field seeds the frame globals and only
   *happens* to equal the folder name in most hosts; they are different questions, and a host where
   they diverge hands the library a path into nowhere, which draws nothing and raises nothing.
-- The controls carry **no tooltip**, and an addon **MUST NOT** add one. One shipped for a single
-  release and was removed rather than repositioned: anchored under the control it covered the first
-  line of the log.
+- **Every title-bar control carries a tooltip, from `LibKa0s v1.105.0`** (owner ruling of smoke round 1,
+  2026-11-16, v2.113.0): Copy ("Copy the log"), Clear ("Clear the log"), settings ("Open settings"), the
+  Debug toggle ("Turn debug logging on or off"), the Diagnostics link ("Write a diagnostics report to
+  this console") and the close ("Close"). The words are the library's `COPY_TIP`, `CLEAR_TIP`,
+  `SETTINGS_TIP`, `TOGGLE_TIP` and `DIAGNOSTICS_TIP`, read through `D:Text` on each hover, so the
+  descriptor's `L` translates them; the close's is `LibKa0s-Tooltip-1.0`'s `CloseTip`. Each opens
+  attached and centered **above** its control (standalone-windows, *Tooltip placement*). The console
+  carried no tooltips before, as a recorded exception, because one that shipped for a single release
+  was anchored under its control and covered the first line of the log; above the control it covers
+  none, so the exception is withdrawn. They are the library's, and an addon **MUST NOT** add, replace or
+  re-place one.
+- **Colors** follow standalone-windows' *Title-bar controls*: the marks, the close and the Diagnostics
+  link rest in `icon.tint` and light `text.link` under the pointer (the close `close.hot`); the Debug
+  ON/OFF label keeps its state colors, `sem.on` / `sem.off`.
 - Requires **DebugLog minor 10** (LibKa0s v1.10.1). Minor 9 accepted `addonName` but its own close
   forwarder dropped the third argument on the way to `Core.MakeCloseButton`, so the console came out
   with two icons and a multiplication sign — see anti-patterns #64 for the class.
@@ -472,3 +486,67 @@ its adoption is blocked rather than overdue.
   section list, the caps, and what the report deliberately does not read or call (secret values,
   protected APIs). Each addon's sections differ, and a maintainer reading a pasted report needs that
   page to read it.
+
+### 15. Reports go to the console, with one chat pointer (MUST, v2.113.0, owner ruling of 2026-11-08)
+
+A **report** is any multi-line read-out the player asks for, to inspect or to share: every `dump`
+target, every `… list` the addon's own verbs print (other than the reserved `/<slash> list`), the
+diagnostics report (§14), perf reports (performance) and anything of the same shape. A report is
+tens of lines asked for by name, which is what a chat frame is worst at and the console is for: it
+scrolls away under other chat, and a chat line cannot be copied clean. The owner ruled on
+2026-11-08 (LibKa0s#79), as written:
+
+> - **Chat**, through the addon's tagged printer: acknowledgments and short answers (one or two lines), refusals and errors (combat, unknown verb, usage, disabled, library missing), the help index, and the reserved `/<slash> list` verb. The owner chose to keep `list` in chat.
+> - **Debug console**: every report, meaning any multi-line read-out: every `dump` target, `priority … list`, `aio … list` and similar lists, diagnostics, and perf reports.
+> - A report is written **whether or not trace logging is on**. It is not a trace.
+> - The console **opens if it is hidden**.
+> - Chat gets **exactly one** pointer line naming the report and its line count, for example `dump bags: 23 lines written to the debug console. Use Copy to share it.` This matches the diagnostics report's line.
+> - Usage and refusal lines inside a report verb stay in chat and write no report.
+> - Without the library, the stub falls back to printing the report in chat, with no pointer.
+
+**The seam is the library's.** From DebugLog minor 23 (`LibKa0s v1.105.0`) the instance carries
+**`D:Report(tag, title, fn) -> n`** and **`D:Serialize(value, opts) -> lines`**
+(`docs/api/DebugLog/` in the library repo, at that key):
+
+- `fn(out)` writes the body, and the body is collected first, so a refusal that writes nothing
+  writes no report and prints nothing; the refusal's own chat line is the verb's, before it.
+- The report lands under `tag`, after a `/<slash> <title>` header, through the ungated `Add` (§4):
+  it never reads or changes the logging flag (§5). It is capped like the diagnostics report, with a
+  truncated line.
+- The console is shown if it is hidden, and exactly **one** localized pointer line is printed through
+  the descriptor's `print`: `<title>: N lines written to the debug console. Use Copy to share it.`,
+  `N` counting the header.
+- A body that raises keeps what it collected, gains one `<title> failed: <err>` line, and still
+  points.
+- `Serialize` renders a value as report lines (sorted keys, indented tables, secret-safe values,
+  capped depth, lines and cycles) and writes nothing; its lines go through `Report`'s body.
+
+An addon that has adopted it:
+
+- **MUST** write every report through `D:Report`, and **MUST NOT** print a report to chat, line by
+  line or as a table dump. **MUST NOT** call `DevTools_Dump` or any other helper that prints a table
+  to the chat frame; `D:Serialize` is the serializer.
+- **MUST** keep in chat what the ruling keeps there: acknowledgments and one- or two-line answers,
+  refusals, usage and errors (a usage or refusal line inside a report verb included, which writes
+  no report), the help index (slash-commands-§4) and the reserved `/<slash> list` (slash-commands-§5).
+- **MUST** give its library-absent stub (§7) a `Report` that streams the report to chat with **no**
+  pointer, and a `Serialize`. This is the opposite of §14's library-absent rule, on purpose: the
+  diagnostics report is hundreds of lines nobody asked to read in chat, while a report is a read-out
+  the player asked for by name, and losing it is worse than reading it in chat.
+- The diagnostics report keeps §14's own helper and its own pointer line; it is a report under this
+  section's definition and already routes as the ruling says.
+
+**Tested.** The addon's suite **MUST** carry, per report verb or once against the shared shape: the
+report lands with the logging flag off and leaves it off, the console is revealed, exactly one chat
+line is printed, a refusal writes nothing to the console, and the stub streams the report to chat.
+The ungated and single-pointer cases carry testing-§12 falsification comments.
+
+**Documented.** `docs/debug.md` (documentation-§3) lists the addon's report verbs and says that they
+write to the console with one chat pointer.
+
+**When it binds.** Like every v2.113.0 rule, this binds an addon **when it adopts the feature**
+(library-stack-§7, *What a re-vendor owes and what adoption owes*): its report verbs move onto
+`D:Report` in one change, tracked by LibKa0s#79. A re-vendor to `LibKa0s v1.105.0` alone owes the
+stub's two members and nothing under this section, and an addon whose reports still print to chat
+before its adoption is not graded for it. A new addon scaffolded on a tag that ships the seam
+builds its reports on it from the first commit.

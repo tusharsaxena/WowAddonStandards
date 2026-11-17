@@ -65,6 +65,19 @@ An addon that ships one:
 
 These are the host's contract. The library guarantees only what it computes, the refusal order with its stood-down backstop and a guarded member that never reaches the client while a session runs, and never advertises the rest as enforced (`LibKa0s#54`). The full descriptor and its obligations are in the `LibKa0s-Sim-1.0` API document (`docs/api/Sim/` in the library repo).
 
+### Sample characters (MUST at adoption, v2.113.0, owner ruling Q4 of 2026-11-16)
+
+A test mode, a simulator and a showcase all draw made-up people, and before this rule the collection used five conventions for them: `Sample`/`Mock` names, `Test` names, fantasy lists, real realm names and a localized name (LibKa0s#87). A sample that looks real reads as a real player's data, and a real realm or a real-looking `Name-Realm` pair can be one. The owner ruled on 2026-11-16 that **this standard owns the naming convention and `LibKa0s-Sim-1.0` owns the data**. These rules mirror the convention recorded in the Sim major's API document (Sim minor 3, `LibKa0s v1.105.0`, `docs/api/Sim/version-3.3.11.4-docs.md` in the library repo), whose suite holds the library's data to them case by case:
+
+1. **Obviously fictional.** A character name, a surname and a pet name is one capitalized word of 2 to 12 letters, a name the client could hold, that **starts `Sample` or `Mock`** (`Samplehunter`, `Mockflame`, `Mockfang`). A guild follows the same pattern (`Sample Company`, `Mock Brigade`).
+2. **Fixed fictional realms.** `Samplerealm`, and `Mockrealm` for a character from another realm. **Never a real realm name**, so never a real-looking `Name-Realm` pair, and never a real player's name.
+3. **The client's identity shape** (clients; client-quirks-§5). Retail: `Name-Realm`, with a `specID` that is one of the class's own. WoW Forever: `First Surname`, with **no realm in the identity**, a class the client has, and a classic talent tree (1 to 3, in `LibKa0s-Role-1.0`'s `TALENT_GROUP_ROLE` order) in place of a spec ID.
+4. **A pet only on a class that has one** (Hunter, Warlock).
+5. **Names are data, never localized**, and never pass through the addon's `L` table. A spec label in the data is English; a display that draws a spec name asks the client for its own.
+6. **The protagonists converge; roster pools do not.** The named sample characters an addon draws are the library's set, `Sim.SAMPLE.retail` and `Sim.SAMPLE.forever` (the same five people on each client), read for the running client through **`Sim.Sample(client)`**, which answers a copy the caller owns. An addon that seeds a crowd keeps its own pool for its seeded determinism, and every name it adds to that pool still follows rules 1 to 5.
+
+An addon **MUST** follow rules 1 to 5 for every sample identity it ships (placeholder data, simulator scenarios, showcases and screenshots made from them) and **SHOULD** read its protagonists from `Sim.Sample` rather than copy them, with a copy of the library's rows as its fallback when the library is absent. A test fixture under `tests/` is not shipped data, but a fixture that pairs a real-looking name with a real realm **SHOULD** move to the convention at the same time. **When it binds:** an addon owes this when it adopts the sample data, tracked by LibKa0s#87 (library-stack-§7, *What a re-vendor owes and what adoption owes*); a re-vendor to `LibKa0s v1.105.0` alone owes nothing under it, and an addon's existing samples are not graded until that adoption. A new addon's samples follow it from the first commit. The release re-look below (*Kept current at every release*) checks the samples like any other placeholder data once the addon has adopted.
+
 ### Kept current at every release (MUST)
 
 This applies to every addon that ships a test mode, a preview drawn by unlocking, or a simulator. A frameless addon, with no positionable display and no simulator, owes only the *Not applicable* answer below.
