@@ -33,7 +33,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Premade Groups Filter Extension | `../../PremadeGroupsFilterExtension/` | https://github.com/tusharsaxena/PremadeGroupsFilterExtension | Retail | Enabled · Test mode (the attached panel shown on its own) | test | none |
 | Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Retail · Forever | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
 | Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Retail · Forever | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
-| Ka0s Skill Master | `../../SkillMaster/` | https://github.com/tusharsaxena/SkillMaster | Forever | Enabled · Locked · Test mode · Sim mode · Show window (the skills window) | test | next to Test mode |
+| Ka0s Skill Master | `../../SkillMaster/` | https://github.com/tusharsaxena/SkillMaster | Forever | Enabled · Locked · Test mode · Sim mode · Show window (the skills window) · Journal | test | next to Test mode |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Retail | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
 
 **The Clients column is normative input to an audit, not decoration** (v2.103.0). It is the single source of truth that
