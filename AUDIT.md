@@ -1263,6 +1263,22 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        shortcut, listed in `ADDONS.md`'s launcher column. A re-vendor to `LibKa0s v1.105.0` alone
        is never a finding under any of them; the re-vendor's own items (stub members, loader lines,
        `settings` on the icons line) are checked as re-vendor items.
+       **Then check which marks each window owes** (standalone-windows, *Which marks a window
+       owes* and *The drag strip's marks*; v2.115.0, owner rulings of 2026-11-19), on every window
+       and HUD display, on any `LibKa0s` tag. Name the primary windows from `ADDONS.md`'s launcher
+       column (the *Show window* parenthesis, and every display the *Locked* entry moves) and read
+       each header's construction (`HeaderButtons(` and any hand-built title bar): a primary window
+       carries the close, the settings mark and a lock mark whose click reaches the same seam as
+       `/<slash> lock` and the launcher's *Locked* entry; every other window carries the close. Then
+       read every footer and bottom button row: a close, settings, lock, minimize, collapse or
+       resize-toggle control there is #121 (the corner resize grip is not one). A missing mark or a
+       footer window control is graded only where the addon's `docs/ARCHITECTURE.md` →
+       `## Documented deviations` carries no row naming the window and the mark; with a row it is a
+       ratified waiver, and without one the finding is the missing row (#120). Where the addon
+       vendors `LibKa0s v1.107.0`+, every `DragHandle` passes a close handler that hides or disables
+       its display and draws the settings mark, and no host `tooltipPlace` hook places the strip's
+       own tooltip (`grep -rn 'tooltipPlace' --include='*.lua' . | grep -v '/libs/'`): a strip
+       breaking either with no register row is #122. Below that tag the strip is a re-vendor item.
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check
