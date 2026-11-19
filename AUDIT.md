@@ -1265,7 +1265,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `settings` on the icons line) are checked as re-vendor items.
        **Then check which marks each window owes** (standalone-windows, *Which marks a window
        owes* and *The drag strip's marks*; v2.115.0, owner rulings of 2026-11-19), on every window
-       and HUD display, on any `LibKa0s` tag. Name the primary windows from `ADDONS.md`'s launcher
+       header, on any `LibKa0s` tag, and on every HUD drag strip from the addon's re-vendor of
+       `LibKa0s v1.107.0` (below). Name the primary windows from `ADDONS.md`'s launcher
        column (the *Show window* parenthesis, and every display the *Locked* entry moves) and read
        each header's construction (`HeaderButtons(` and any hand-built title bar): a primary window
        carries the close, the settings mark and a lock mark whose click reaches the same seam as
