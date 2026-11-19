@@ -98,7 +98,7 @@ A **footer** is the band along a window's bottom edge that carries a status line
 
 ### Resizing
 
-A resizable window is laid out many times a second while the player drags its grip, and work that costs nothing once costs a visible stutter when it runs on every size tick. The measured case is Ka0s DPS Race (2026-10-26): its window rebound and redrew its content from data on every size change, so the frame trailed the pointer, and the collection owner asked for smooth resizing on every window, *including ones that are not laggy today*. A window that is fast now gains content later, and the lag arrives with the content rather than with a change anyone reviews as a resize change.
+A resizable window is laid out many times a second while the player drags its grip, and work that costs nothing once costs a visible stutter when it runs on every size tick. The measured case is the race window Ka0s Combat Trail now carries (2026-10-26, measured before the merge): it rebound and redrew its content from data on every size change, so the frame trailed the pointer, and the collection owner asked for smooth resizing on every window, *including ones that are not laggy today*. A window that is fast now gains content later, and the lag arrives with the content rather than with a change anyone reviews as a resize change.
 
 This binds **every standalone window an addon owns that can be resized**, whether the player drags a grip or the size changes by any other means in a continuous run (a size slider being dragged, a scripted resize). A window a library draws — the debug console, its copy windows, the perf panel — is the library's, not the host's.
 
