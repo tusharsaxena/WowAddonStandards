@@ -36,7 +36,7 @@ Items recorded for future versions of this standard:
   - **Votes from the 2026-11-06 harvest** (`harvests/2026-11-06/02_FINDINGS.md`, category 1 and 2; every repo count is as measured on 2026-11-06). None is a nomination with an API sketch; each is evidence for the next promotion pass to weigh against library-stack-§7's bars:
     - **A keyed combat-end queue** (`Run(key, fn)`, latest wins, replayed on `PLAYER_REGEN_ENABLED`): four copies — Outfitter Reborn `core/SecureQueue.lua`, PartyFrameEnhanced `core/PartyFrameEnhanced.lua`, QuickComms `modules/SendEngine.lua`, WhatGroup `modules/Frame.lua` — that differ on error isolation, ordering and the stand-down clear (F1-01).
     - **A coalesced refresh** (one run per burst): about six copies over four timer APIs; LootHistory `core/Util.lua` records a shipped freeze when the stand-down canceled the timer, a correctness cost a Lifecycle-aware library member would remove (F1-02).
-    - **`PlainString` / `PlainNumber`** (secret-safe): DpsRace, QuickComms, DropWatcher (twice) and Outfitter Reborn, the last a same-author copy of DpsRace's (F1-03).
+    - **`PlainString` / `PlainNumber`** (secret-safe): Combat Trail (`core/Secrets.lua`, carried in with its race mode), QuickComms, DropWatcher (twice) and Outfitter Reborn, the last a same-author copy of the first (F1-03).
     - **A Name-Realm key**: five shapes; BankLedger and LootHistory keep the hyphen and write `Unknown`, DropWatcher strips it, so two addons that join on the key disagree (F2-03, a correctness split).
     - **Class color by `classFile`**: seven re-implementations; DropWatcher reads `C_ClassColor` first, against the library's ruling (F2-04).
     - **The slash `format` hook drops the library's color decode**, so AuraMaster and ConsumableMaster copy the library's color branch (F2-05, a library fix).
@@ -315,7 +315,7 @@ Items recorded for future versions of this standard:
   keep to the characters every shipped face draws (localization-§7). Its `LibKa0s` issues, filed
   after the release: the conditional-sections sweep across every addon (options-ui-§22,
   `LibKa0s#67`; it landed per addon on `feat/2026-10-31-findings-remediation`, with fixes in Aura
-  Master, DPS Race, Drop Watcher, KickCD and Quick Comms, and the issue closes at that run's
+  Master, the race addon Combat Trail has since absorbed, Drop Watcher, KickCD and Quick Comms, and the issue closes at that run's
   merge), the anchor-width check across every addon (above) and the real Friz Quadrata measurement
   (next entry).
   These rules bind an adopted addon from its re-vendor of `v1.82.0`, tagged locally and not yet pushed. Re-check when the

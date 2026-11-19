@@ -209,7 +209,10 @@ disagreeing with the collection's intent while looking, in review, like it had b
    host helper; never scaffold `ANCHOR_CURSOR` or `ANCHOR_RIGHT` on a chrome control (anti-pattern
    #119). On the same tag, build every window's title-bar marks with `W.HeaderButtons` (extras ·
    settings · close, standalone-windows, *Title-bar controls*), each control with a tooltip and the
-   title-bar colors (`icon.tint` at rest, `text.link` hot, the close `close.hot`), build every footer
+   title-bar colors (`icon.tint` at rest, `text.link` hot, the close `close.hot`), give the main display
+   a lock extra beside its settings and close and every other window a close, with no window control
+   in a footer (standalone-windows, *Which marks a window owes*, v2.115.0), give every HUD drag strip a
+   close handler and its settings mark on `LibKa0s v1.107.0`+ (*The drag strip's marks*), build every footer
    button through the library's painters so it hovers by the skin's tokens, a plain one's label
    lighting `btn.hover` and a primary one's fill turning `btnPrimary.hoverBg` (*The footer*),
    paint every list's section headers with `list.header.bg` (skinning-§4), write every multi-line report through

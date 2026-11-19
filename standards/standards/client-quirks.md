@@ -99,7 +99,7 @@ GUID; seven repos (Q7).
 secret stays secret after combat ends, and the client writes a secret to SavedVariables as `nil` — or,
 where it was a key, loses the entry. *Measured:* a reload probe, 2026-10-25. *Cost:* silent data loss on
 the next reload. *Do:* store a plain value or nothing; never store a captured secret to read later.
-*Source:* DpsRace `docs/known-limitations.md`, the reload probe; three repos (Q21).
+*Source:* Combat Trail `docs/known-limitations.md`, the reload probe its race mode carries; three repos (Q21).
 
 **A frame handed a secret has secret geometry, and so does everything anchored to it.** After
 `StatusBar:SetValue(secret)` (or `SetAlphaFromBoolean`, or anchoring to an aura engine container) the
@@ -129,7 +129,7 @@ path takes the event's plain value; do not inherit `CastingBarFrameTemplate` for
 player. *Source:* KickCD `docs/midnight-quirks.md`, "split the gate in two"; two repos (Q13).
 
 **`InChatMessagingLockdown` can answer a secret.** *Do:* read it through a guard and treat a secret as
-locked. *Source:* DropWatcher and QuickComms `core/Compat.lua` (byte-identical), DpsRace; three repos (Q27).
+locked. *Source:* DropWatcher and QuickComms `core/Compat.lua` (byte-identical), Combat Trail; three repos (Q27).
 
 ### 3. Events
 

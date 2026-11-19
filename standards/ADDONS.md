@@ -21,7 +21,6 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Bank Ledger | `../../BankLedger/` | https://github.com/tusharsaxena/BankLedger | Retail (port pending) | Enabled · Locked · Test mode · Sim mode · Show window (the ledger browser) | test | next to Test mode |
 | Ka0s Combat Trail | `../../CombatTrail/` | https://github.com/tusharsaxena/CombatTrail | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the DPS HUD) | test | next to Test mode |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail · Forever | Enabled · Locked (the macro bar) | unlock | none |
-| Ka0s DPS Race | `../../DpsRace/` | https://github.com/tusharsaxena/DpsRace | Retail | Enabled · Locked · Test mode · Sim mode · Show window (the race HUD) | test | next to Test mode |
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
 | Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Retail (port pending) | Enabled · Locked · Sim mode | unlock | next to Lock frame |
 | Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Retail · Forever | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
@@ -124,6 +123,10 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
 
 - **Do not modify the addons from this repo.** This repository holds the standard and the process
   playbooks only; each addon's code lives in its own repository and is changed there.
+- **Retired addons leave the roster.** Ka0s DPS Race left it on 2026-11-19 (v2.115.0): it was merged into Ka0s
+  Combat Trail as its race mode, and its repository is archived. Its local checkout and its history stay as
+  written, and it is out of every sweep, audit and re-vendor. A retired addon's row is removed, never kept
+  with a note.
 - **Default branches differ.** Most repos above default to `master`; CombatTrail and SkillMaster default to
   `main`. Detect a repo's default branch rather than assuming it.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
