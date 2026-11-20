@@ -1072,7 +1072,18 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      no Defaults path can put back, and the keys list no font size, no class or meaning color and
      neither `skin.ignorePanel` nor `skin.ignoreFonts` (#110). A host with no HUD owes no step and
      records why. Grade a settings-page surface with the Scope cleared: one that stays stock is #110
-     whatever the default hides, and nothing writes `skin.ignorePanel`.
+     whatever the default hides, and nothing writes `skin.ignorePanel`. From the addon's re-vendor of
+     `LibKa0s v1.108.0` (skinning-§9, *Every option default follows the skin*, v2.116.0): read the
+     addon's AceDB defaults and its composer calls. Every texture, font, flags, shadow or color
+     option whose default is the addon's own value has a `<key>FromSkin` companion (or *From skin*
+     value) defaulting `true`, on the row and in the defaults, and is drawn through the skin while
+     on; each `fromSkin = false` or part opt-out cites the ruling that keeps the element on its own
+     look; a value the addon wrote into profiles at an old default moves once through its own step
+     calling `Skin.ResetToSkin`. Read `Kit.skinSwitch.surfaces` for `expect = "texture"` on every
+     data fill or skin-art Texture, a ruling beside each `hold`, and `clear = true` only on a bar
+     drawn clear; read `Kit.skinValues.rows` for a kit `category` where a row's value draws no look.
+     A preview stand-in keeps the look of the frame it imitates (skinning-§9, *Preview stand-ins*);
+     one painted from the skin is #110.
      (j) From the addon's re-vendor of `LibKa0s v1.85.0`, the skin picker's preview (skinning-§10,
      v2.98.0). Run `grep -rn 'onPreview\|preview *=' --include='*.lua' core modules settings` and read
      the spec the addon hands `O.SkinPicker`, `O.SkinNotice` and `O.SkinVerb`: it passes
