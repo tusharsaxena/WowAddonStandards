@@ -46,9 +46,9 @@ owner sets when the addon's core does not exist on the other client, with the re
 
 | Value | Meaning | TOC shape it requires | What the audit flags |
 |---|---|---|---|
-| `Retail · Forever` | Ported. One codebase serves Retail and WoW Forever. | One unsuffixed TOC with a two-number line, `## Interface: <retail>, <forever>`. No load-gating line. | Any clients-§3..§6 shape that is missing or broken: detection outside Compat, an ungated per-client feature, a filtered seed list, a smoke file or test run that covers one client. |
+| `Retail · Forever` | Ported. One codebase serves Retail and WoW Forever. | One unsuffixed TOC with a two-number line, `## Interface: <retail>, <forever>`. No load-gating line. | Any clients-§3..§6 shape that is missing or broken: detection outside Compat, an ungated per-client feature, a filtered seed list, a smoke file or test run that covers one client, a missing `docs/midnight-quirks.md` or `docs/forever-quirks.md` (documentation-§3). |
 | `Retail` | Retail-only **by the owner's decision**, not ported and not to be. | One number, plus `## AllowLoadGameType: standard` and `## ExcludeLoadGameType: camelot`, so Forever never lists it. | A missing or misspelled load-gating line; a `WOW_PROJECT_CAMELOT` read or a Forever branch (dead code in a Retail-only addon); no recorded reason in the README and `docs/ARCHITECTURE.md`. |
-| `Forever` | Forever-only **by the owner's decision**, because the addon's core does not exist on Retail (clients-§9). | One number, `## Interface: 16001`, plus `## AllowLoadGameType: camelot` and `## ExcludeLoadGameType: standard`, so Retail never lists it. | A missing or misspelled load-gating line; an `IsRetail()` read or other Retail branch, a Retail seed list, or a `clients = { "retail" }` declaration (dead code in a Forever-only addon); a suite not run as `KA0S_KIT_CLIENT=forever`; no recorded reason in the README and `docs/ARCHITECTURE.md`. |
+| `Forever` | Forever-only **by the owner's decision**, because the addon's core does not exist on Retail (clients-§9). | One number, `## Interface: 16001`, plus `## AllowLoadGameType: camelot` and `## ExcludeLoadGameType: standard`, so Retail never lists it. | A missing or misspelled load-gating line; an `IsRetail()` read or other Retail branch, a Retail seed list, or a `clients = { "retail" }` declaration (dead code in a Forever-only addon); a suite not run as `KA0S_KIT_CLIENT=forever`; a `docs/midnight-quirks.md` (a retired name here) or no `docs/forever-quirks.md` (clients-§9); no recorded reason in the README and `docs/ARCHITECTURE.md`. |
 | `Retail (port pending)` | Retail today, not ported yet. A port flips the row to `Retail · Forever`. | One number and **no** load-gating line, because Forever players already run some of these addons out of date and must not be cut off. | A new Retail-only feature added with no declaration (clients-§4). It does **not** flag the missing dual-client shapes. |
 
 Both clients are named in clients-§1. The Clients column gives no addon a Classic value, because the collection has no Classic support.
@@ -127,8 +127,9 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
   Combat Trail as its race mode, and its repository is archived. Its local checkout and its history stay as
   written, and it is out of every sweep, audit and re-vendor. A retired addon's row is removed, never kept
   with a note.
-- **Default branches differ.** Most repos above default to `master`; CombatTrail and SkillMaster default to
-  `main`. Detect a repo's default branch rather than assuming it.
+- **Every repo defaults to `master`.** Every repo above, the library repos and the documentation-and-tooling repos
+  default to `master` (PremadeGroupsFilterExtension was renamed from `main` on 2026-10-24, CombatTrail and SkillMaster
+  on 2026-11-19). Detect a repo's default branch anyway rather than assuming it.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
   `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here; this repo's own
   `docs/audits/` holds only its own documentation-lane audits. Changing this roster
