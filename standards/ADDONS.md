@@ -127,8 +127,9 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
   Combat Trail as its race mode, and its repository is archived. Its local checkout and its history stay as
   written, and it is out of every sweep, audit and re-vendor. A retired addon's row is removed, never kept
   with a note.
-- **Default branches differ.** Most repos above default to `master`; CombatTrail and SkillMaster default to
-  `main`. Detect a repo's default branch rather than assuming it.
+- **Every repo defaults to `master`.** Every repo above, the library repos and the documentation-and-tooling repos
+  default to `master` (PremadeGroupsFilterExtension was renamed from `main` on 2026-10-24, CombatTrail and SkillMaster
+  on 2026-11-19). Detect a repo's default branch anyway rather than assuming it.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
   `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here; this repo's own
   `docs/audits/` holds only its own documentation-lane audits. Changing this roster
