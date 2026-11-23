@@ -1291,6 +1291,13 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        its display and draws the settings mark, and no host `tooltipPlace` hook places the strip's
        own tooltip (`grep -rn 'tooltipPlace' --include='*.lua' . | grep -v '/libs/'`): a strip
        breaking either with no register row is #122. Below that tag the strip is a re-vendor item.
+       Then read every unlock strip's right-click (v2.118.0): where the addon vendors
+       `LibKa0s v1.111.0`+, a `DragHandle` passes no `onRightClick`, or one that calls the same
+       function as its settings mark (`grep -rn 'onRightClick' --include='*.lua' . | grep -v '/libs/'`,
+       then compare each with the spec's `settings` / `onSettings`); on any tag, an unlock strip the
+       addon draws itself calls its settings mark's function on a right-click. A strip that ignores a
+       right-click while it carries a gear, or opens another target than the gear, with no register
+       row, is #123. Below `LibKa0s v1.111.0` a `DragHandle` strip that ignores it is a re-vendor item.
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check
