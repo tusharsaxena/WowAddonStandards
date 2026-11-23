@@ -1257,8 +1257,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        one chat pointer and none prints to chat, and no `DevTools_Dump` call remains
        (`grep -rn 'DevTools_Dump' --include='*.lua' . | grep -v '/libs/'`), the stub carries
        `Report` and `Serialize`, and the suite carries debug-logging-§15's cases; every window's
-       marks read extras · settings · close through the strip, with a settings mark unless a
-       `settingsOptOut` reason is passed, each window's `owner` equals the launcher's `name`, every
+       marks read extras · settings · close through the strip, with a settings mark unless the
+       window is a companion (`companion = true`, v2.119.0) or a `settingsOptOut` reason is passed, each window's `owner` equals the launcher's `name`, every
        title-bar control carries a tooltip, and every one rests in `icon.tint` and lights `text.link`
        (the close `close.hot`), a state toggle keeping its state colors; where the addon has adopted
        skins and the floors (LibKa0s#82, #84), every list's section headers paint `list.header.bg`,
@@ -1298,6 +1298,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        addon draws itself calls its settings mark's function on a right-click. A strip that ignores a
        right-click while it carries a gear, or opens another target than the gear, with no register
        row, is #123. Below `LibKa0s v1.111.0` a `DragHandle` strip that ignores it is a re-vendor item.
+       Then classify every window as a companion or not (v2.119.0, standalone-windows, *A companion
+       window carries no settings mark*): a companion is owned (it opens only from a control on, or
+       attached to, one other frame), bound (it shows only that frame's content, closes with it and
+       keeps no saved position) and not a display. Where the addon vendors `LibKa0s v1.112.0`+, every
+       non-companion window's title bar carries the settings gear unless a register row waives it,
+       and no companion carries one (`grep -rn 'hideOnSettings\|companion\s*=\|settingsOptOut' --include='*.lua' . | grep -v '/libs/'`,
+       then read each window's opener and its saved position). A missing gear with no row, or a
+       companion with a gear, is #124. Below `LibKa0s v1.112.0` both are re-vendor items. A title
+       bar's right-click is not graded under #123.
        **Then check the simulator** (`preview-mode`, *The in-game simulator*, v2.86.0), where the
        addon ships one (a `sim` slash verb, or a `Sim:New` / `NewSeam` call). Read each from code:
        built on `LibKa0s-Sim-1.0` when first shipped on `LibKa0s v1.75.0`+ (the adoption check
@@ -1347,8 +1356,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        `classColorSource`, and its value is checked against what the drawing code actually means
        (cite the `file:line` where the render path decides whose class it reads — a control stored
        under a per-unit path that draws the player's own spells is `player`). Finally read the
-       resolver: one function, the stored alpha used under both modes, and an unresolvable class
-       falling through to the stored swatch. A literal gray or white fallback is at least **medium**
+       resolver: one function, the stored alpha used under both modes, a resolved class ahead of the
+       skin's color, and an unresolvable class falling through to the skin's color while *Use the
+       skin's color* is on, else the stored swatch (v2.119.0; `Core.FollowColor` from `LibKa0s v1.112.0`).
+       Then read each preview, unlock, test and sim path that draws a unit-scoped color for an absent
+       unit: it resolves its stand-in's class (`standIn`), and a live surface repaints on its unit's
+       change. A break of either is #125 (options-ui-§17, *The precedence* and *A preview shows a class*). A literal gray or white fallback is at least **medium**
        — it is user-visible and reads exactly like the setting not working. Palette-definition
        swatches (one color per statistic, per rarity, per category) are exempt and are the only
        exemption.
