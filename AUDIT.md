@@ -1099,12 +1099,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      addon draws: `grep -rn 'Dropdown(\|Menu(\|textSel' --include='*.lua' core modules settings`.
      A `W.Dropdown` passes from the addon's re-vendor of `LibKa0s v1.113.0`; a menu the addon
      builds itself, on any tag, draws its selected row in `W.SelectedColor(owner)` (from
-     `LibKa0s v1.113.0`; never the raw `menu.textSel` token) and the rest in
-     `menu.text` (or their meaning colors), a preset row such as `Character: Current` included,
-     with no typed gold and no class or quality color left on the selected row. A selection
-     marked by a highlight bar alone, or a selected row keeping a value color, is #127. A client
-     menu (`MenuUtil`) and AceGUI's settings-page pullout are not graded. How it reads in each
-     skin is the owner's in-client smoke.
+     `LibKa0s v1.113.0`: Ka0s Default's gold in every skin, the skin's `menu.textSel` only where
+     the gold sits under 20 CIEDE2000 off its `menu.text`; never the raw `menu.textSel` token,
+     which outside Ka0s Default is the skin's accent) and the rest in `menu.text` (or their
+     meaning colors), a preset row such as `Character: Current` included, with no typed gold and
+     no class or quality color left on the selected row. A selection marked by a highlight bar
+     alone, a selected row in the skin's accent rather than the gold, or a selected row keeping a
+     value color, is #127. A client menu (`MenuUtil`) and AceGUI's settings-page pullout are not
+     graded. How it reads in each skin is the owner's in-client smoke.
      How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
      owner's in-client smoke, never by this read (skinning-§8).
    - **Check display characters (`localization-§7`, v2.93.0).** Code only, `libs/` and `tests/_kit/`
