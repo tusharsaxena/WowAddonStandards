@@ -997,7 +997,7 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (frame-layering-§7).
    - **Check skinning (`skinning`, v2.89.0).** Code only, `libs/` and `tests/_kit/` excluded. First
      decide adoption: `grep -rn 'RegisterOwner(' --include='*.lua' core modules settings`. **No hit:
-     not adopted, not a finding.** File nothing under (b) to (j) or anti-pattern #107, #110 or #111; grade the
+     not adopted, not a finding.** File nothing under (b) to (k) or anti-pattern #107, #110 or #111; grade the
      addon's look against the Ka0s Default values the rescoped rules state (skinning-§7), and run (a)
      only. With a hit, run all of them:
      (a) From the addon's first re-vendor of `LibKa0s v1.78.0`, adopted or not, the Options
@@ -1095,6 +1095,15 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      `spec.preview` on an addon whose column is not `none`, a mode that disagrees with the column, or
      a seam bypass is #111. An addon recorded `none` passes neither. Whether the picker enters, the
      eye toggles and each close route restores is the owner's in-client smoke.
+     (k) A selected entry reads apart (skinning-§4, v2.120.0). Find every dropdown and menu the
+     addon draws: `grep -rn 'Dropdown(\|Menu(\|textSel' --include='*.lua' core modules settings`.
+     A `W.Dropdown` passes from the addon's re-vendor of `LibKa0s v1.113.0`; a menu the addon
+     builds itself, on any tag, draws its selected row in `menu.textSel` and the rest in
+     `menu.text` (or their meaning colors), a preset row such as `Character: Current` included,
+     with no typed gold and no class or quality color left on the selected row. A selection
+     marked by a highlight bar alone, or a selected row keeping a value color, is #127. A client
+     menu (`MenuUtil`) and AceGUI's settings-page pullout are not graded. How it reads in each
+     skin is the owner's in-client smoke.
      How each skin looks, the live switch and the EllesmereUI provider are confirmed only by the
      owner's in-client smoke, never by this read (skinning-§8).
    - **Check display characters (`localization-§7`, v2.93.0).** Code only, `libs/` and `tests/_kit/`
@@ -1268,8 +1277,14 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        owner token for a title-bar or footer-button hover, a primary's `hoverBg` included, sits
        under 20 ΔE00 off its rest in any skin (standalone-windows, *Title-bar controls* and
        *The footer*);
-       every shipped sample identity follows preview-mode's six rules (no real realm, no
-       real-looking `Name-Realm` pair, `Sample`/`Mock` names, never through `L`); at most two
+       every shipped sample identity follows preview-mode's rules 1 to 5 (no real realm, no
+       real-looking `Name-Realm` pair, `Sample`/`Mock` names, never through `L`); from the
+       addon's re-vendor of `LibKa0s v1.113.0`, rule 6 (v2.120.0): every named sample person comes
+       from `Sim.Sample` or `Sim.SampleCrowd`, and
+       `grep -rnE '"(Sample|Mock)[a-z]+' --include='*.lua' . | grep -v '/libs/\|^\./tests/'` finds no
+       person the addon types itself, read each hit (a guild name the library's rows do not carry
+       is not one); an own list or a library-absent copy of the library's rows is #128, and below
+       that tag it is a re-vendor item, LibKa0s#104; at most two
        `extraEntries`, each a verb's own handler, no duplicate of a built-in entry and no settings
        shortcut, listed in `ADDONS.md`'s launcher column. A re-vendor to `LibKa0s v1.105.0` alone
        is never a finding under any of them; the re-vendor's own items (stub members, loader lines,
@@ -1319,7 +1334,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        simulated event's path, and no position store (`d.panel` carries no `store`); every module the
        session touches registering an `OnStopGuarded` or `OnStop` cleanup, and every timer inside
        the simulation a `sim:After`; the session marked on screen by the major's step panel, built
-       with `close = false` where no window strip marks the session, and, below `LibKa0s v1.103.0`,
+       with `close = false` where no window strip marks the session, and shown on every start
+       (v2.120.0): from the addon's re-vendor of `LibKa0s v1.113.0` (on any tag for a simulator
+       the addon runs itself), read every start route, `sim start <scenario>`, the panel's Start,
+       the launcher's *Sim mode* entry, the Master-controls checkbox and any host `sim:Start`
+       call, for a `HidePanel` after it or a start that bypasses the session's own; a start that
+       plays with the panel hidden is #126, and below that tag a re-vendor item, and, below `LibKa0s v1.103.0`,
        no simulation anchor, badge or strip over a HUD display other than a sim strip the host
        already docks where preview-mode's HUD rule puts it, which is compliant there and not
        graded (#97, v2.93.0; v2.112.2), while on that tag
