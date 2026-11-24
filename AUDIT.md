@@ -1098,7 +1098,8 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      (k) A selected entry reads apart (skinning-§4, v2.120.0). Find every dropdown and menu the
      addon draws: `grep -rn 'Dropdown(\|Menu(\|textSel' --include='*.lua' core modules settings`.
      A `W.Dropdown` passes from the addon's re-vendor of `LibKa0s v1.113.0`; a menu the addon
-     builds itself, on any tag, draws its selected row in `menu.textSel` and the rest in
+     builds itself, on any tag, draws its selected row in `W.SelectedColor(owner)` (from
+     `LibKa0s v1.113.0`; never the raw `menu.textSel` token) and the rest in
      `menu.text` (or their meaning colors), a preset row such as `Character: Current` included,
      with no typed gold and no class or quality color left on the selected row. A selection
      marked by a highlight bar alone, or a selected row keeping a value color, is #127. A client
