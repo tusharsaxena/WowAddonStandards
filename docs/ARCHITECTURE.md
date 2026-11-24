@@ -91,7 +91,7 @@ Every `.md` in this repo appears in exactly one row below.
 | `AUDIT.md`, `AUTOMATED_TESTS.md`, `NEW_ADDON.md`, `PERF_ANALYSIS.md` | The four process playbooks |
 | `standards/STANDARDS.md` | The standard's index, with the current changelog entry |
 | `standards/CHANGELOG.md` | The standard's changelog history: every earlier entry, newest first |
-| `standards/standards/*.md` (32 files, 2026-11-21) | The canonical section files |
+| `standards/standards/*.md` (32 files, 2026-11-24) | The canonical section files |
 | `standards/ADDONS.md` | The roster |
 | `standards/README.md`, `standards/EXECUTIVE_SUMMARY.md`, `standards/INDUSTRY_RESEARCH.md`, `standards/NEW_ADDON_CONTEXT.md` | Process entry point, summary, research, scaffold context pack |
 | `standards/_raw/_industry/` | Frozen source material behind `INDUSTRY_RESEARCH.md` |

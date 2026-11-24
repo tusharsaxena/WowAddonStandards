@@ -218,9 +218,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
    button through the library's painters so it hovers by the skin's tokens, a plain one's label
    lighting `btn.hover` and a primary one's fill turning `btnPrimary.hoverBg` (*The footer*),
    paint every list's section headers with `list.header.bg` (skinning-§4), write every multi-line report through
-   `NS.DebugLog:Report` with one chat pointer (debug-logging-§15), and draw sample characters from
-   `Sim.Sample()` under preview-mode's naming convention (v2.113.0): a new addon has nothing to adopt
-   later. A mark
+   `NS.DebugLog:Report` with one chat pointer (debug-logging-§15), and draw every sample character from
+   `Sim.Sample()` or `Sim.SampleCrowd` under preview-mode's naming convention (v2.113.0; one source, v2.120.0),
+   with no name list of its own: a new addon has nothing to adopt later. A mark
    the catalog lacks is added upstream in the `LibKa0s` repo, in the same style, by the generator that
    produced the rest — never drawn one-off here.
 
