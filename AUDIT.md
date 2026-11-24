@@ -501,9 +501,11 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      only and for server-side facts only, pins one tag per run, and its bundles carry no ForeverDB rows: a
      `raw/` of ForeverDB files, a dump or a fixture copied from the install is a MUST finding (#129).
      An addon whose feature reads an external data addon (`clients-§11`, v2.121.0): `grep -rnE
-     'ForeverDB' --include='*.lua' --include='*.toc' .` (`libs/` and `tests/_kit/` excluded) finds only
-     `LibKa0s-ForeverDB-1.0` lookups in the addon's code (no `ForeverDB` global read, no `LoadAddOn` of it)
-     and the TOC's `## OptionalDeps`; it is never in `## Dependencies` or `.pkgmeta`'s
+     '_G\.ForeverDB|_G\[.ForeverDB.\]|(^|[^-A-Za-z0-9_"])ForeverDB *(\.[A-Za-z_]|\[)|LoadAddOn\(.ForeverDB'
+     --include='*.lua' --exclude-dir=libs --exclude-dir=tests .` finds nothing (the addon's code reads no
+     `ForeverDB` global and loads it nowhere; its `LibKa0s-ForeverDB-1.0` lookups, a user-facing string
+     naming ForeverDB and the suite's `mock_foreverdb` setup are all allowed hits of a plain `ForeverDB`
+     grep), and the TOC names it in `## OptionalDeps`; it is never in `## Dependencies` or `.pkgmeta`'s
      `required-dependencies` (an `optional-dependencies` entry is a MAY); no lookup runs from a file load,
      `OnInitialize`, `OnEnable` or a login event; the feature is declared `clients = { "forever" }` (or
      gated by `Compat.ForClient`) and says in its row or tooltip that it needs ForeverDB; the suite
