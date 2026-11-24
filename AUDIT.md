@@ -497,6 +497,19 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      pinned build of that client's product (`wow` or `wowf`) and the rulings applied, or a line in
      `docs/ARCHITECTURE.md` saying how the list is maintained instead; having neither is the SHOULD
      failure only. A Forever list derived by filtering the Retail one is still `clients-§5`'s MUST (#116).
+     A contract that names ForeverDB as evidence (`clients-§10`, v2.121.0) does so for the `forever` flavor
+     only and for server-side facts only, pins one tag per run, and its bundles carry no ForeverDB rows: a
+     `raw/` of ForeverDB files, a dump or a fixture copied from the install is a MUST finding (#129).
+     An addon whose feature reads an external data addon (`clients-§11`, v2.121.0): `grep -rnE
+     'ForeverDB' --include='*.lua' --include='*.toc' .` (`libs/` and `tests/_kit/` excluded) finds only
+     `LibKa0s-ForeverDB-1.0` lookups in the addon's code (no `ForeverDB` global read, no `LoadAddOn` of it)
+     and the TOC's `## OptionalDeps`; it is never in `## Dependencies` or `.pkgmeta`'s
+     `required-dependencies` (an `optional-dependencies` entry is a MAY); no lookup runs from a file load,
+     `OnInitialize`, `OnEnable` or a login event; the feature is declared `clients = { "forever" }` (or
+     gated by `Compat.ForClient`) and says in its row or tooltip that it needs ForeverDB; the suite
+     covers it on the kit's `mock_foreverdb` presets and proves it absent under the Retail profile; and
+     `docs/performance.md` records the data addon's size and first-use load. Any miss is a MUST finding
+     (#130; a copied row, #129).
    - **`X-Curse-Project-ID` on an unpublished addon is not a deviation (`toc-file-§1`).** If the
      field is absent and the TOC carries a comment in its position saying the addon is not published
      yet, that is **compliant** — record it as such and file nothing. A placeholder, invented, or
