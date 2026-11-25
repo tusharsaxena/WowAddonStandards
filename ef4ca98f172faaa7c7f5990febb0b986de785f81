@@ -1,0 +1,11 @@
+Independent review, Ka0sAddonsCommonTasks docs/2026-11-25-SEEDS_AND_FOREVERDB (workflows wf_df07c1ab-8d1, wf_219c4c4a-92a)
+SF-STD-01: 5 findings (minor, minor, minor, minor, minor); fix pass: b303a04 SF-STD-01: review fixes (audit grep, replay keyword, perf-page wording, suite pointer); fix gate green=True
+  - [minor] AUDIT.md:503 The clients-§11 audit check says the grep `grep -rnE 'ForeverDB' --include='*.lua' --include='*.toc' .` "finds only `LibKa0s-ForeverDB-1.0` lookups ... and the TOC's `## OptionalDeps`". A compliant ad
+  - [minor] standards/standards/clients.md:176 The ForeverDB evidence bullets all carry an RFC keyword except one. The bullet "**Replays by tag, not from `raw/`.**" has none, so the replay obligation and the ban on keeping `raw/` have no normative
+  - [minor] standards/standards/clients.md:194 The perf bullet says to record the cost "beside the perf ceilings ... (performance-§9)". "Perf ceilings" is not a term the standard defines anywhere: grep finds no 'ceiling' in performance.md. perform
+  - [minor] standards/standards/library-stack.md:74 The pointer says an external data addon is "this shape with four more rules" and names four. clients-§11 adds a fifth that the (a)-(c) suite rules do not cover: recording the size and the first-use lo
+  - [minor] standards/STANDARDS.md:154 This is a known follow-up the commit body itself records, not a defect in this commit. library-stack-§7's counts and module table still say 25 majors across 86 files (v1.113.0). After SF-LK-REL tags L
+SF-STD-01 recount: 2 findings (major, minor); fix pass: ef4ca98 SF-STD-01: review fixes (Core-floor census recounted at LibKa0s v1.114.0: twelve, not fourteen; Skin's eleven secondary files); fix gate green=True
+  - [major] standards/standards/library-stack.md:160 The Core-floor paragraph is wrong at the v1.114.0 tag. It says "fourteen of those twenty-four" floor on Core without calling a member, and its list of fourteen includes `Callout` and `WaypointArrow`.
+  - [minor] standards/standards/library-stack.md:160 "`LibKa0s-Skin-1.0` adds no second edge: its shell floors on Core alone, and its eight secondary files gate on the shell." At the v1.114.0 tag the Skin major has 12 files, so it has 11 secondary files
+Lead gate re-run 2026-11-25 at this head: green (see EXECUTION_RECORD.md).
