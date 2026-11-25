@@ -189,10 +189,10 @@ Items recorded for future versions of this standard:
   a panel's subscription to its own refresh message left live across a stand-down is not filed under
   slash-commands-§7's *What MUST stand down*, and one taken down is not filed either.
 - **Whether a runtime-critical major that calls nothing in Core should floor on it (recorded, not
-  ruled).** Fourteen of the twenty-six `LibKa0s` majors floor on `LibKa0s-Core-1.0` without calling a member
+  ruled).** Twelve of the twenty-six `LibKa0s` majors floor on `LibKa0s-Core-1.0` without calling a member
   (library-stack-§7), so that a partial payload leaves every module absent rather than a mixed set.
   `LibKa0s-Schema-1.0` is one of them (`Options` left the set at `LibKa0s v1.77.0`, when it began
-  reading Core's `SafeRegisterEvent`, `Charts` joined it at `LibKa0s v1.84.0`, `Callout` at `LibKa0s v1.96.0`, `WaypointArrow` at `LibKa0s v1.99.0` and `ForeverDB` at `LibKa0s v1.114.0`, and `Launcher` left it at `LibKa0s v1.105.0`, when it began calling Core's `RegisterSettingsOpener`), and so is
+  reading Core's `SafeRegisterEvent`, `Charts` joined it at `LibKa0s v1.84.0`, `Callout` at `LibKa0s v1.96.0`, `WaypointArrow` at `LibKa0s v1.99.0` and `ForeverDB` at `LibKa0s v1.114.0`; `Callout` left it at `LibKa0s v1.100.0` and `WaypointArrow` at `LibKa0s v1.101.0`, when each began reading Core's `ClassColor`, and `Launcher` left it at `LibKa0s v1.105.0`, when it began calling Core's `RegisterSettingsOpener`), and so is
   `LibKa0s-Compat-1.0`, and the feature runtime
   reaches both while neither calls a Core member (`grep -l 'local NEEDS_CORE' LibKa0s/*.lua` in
   the library; no Core read in `Compat.lua` or `Schema.lua` beyond the floor). Schema's seam is read
