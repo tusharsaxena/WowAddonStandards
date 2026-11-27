@@ -33,7 +33,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Pretty Chat | `../../PrettyChat/` | https://github.com/tusharsaxena/PrettyChat | Retail · Forever | Enabled | console (the debug console, filled with `/pc test` sample lines) | none |
 | Ka0s Quick Comms | `../../QuickComms/` | https://github.com/tusharsaxena/QuickComms | Retail · Forever | Enabled · Locked · Test mode · Show window (its Comms Pads) | test | none |
 | Ka0s Range Master | `../../RangeMaster/` | https://github.com/tusharsaxena/RangeMaster | Retail · Forever | Enabled · Locked · Test mode · Sim mode | test | next to Test mode |
-| Ka0s Skill Master | `../../SkillMaster/` | https://github.com/tusharsaxena/SkillMaster | Forever | Enabled · Locked · Test mode · Sim mode · Show window (the skills window) · Journal | test | next to Test mode |
+| Ka0s Character Ledger | `../../CharacterLedger/` | https://github.com/tusharsaxena/CharacterLedger | Forever | Enabled · Locked · Test mode · Sim mode · Show window (the skills window) · Journal | test | next to Test mode |
 | Ka0s WhatGroup | `../../WhatGroup/` | https://github.com/tusharsaxena/WhatGroup | Retail | Enabled · Locked · Test mode · Show window (the group popup) | test | none |
 
 **The Clients column is normative input to an audit, not decoration** (v2.103.0). It is the single source of truth that
@@ -128,8 +128,8 @@ one place nobody thinks to look, and because `AUDIT.md` resolves a repo's kind f
   written, and it is out of every sweep, audit and re-vendor. A retired addon's row is removed, never kept
   with a note.
 - **Every repo defaults to `master`.** Every repo above, the library repos and the documentation-and-tooling repos
-  default to `master` (PremadeGroupsFilterExtension was renamed from `main` on 2026-10-24, CombatTrail and SkillMaster
-  on 2026-11-19). Detect a repo's default branch anyway rather than assuming it.
+  default to `master` (PremadeGroupsFilterExtension was renamed from `main` on 2026-10-24, CombatTrail and CharacterLedger
+  (then SkillMaster) on 2026-11-19). Detect a repo's default branch anyway rather than assuming it.
 - **Audits live with the addon.** Each addon's compliance runs are written to *its own*
   `docs/audits/<YYYY-MM-DD>/` folder (see [`../AUDIT.md`](../AUDIT.md)), not here; this repo's own
   `docs/audits/` holds only its own documentation-lane audits. Changing this roster
