@@ -24,7 +24,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
 | Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Retail · Forever | Enabled · Locked · Sim mode | unlock | next to Lock frame |
 | Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Retail · Forever | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
-| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
+| Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) · Farm session | test | next to Test mode |
 | Ka0s Multi Meters | `../../MultiMeters/` | https://github.com/tusharsaxena/MultiMeters | Retail | Enabled · Locked · Test mode · Sim mode · Show window (its meter windows) | test | next to Test mode |
 | Ka0s Outfitter Reborn | `../../OutfitterReborn/` | https://github.com/tusharsaxena/OutfitterReborn | Retail · Forever | Enabled · Locked (the outfit bar) · Test mode · Show window (the outfit window) | test | none |
 | Ka0s Panel Master | `../../PanelMaster/` | https://github.com/tusharsaxena/PanelMaster | Retail · Forever | Enabled · Locked | unlock | none |
