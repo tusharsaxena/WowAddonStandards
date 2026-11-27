@@ -16,7 +16,7 @@ Elements of different roles are separated by **strata**. Elements within one rol
 | T1 | HUD display: a world-anchored, persistent display (bar, icon grid, cast bar, meter, pad) | `MEDIUM`, set on the display root | `HUD` |
 | T2 | edit-mode chrome: drag handles, unlock outlines, overlaying test and sim markers, unlock-only grips | the display's strata (§2) | `CHROME` |
 | T3 | HUD popup: a transient surface opened from a HUD element | one strata above the HUD root, or its Blizzard equivalent's | `HUD_POPUP` |
-| T4 | window: persistent (kept up while playing) / on demand (opened to read) | `MEDIUM` / `HIGH` | `WINDOW` |
+| T4 | window: persistent (kept up while playing) / on demand (opened to read) | `MEDIUM` / `HIGH` | `WINDOW_PERSISTENT` / `WINDOW` |
 | T5 | alert: interactive toast / non-interactive screen alert | `HIGH` / `FULLSCREEN`, mouse disabled | `ALERT` / `SCREEN_ALERT` |
 | T6 | modal and tool window: dialogs the player answers, the debug console, perf and sim panels; Blizzard StaticPopups live here | `DIALOG` | `MODAL` |
 | T7 | detached child window opened from a T6 window | `FULLSCREEN` | `CHILD` |
@@ -29,6 +29,8 @@ What the ladder guarantees, and why each line is where it is:
 - **Dropdowns, menus and tooltips are never covered.** Nothing an addon draws sits at `FULLSCREEN_DIALOG` or above except T8 and T9 surfaces, so AceGUI pullouts, the `LibKa0s-Widgets-1.0` menu and Blizzard's `Menu` open over every window. A window that wants a pullout to open over it **MUST** stay at or below `FULLSCREEN`.
 - A frame opened from another frame sits **at least one strata above its opener** (T4 < T6 < T7 < T8). The library's copy window, `FULLSCREEN` over the `DIALOG` console that opens it, is the reference.
 - A non-interactive alert is not in the popup strata, so a menu opened while it shows draws over it.
+
+**T4's two keys (v2.122.0).** Each layers-table key holds one strata (§5), so an addon that has both window kinds declares both: `WINDOW_PERSISTENT` (`MEDIUM`) for the window kept up while playing and `WINDOW` (`HIGH`) for the window opened to read. An addon with only one window kind keeps the single key `WINDOW`, set to that kind's strata.
 
 **Variants of T1.**
 - **Player-chosen strata.** A display whose strata is a setting **MUST** offer `BACKGROUND`, `LOW`, `MEDIUM` and `HIGH` only. A knob that shipped before v2.88.0 with `DIALOG` or higher keeps its stored values (a value-set change needs a migration and an owner decision), and its tooltip **MUST** say what those values cover: the addon's own popups and debug console, and the Settings window. The row's tooltip **MUST** be the library's `O.StrataTooltip(values)` (`LibKa0s-Options-1.0`, from `LibKa0s v1.77.0`), passed the row's own value table. It states the tiers once for the collection and adds the dialog-and-above sentences only when the row offers those values. A host **MUST NOT** write tier sentences of its own; a row-specific sentence (what the frame is) MAY precede it. The three sentences, in order, the second only when the values hold `DIALOG`, `FULLSCREEN`, `FULLSCREEN_DIALOG` or `TOOLTIP`, the third only when they hold `FULLSCREEN_DIALOG` or `TOOLTIP`:
@@ -99,7 +101,7 @@ An addon that sets any strata or level **MUST** declare them once, in `core/Cons
       LEVEL  = { FILL = 1, BORDER = 2, EFFECT = 3, OVERLAY = 4, HANDLE = 50, ... },
     }
 
-Its header comment states the addon's whole stack once, the library- and Blizzard-owned tiers it relies on included (debug console `DIALOG`, copy window `FULLSCREEN`, menus `FULLSCREEN_DIALOG`, grip +10). Every `SetFrameStrata` and `SetFrameLevel` in the addon reads it, so `grep -rn 'SetFrameStrata("' core modules settings` returns nothing and every `SetFrameLevel` argument names a `LAYERS.LEVEL` member. An addon with a single explicit strata call **MAY** use one named local constant carrying the same comment. `docs/ARCHITECTURE.md` points at the table in one line rather than copying it, because a copied tier table goes stale the first time a library choice changes.
+Its header comment states the addon's whole stack once, the library- and Blizzard-owned tiers it relies on included (debug console `DIALOG`, copy window `FULLSCREEN`, menus `FULLSCREEN_DIALOG`, grip +10). Each key holds one strata, never one reassigned per frame, which is why T4 has two keys (§1). Every `SetFrameStrata` and `SetFrameLevel` in the addon reads it, so `grep -rn 'SetFrameStrata("' core modules settings` returns nothing and every `SetFrameLevel` argument names a `LAYERS.LEVEL` member. An addon with a single explicit strata call **MAY** use one named local constant carrying the same comment. `docs/ARCHITECTURE.md` points at the table in one line rather than copying it, because a copied tier table goes stale the first time a library choice changes.
 
 **A frameless addon owns no strata.** An addon whose only surfaces are the Settings canvas, library windows and Blizzard or Ace3 popups **MUST NOT** call `SetFrameStrata`, `SetFrameLevel`, `SetToplevel` or `Raise` itself, and **SHOULD** pin that with a static test.
 
