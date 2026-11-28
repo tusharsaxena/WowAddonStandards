@@ -396,8 +396,13 @@ required doc and an orphaned undocumented one are both findings, where previousl
 
 Frozen and generated material is **out of scope** and **MUST NOT** be enumerated row by row:
 `docs/audits/`, `docs/reviews/`, `docs/automated-tests/<run>/`, `docs/perf-analysis/<run>/`,
-`docs/revendor/<date>-v<tag>/`, `docs/superpowers/` and `docs/investigations/` are named as
-directories, once each. A register that grows a row per audit is a register nobody re-reads.
+`docs/revendor/<date>-v<tag>/`, `docs/seed-research/<date>-<flavor>/`, `docs/superpowers/` and
+`docs/investigations/` are named as directories, once each. A register that grows a row per audit is
+a register nobody re-reads. `docs/seed-research/<date>-<flavor>/` is the seed bundle clients-§10
+freezes, one per validation run (v2.122.0, WowAddonStandards#15): on 2026-11-28 thirteen addons and
+`LibKa0s` kept the store, and Drop Watcher's and Item Search's maps already named it frozen, so the
+list now says what they do. A seed store a repo keeps under another name (an aura addon's
+`docs/spell-research/`) stays a repo-own frozen store (§6).
 
 **The shape of `docs/superpowers/` (SHOULD, v2.102.0).** The store holds the design specs and plans of
 single-repo work, and a new file in it is named by its date and topic: a design spec is
@@ -708,8 +713,8 @@ the **command that produces the current count**, e.g.
 ```sh
 git ls-files -z -- '*.md' \
   ':!:docs/audits/**' ':!:docs/reviews/**' ':!:docs/automated-tests/*/**' \
-  ':!:docs/perf-analysis/*/**' ':!:docs/revendor/*/**' ':!:docs/superpowers/**' \
-  ':!:docs/investigations/**' ':!:libs/**' ':!:tests/_kit/**' \
+  ':!:docs/perf-analysis/*/**' ':!:docs/revendor/*/**' ':!:docs/seed-research/*/**' \
+  ':!:docs/superpowers/**' ':!:docs/investigations/**' ':!:libs/**' ':!:tests/_kit/**' \
   ':!:harvests/**' ':!:standards/_raw/**' \
   | xargs -0 grep -nE '§[0-9]+\.[0-9]'
 ```
