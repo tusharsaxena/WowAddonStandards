@@ -331,8 +331,9 @@ disagreeing with the collection's intent while looking, in review, like it had b
      with `classColorSource` declared on both rows, and resolved through the library's one resolver —
      which keeps the swatch's alpha, falls through to the stored swatch when the class cannot be
      resolved, and reads the tracked unit's class where the surface describes a unit
-     (options-ui-§17). Never `disabledIf` on a color row. Write nothing private here: the four-copies
-     version is what this rule was written out of.
+     (options-ui-§17). Never `disabledIf` on a color row while its class-color companion is on (its
+     alpha is still read); a row wholly unread while its feature is off may be dimmed. Write nothing
+     private here: the four-copies version is what this rule was written out of.
    - **Anything a player orders is the shared drag-to-reorder list**, never arrow buttons; the handle
      and the bounded row box are the library's and the row's contents are yours, and the controller is
      canceled at the top of the render (options-ui-§18).
