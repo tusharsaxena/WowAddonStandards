@@ -1405,9 +1405,12 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
        — it is user-visible and reads exactly like the setting not working. Palette-definition
        swatches (one color per statistic, per rarity, per category) are exempt and are the only
        exemption.
-     - **(d) No `disabledIf` on a color row (options-ui-§17).** One grep over the schema files. Every
-       hit is a finding, because the row is still read for its alpha, so graying it tells the player
-       something untrue.
+     - **(d) No `disabledIf` on a color row while it is still read (options-ui-§17).** One grep over
+       the schema files, then read each hit's condition. A `disabledIf` that holds while the row's
+       class-color companion is on is a finding (#74), because the row is still read for its alpha, so
+       graying it tells the player something untrue. A condition under which no part of the swatch is
+       read (its feature's own switch off, another drawer replacing the surface, a companion that
+       supplies the whole color) is allowed from v2.122.0; cite the read that proves it unread.
      - **(e) Ordering is a drag (options-ui-§18).** One grep for the paired chat-scroll arrow art in
        a settings file:
 

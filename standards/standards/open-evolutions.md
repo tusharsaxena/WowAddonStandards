@@ -254,12 +254,14 @@ Items recorded for future versions of this standard:
   picker library-drawn beside them. Not ruled at v2.88.0: one accepted change needed it and expressed
   it with `PageHeader`, and the library's tabbed-page file is at its size re-check trigger. Re-check
   when a second addon's band needs it.
-- **Gating a swatch on its feature's own switch (deferred, owner call CALL-05).** options-ui-§17
-  forbids `disabledIf` on a color row because the swatch's alpha survives class color; where the
-  whole feature is off, though, the swatch is truly not read (U-13). The proposal: allow gating a
-  swatch on its feature's on/off row, never on its class-color companion. Not ruled at v2.88.0: the
-  owner deferred it to an issue,
-  <https://github.com/tusharsaxena/WowAddonStandards/issues/13>. Re-check when that issue is triaged.
+- ~~**Gating a swatch on its feature's own switch (deferred, owner call CALL-05).**~~ **Ruled at
+  v2.122.0, by the owner's narrow reading of 2026-11-28** (WowAddonStandards#17, which settles #13):
+  `disabledIf` on a color row is forbidden only while a companion is on whose swatch is still read
+  (its alpha, under class color, anti-pattern #74); a color row wholly unread while a condition holds,
+  its feature's own switch off among them, **MAY** be dimmed (options-ui-§17, options-ui-§22). The
+  proposal as recorded at v2.88.0 (U-13): allow gating a swatch on its feature's on/off row, never on
+  its class-color companion; the owner deferred it to
+  <https://github.com/tusharsaxena/WowAddonStandards/issues/13>.
   - **Vote (harvest 2026-11-06, F5-01).** QuickComms (QC-18) and AuraMaster (AM-03) each hold a ratified `## Documented deviations` row against options-ui-§17 for exactly this; WowAddonStandards#13 is open.
 - **Flow-engine seams for host blocks (recorded, not ruled).** An after-subgroup hook, a
   before-group hook, a schema `note` row drawn dim and full width and skipped by `/list`, and a
