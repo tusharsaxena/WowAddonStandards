@@ -22,6 +22,7 @@ Each addon lives in its own repository, as a **sibling folder** next to this rep
 | Ka0s Combat Trail | `../../CombatTrail/` | https://github.com/tusharsaxena/CombatTrail | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the DPS HUD) | test | next to Test mode |
 | Ka0s Consumable Master | `../../ConsumableMaster/` | https://github.com/tusharsaxena/ConsumableMaster | Retail · Forever | Enabled · Locked (the macro bar) | unlock | none |
 | Ka0s Drop Watcher | `../../DropWatcher/` | https://github.com/tusharsaxena/DropWatcher | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the drop feed) | test | next to Test mode |
+| Ka0s Item Search | `../../ItemSearch/` | https://github.com/tusharsaxena/ItemSearch | Forever | Enabled · Locked · Test mode · Show window (the Item Search window) | test | none |
 | Ka0s KickCD | `../../KickCD/` | https://github.com/tusharsaxena/KickCD | Retail · Forever | Enabled · Locked · Sim mode | unlock | next to Lock frame |
 | Ka0s Skin Tester | `../../LibKa0sSkinTester/` | https://github.com/tusharsaxena/LibKa0sSkinTester | Retail · Forever | Enabled · Show window (the skin showroom) | window (the skin showroom) | none |
 | Ka0s Loot History | `../../LootHistory/` | https://github.com/tusharsaxena/LootHistory | Retail · Forever | Enabled · Locked · Test mode · Sim mode · Show window (the History browser) | test | next to Test mode |
