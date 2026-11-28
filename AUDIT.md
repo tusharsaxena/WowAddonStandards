@@ -511,7 +511,9 @@ Assign the addon a prefix on its first audit and reuse it thereafter.
      gated by `Compat.ForClient`) and says in its row or tooltip that it needs ForeverDB; the suite
      covers it on the kit's `mock_foreverdb` presets and proves it absent under the Retail profile; and
      `docs/performance.md` records the data addon's size and first-use load. Any miss is a MUST finding
-     (#130; a copied row, #129).
+     (#130; a copied row, #129). A `Forever` roster row is the exception for two of those (v2.122.0):
+     its TOC gate (`clients-§9`) is the registration gate, so no `clients = { "forever" }` declaration
+     and no Retail-profile absence case are owed, and their absence is not a finding.
    - **`X-Curse-Project-ID` on an unpublished addon is not a deviation (`toc-file-§1`).** If the
      field is absent and the TOC carries a comment in its position saying the addon is not published
      yet, that is **compliant** — record it as such and file nothing. A placeholder, invented, or
